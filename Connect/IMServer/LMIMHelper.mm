@@ -208,7 +208,7 @@ extern "C"{
 
 #pragma mark -AES
 
-+ (NSDictionary *)xtalkEncodeAES_gcm:(NSString *)password data:(NSString *)dataStr aad:(NSString *)aad iv:(NSString *)iv {
++ (NSDictionary *)xtalkEncodeAES_GCM:(NSString *)password data:(NSString *)dataStr aad:(NSString *)aad iv:(NSString *)iv {
 
     unsigned char *encryptedData;
 
@@ -275,7 +275,7 @@ extern "C"{
 }
 
 
-+ (NSDictionary *)xtalkEncodeAES_imWithPassword:(NSData *)password originData:(NSData *)data aad:(NSData *)aad {
++ (NSDictionary *)xtalkEncodeAES_GCMWithPassword:(NSData *)password originData:(NSData *)data aad:(NSData *)aad {
 
     if (!data || data.length <= 0 || !password || password.length <= 0 || !aad || aad.length <= 0) {
         return nil;
@@ -328,7 +328,7 @@ extern "C"{
 }
 
 
-+ (NSDictionary *)xtalkEncodeAES_gcm:(NSString *)password withNSdata:(NSData *)data aad:(NSString *)aad iv:(NSString *)iv {
++ (NSDictionary *)xtalkEncodeAES_GCM:(NSString *)password withNSdata:(NSData *)data aad:(NSString *)aad iv:(NSString *)iv {
 
     if (!data) {
         return nil;
