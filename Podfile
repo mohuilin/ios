@@ -12,10 +12,13 @@ target 'Connect' do
     pod 'libPhoneNumber-iOS', '~> 0.8'
     pod 'FMDBMigrationManager'
     pod 'FMDB'
+    pod 'Realm'
 end
 target :'ConnectTests' do
     pod 'Kiwi'
+    pod 'Realm/Headers'
 end
 target :'ConnectUITests' do
   pod 'Kiwi'
+  pod 'Realm/Headers'
 end
