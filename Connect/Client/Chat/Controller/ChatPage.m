@@ -158,12 +158,6 @@
     [LMConversionManager sharedManager].conversationListDelegate = self;
     [[LMConversionManager sharedManager] getAllConversationFromDB];
     
-    LMRecentChat *model = [LMRecentChat new];
-    model.identifier = @"321";
-    model.identifier2 = @"1";
-    model.isTopChat = YES;
-    model.unReadCount = 10000;
-    [LMRealmDBManager saveRecentChat:model];
 }
 
 #pragma mark - LMConversionListChangeManagerDelegate

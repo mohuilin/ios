@@ -14,6 +14,7 @@
 #import "ConnectTool.h"
 #import "LMBaseSSDBManager.h"
 #import "LMConversionManager.h"
+#import "LMRealmDBManager.h"
 
 
 static RecentChatDBManager *manager = nil;
@@ -100,6 +101,12 @@ static RecentChatDBManager *manager = nil;
 
 - (NSArray *)getAllRecentChat {
 
+    if (REALMDBWAY) {
+        DDLogInfo(@"realm db");
+    } else {
+        DDLogInfo(@"sqllite db");
+    }
+    
     NSString *querySql = @"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier order by c.last_time desc";
     NSArray *resultArray = [self queryWithSql:querySql];
     NSMutableArray *recentChatArrayM = [NSMutableArray array];
@@ -123,6 +130,24 @@ static RecentChatDBManager *manager = nil;
     
     //sort
     [recentChatArrayM sortUsingSelector:@selector(comparedata:)];
+    
+    for (RecentChatModel *recentModel in recentChatArrayM) {
+        LMRecentChat *model = [LMRecentChat new];
+        model.identifier = recentModel.identifier;
+        model.name = recentModel.name;
+        model.headUrl = recentModel.headUrl;
+        model.time = recentModel.time;
+        model.content = recentModel.content;
+        model.isTopChat = recentModel.isTopChat;
+        model.stranger = recentModel.stranger;
+        model.notifyStatus = recentModel.notifyStatus;
+        model.groupNoteMyself = recentModel.groupNoteMyself;
+        model.snapChatDeleteTime = recentModel.snapChatDeleteTime;
+        model.unReadCount = recentModel.unReadCount;
+        model.talkType = (int)recentModel.talkType;
+        model.draft = recentModel.draft;
+        [LMRealmDBManager saveRecentChat:model];
+    }
     
     return recentChatArrayM;
 }

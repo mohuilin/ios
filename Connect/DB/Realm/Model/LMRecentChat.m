@@ -14,8 +14,4 @@
     return @"identifier";
 }
 
-+ (NSArray<NSString *> *)indexedProperties{
-    return @[@"identifier2",@"identifier"];
-}
-
 @end
