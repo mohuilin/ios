@@ -778,6 +778,9 @@
 		D95C04921E810902006C5C8A /* GJGCRefreshHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = D95C042E1E810902006C5C8A /* GJGCRefreshHeaderView.m */; };
 		D95C04931E810902006C5C8A /* LKAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = D95C04301E810902006C5C8A /* LKAnnotation.m */; };
 		D95C04971E810902006C5C8A /* MemberHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = D95C04371E810902006C5C8A /* MemberHeaderView.m */; };
+		D96104141EF7B453001A0998 /* LMBaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D96104131EF7B453001A0998 /* LMBaseModel.m */; };
+		D961041D1EF7D5DF001A0998 /* LMRealmDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D961041C1EF7D5DF001A0998 /* LMRealmDBManager.m */; };
+		D96104201EF7D5F0001A0998 /* LMRecentChat.m in Sources */ = {isa = PBXBuildFile; fileRef = D961041F1EF7D5F0001A0998 /* LMRecentChat.m */; };
 		D9615C481D34992300987F40 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9615C471D34992300987F40 /* Accelerate.framework */; };
 		D97A137C1DBB3544007DADA9 /* libleveldb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D97A13781DBB3544007DADA9 /* libleveldb-ios.a */; };
 		D97A137D1DBB3544007DADA9 /* libsnappy-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D97A13791DBB3544007DADA9 /* libsnappy-ios.a */; };
@@ -2456,6 +2459,12 @@
 		D95C04361E810902006C5C8A /* MemberHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemberHeaderView.h; sourceTree = "<group>"; };
 		D95C04371E810902006C5C8A /* MemberHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MemberHeaderView.m; sourceTree = "<group>"; };
 		D95C07271E8109A6006C5C8A /* ChatLibHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatLibHeader.h; sourceTree = "<group>"; };
+		D96104121EF7B453001A0998 /* LMBaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseModel.h; sourceTree = "<group>"; };
+		D96104131EF7B453001A0998 /* LMBaseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBaseModel.m; sourceTree = "<group>"; };
+		D961041B1EF7D5DF001A0998 /* LMRealmDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRealmDBManager.h; sourceTree = "<group>"; };
+		D961041C1EF7D5DF001A0998 /* LMRealmDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRealmDBManager.m; sourceTree = "<group>"; };
+		D961041E1EF7D5F0001A0998 /* LMRecentChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRecentChat.h; sourceTree = "<group>"; };
+		D961041F1EF7D5F0001A0998 /* LMRecentChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRecentChat.m; sourceTree = "<group>"; };
 		D9615C471D34992300987F40 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		D97A136E1DBB3544007DADA9 /* binlog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binlog.h; sourceTree = "<group>"; };
 		D97A136F1DBB3544007DADA9 /* const.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = const.h; sourceTree = "<group>"; };
@@ -12923,6 +12932,7 @@
 		D9222D411E82283400D67110 /* DB */ = {
 			isa = PBXGroup;
 			children = (
+				D96104101EF7B3D6001A0998 /* Realm */,
 				D95488E91E9CC0EC00F200DF /* DataMigartion */,
 				D9222D541E82283400D67110 /* Migration */,
 				D9222D441E82283400D67110 /* BaseDB.h */,
@@ -15244,6 +15254,27 @@
 				D95C04141E810901006C5C8A /* LMMessageTextView.m */,
 			);
 			path = ChatInputPanel;
+			sourceTree = "<group>";
+		};
+		D96104101EF7B3D6001A0998 /* Realm */ = {
+			isa = PBXGroup;
+			children = (
+				D96104111EF7B40F001A0998 /* Model */,
+				D961041B1EF7D5DF001A0998 /* LMRealmDBManager.h */,
+				D961041C1EF7D5DF001A0998 /* LMRealmDBManager.m */,
+			);
+			path = Realm;
+			sourceTree = "<group>";
+		};
+		D96104111EF7B40F001A0998 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D961041E1EF7D5F0001A0998 /* LMRecentChat.h */,
+				D961041F1EF7D5F0001A0998 /* LMRecentChat.m */,
+				D96104121EF7B453001A0998 /* LMBaseModel.h */,
+				D96104131EF7B453001A0998 /* LMBaseModel.m */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		D97A136B1DBB3544007DADA9 /* ssdb */ = {
@@ -32988,6 +33019,7 @@
 				192351321E8121CB0022D844 /* lmPayView.m in Sources */,
 				192350BE1E81213F0022D844 /* LMTranFriendLsitViewController.m in Sources */,
 				D9222FC11E822A3100D67110 /* NSObject+YYAdd.m in Sources */,
+				D96104201EF7D5F0001A0998 /* LMRecentChat.m in Sources */,
 				F17114DB1E9C80890000E270 /* LMPayCheck.m in Sources */,
 				192352A51E81275B0022D844 /* RedPacketHistoryCell.m in Sources */,
 				D92233361E83DBC300D67110 /* WallteNetWorkTool.m in Sources */,
@@ -33097,6 +33129,7 @@
 				D94BE0581EBC7252008BEB0B /* LMNotificationDefine.m in Sources */,
 				D9B084CC1E810DDC0067EC4A /* MyInfoPage.m in Sources */,
 				D9222FC41E822A3100D67110 /* NSString+YYAdd.m in Sources */,
+				D961041D1EF7D5DF001A0998 /* LMRealmDBManager.m in Sources */,
 				D95C04741E810902006C5C8A /* GJGCChatInputExpandMenuPanel.m in Sources */,
 				192350171E811D3E0022D844 /* BottomLineTextField.m in Sources */,
 				19234F801E8117020022D844 /* FriendTransactionHisPage.m in Sources */,
@@ -33176,6 +33209,7 @@
 				19234F571E8114220022D844 /* LocalUserInfoView.m in Sources */,
 				D9222F851E822A3000D67110 /* MASViewAttribute.m in Sources */,
 				F1CC2E941E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m in Sources */,
+				D96104141EF7B453001A0998 /* LMBaseModel.m in Sources */,
 				D9B084C81E810DDC0067EC4A /* ImageClipViewController.m in Sources */,
 				D92232701E822BF800D67110 /* UIBarButtonItem+WZLBadge.m in Sources */,
 				19234F6A1E81160A0022D844 /* LinkmanPage.m in Sources */,
