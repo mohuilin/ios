@@ -11,6 +11,8 @@
 
 @interface LMRealmDBManager : NSObject
 
-+ (void)saveRecentChat:(LMRecentChat *)recentChat;
++ (void)migartion;
+
++ (void)saveInfo:(LMBaseModel *)ramModel;
 
 @end

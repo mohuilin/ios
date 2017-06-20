@@ -1,22 +1,17 @@
 //
-//  LMBaseModel.m
+//  RLMRealm+LMRLMRealm.m
 //  Connect
 //
-//  Created by MoHuilin on 2017/6/19.
+//  Created by MoHuilin on 2017/6/20.
 //  Copyright © 2017年 Connect. All rights reserved.
 //
 
-#import "LMBaseModel.h"
+#import "RLMRealm+LMRLMRealm.h"
 
-@implementation LMBaseModel
+@implementation RLMRealm (LMRLMRealm)
 
-+ (void)initialize{
-    [self setDefaultRealm];
-}
-
-+ (void)setDefaultRealm {
++ (RLMRealm *)defaultLoginUserRealm{
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-
     NSArray *docPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *path = [docPath objectAtIndex:0];
     NSString *fileName = [NSString stringWithFormat:@"%@.realm",[[LKUserCenter shareCenter] currentLoginUser].address];
@@ -26,19 +21,12 @@
     config.fileURL = [NSURL URLWithString:filePath];
     config.readOnly = NO;
     config.schemaVersion = 1.0;
+    config.migrationBlock = ^(RLMMigration *migration , uint64_t oldSchemaVersion) {
+        
+    };
     // Set this as the configuration used for the default Realm
     [RLMRealmConfiguration setDefaultConfiguration:config];
-}
-
-+ (NSString *)primaryKey{
-    return @"ID";
-}
-
-+ (NSDictionary *)defaultPropertyValues{
-    NSString *ID = [NSString stringWithFormat:@"%lld",(long long)[[NSDate date] timeIntervalSince1970]];
-    return @{
-        @"ID":ID
-             };
+    return [self realmWithConfiguration:config error:nil];
 }
 
 @end

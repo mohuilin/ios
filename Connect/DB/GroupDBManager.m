@@ -7,7 +7,8 @@
 //
 
 #import "GroupDBManager.h"
-
+#import "LMRamGroupInfo.h"
+#import "LMRealmDBManager.h"
 
 #define GroupInformationTable  @"t_group"
 #define GroupMemberTable       @"t_group_Member"
@@ -355,26 +356,31 @@ static GroupDBManager *manager = nil;
 
 
 - (NSArray *)getAllgroups {
-    NSArray *groupArray = [self getDatasFromTableName:GroupInformationTable conditions:nil fields:@[GroupInformation]];
-    if (groupArray.count <= 0) {
-        return nil;
+    if (!REALMDBWAY) {
+        
+    } else {
+        NSArray *groupArray = [self getDatasFromTableName:GroupInformationTable conditions:nil fields:@[GroupInformation]];
+        if (groupArray.count <= 0) {
+            return nil;
+        }
+        NSMutableArray *groupsArray = [NSMutableArray array];
+        for (NSDictionary *dict in groupArray) {
+            LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
+            lmGroup.groupIdentifer = [dict safeObjectForKey:@"identifier"];
+            lmGroup.groupName = [dict safeObjectForKey:@"name"];
+            lmGroup.groupEcdhKey = [dict safeObjectForKey:@"ecdh_key"];
+            lmGroup.isCommonGroup = [[dict safeObjectForKey:@"common"] boolValue];
+            lmGroup.isGroupVerify = [[dict safeObjectForKey:@"verify"] boolValue];
+            lmGroup.isPublic = [[dict safeObjectForKey:@"pub"] boolValue];
+            lmGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
+            lmGroup.summary = [dict safeObjectForKey:@"summary"];
+            lmGroup.groupMembers = [self getgroupMemberByGroupIdentifier:lmGroup.groupIdentifer];
+            lmGroup.admin = [lmGroup.groupMembers firstObject];
+            [groupsArray objectAddObject:lmGroup];
+        }
+        return groupsArray;
     }
-    NSMutableArray *groupsArray = [NSMutableArray array];
-    for (NSDictionary *dict in groupArray) {
-        LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
-        lmGroup.groupIdentifer = [dict safeObjectForKey:@"identifier"];
-        lmGroup.groupName = [dict safeObjectForKey:@"name"];
-        lmGroup.groupEcdhKey = [dict safeObjectForKey:@"ecdh_key"];
-        lmGroup.isCommonGroup = [[dict safeObjectForKey:@"common"] boolValue];
-        lmGroup.isGroupVerify = [[dict safeObjectForKey:@"verify"] boolValue];
-        lmGroup.isPublic = [[dict safeObjectForKey:@"pub"] boolValue];
-        lmGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
-        lmGroup.summary = [dict safeObjectForKey:@"summary"];
-        lmGroup.groupMembers = [self getgroupMemberByGroupIdentifier:lmGroup.groupIdentifer];
-        lmGroup.admin = [lmGroup.groupMembers firstObject];
-        [groupsArray objectAddObject:lmGroup];
-    }
-    return groupsArray;
+    return nil;
 }
 
 - (BOOL)isGroupPublic:(NSString *)groupid {
