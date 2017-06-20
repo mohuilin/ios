@@ -7,24 +7,23 @@
 //
 
 #import "LMRealmDBManager.h"
+#import "MMGlobal.h"
 
 @implementation LMRealmDBManager
 
-+ (void)saveRecentChat:(LMRecentChat *)recentChat{
-    NSArray *docPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *path = [docPath objectAtIndex:0];
-    NSString *fileName = [NSString stringWithFormat:@"%@.realm",[[LKUserCenter shareCenter] currentLoginUser].address];
-    NSString *filePath = [path stringByAppendingPathComponent:fileName];
-    NSLog(@"数据库目录 = %@",filePath);
++ (void)migartion{
+    NSString *olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key.sha256String];
+    if (GJCFFileIsExist(olddbPath)) {
     
-    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.fileURL = [NSURL URLWithString:filePath];
-    config.readOnly = NO;
-    config.schemaVersion = 1.0;
-    config.migrationBlock = ^(RLMMigration *migration , uint64_t oldSchemaVersion) {
-        
-    };
-    [RLMRealmConfiguration setDefaultConfiguration:config];
+    } else {
+        olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
+        if (GJCFFileIsExist(olddbPath)) {
+            
+        }
+    }
+}
+
++ (void)saveRecentChat:(LMRecentChat *)recentChat{
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         RLMRealm *realm = [RLMRealm defaultRealm];
         // Updating book with id = 1

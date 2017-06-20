@@ -10,18 +10,18 @@
 
 @interface LMRecentChat : LMBaseModel
 
-@property(nonatomic, copy) NSString *headUrl;
-@property(nonatomic, copy) NSString *name;
-@property(nonatomic, copy) NSString *time;
-@property(nonatomic, copy) NSString *content;
-@property(nonatomic, copy) NSString *identifier;
-@property(nonatomic, copy) NSString *draft;
-@property(nonatomic, assign) BOOL isTopChat;
-@property(nonatomic, assign) BOOL stranger;
-@property(nonatomic, assign) BOOL notifyStatus;
-@property(nonatomic ,assign) BOOL groupNoteMyself;
-@property(nonatomic, assign) int unReadCount;
-@property(nonatomic, assign) int snapChatDeleteTime;
-@property(nonatomic, assign) int talkType;
+@property NSString *headUrl;
+@property NSString *name;
+@property NSString *time;
+@property NSString *content;
+@property NSString *identifier;
+@property NSString *draft;
+@property BOOL isTopChat;
+@property BOOL stranger;
+@property BOOL notifyStatus;
+@property BOOL groupNoteMyself;
+@property int unReadCount;
+@property int snapChatDeleteTime;
+@property int talkType;
 
 @end

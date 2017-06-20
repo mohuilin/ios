@@ -781,6 +781,7 @@
 		D96104141EF7B453001A0998 /* LMBaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D96104131EF7B453001A0998 /* LMBaseModel.m */; };
 		D961041D1EF7D5DF001A0998 /* LMRealmDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D961041C1EF7D5DF001A0998 /* LMRealmDBManager.m */; };
 		D96104201EF7D5F0001A0998 /* LMRecentChat.m in Sources */ = {isa = PBXBuildFile; fileRef = D961041F1EF7D5F0001A0998 /* LMRecentChat.m */; };
+		D96104231EF923E9001A0998 /* RLMRealm+LMRLMRealm.m in Sources */ = {isa = PBXBuildFile; fileRef = D96104221EF923E9001A0998 /* RLMRealm+LMRLMRealm.m */; };
 		D9615C481D34992300987F40 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9615C471D34992300987F40 /* Accelerate.framework */; };
 		D97A137C1DBB3544007DADA9 /* libleveldb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D97A13781DBB3544007DADA9 /* libleveldb-ios.a */; };
 		D97A137D1DBB3544007DADA9 /* libsnappy-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D97A13791DBB3544007DADA9 /* libsnappy-ios.a */; };
@@ -2465,6 +2466,8 @@
 		D961041C1EF7D5DF001A0998 /* LMRealmDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRealmDBManager.m; sourceTree = "<group>"; };
 		D961041E1EF7D5F0001A0998 /* LMRecentChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRecentChat.h; sourceTree = "<group>"; };
 		D961041F1EF7D5F0001A0998 /* LMRecentChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRecentChat.m; sourceTree = "<group>"; };
+		D96104211EF923E9001A0998 /* RLMRealm+LMRLMRealm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RLMRealm+LMRLMRealm.h"; sourceTree = "<group>"; };
+		D96104221EF923E9001A0998 /* RLMRealm+LMRLMRealm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RLMRealm+LMRLMRealm.m"; sourceTree = "<group>"; };
 		D9615C471D34992300987F40 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		D97A136E1DBB3544007DADA9 /* binlog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binlog.h; sourceTree = "<group>"; };
 		D97A136F1DBB3544007DADA9 /* const.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = const.h; sourceTree = "<group>"; };
@@ -15262,6 +15265,8 @@
 				D96104111EF7B40F001A0998 /* Model */,
 				D961041B1EF7D5DF001A0998 /* LMRealmDBManager.h */,
 				D961041C1EF7D5DF001A0998 /* LMRealmDBManager.m */,
+				D96104211EF923E9001A0998 /* RLMRealm+LMRLMRealm.h */,
+				D96104221EF923E9001A0998 /* RLMRealm+LMRLMRealm.m */,
 			);
 			path = Realm;
 			sourceTree = "<group>";
@@ -15269,10 +15274,10 @@
 		D96104111EF7B40F001A0998 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				D961041E1EF7D5F0001A0998 /* LMRecentChat.h */,
-				D961041F1EF7D5F0001A0998 /* LMRecentChat.m */,
 				D96104121EF7B453001A0998 /* LMBaseModel.h */,
 				D96104131EF7B453001A0998 /* LMBaseModel.m */,
+				D961041E1EF7D5F0001A0998 /* LMRecentChat.h */,
+				D961041F1EF7D5F0001A0998 /* LMRecentChat.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -33302,6 +33307,7 @@
 				D9222FE31E822A3100D67110 /* YYImageCache.m in Sources */,
 				192351311E8121CB0022D844 /* LMNumberTextField.m in Sources */,
 				D95C04921E810902006C5C8A /* GJGCRefreshHeaderView.m in Sources */,
+				D96104231EF923E9001A0998 /* RLMRealm+LMRLMRealm.m in Sources */,
 				D95C04551E810902006C5C8A /* GroupMembersCell.m in Sources */,
 				D95C03751E8108D8006C5C8A /* PlayViewController.m in Sources */,
 				D95488F91E9CD53200F200DF /* LMDataMigrationHelper.m in Sources */,
