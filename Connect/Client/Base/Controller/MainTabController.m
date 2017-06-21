@@ -33,6 +33,8 @@
 #import "RecentChatDBManager.h"
 #import "GJGCChatGroupViewController.h"
 #import "NSMutableArray+MoveObject.h"
+#import "LMRealmDBManager.h"
+
 @interface MainTabController (){
     dispatch_source_t _timer;
 }
@@ -120,6 +122,9 @@
     
     //Database migration
     [BaseDB migrationWithUserPublicKey:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
+    [LMRealmDBManager dataMigrationWithComplete:^(CGFloat progress) {
+        
+    }];
     //start imserver
     [[IMService instance] start];
     
