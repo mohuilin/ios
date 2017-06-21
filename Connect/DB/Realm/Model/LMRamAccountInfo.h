@@ -7,7 +7,7 @@
 //
 
 #import "LMBaseModel.h"
-
+@class LMRamGroupInfo;
 @interface LMRamAccountInfo : LMBaseModel
 
 @property  NSString *identifier;
@@ -18,6 +18,8 @@
 @property  NSString *groupNicksName;
 @property  NSString *pubKey;
 @property  BOOL isGroupAdmin;
-@property  NSString *currentTime;
+@property  NSString *univerStr;
 
 @end
+
+RLM_ARRAY_TYPE(LMRamAccountInfo)

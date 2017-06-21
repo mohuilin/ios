@@ -10,7 +10,7 @@
 
 @interface LMRamMessageInfo : LMBaseModel
 
-@property NSInteger ID;
+@property NSInteger iD;
 @property NSString *messageId;
 @property NSString *messageOwer;
 @property NSString *content;

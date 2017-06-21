@@ -7,10 +7,10 @@
 //
 
 #import "LMRamAccountInfo.h"
-
+#import "LMRamGroupInfo.h"
 @implementation LMRamAccountInfo
 +(NSString *)primaryKey {
     
-    return @"currentTime";
+    return @"univerStr";
 }
 @end

@@ -173,7 +173,7 @@ static FMDatabaseQueue *queue;
     NSMutableArray *temM = [NSMutableArray array];
     for (NSDictionary *temD in resultArray) {
         LMRamMessageInfo *chatMessage = [[LMRamMessageInfo alloc] init];
-        chatMessage.ID = [[temD safeObjectForKey:@"id"] integerValue];
+        chatMessage.iD = [[temD safeObjectForKey:@"id"] integerValue];
         chatMessage.messageOwer = [temD safeObjectForKey:@"message_ower"];
         chatMessage.messageId = [temD safeObjectForKey:@"message_id"];
         chatMessage.createTime = [[temD safeObjectForKey:@"createtime"] integerValue];
@@ -252,24 +252,20 @@ static FMDatabaseQueue *queue;
     NSString *querySql = @"select * from t_group_member";
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *mutableMembers = [NSMutableArray array];
-    long long indexNumber = 0;
-    long long currenetTime = [[NSDate date] timeIntervalSince1970] * 1000;
     LMRamAccountInfo *admin = nil;
     for (NSDictionary *dic in resultArray) {
-        indexNumber ++;
-        NSString *currentString = [NSString stringWithFormat:@"%lld",(currenetTime + indexNumber)];
         LMRamAccountInfo *accountInfo = [[LMRamAccountInfo alloc] init];
         accountInfo.username = [dic safeObjectForKey:@"username"];
         accountInfo.identifier = [dic safeObjectForKey:@"identifier"];
         accountInfo.avatar = [dic safeObjectForKey:@"avatar"];
         accountInfo.address = [dic safeObjectForKey:@"address"];
-        accountInfo.currentTime = currentString;
         NSString *remark = [dic valueForKey:@"remarks"];
         if (GJCFStringIsNull(remark) || [remark isEqual:[NSNull null]]) {
             accountInfo.groupNicksName = [dic safeObjectForKey:@"nick"];
         } else {
             accountInfo.groupNicksName = remark;
         }
+        accountInfo.univerStr = [NSString stringWithFormat:@"%@%@",accountInfo.address,accountInfo.identifier];
         accountInfo.roleInGroup = [[dic safeObjectForKey:@"role"] intValue];
         accountInfo.pubKey = [dic safeObjectForKey:@"pub_key"];
         if (accountInfo.roleInGroup == 1) {
@@ -295,18 +291,33 @@ static FMDatabaseQueue *queue;
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *groupsArray = [NSMutableArray array];
     for (NSDictionary *dict in resultArray) {
-        LMRamGroupInfo *lmGroup = [[LMRamGroupInfo alloc] init];
-        lmGroup.groupIdentifer = [dict safeObjectForKey:@"identifier"];
-        lmGroup.groupName = [dict safeObjectForKey:@"name"];
-        lmGroup.groupEcdhKey = [dict safeObjectForKey:@"ecdh_key"];
-        lmGroup.isCommonGroup = [[dict safeObjectForKey:@"common"] boolValue];
-        lmGroup.isGroupVerify = [[dict safeObjectForKey:@"verify"] boolValue];
-        lmGroup.isPublic = [[dict safeObjectForKey:@"pub"] boolValue];
-        lmGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
-        lmGroup.summary = [dict safeObjectForKey:@"summary"];
-        //        lmGroup.groupMembers = [self getgroupMemberByGroupIdentifier:lmGroup.groupIdentifer];
-        //        lmGroup.admin = [lmGroup.groupMembers firstObject];
-        [groupsArray objectAddObject:lmGroup];
+        
+        LMRamGroupInfo *ramGroup = [[LMRamGroupInfo alloc] init];
+        ramGroup.groupIdentifer = [dict safeObjectForKey:@"identifier"];
+        ramGroup.groupName = [dict safeObjectForKey:@"name"];
+        ramGroup.groupEcdhKey = [dict safeObjectForKey:@"ecdh_key"];
+        ramGroup.isCommonGroup = [[dict safeObjectForKey:@"common"] boolValue];
+        ramGroup.isGroupVerify = [[dict safeObjectForKey:@"verify"] boolValue];
+        ramGroup.isPublic = [[dict safeObjectForKey:@"pub"] boolValue];
+        ramGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
+        ramGroup.summary = [dict safeObjectForKey:@"summary"];
+        NSMutableArray *memberArray = [self getgroupMemberByGroupIdentifier:ramGroup.groupIdentifer];
+        NSMutableArray <LMRamAccountInfo *> *ramMemberArray = [NSMutableArray array];
+        for (AccountInfo *info in memberArray) {
+            LMRamAccountInfo *ramInfo = [LMRamAccountInfo new];
+            ramInfo.identifier = ramGroup.groupIdentifer;
+            ramInfo.username = info.username;
+            ramInfo.avatar = info.avatar;
+            ramInfo.address = info.address;
+            ramInfo.roleInGroup = info.roleInGroup;
+            ramInfo.groupNicksName = info.groupNickName;
+            ramInfo.pubKey = info.pub_key;
+            ramInfo.isGroupAdmin = info.isGroupAdmin;
+            ramInfo.univerStr = [NSString stringWithFormat:@"%@%@",ramInfo.address,ramGroup.groupIdentifer];
+            [ramMemberArray addObject:ramInfo];
+        }
+        [ramGroup.membersArray addObjects:ramMemberArray];
+        [groupsArray objectAddObject:ramGroup];
     }
     if (groupsArray.count > 0) {
         [self realmAddObject:groupsArray];
@@ -314,6 +325,43 @@ static FMDatabaseQueue *queue;
     return YES;
     
 }
++ (NSMutableArray *)getgroupMemberByGroupIdentifier:(NSString *)groupid {
+    if (GJCFStringIsNull(groupid)) {
+        return nil;
+    }
+    NSArray *memberArray = [self recentQueryWithSql:[NSString stringWithFormat:@"select gm.username,gm.avatar,gm.pub_key,gm.address,gm.role,gm.nick,c.remark from t_group_Member as gm left join t_contact as c on c.pub_key = gm.pub_key where gm.identifier = '%@'", groupid]];
+    if (memberArray.count <= 0) {
+        return nil;
+    }
+    NSMutableArray *mutableMembers = [NSMutableArray array];
+    AccountInfo *admin = nil;
+    for (NSDictionary *dic in memberArray) {
+        AccountInfo *accountInfo = [[AccountInfo alloc] init];
+        accountInfo.username = [dic safeObjectForKey:@"username"];
+        accountInfo.avatar = [dic safeObjectForKey:@"avatar"];
+        accountInfo.address = [dic safeObjectForKey:@"address"];
+        NSString *remark = [dic valueForKey:@"remarks"];
+        if (GJCFStringIsNull(remark) || [remark isEqual:[NSNull null]]) {
+            accountInfo.groupNickName = [dic safeObjectForKey:@"nick"];
+        } else {
+            accountInfo.groupNickName = remark;
+        }
+        accountInfo.roleInGroup = [[dic safeObjectForKey:@"role"] intValue];
+        accountInfo.pub_key = [dic safeObjectForKey:@"pub_key"];
+        if (accountInfo.roleInGroup == 1) {
+            admin = accountInfo;
+            accountInfo.isGroupAdmin = YES;
+        } else {
+            [mutableMembers objectAddObject:accountInfo];
+        }
+    }
+    
+    if (admin) {
+        [mutableMembers objectInsert:admin atIndex:0];
+    }
+    return mutableMembers;
+}
+
 + (BOOL)saveRecentChatToRealm{
     //query
     NSString *querySql = @"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier order by c.last_time desc";
