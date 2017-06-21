@@ -89,7 +89,7 @@ static FMDatabaseQueue *queue;
                             complete(0.5);
                         }
                     }
-                    //t_addressbook
+                    //t_friend
                     if ([self friendRequestNewDataMigration]) {
                         if (complete) {
                             complete(0.5);
