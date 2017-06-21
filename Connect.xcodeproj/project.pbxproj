@@ -1016,6 +1016,7 @@
 		F17CBE2F1ED40C700067234D /* LMselectCountryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */; };
 		F17CBE321ED536920067234D /* LMDisplayProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE311ED536920067234D /* LMDisplayProgressView.m */; };
 		F1ADBAF01EF90C3500570DF6 /* LMRamGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */; };
+		F1ADBAF31EF97F6500570DF6 /* LMRamAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */; };
 		F1B363D21E85255600B65086 /* LMSearchTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F1B363D11E85255600B65086 /* LMSearchTextField.m */; };
 		F1CC2E941E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2E931E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m */; };
 		F1CC2ED91E95F0BA0045FBB7 /* NSArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2ED81E95F0BA0045FBB7 /* NSArray+LMSafeMethod.m */; };
@@ -12565,6 +12566,8 @@
 		F198A98B1EAF6048008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F1ADBAEE1EF90C3500570DF6 /* LMRamGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamGroupInfo.h; sourceTree = "<group>"; };
 		F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamGroupInfo.m; sourceTree = "<group>"; };
+		F1ADBAF11EF97F6500570DF6 /* LMRamAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamAccountInfo.h; sourceTree = "<group>"; };
+		F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamAccountInfo.m; sourceTree = "<group>"; };
 		F1B363D01E85255600B65086 /* LMSearchTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSearchTextField.h; sourceTree = "<group>"; };
 		F1B363D11E85255600B65086 /* LMSearchTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMSearchTextField.m; sourceTree = "<group>"; };
 		F1CC2E921E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+LMSafeMethod.h"; sourceTree = "<group>"; };
@@ -15283,6 +15286,8 @@
 				F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */,
 				D961041E1EF7D5F0001A0998 /* LMRecentChat.h */,
 				D961041F1EF7D5F0001A0998 /* LMRecentChat.m */,
+				F1ADBAF11EF97F6500570DF6 /* LMRamAccountInfo.h */,
+				F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -32952,6 +32957,7 @@
 				D92232E81E822BF900D67110 /* GJCFCoreTextRun.m in Sources */,
 				D95845211ECAF970004C8984 /* LMMessageAdapter.m in Sources */,
 				192352A21E81275B0022D844 /* LMRootModel.m in Sources */,
+				F1ADBAF31EF97F6500570DF6 /* LMRamAccountInfo.m in Sources */,
 				D92232E31E822BF900D67110 /* GJCFAssetsPreviewController.m in Sources */,
 				D92232B31E822BF800D67110 /* Language.m in Sources */,
 				19234F6F1E81160A0022D844 /* SearchResultController.m in Sources */,

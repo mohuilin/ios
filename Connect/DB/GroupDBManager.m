@@ -9,6 +9,7 @@
 #import "GroupDBManager.h"
 #import "LMRamGroupInfo.h"
 #import "LMRealmDBManager.h"
+#import "LMRamAccountInfo.h"
 
 #define GroupInformationTable  @"t_group"
 #define GroupMemberTable       @"t_group_Member"
@@ -343,6 +344,37 @@ static GroupDBManager *manager = nil;
         [mutableMembers objectInsert:admin atIndex:0];
     }
     return mutableMembers;
+    
+    
+    NSString *selectName = [NSString stringWithFormat:@"identifier = %@",groupid];
+    RLMResults<LMRamAccountInfo *> *ramAccountInfoResults = [LMRamAccountInfo objectsWhere:selectName];
+    for (LMRamAccountInfo *ramAccountInfo in ramAccountInfoResults) {
+        AccountInfo *accountInfo = [[AccountInfo alloc] init];
+        accountInfo.username = ramAccountInfo.username;
+        accountInfo.avatar = ramAccountInfo.avatar;
+        accountInfo.address = ramAccountInfo.address;
+        NSString *remark = ramAccountInfo.remarks;
+        if (GJCFStringIsNull(remark) || [remark isEqual:[NSNull null]]) {
+            accountInfo.groupNickName = ramAccountInfo.nick;
+        } else {
+            accountInfo.groupNickName = remark;
+        }
+        accountInfo.roleInGroup = ramAccountInfo.roleInGroup;
+        accountInfo.pub_key = ramAccountInfo.pub_key;
+        if (accountInfo.roleInGroup == 1) {
+            admin = accountInfo;
+            accountInfo.isGroupAdmin = YES;
+        } else {
+            [mutableMembers objectAddObject:accountInfo];
+        }
+
+    }
+    if (admin) {
+        [mutableMembers objectInsert:admin atIndex:0];
+    }
+    return mutableMembers;
+    
+    
 }
 
 - (NSString *)getGroupEcdhKeyByGroupIdentifier:(NSString *)groupid {
@@ -356,31 +388,51 @@ static GroupDBManager *manager = nil;
 
 
 - (NSArray *)getAllgroups {
-    if (!REALMDBWAY) {
-        
-    } else {
-        NSArray *groupArray = [self getDatasFromTableName:GroupInformationTable conditions:nil fields:@[GroupInformation]];
-        if (groupArray.count <= 0) {
-            return nil;
-        }
-        NSMutableArray *groupsArray = [NSMutableArray array];
-        for (NSDictionary *dict in groupArray) {
-            LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
-            lmGroup.groupIdentifer = [dict safeObjectForKey:@"identifier"];
-            lmGroup.groupName = [dict safeObjectForKey:@"name"];
-            lmGroup.groupEcdhKey = [dict safeObjectForKey:@"ecdh_key"];
-            lmGroup.isCommonGroup = [[dict safeObjectForKey:@"common"] boolValue];
-            lmGroup.isGroupVerify = [[dict safeObjectForKey:@"verify"] boolValue];
-            lmGroup.isPublic = [[dict safeObjectForKey:@"pub"] boolValue];
-            lmGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
-            lmGroup.summary = [dict safeObjectForKey:@"summary"];
-            lmGroup.groupMembers = [self getgroupMemberByGroupIdentifier:lmGroup.groupIdentifer];
-            lmGroup.admin = [lmGroup.groupMembers firstObject];
-            [groupsArray objectAddObject:lmGroup];
-        }
-        return groupsArray;
+    
+    NSArray *groupArray = [self getDatasFromTableName:GroupInformationTable conditions:nil fields:@[GroupInformation]];
+    if (groupArray.count <= 0) {
+        return nil;
     }
-    return nil;
+    NSMutableArray *groupsArray = [NSMutableArray array];
+    for (NSDictionary *dict in groupArray) {
+        LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
+        lmGroup.groupIdentifer = [dict safeObjectForKey:@"identifier"];
+        lmGroup.groupName = [dict safeObjectForKey:@"name"];
+        lmGroup.groupEcdhKey = [dict safeObjectForKey:@"ecdh_key"];
+        lmGroup.isCommonGroup = [[dict safeObjectForKey:@"common"] boolValue];
+        lmGroup.isGroupVerify = [[dict safeObjectForKey:@"verify"] boolValue];
+        lmGroup.isPublic = [[dict safeObjectForKey:@"pub"] boolValue];
+        lmGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
+        lmGroup.summary = [dict safeObjectForKey:@"summary"];
+        lmGroup.groupMembers = [self getgroupMemberByGroupIdentifier:lmGroup.groupIdentifer];
+        lmGroup.admin = [lmGroup.groupMembers firstObject];
+        [groupsArray objectAddObject:lmGroup];
+    }
+    return groupsArray;
+    
+    
+    RLMResults<LMRamGroupInfo *> *ramGroupResult = [LMRamGroupInfo allObjects];
+    if (ramGroupResult.count <= 0) {
+        return nil;
+    }
+    for (LMRamGroupInfo *ramGroupInfo  in ramGroupResult) {
+        LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
+        lmGroup.groupIdentifer = ramGroupInfo.groupIdentifer;
+        lmGroup.groupName = ramGroupInfo.groupName;
+        lmGroup.groupEcdhKey = ramGroupInfo.groupEcdhKey;
+        lmGroup.isCommonGroup = ramGroupInfo.isCommonGroup;
+        lmGroup.isGroupVerify = ramGroupInfo.isGroupVerify;
+        lmGroup.isPublic = ramGroupInfo.isPublic;
+        lmGroup.avatarUrl = ramGroupInfo.avatarUrl;
+        lmGroup.summary = ramGroupInfo.summary;
+        lmGroup.groupMembers = [self getgroupMemberByGroupIdentifier:lmGroup.groupIdentifer];
+        lmGroup.admin = [lmGroup.groupMembers firstObject];
+        [groupsArray objectAddObject:lmGroup];
+    }
+    return groupsArray;
+    
+    
+    
 }
 
 - (BOOL)isGroupPublic:(NSString *)groupid {
