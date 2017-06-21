@@ -13,6 +13,4 @@
 
 + (void)migartion;
 
-+ (void)saveRecentChat:(LMRecentChat *)recentChat;
-
 @end

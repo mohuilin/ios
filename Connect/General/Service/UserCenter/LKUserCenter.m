@@ -27,6 +27,7 @@
 #import "Protofile.pbobjc.h"
 #import "LMConversionManager.h"
 #import "LMLinkManDataManager.h"
+#import "LMRealmDBManager.h"
 
 @interface LKUserCenter ()
 
@@ -111,6 +112,7 @@ static LKUserCenter *center = nil;
             
             // Database migration
             [BaseDB migrationWithUserPublicKey:loginUser.pub_key];
+            [LMRealmDBManager migartion];
             
             privkey = loginUser.prikey;
             if (GJCFStringIsNull(loginUser.address)) { // May be swept of the user information
@@ -259,6 +261,7 @@ static LKUserCenter *center = nil;
     self.loginUser = user;
     // Database migration
     [BaseDB migrationWithUserPublicKey:user.pub_key];
+    [LMRealmDBManager migartion];
     // save current user message
     [[MMAppSetting sharedSetting]  saveLoginUserPrivkey:self.loginUser.prikey];
     [[MMAppSetting sharedSetting]  saveLoginAddress:self.loginUser.address];    

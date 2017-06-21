@@ -101,92 +101,29 @@ static RecentChatDBManager *manager = nil;
 }
 
 - (NSArray *)getAllRecentChat {
-
     NSMutableArray *recentChatArrayM = [NSMutableArray array];
-    if (REALMDBWAY) {
-        RLMResults<LMRecentChat *> *recentChats = [LMRecentChat allObjects];
-        for (LMRecentChat *recentModel in recentChats) {
-            RecentChatModel *model = [RecentChatModel new];
-            model.identifier = recentModel.identifier;
-            model.name = recentModel.name;
-            model.headUrl = recentModel.headUrl;
-            model.time = recentModel.time;
-            model.content = recentModel.content;
-            model.isTopChat = recentModel.isTopChat;
-            model.stranger = recentModel.stranger;
-            model.notifyStatus = recentModel.notifyStatus;
-            model.groupNoteMyself = recentModel.groupNoteMyself;
-            model.snapChatDeleteTime = recentModel.snapChatDeleteTime;
-            model.unReadCount = recentModel.unReadCount;
-            model.talkType = recentModel.talkType;
-            model.draft = recentModel.draft;
-            
-            [recentChatArrayM addObject:model];
-        }
-        DDLogInfo(@"realm db");
-    } else {
-        DDLogInfo(@"sqllite db");
-        NSString *querySql = @"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier order by c.last_time desc";
-        NSArray *resultArray = [self queryWithSql:querySql];
-        
-        for (NSDictionary *resultDict in resultArray) {
-            RecentChatModel *model = [RecentChatModel new];
-            model.identifier = [resultDict safeObjectForKey:@"identifier"];
-            model.name = [resultDict safeObjectForKey:@"name"];
-            model.headUrl = [resultDict safeObjectForKey:@"avatar"];
-            model.draft = [resultDict safeObjectForKey:@"draft"];
-            model.stranger = [[resultDict safeObjectForKey:@"stranger"] boolValue];
-            model.time = [[resultDict safeObjectForKey:@"last_time"] stringValue];
-            model.unReadCount = [[resultDict safeObjectForKey:@"unread_count"] intValue];
-            model.isTopChat = [[resultDict safeObjectForKey:@"top"] boolValue];
-            model.groupNoteMyself = [[resultDict safeObjectForKey:@"notice"] boolValue];
-            model.talkType = [[resultDict safeObjectForKey:@"type"] integerValue];
-            model.content = [resultDict safeObjectForKey:@"content"];
-            model.snapChatDeleteTime = [[resultDict safeObjectForKey:@"snap_time"] intValue];
-            model.notifyStatus = [[resultDict safeObjectForKey:@"disturb"] boolValue];
-            [recentChatArrayM addObject:model];
-        }
-        
-        for (RecentChatModel *recentModel in recentChatArrayM) {
-            LMRecentChat *model = [LMRecentChat new];
-            model.identifier = recentModel.identifier;
-            model.name = recentModel.name;
-            model.headUrl = recentModel.headUrl;
-            model.time = recentModel.time;
-            model.content = recentModel.content;
-            model.isTopChat = recentModel.isTopChat;
-            model.stranger = recentModel.stranger;
-            model.notifyStatus = recentModel.notifyStatus;
-            model.groupNoteMyself = recentModel.groupNoteMyself;
-            model.snapChatDeleteTime = recentModel.snapChatDeleteTime;
-            model.unReadCount = recentModel.unReadCount;
-            model.talkType = (int)recentModel.talkType;
-            model.draft = recentModel.draft;
-            [LMRealmDBManager saveRecentChat:model];
-        }
-
-        
-        LMRecentChat *model = [LMRecentChat new];
-        model.identifier = @"123";
-        model.name = @"ffda";
-        model.headUrl = @"fda";
-        model.time = @"time";
-        model.content = @"content";
-        model.isTopChat = YES;
-        model.stranger = NO;
-        model.draft = @"FDA";
-        model.notifyStatus = NO;
-        model.groupNoteMyself = NO;
-        model.snapChatDeleteTime = 100;
-        model.unReadCount = 100;
-        model.talkType = 1;
-        
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        // Updating book with id = 1
-        [realm beginWriteTransaction];
-        [realm addOrUpdateObject:model];
-        [realm commitWriteTransaction];
+    DDLogInfo(@"sqllite db");
+    NSString *querySql = @"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier order by c.last_time desc";
+    NSArray *resultArray = [self queryWithSql:querySql];
+    
+    for (NSDictionary *resultDict in resultArray) {
+        RecentChatModel *model = [RecentChatModel new];
+        model.identifier = [resultDict safeObjectForKey:@"identifier"];
+        model.name = [resultDict safeObjectForKey:@"name"];
+        model.headUrl = [resultDict safeObjectForKey:@"avatar"];
+        model.draft = [resultDict safeObjectForKey:@"draft"];
+        model.stranger = [[resultDict safeObjectForKey:@"stranger"] boolValue];
+        model.time = [[resultDict safeObjectForKey:@"last_time"] stringValue];
+        model.unReadCount = [[resultDict safeObjectForKey:@"unread_count"] intValue];
+        model.isTopChat = [[resultDict safeObjectForKey:@"top"] boolValue];
+        model.groupNoteMyself = [[resultDict safeObjectForKey:@"notice"] boolValue];
+        model.talkType = [[resultDict safeObjectForKey:@"type"] integerValue];
+        model.content = [resultDict safeObjectForKey:@"content"];
+        model.snapChatDeleteTime = [[resultDict safeObjectForKey:@"snap_time"] intValue];
+        model.notifyStatus = [[resultDict safeObjectForKey:@"disturb"] boolValue];
+        [recentChatArrayM addObject:model];
     }
+    
     //sort
     [recentChatArrayM sortUsingSelector:@selector(comparedata:)];
     return recentChatArrayM;
