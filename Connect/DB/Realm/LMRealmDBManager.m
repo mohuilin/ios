@@ -5,16 +5,23 @@
 //  Created by MoHuilin on 2017/6/19.
 //  Copyright © 2017年 Connect. All rights reserved.
 //
-
+#import <FMDBMigrationManager/FMDBMigrationManager.h>
 #import "LMRealmDBManager.h"
 #import "RLMRealm+LMRLMRealm.h"
 #import "MMGlobal.h"
 #import "NSDictionary+LMSafety.h"
+#import "LMHistoryCacheManager.h"
+#import "LMRecentChat.h"
 #import "BaseDB.h"
 #import "RecentChatModel.h"
-#import "LMHistoryCacheManager.h"
-#import <FMDBMigrationManager/FMDBMigrationManager.h>
 #import "LMRecentChat.h"
+#import "LMContactAccountInfo.h"
+#import "RLMRealm+LMRLMRealm.h"
+#import "LMRamGroupInfo.h"
+#import "LMRamAccountInfo.h"
+
+
+
 @implementation LMRealmDBManager
 static FMDatabaseQueue *queue;
 + (void)saveInfo:(LMBaseModel *)ramModel{
@@ -49,71 +56,71 @@ static FMDatabaseQueue *queue;
                         complete(0.1);
                     }
                 }
-                // t_contact
-                if ([self contactDataMigration]) {
-                    if (complete) {
-                        complete(0.2);
-                    }
-                }
-                // t_group
-                if ([self groupDataMigration]) {
-                    if (complete) {
-                        complete(0.3);
-                    }
-                }
-                //t_group_member
-                if ([self groupMembersDataMigration]) {
-                    if (complete) {
-                        complete(0.4);
-                    }
-                }
-                //t_addressbook
-                if ([self addressbookDataMigration]) {
-                    if (complete) {
-                        complete(0.5);
-                    }
-                }
-                if ([self recentChatSettingDataMigration]) {
-                    if (complete) {
-                        complete(0.5);
-                    }
-                }
-                //t_recommand_friend
-                if ([self recommandFriendDataMigration]) {
-                    if (complete) {
-                        complete(0.6);
-                    }
-                }
-                //t_friendrequest
-                if ([self friendRequestDataMigration]) {
-                    if (complete) {
-                        complete(0.7);
-                    }
-                }
-                //t_transactiontable
-                if ([self transactionDataMigration]) {
-                    if (complete) {
-                        complete(0.8);
-                    }
-                }
-                //t_tag
-                if ([self tagDataMigration]) {
-                    if (complete) {
-                        complete(0.9);
-                    }
-                }
-                //t_usertag
-                if ([self userTagDataMigration]) {
-                    if (complete) {
-                        complete(0.9);
-                    }
-                }
-                //t_message
-                if ([self messageDataMigration]) {
-                    if (complete) {
-                        complete(1);
-                    }
-                }
+                //                // t_contact
+                //                if ([self contactDataMigrations]) {
+                //                    if (complete) {
+                //                        complete(0.2);
+                //                    }
+                //                }
+                //                // t_group
+                //                if ([self groupDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.3);
+                //                    }
+                //                }
+                //                //t_group_member
+                //                if ([self groupMembersDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.4);
+                //                    }
+                //                }
+                //                //t_addressbook
+                //                if ([self addressbookDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.5);
+                //                    }
+                //                }
+                //                if ([self recentChatSettingDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.5);
+                //                    }
+                //                }
+                //                //t_recommand_friend
+                //                if ([self recommandFriendDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.6);
+                //                    }
+                //                }
+                //                //t_friendrequest
+                //                if ([self friendRequestDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.7);
+                //                    }
+                //                }
+                //                //t_transactiontable
+                //                if ([self transactionDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.8);
+                //                    }
+                //                }
+                //                //t_tag
+                //                if ([self tagDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.9);
+                //                    }
+                //                }
+                //                //t_usertag
+                //                if ([self userTagDataMigration]) {
+                //                    if (complete) {
+                //                        complete(0.9);
+                //                    }
+                //                }
+                //                //t_message
+                //                if ([self messageDataMigration]) {
+                //                    if (complete) {
+                //                        complete(1);
+                //                    }
+                //                }
             }
             BOOL delete = GJCFFileDeleteFile(olddbPath);
             if (delete) {
@@ -143,76 +150,76 @@ static FMDatabaseQueue *queue;
                             complete(0.1);
                         }
                     }
-                    // t_contact
-                    if ([self contactDataMigration]) {
+                    if ([self contactNewDataMigration]) {
                         if (complete) {
-                            complete(0.2);
+                            complete(0.1);
                         }
                     }
+                    
                     // t_group
-                    if ([self groupDataMigration]) {
+                    if ([self groupNewDataMigration]) {
                         if (complete) {
                             complete(0.3);
                         }
                     }
                     //t_group_member
-                    if ([self groupMembersDataMigration]) {
+                    if ([self groupNewMembersDataMigration]) {
                         if (complete) {
                             complete(0.4);
                         }
                     }
                     //t_addressbook
-                    if ([self addressbookDataMigration]) {
+                    if ([self addressbookNewDataMigration]) {
                         if (complete) {
                             complete(0.5);
                         }
                     }
-                    if ([self recentChatSettingDataMigration]) {
-                        if (complete) {
-                            complete(0.5);
-                        }
-                    }
-                    //t_recommand_friend
-                    if ([self recommandFriendDataMigration]) {
-                        if (complete) {
-                            complete(0.6);
-                        }
-                    }
-                    //t_friendrequest
-                    if ([self friendRequestDataMigration]) {
-                        if (complete) {
-                            complete(0.7);
-                        }
-                    }
-                    //t_transactiontable
-                    if ([self transactionDataMigration]) {
-                        if (complete) {
-                            complete(0.8);
-                        }
-                    }
-                    //t_tag
-                    if ([self tagDataMigration]) {
-                        if (complete) {
-                            complete(0.9);
-                        }
-                    }
-                    //t_usertag
-                    if ([self userTagDataMigration]) {
-                        if (complete) {
-                            complete(0.9);
-                        }
-                    }
-                    //t_message
-                    if ([self messageDataMigration]) {
-                        if (complete) {
-                            complete(1);
-                        }
-                    }
+                    //                    if ([self recentChatSettingDataMigration]) {
+                    //                        if (complete) {
+                    //                            complete(0.5);
+                    //                        }
+                    //                    }
+                    //                    //t_recommand_friend
+                    //                    if ([self recommandFriendDataMigration]) {
+                    //                        if (complete) {
+                    //                            complete(0.6);
+                    //                        }
+                    //                    }
+                    //                    //t_friendrequest
+                    //                    if ([self friendRequestDataMigration]) {
+                    //                        if (complete) {
+                    //                            complete(0.7);
+                    //                        }
+                    //                    }
+                    //                    //t_transactiontable
+                    //                    if ([self transactionDataMigration]) {
+                    //                        if (complete) {
+                    //                            complete(0.8);
+                    //                        }
+                    //                    }
+                    //                    //t_tag
+                    //                    if ([self tagDataMigration]) {
+                    //                        if (complete) {
+                    //                            complete(0.9);
+                    //                        }
+                    //                    }
+                    //                    //t_usertag
+                    //                    if ([self userTagDataMigration]) {
+                    //                        if (complete) {
+                    //                            complete(0.9);
+                    //                        }
+                    //                    }
+                    //                    //t_message
+                    //                    if ([self messageDataMigration]) {
+                    //                        if (complete) {
+                    //                            complete(1);
+                    //                        }
+                    //                    }
                 }
-                BOOL delete = GJCFFileDeleteFile(olddbPath);
-                if (delete) {
-                    NSLog(@"delete success");
-                }
+                //                BOOL delete = GJCFFileDeleteFile(olddbPath);
+                //                if (delete) {
+                //                    NSLog(@"delete success");
+                //                }
             }
         }
     }
@@ -267,35 +274,94 @@ static FMDatabaseQueue *queue;
     [queue close];
     return arrayM.copy;
 }
-+ (BOOL)batchInsertTableName:(NSString *)tableName fields:(NSArray *)fields batchValues:(NSArray *)batchValues {
-    NSMutableString *palce = [NSMutableString stringWithFormat:@"("];
-    NSMutableString *fieldString = [NSMutableString stringWithFormat:@"("];
-    for (NSString *field in fields) {
-        if ([field isEqualToString:[fields lastObject]]) {
-            [palce appendString:@"?)"];
-            [fieldString appendFormat:@"%@)", field];
+
+
+#pragma mark - new margon
++ (BOOL)addressbookNewDataMigration {
+    NSString *querySql = @"select * from t_addressbook c";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    NSMutableArray *temM = [NSMutableArray array];
+    for (NSDictionary *temD in resultArray) {
+        //        LMRamAddressBook *info = [[LMRamAddressBook alloc] init];
+        //        info.address = [temD safeObjectForKey:@"address"];
+        //        info.tag = [temD safeObjectForKey:@"tag"];
+        //        [temM objectAddObject:info];
+    }
+    if (temM.count > 0) {
+        [self realmAddObject:temM];
+    }
+    return YES;
+    
+}
++ (BOOL)groupNewMembersDataMigration {
+    NSString *querySql = @"select * from t_group_member c";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    NSMutableArray *mutableMembers = [NSMutableArray array];
+    long long indexNumber = 0;
+    long long currenetTime = [[NSDate date] timeIntervalSince1970] * 1000;
+    LMRamAccountInfo *admin = nil;
+    for (NSDictionary *dic in resultArray) {
+        indexNumber ++;
+        NSString *currentString = [NSString stringWithFormat:@"%lld",(currenetTime + indexNumber)];
+        LMRamAccountInfo *accountInfo = [[LMRamAccountInfo alloc] init];
+        accountInfo.username = [dic safeObjectForKey:@"username"];
+        accountInfo.identifier = [dic safeObjectForKey:@"identifier"];
+        accountInfo.avatar = [dic safeObjectForKey:@"avatar"];
+        accountInfo.address = [dic safeObjectForKey:@"address"];
+        accountInfo.currentTime = currentString;
+        NSString *remark = [dic valueForKey:@"remarks"];
+        if (GJCFStringIsNull(remark) || [remark isEqual:[NSNull null]]) {
+            accountInfo.groupNicksName = [dic safeObjectForKey:@"nick"];
         } else {
-            [palce appendString:@"?,"];
-            [fieldString appendFormat:@"%@,", field];
+            accountInfo.groupNicksName = remark;
+        }
+        accountInfo.roleInGroup = [[dic safeObjectForKey:@"role"] intValue];
+        accountInfo.pubKey = [dic safeObjectForKey:@"pub_key"];
+        if (accountInfo.roleInGroup == 1) {
+            admin = accountInfo;
+            accountInfo.isGroupAdmin = YES;
+        } else {
+            [mutableMembers objectAddObject:accountInfo];
         }
     }
+    if (admin) {
+        [mutableMembers objectInsert:admin atIndex:0];
+    }
+    if (mutableMembers.count > 0) {
+        [self realmAddObject:mutableMembers];
+    }
     
-    NSMutableString *sql = [NSMutableString stringWithFormat:@"INSERT OR REPLACE INTO %@ %@ VALUES %@ ;", tableName, fieldString, palce];
-    DDLogInfo(@"instertSql %@", sql);
-    __block BOOL result = NO;
-    [queue inTransaction:^(FMDatabase *db, BOOL *rollback) {
-        if (batchValues && batchValues.count > 0) {
-            for (NSArray *values in batchValues) {
-                result = [db executeUpdate:sql withArgumentsInArray:values];
-            }
-        } else {
-            result = [db executeUpdate:sql];
-        }
-    }];
-    return result;
+    
+    return YES;
+    
+}
++ (BOOL)groupNewDataMigration {
+    NSString *querySql = @"select c.identifier,c.name,c.ecdh_key,c.common,c.verify,c.pub,c.avatar,c.summary from t_group c";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    NSMutableArray *groupsArray = [NSMutableArray array];
+    for (NSDictionary *dict in resultArray) {
+        LMRamGroupInfo *lmGroup = [[LMRamGroupInfo alloc] init];
+        lmGroup.groupIdentifer = [dict safeObjectForKey:@"identifier"];
+        lmGroup.groupName = [dict safeObjectForKey:@"name"];
+        lmGroup.groupEcdhKey = [dict safeObjectForKey:@"ecdh_key"];
+        lmGroup.isCommonGroup = [[dict safeObjectForKey:@"common"] boolValue];
+        lmGroup.isGroupVerify = [[dict safeObjectForKey:@"verify"] boolValue];
+        lmGroup.isPublic = [[dict safeObjectForKey:@"pub"] boolValue];
+        lmGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
+        lmGroup.summary = [dict safeObjectForKey:@"summary"];
+        //        lmGroup.groupMembers = [self getgroupMemberByGroupIdentifier:lmGroup.groupIdentifer];
+        //        lmGroup.admin = [lmGroup.groupMembers firstObject];
+        [groupsArray objectAddObject:lmGroup];
+    }
+    if (groupsArray.count > 0) {
+        [self realmAddObject:groupsArray];
+    }
+    return YES;
+    
 }
 + (BOOL)recentNewChatDataMigration {
-   
+    
+    NSMutableArray *recentArray = [NSMutableArray array];
     NSString *querySql = @"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier order by c.last_time desc";
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     
@@ -314,12 +380,45 @@ static FMDatabaseQueue *queue;
         model.content = [resultDict safeObjectForKey:@"content"];
         model.snapChatDeleteTime = [[resultDict safeObjectForKey:@"snap_time"] intValue];
         model.notifyStatus = [[resultDict safeObjectForKey:@"disturb"] boolValue];
-        [self saveInfo:model];
-        
+        [recentArray addObject:model];
+    }
+    if (recentArray.count) {
+        [self realmAddObject:recentArray];
+    }
+    return YES;
+}
++ (BOOL)contactNewDataMigration {
+    NSString *querySql = @"select c.address,c.pub_key,c.avatar,c.username,c.remark,c.source,c.blocked,c.common from t_contact c";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    NSMutableArray *findUsers = [NSMutableArray array];
+    for (NSDictionary *resultDict in resultArray) {
+        LMContactAccountInfo *findUser = [LMContactAccountInfo new];
+        findUser.address = [resultDict safeObjectForKey:@"address"];
+        findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
+        findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
+        findUser.username = [resultDict safeObjectForKey:@"username"];
+        findUser.remarks = [resultDict safeObjectForKey:@"remark"];
+        findUser.source = [[resultDict safeObjectForKey:@"source"] intValue];
+        findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
+        findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
+        [findUsers addObject:findUser];
+    }
+    if (findUsers.count > 0) {
+        [self realmAddObject:findUsers];
     }
     return YES;
     
 }
++ (void)realmAddObject:(NSMutableArray *)realmArray {
+    
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [realm addOrUpdateObjectsFromArray:realmArray];
+    [realm commitWriteTransaction];
+    
+    
+}
+#pragma mark - old margon
 + (BOOL)recentChatSettingDataMigration {
     
     NSString *sql = @"select snapchat_luck_delete,identifier,notify_status from t_recent_conversion";
@@ -332,13 +431,12 @@ static FMDatabaseQueue *queue;
                                        [dict safeObjectForKey:@"notify_status"]]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_conversion_setting" fields:@[@"identifier", @"snap_time", @"disturb"] batchValues:bitchValues];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_conversion_setting" fields:@[@"identifier", @"snap_time", @"disturb"] batchValues:bitchValues];
+        
+        
     }
+    return YES;
 }
-
-
 + (BOOL)recentChatDataMigration {
     
     NSMutableArray *bitchValues = [NSMutableArray array];
@@ -380,13 +478,12 @@ static FMDatabaseQueue *queue;
     }
     
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_conversion" fields:@[@"identifier", @"name", @"avatar", @"draft", @"stranger", @"last_time", @"unread_count", @"top", @"notice", @"type", @"content"] batchValues:bitchValues];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_conversion" fields:@[@"identifier", @"name", @"avatar", @"draft", @"stranger", @"last_time", @"unread_count", @"top", @"notice", @"type", @"content"] batchValues:bitchValues];
     }
+    return YES;
 }
-
-+ (BOOL)contactDataMigration {
+#pragma mark - private query method
++ (BOOL)contactDataMigrations {
     NSMutableArray *bitchValues = [NSMutableArray array];
     NSString *sql = @"select address,public_key,avatar,username,remarks,source,black_man,offen_contact from t_contact";
     NSArray *contactArray = [self queryWithSql:sql];
@@ -405,32 +502,12 @@ static FMDatabaseQueue *queue;
         [bitchValues objectAddObject:temArray];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_contact" fields:@[@"address", @"pub_key", @"avatar", @"username", @"remark", @"source", @"blocked", @"common"] batchValues:bitchValues.copy];
-    } else {
-        return YES;
-    }
-}
-+ (BOOL)contactNewDataMigration {
-    NSString *querySql = @"select c.address,c.pub_key,c.avatar,c.username,c.remark,c.source,c.blocked,c.common from t_contact c";
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSMutableArray *findUsers = [NSMutableArray array];
-    for (NSDictionary *resultDict in resultArray) {
-        AccountInfo *findUser = [AccountInfo new];
-        findUser.address = [resultDict safeObjectForKey:@"address"];
-        findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
-        findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
-        findUser.username = [resultDict safeObjectForKey:@"username"];
-        findUser.remarks = [resultDict safeObjectForKey:@"remark"];
-        findUser.source = [[resultDict safeObjectForKey:@"source"] integerValue];
-        findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
-        findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
-        
-        [findUsers addObject:findUser];
+        //        return [self batchInsertTableName:@"t_contact" fields:@[@"address", @"pub_key", @"avatar", @"username", @"remark", @"source", @"blocked", @"common"] batchValues:bitchValues.copy];
     }
     return YES;
-    
 }
 + (BOOL)groupDataMigration {
+    
     NSString *sql = @"select groupIdentifer,groupName,groupEcdhKey,commonGroup,groupVerify,groupPublic,avatarUrl,summary from t_group_information";
     NSArray *array = [self queryWithSql:sql];
     NSMutableArray *bitchValues = [NSMutableArray array];
@@ -446,10 +523,11 @@ static FMDatabaseQueue *queue;
                                        [dict safeObjectForKey:@"summary"]]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_group" fields:@[@"identifier", @"name", @"ecdh_key", @"common", @"verify", @"pub", @"avatar", @"summary"] batchValues:bitchValues];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_group" fields:@[@"identifier", @"name", @"ecdh_key", @"common", @"verify", @"pub", @"avatar", @"summary"] batchValues:bitchValues];
+        
+        
     }
+    return YES;
 }
 
 + (BOOL)groupMembersDataMigration {
@@ -467,10 +545,11 @@ static FMDatabaseQueue *queue;
                                        [dict safeObjectForKey:@"pubKey"]]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_group_member" fields:@[@"identifier", @"username", @"avatar", @"address", @"role", @"nick", @"pub_key"] batchValues:bitchValues];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_group_member" fields:@[@"identifier", @"username", @"avatar", @"address", @"role", @"nick", @"pub_key"] batchValues:bitchValues];
+        
+        
     }
+    return YES;
 }
 
 + (BOOL)messageDataMigration {
@@ -502,10 +581,11 @@ static FMDatabaseQueue *queue;
                                        [temD safeObjectForKey:@"createtime"]]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_message" fields:@[@"message_id", @"message_ower", @"content", @"send_status", @"snap_time", @"read_time", @"state", @"createtime"] batchValues:bitchValues];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_message" fields:@[@"message_id", @"message_ower", @"content", @"send_status", @"snap_time", @"read_time", @"state", @"createtime"] batchValues:bitchValues];
+        
+        
     }
+    return YES;
 }
 
 + (BOOL)addressbookDataMigration {
@@ -520,10 +600,10 @@ static FMDatabaseQueue *queue;
                                        ]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_addressbook" fields:@[@"address", @"tag", @"create_time"] batchValues:bitchValues];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_addressbook" fields:@[@"address", @"tag", @"create_time"] batchValues:bitchValues];
+        
     }
+    return YES;
 }
 
 + (BOOL)recommandFriendDataMigration {
@@ -538,10 +618,11 @@ static FMDatabaseQueue *queue;
                                        @([[dic safeObjectForKey:@"isSend"] intValue])]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_recommand_friend" fields:@[@"username", @"address", @"avatar", @"pub_key", @"status"] batchValues:bitchValues.copy];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_recommand_friend" fields:@[@"username", @"address", @"avatar", @"pub_key", @"status"] batchValues:bitchValues.copy];
+        
+        
     }
+    return YES;
 }
 
 + (BOOL)friendRequestDataMigration {
@@ -610,10 +691,11 @@ static FMDatabaseQueue *queue;
                                        [dict safeObjectForKey:@"create_time"]]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_friendrequest" fields:@[@"address", @"pub_key", @"avatar", @"username", @"source", @"status", @"read", @"tips", @"createtime"] batchValues:bitchValues.copy];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_friendrequest" fields:@[@"address", @"pub_key", @"avatar", @"username", @"source", @"status", @"read", @"tips", @"createtime"] batchValues:bitchValues.copy];
+        
+        
     }
+    return YES;
     
 }
 
@@ -650,10 +732,11 @@ static FMDatabaseQueue *queue;
                                        ]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_transactiontable" fields:@[@"message_id", @"hashid", @"status", @"pay_count", @"crowd_count"] batchValues:bitchValues.copy];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_transactiontable" fields:@[@"message_id", @"hashid", @"status", @"pay_count", @"crowd_count"] batchValues:bitchValues.copy];
+        
+        
     }
+    return YES;
 }
 
 
@@ -665,10 +748,10 @@ static FMDatabaseQueue *queue;
         [bitchValues objectAddObject:@[[dic safeObjectForKey:@"tag"]]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_tag" fields:@[@"tag"] batchValues:bitchValues.copy];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_tag" fields:@[@"tag"] batchValues:bitchValues.copy];
+        
     }
+    return YES;
 }
 
 + (BOOL)userTagDataMigration {
@@ -681,9 +764,9 @@ static FMDatabaseQueue *queue;
                                        ]];
     }
     if (bitchValues.count) {
-        return [self batchInsertTableName:@"t_usertag" fields:@[@"tag_id", @"address"] batchValues:bitchValues.copy];
-    } else {
-        return YES;
+        //        return [self batchInsertTableName:@"t_usertag" fields:@[@"tag_id", @"address"] batchValues:bitchValues.copy];
+        
     }
+    return YES;
 }
 @end

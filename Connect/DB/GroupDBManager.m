@@ -346,32 +346,32 @@ static GroupDBManager *manager = nil;
     return mutableMembers;
     
     
-    NSString *selectName = [NSString stringWithFormat:@"identifier = %@",groupid];
-    RLMResults<LMRamAccountInfo *> *ramAccountInfoResults = [LMRamAccountInfo objectsWhere:selectName];
-    for (LMRamAccountInfo *ramAccountInfo in ramAccountInfoResults) {
-        AccountInfo *accountInfo = [[AccountInfo alloc] init];
-        accountInfo.username = ramAccountInfo.username;
-        accountInfo.avatar = ramAccountInfo.avatar;
-        accountInfo.address = ramAccountInfo.address;
-        NSString *remark = ramAccountInfo.remarks;
-        if (GJCFStringIsNull(remark) || [remark isEqual:[NSNull null]]) {
-            accountInfo.groupNickName = ramAccountInfo.nick;
-        } else {
-            accountInfo.groupNickName = remark;
-        }
-        accountInfo.roleInGroup = ramAccountInfo.roleInGroup;
-        accountInfo.pub_key = ramAccountInfo.pub_key;
-        if (accountInfo.roleInGroup == 1) {
-            admin = accountInfo;
-            accountInfo.isGroupAdmin = YES;
-        } else {
-            [mutableMembers objectAddObject:accountInfo];
-        }
-
-    }
-    if (admin) {
-        [mutableMembers objectInsert:admin atIndex:0];
-    }
+//    NSString *selectName = [NSString stringWithFormat:@"identifier = %@",groupid];
+//    RLMResults<LMRamAccountInfo *> *ramAccountInfoResults = [LMRamAccountInfo objectsWhere:selectName];
+//    for (LMRamAccountInfo *ramAccountInfo in ramAccountInfoResults) {
+//        AccountInfo *accountInfo = [[AccountInfo alloc] init];
+//        accountInfo.username = ramAccountInfo.username;
+//        accountInfo.avatar = ramAccountInfo.avatar;
+//        accountInfo.address = ramAccountInfo.address;
+//        NSString *remark = ramAccountInfo.remarks;
+//        if (GJCFStringIsNull(remark) || [remark isEqual:[NSNull null]]) {
+//            accountInfo.groupNickName = ramAccountInfo.nick;
+//        } else {
+//            accountInfo.groupNickName = remark;
+//        }
+//        accountInfo.roleInGroup = ramAccountInfo.roleInGroup;
+//        accountInfo.pub_key = ramAccountInfo.pub_key;
+//        if (accountInfo.roleInGroup == 1) {
+//            admin = accountInfo;
+//            accountInfo.isGroupAdmin = YES;
+//        } else {
+//            [mutableMembers objectAddObject:accountInfo];
+//        }
+//
+//    }
+//    if (admin) {
+//        [mutableMembers objectInsert:admin atIndex:0];
+//    }
     return mutableMembers;
     
     

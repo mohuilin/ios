@@ -9,5 +9,8 @@
 #import "LMRamAccountInfo.h"
 
 @implementation LMRamAccountInfo
-
++(NSString *)primaryKey {
+    
+    return @"currentTime";
+}
 @end
