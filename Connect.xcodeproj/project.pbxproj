@@ -869,6 +869,10 @@
 		E39C2CB69BB018BF89D2831C /* libPods-ConnectTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA05F3C052536B3AAD8C0B5 /* libPods-ConnectTests.a */; };
 		F116E9601EA06AA500DCAED4 /* LMMessageExtendManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */; };
 		F11CF9A51EFA6CA400750437 /* LMContactAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */; };
+		F11CF9A81EFA724400750437 /* LMRamAddressBook.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A71EFA724400750437 /* LMRamAddressBook.m */; };
+		F11CF9AB1EFA742C00750437 /* LMFriendRequestInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */; };
+		F11CF9AE1EFA776900750437 /* LMRamTransationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9AD1EFA776900750437 /* LMRamTransationInfo.m */; };
+		F11CF9B11EFA7A5B00750437 /* LMRamMessageInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9B01EFA7A5B00750437 /* LMRamMessageInfo.m */; };
 		F156BB621EC4681B00512743 /* LMlockGestureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F156BB611EC4681B00512743 /* LMlockGestureViewController.m */; };
 		F16FD7B81EC3205B002F9395 /* allocators.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16FADB31EC3203E002F9395 /* allocators.cpp */; };
 		F16FD7B91EC3205B002F9395 /* base58.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16FADB51EC3203E002F9395 /* base58.cpp */; };
@@ -2636,6 +2640,14 @@
 		F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMMessageExtendManager.m; sourceTree = "<group>"; };
 		F11CF9A31EFA6CA400750437 /* LMContactAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMContactAccountInfo.h; sourceTree = "<group>"; };
 		F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMContactAccountInfo.m; sourceTree = "<group>"; };
+		F11CF9A61EFA724400750437 /* LMRamAddressBook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamAddressBook.h; sourceTree = "<group>"; };
+		F11CF9A71EFA724400750437 /* LMRamAddressBook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamAddressBook.m; sourceTree = "<group>"; };
+		F11CF9A91EFA742C00750437 /* LMFriendRequestInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRequestInfo.h; sourceTree = "<group>"; };
+		F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRequestInfo.m; sourceTree = "<group>"; };
+		F11CF9AC1EFA776900750437 /* LMRamTransationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamTransationInfo.h; sourceTree = "<group>"; };
+		F11CF9AD1EFA776900750437 /* LMRamTransationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamTransationInfo.m; sourceTree = "<group>"; };
+		F11CF9AF1EFA7A5B00750437 /* LMRamMessageInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamMessageInfo.h; sourceTree = "<group>"; };
+		F11CF9B01EFA7A5B00750437 /* LMRamMessageInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamMessageInfo.m; sourceTree = "<group>"; };
 		F156BB601EC4681B00512743 /* LMlockGestureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMlockGestureViewController.h; sourceTree = "<group>"; };
 		F156BB611EC4681B00512743 /* LMlockGestureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMlockGestureViewController.m; sourceTree = "<group>"; };
 		F16FADB31EC3203E002F9395 /* allocators.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = allocators.cpp; sourceTree = "<group>"; };
@@ -15293,6 +15305,14 @@
 				F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */,
 				F11CF9A31EFA6CA400750437 /* LMContactAccountInfo.h */,
 				F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */,
+				F11CF9A61EFA724400750437 /* LMRamAddressBook.h */,
+				F11CF9A71EFA724400750437 /* LMRamAddressBook.m */,
+				F11CF9A91EFA742C00750437 /* LMFriendRequestInfo.h */,
+				F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */,
+				F11CF9AC1EFA776900750437 /* LMRamTransationInfo.h */,
+				F11CF9AD1EFA776900750437 /* LMRamTransationInfo.m */,
+				F11CF9AF1EFA7A5B00750437 /* LMRamMessageInfo.h */,
+				F11CF9B01EFA7A5B00750437 /* LMRamMessageInfo.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -32823,6 +32843,7 @@
 				D9222FD81E822A3100D67110 /* YYDiskCache.m in Sources */,
 				D92232931E822BF800D67110 /* UIImageView+LMSetImageUrl.m in Sources */,
 				D9222FBC1E822A3100D67110 /* NSDate+YYAdd.m in Sources */,
+				F11CF9A81EFA724400750437 /* LMRamAddressBook.m in Sources */,
 				D92232771E822BF800D67110 /* UUImageAvatarBrowser.m in Sources */,
 				D9222FBB1E822A3100D67110 /* NSData+YYAdd.m in Sources */,
 				D92232EE1E822BF900D67110 /* GJCFCoreTextKeywordAttributedStringStyle.m in Sources */,
@@ -32847,6 +32868,7 @@
 				D92232541E822BF800D67110 /* Adapter.m in Sources */,
 				D95C04401E810902006C5C8A /* ChatNameCardCell.m in Sources */,
 				192350691E81200D0022D844 /* AccountWListCell.m in Sources */,
+				F11CF9AB1EFA742C00750437 /* LMFriendRequestInfo.m in Sources */,
 				D922329B1E822BF800D67110 /* UIView+ScreenShot.m in Sources */,
 				D9222FE81E822A3100D67110 /* YYAsyncLayer.m in Sources */,
 				D9C73AEB1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m in Sources */,
@@ -33161,6 +33183,7 @@
 				D92232E21E822BF900D67110 /* GJCFAssetsPickerViewController.m in Sources */,
 				19234FBC1E8119BB0022D844 /* LMConnectStatusView.m in Sources */,
 				D9222FED1E822A3100D67110 /* YYReachability.m in Sources */,
+				F11CF9B11EFA7A5B00750437 /* LMRamMessageInfo.m in Sources */,
 				D95C04911E810902006C5C8A /* GJGCRefreshFooterView.m in Sources */,
 				D97FDCB91E86664800B161C8 /* UIView+YYText.m in Sources */,
 				D92232B51E822BF800D67110 /* ChatMessageFileManager.m in Sources */,
@@ -33480,6 +33503,7 @@
 				D9222F7D1E822A3000D67110 /* GCDGroup.m in Sources */,
 				D9222F841E822A3000D67110 /* MASLayoutConstraint.m in Sources */,
 				D97FDCC51E88FCC500B161C8 /* NSMutableArray+Check.m in Sources */,
+				F11CF9AE1EFA776900750437 /* LMRamTransationInfo.m in Sources */,
 				D922330E1E822BF900D67110 /* SystemTool.m in Sources */,
 				D9222FC21E822A3100D67110 /* NSObject+YYAddForARC.m in Sources */,
 				D92233261E824A0200D67110 /* NSArray+Util.m in Sources */,

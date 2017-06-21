@@ -18,12 +18,14 @@
 #import "RLMRealm+LMRLMRealm.h"
 #import "LMRamGroupInfo.h"
 #import "LMRamAccountInfo.h"
+#import "LMRamAddressBook.h"
 #import "BaseDB.h"
 #import "RecentChatModel.h"
 #import "RLMRealm+LMRLMRealm.h"
-
-
-
+#import "LMFriendRequestInfo.h"
+#import "LMRamTransationInfo.h"
+#import "LMRamMessageInfo.h"
+#import "MMMessage.h"
 
 @implementation LMRealmDBManager
 static FMDatabaseQueue *queue;
@@ -87,52 +89,29 @@ static FMDatabaseQueue *queue;
                             complete(0.5);
                         }
                     }
-                    //                    if ([self recentChatSettingDataMigration]) {
-                    //                        if (complete) {
-                    //                            complete(0.5);
-                    //                        }
-                    //                    }
-                    //                    //t_recommand_friend
-                    //                    if ([self recommandFriendDataMigration]) {
-                    //                        if (complete) {
-                    //                            complete(0.6);
-                    //                        }
-                    //                    }
-                    //                    //t_friendrequest
-                    //                    if ([self friendRequestDataMigration]) {
-                    //                        if (complete) {
-                    //                            complete(0.7);
-                    //                        }
-                    //                    }
-                    //                    //t_transactiontable
-                    //                    if ([self transactionDataMigration]) {
-                    //                        if (complete) {
-                    //                            complete(0.8);
-                    //                        }
-                    //                    }
-                    //                    //t_tag
-                    //                    if ([self tagDataMigration]) {
-                    //                        if (complete) {
-                    //                            complete(0.9);
-                    //                        }
-                    //                    }
-                    //                    //t_usertag
-                    //                    if ([self userTagDataMigration]) {
-                    //                        if (complete) {
-                    //                            complete(0.9);
-                    //                        }
-                    //                    }
-                    //                    //t_message
-                    //                    if ([self messageDataMigration]) {
-                    //                        if (complete) {
-                    //                            complete(1);
-                    //                        }
-                    //                    }
+                    //t_addressbook
+                    if ([self friendRequestNewDataMigration]) {
+                        if (complete) {
+                            complete(0.5);
+                        }
+                    }
+                    if ([self transationNewDataMigration]) {
+                        if (complete) {
+                            complete(0.5);
+                        }
+                    }
+                    if ([self messageNewDataMigration]) {
+                        if (complete) {
+                            complete(0.5);
+                        }
+                    }
+                   
+                
                 }
-                //                BOOL delete = GJCFFileDeleteFile(olddbPath);
-                //                if (delete) {
-                //                    NSLog(@"delete success");
-                //                }
+//                BOOL delete = GJCFFileDeleteFile(olddbPath);
+//                if (delete) {
+//                    NSLog(@"delete success");
+//                }
             }
         }
     }
@@ -188,15 +167,80 @@ static FMDatabaseQueue *queue;
     return arrayM.copy;
 }
 #pragma mark - new margon
-+ (BOOL)addressbookNewDataMigration {
-    NSString *querySql = @"select * from t_addressbook c";
++ (BOOL)messageNewDataMigration {
+    NSString *querySql = @"select * from t_message";
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *temM = [NSMutableArray array];
     for (NSDictionary *temD in resultArray) {
-        //        LMRamAddressBook *info = [[LMRamAddressBook alloc] init];
-        //        info.address = [temD safeObjectForKey:@"address"];
-        //        info.tag = [temD safeObjectForKey:@"tag"];
-        //        [temM objectAddObject:info];
+        LMRamMessageInfo *chatMessage = [[LMRamMessageInfo alloc] init];
+        chatMessage.ID = [[temD safeObjectForKey:@"id"] integerValue];
+        chatMessage.messageOwer = [temD safeObjectForKey:@"message_ower"];
+        chatMessage.messageId = [temD safeObjectForKey:@"message_id"];
+        chatMessage.createTime = [[temD safeObjectForKey:@"createtime"] integerValue];
+        chatMessage.readTime = [[temD safeObjectForKey:@"read_time"] integerValue];
+        chatMessage.snapTime = [[temD safeObjectForKey:@"snap_time"] integerValue];
+        chatMessage.sendStatus = [[temD safeObjectForKey:@"send_status"] intValue];
+        chatMessage.state = [[temD safeObjectForKey:@"state"] intValue];
+        if (chatMessage.state == 0) {
+            chatMessage.state = chatMessage.readTime > 0 ? 1 : 0;
+        }
+        [temM objectAddObject:chatMessage];
+    }
+    if (temM.count > 0) {
+        [self realmAddObject:temM];
+    }
+    return YES;
+}
++ (BOOL)transationNewDataMigration {
+    NSString *querySql = @"select * from t_transactiontable";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    NSMutableArray *temM = [NSMutableArray array];
+    for (NSDictionary *dic in resultArray) {
+        LMRamTransationInfo *accountInfo = [[LMRamTransationInfo alloc] init];
+        accountInfo.messageId = [dic safeObjectForKey:@"message_id"];
+        accountInfo.hashId = [dic safeObjectForKey:@"hashid"];
+        accountInfo.status = [[dic safeObjectForKey:@"status"] intValue];
+        accountInfo.payCount = [[dic safeObjectForKey:@"pay_count"] intValue];
+        accountInfo.crowdCount = [[dic safeObjectForKey:@"crowd_count"] intValue];
+    }
+    if (temM.count > 0) {
+        [self realmAddObject:temM];
+    }
+    return YES;
+}
++ (BOOL)friendRequestNewDataMigration {
+    NSString *querySql = @"select * from t_friendrequest";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    NSMutableArray *temM = [NSMutableArray array];
+    for (NSDictionary *dic in resultArray) {
+        LMFriendRequestInfo *accountInfo = [[LMFriendRequestInfo alloc] init];
+        accountInfo.username = [dic safeObjectForKey:@"username"];
+        accountInfo.address = [dic safeObjectForKey:@"address"];
+        accountInfo.avatar = [dic safeObjectForKey:@"avatar"];
+        accountInfo.pubKey = [dic safeObjectForKey:@"pub_key"];
+        accountInfo.status = [[dic safeObjectForKey:@"status"] intValue];
+        accountInfo.read = [[dic safeObjectForKey:@"read"] intValue];
+        accountInfo.status = [[dic safeObjectForKey:@"status"] intValue];
+        accountInfo.tips = [dic safeObjectForKey:@"tips"];
+        if (accountInfo.address.length > 0) {
+           [temM objectAddObject:accountInfo];
+        }
+    }
+    if (temM.count > 0) {
+        [self realmAddObject:temM];
+    }
+    return YES;
+
+}
++ (BOOL)addressbookNewDataMigration {
+    NSString *querySql = @"select * from t_addressbook";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    NSMutableArray *temM = [NSMutableArray array];
+    for (NSDictionary *temD in resultArray) {
+        LMRamAddressBook *info = [[LMRamAddressBook alloc] init];
+        info.address = [temD safeObjectForKey:@"address"];
+        info.tag = [temD safeObjectForKey:@"tag"];
+        [temM objectAddObject:info];
     }
     if (temM.count > 0) {
         [self realmAddObject:temM];
@@ -205,7 +249,7 @@ static FMDatabaseQueue *queue;
     
 }
 + (BOOL)groupNewMembersDataMigration {
-    NSString *querySql = @"select * from t_group_member c";
+    NSString *querySql = @"select * from t_group_member";
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *mutableMembers = [NSMutableArray array];
     long long indexNumber = 0;
