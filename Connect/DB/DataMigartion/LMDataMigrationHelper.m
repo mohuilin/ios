@@ -236,7 +236,6 @@ static FMDatabaseQueue *queue;
         return YES;
     }
 }
-
 + (BOOL)contactDataMigration {
     NSMutableArray *bitchValues = [NSMutableArray array];
     NSString *sql = @"select address,public_key,avatar,username,remarks,source,black_man,offen_contact from t_contact";

@@ -14,6 +14,7 @@
 #import "RecentChatModel.h"
 #import "LMHistoryCacheManager.h"
 #import <FMDBMigrationManager/FMDBMigrationManager.h>
+#import "LMRecentChat.h"
 @implementation LMRealmDBManager
 static FMDatabaseQueue *queue;
 + (void)saveInfo:(LMBaseModel *)ramModel{
@@ -122,12 +123,127 @@ static FMDatabaseQueue *queue;
     } else {
         olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
         if (GJCFFileIsExist(olddbPath)) {
-            
+            //db path
+            NSString *dbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
+            queue = [FMDatabaseQueue databaseQueueWithPath:dbPath];
+            if (queue) {
+                DDLogInfo(@"Create encryptdatabase success! %@", dbPath);
+                FMDBMigrationManager *manager = [FMDBMigrationManager managerWithDatabaseAtPath:dbPath migrationsBundle:[NSBundle mainBundle]];
+                BOOL resultState = NO;
+                NSError *error = nil;
+                if (!manager.hasMigrationsTable) {
+                    resultState = [manager createMigrationsTable:&error];
+                }
+                resultState = [manager migrateDatabaseToVersion:UINT64_MAX progress:nil error:&error];
+                if (resultState) {
+                    //data migration
+                    //t_conversion
+                    if ([self recentNewChatDataMigration]) {
+                        if (complete) {
+                            complete(0.1);
+                        }
+                    }
+                    // t_contact
+                    if ([self contactDataMigration]) {
+                        if (complete) {
+                            complete(0.2);
+                        }
+                    }
+                    // t_group
+                    if ([self groupDataMigration]) {
+                        if (complete) {
+                            complete(0.3);
+                        }
+                    }
+                    //t_group_member
+                    if ([self groupMembersDataMigration]) {
+                        if (complete) {
+                            complete(0.4);
+                        }
+                    }
+                    //t_addressbook
+                    if ([self addressbookDataMigration]) {
+                        if (complete) {
+                            complete(0.5);
+                        }
+                    }
+                    if ([self recentChatSettingDataMigration]) {
+                        if (complete) {
+                            complete(0.5);
+                        }
+                    }
+                    //t_recommand_friend
+                    if ([self recommandFriendDataMigration]) {
+                        if (complete) {
+                            complete(0.6);
+                        }
+                    }
+                    //t_friendrequest
+                    if ([self friendRequestDataMigration]) {
+                        if (complete) {
+                            complete(0.7);
+                        }
+                    }
+                    //t_transactiontable
+                    if ([self transactionDataMigration]) {
+                        if (complete) {
+                            complete(0.8);
+                        }
+                    }
+                    //t_tag
+                    if ([self tagDataMigration]) {
+                        if (complete) {
+                            complete(0.9);
+                        }
+                    }
+                    //t_usertag
+                    if ([self userTagDataMigration]) {
+                        if (complete) {
+                            complete(0.9);
+                        }
+                    }
+                    //t_message
+                    if ([self messageDataMigration]) {
+                        if (complete) {
+                            complete(1);
+                        }
+                    }
+                }
+                BOOL delete = GJCFFileDeleteFile(olddbPath);
+                if (delete) {
+                    NSLog(@"delete success");
+                }
+            }
         }
     }
 }
 + (NSArray *)queryWithSql:(NSString *)sql {
     NSString *dbName = [[LKUserCenter shareCenter] currentLoginUser].pub_key.sha256String;
+    if (!dbName) {
+        return nil;
+    }
+    if (GJCFStringIsNull(sql)) {
+        return nil;
+    }
+    NSMutableArray __block *arrayM = @[].mutableCopy;
+    NSString *dbPath = [MMGlobal getDBFile:dbName];
+    FMDatabaseQueue *queue = [FMDatabaseQueue databaseQueueWithPath:dbPath];
+    [queue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+        FMResultSet *result = [db executeQuery:sql];
+        while ([result next]) {
+            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+            for (int i = 0; i < result.columnCount; i++) {
+                NSString *name = [result columnNameForIndex:i];
+                [dict setObject:[result objectForColumnIndex:i] forKey:name];
+            }
+            [arrayM objectAddObject:dict];
+        }
+    }];
+    [queue close];
+    return arrayM.copy;
+}
++ (NSArray *)recentQueryWithSql:(NSString *)sql {
+    NSString *dbName = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
     if (!dbName) {
         return nil;
     }
@@ -178,8 +294,32 @@ static FMDatabaseQueue *queue;
     }];
     return result;
 }
-
-
++ (BOOL)recentNewChatDataMigration {
+   
+    NSString *querySql = @"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier order by c.last_time desc";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    
+    for (NSDictionary *resultDict in resultArray) {
+        LMRecentChat *model = [LMRecentChat new];
+        model.identifier = [resultDict safeObjectForKey:@"identifier"];
+        model.name = [resultDict safeObjectForKey:@"name"];
+        model.headUrl = [resultDict safeObjectForKey:@"avatar"];
+        model.draft = [resultDict safeObjectForKey:@"draft"];
+        model.stranger = [[resultDict safeObjectForKey:@"stranger"] boolValue];
+        model.time = [[resultDict safeObjectForKey:@"last_time"] stringValue];
+        model.unReadCount = [[resultDict safeObjectForKey:@"unread_count"] intValue];
+        model.isTopChat = [[resultDict safeObjectForKey:@"top"] boolValue];
+        model.groupNoteMyself = [[resultDict safeObjectForKey:@"notice"] boolValue];
+        model.talkType = [[resultDict safeObjectForKey:@"type"] intValue];
+        model.content = [resultDict safeObjectForKey:@"content"];
+        model.snapChatDeleteTime = [[resultDict safeObjectForKey:@"snap_time"] intValue];
+        model.notifyStatus = [[resultDict safeObjectForKey:@"disturb"] boolValue];
+        [self saveInfo:model];
+        
+    }
+    return YES;
+    
+}
 + (BOOL)recentChatSettingDataMigration {
     
     NSString *sql = @"select snapchat_luck_delete,identifier,notify_status from t_recent_conversion";
@@ -270,7 +410,26 @@ static FMDatabaseQueue *queue;
         return YES;
     }
 }
-
++ (BOOL)contactNewDataMigration {
+    NSString *querySql = @"select c.address,c.pub_key,c.avatar,c.username,c.remark,c.source,c.blocked,c.common from t_contact c";
+    NSArray *resultArray = [self queryWithSql:querySql];
+    NSMutableArray *findUsers = [NSMutableArray array];
+    for (NSDictionary *resultDict in resultArray) {
+        AccountInfo *findUser = [AccountInfo new];
+        findUser.address = [resultDict safeObjectForKey:@"address"];
+        findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
+        findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
+        findUser.username = [resultDict safeObjectForKey:@"username"];
+        findUser.remarks = [resultDict safeObjectForKey:@"remark"];
+        findUser.source = [[resultDict safeObjectForKey:@"source"] integerValue];
+        findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
+        findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
+        
+        [findUsers addObject:findUser];
+    }
+    return YES;
+    
+}
 + (BOOL)groupDataMigration {
     NSString *sql = @"select groupIdentifer,groupName,groupEcdhKey,commonGroup,groupVerify,groupPublic,avatarUrl,summary from t_group_information";
     NSArray *array = [self queryWithSql:sql];
