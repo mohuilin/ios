@@ -35,9 +35,8 @@
 }
 
 + (NSDictionary *)defaultPropertyValues{
-    NSString *ID = [NSString stringWithFormat:@"%lld",(long long)[[NSDate date] timeIntervalSince1970]];
     return @{
-        @"ID":ID
+        @"ID":@((long long)([[NSDate date] timeIntervalSince1970] * 1000))
              };
 }
 

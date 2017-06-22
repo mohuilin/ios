@@ -9,9 +9,6 @@
 #import "BaseDB.h"
 #import "RecentChatModel.h"
 
-#define RecentChatTable @"t_conversion"
-#define RecentChatTableSetting @"t_conversion_setting"
-
 @interface RecentChatDBManager : BaseDB
 
 + (RecentChatDBManager *)sharedManager;
@@ -132,13 +129,6 @@
 - (void)removeAllLastContent;
 
 - (void)removeLastContentWithIdentifier:(NSString *)identifier;
-
-/**
- * updata custum field value
- * @param fieldsValues
- * @param identifier
- */
-- (void)customUpdateRecentChatTableWithFieldsValues:(NSDictionary *)fieldsValues withIdentifier:(NSString *)identifier;
 
 /**
  * set group chat @ me

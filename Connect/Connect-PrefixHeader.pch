@@ -47,6 +47,8 @@ static const DDLogLevel ddLogLevel = DDLogLevelAll;
 static const DDLogLevel ddLogLevel = DDLogLevelOff;
 #endif
 
+#import "RLMRealm+LMRLMRealm.h"
+
 //-------- app hander tool --------
 #import "ChatLibHeader.h"
 #import "LKUserCenter.h"

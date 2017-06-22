@@ -13,6 +13,7 @@
 #import "UserDBManager.h"
 #import "IMService.h"
 #import "ConnectTool.h"
+#import "LMRecentChat.h"
 
 @interface LMConversionManager ()
 
@@ -123,25 +124,25 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                     recentModel.unReadCount = 0;
                 }
                 recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
-                NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-                [fieldsValues safeSetObject:@(recentModel.unReadCount) forKey:@"unread_count"];
-                [fieldsValues safeSetObject:recentModel.content forKey:@"content"];
-                [fieldsValues safeSetObject:recentModel.time forKey:@"last_time"];
-                if (snapChatTime < 0) {
-                    snapChatTime = 0;
-                }
-                if (recentModel.stranger) {
-                    [fieldsValues safeSetObject:@(NO) forKey:@"stranger"];
-                }
-                [[RecentChatDBManager sharedManager] customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:recentModel.identifier];
+
                 if (lastMessage.message.type == GJGCChatFriendContentTypeSnapChat) {
                     recentModel.snapChatDeleteTime = [lastMessage.message.content intValue];
                 }
+                
+                //update
+                LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
+                RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+                [realm beginWriteTransaction];
+                realmModel.unReadCount = recentModel.unReadCount;
+                realmModel.time = recentModel.time;
+                realmModel.stranger = recentModel.stranger;
+                realmModel.content = recentModel.content;
                 if (snapChatTime >= 0 &&
                     snapChatTime != recentModel.snapChatDeleteTime) {
                     recentModel.snapChatDeleteTime = (int)snapChatTime;
-                    [[RecentChatDBManager sharedManager] openOrCloseSnapChatWithTime:recentModel.snapChatDeleteTime chatIdentifer:recentModel.identifier];
+                    realmModel.chatSetting.snapChatDeleteTime = recentModel.snapChatDeleteTime;
                 }
+                [realm commitWriteTransaction];
             }
         }
             break;
@@ -185,11 +186,15 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                     recentModel.unReadCount += messageCount;
                 }
                 recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
-                NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-                [fieldsValues safeSetObject:@(recentModel.unReadCount) forKey:@"unread_count"];
-                [fieldsValues safeSetObject:recentModel.content forKey:@"content"];
-                [fieldsValues safeSetObject:recentModel.time forKey:@"last_time"];
-                [[RecentChatDBManager sharedManager] customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:recentModel.identifier];
+                
+                //update
+                LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
+                RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+                [realm beginWriteTransaction];
+                realmModel.unReadCount = recentModel.unReadCount;
+                realmModel.time = recentModel.time;
+                realmModel.content = recentModel.content;
+                [realm commitWriteTransaction];
             }
         }
             break;
@@ -206,11 +211,16 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 }
                 recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
                 recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content];
-                NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-                [fieldsValues safeSetObject:@(recentModel.unReadCount) forKey:@"unread_count"];
-                [fieldsValues safeSetObject:recentModel.content forKey:@"content"];
-                [fieldsValues safeSetObject:recentModel.time forKey:@"last_time"];
-                [[RecentChatDBManager sharedManager] customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:recentModel.identifier];
+                
+                
+                //update
+                LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
+                RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+                [realm beginWriteTransaction];
+                realmModel.unReadCount = recentModel.unReadCount;
+                realmModel.time = recentModel.time;
+                realmModel.content = recentModel.content;
+                [realm commitWriteTransaction];
             } else{
                 recentModel = [[RecentChatModel alloc] init];
                 recentModel.talkType = GJGCChatFriendTalkTypePostSystem;
@@ -276,12 +286,16 @@ CREATE_SHARED_MANAGER(LMConversionManager)
             recentModel.unReadCount += messageCount;
         }
         recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
-        NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-        [fieldsValues safeSetObject:@(recentModel.unReadCount) forKey:@"unread_count"];
-        [fieldsValues safeSetObject:recentModel.content forKey:@"content"];
-        [fieldsValues safeSetObject:recentModel.time forKey:@"last_time"];
-        [fieldsValues safeSetObject:@(groupNoteMyself) forKey:@"notice"];
-        [[RecentChatDBManager sharedManager] customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:recentModel.identifier];
+        
+        //update
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmModel.unReadCount = recentModel.unReadCount;
+        realmModel.time = recentModel.time;
+        realmModel.groupNoteMyself = recentModel.groupNoteMyself;
+        realmModel.content = recentModel.content;
+        [realm commitWriteTransaction];
     }
     
     [self reloadRecentChatWithRecentChatModel:recentModel needReloadBadge:messageCount > 0];

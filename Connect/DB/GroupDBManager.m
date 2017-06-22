@@ -451,6 +451,7 @@ static GroupDBManager *manager = nil;
     if (groupArray.count <= 0) {
         return nil;
     }
+    
     NSMutableArray *groupsArray = [NSMutableArray array];
     for (NSDictionary *dict in groupArray) {
         LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
