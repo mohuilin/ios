@@ -22,7 +22,7 @@
 
 @property(nonatomic, strong) NSMutableArray *dataArr;
 
-@property(nonatomic, strong) NSMutableArray *sectionTitleArr;
+@property(nonatomic, strong) NSMutableArray *sectionIndexArr;
 
 @property(nonatomic, strong) UITableView *tableView;
 
@@ -52,7 +52,7 @@ static NSString *friends = @"friends";
     
     [GCDQueue executeInGlobalQueue:^{
             self.dataArr = [[LMLinkManDataManager sharedManager] getFriendsArrWithNoConnect];
-            self.sectionTitleArr = [self getIndexArray:self.dataArr];
+            self.sectionIndexArr = [MMGlobal getIndexArray:self.dataArr];
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD hideHUDForView:weakSelf.view];
                 [weakSelf.tableView reloadData];
@@ -71,12 +71,13 @@ static NSString *friends = @"friends";
     }
     return _dataArr;
 }
-- (NSMutableArray *)sectionTitleArr {
-    if (!_sectionTitleArr) {
-        self.sectionTitleArr = [NSMutableArray array];
+- (NSMutableArray *)sectionIndexArr {
+    if (!_sectionIndexArr) {
+        self.sectionIndexArr = [NSMutableArray array];
     }
-    return _sectionTitleArr;
+    return _sectionIndexArr;
 }
+
 - (NSMutableArray *)selectedList {
     if (!_selectedList) {
         self.selectedList = [NSMutableArray array];
@@ -99,18 +100,6 @@ static NSString *friends = @"friends";
 
 }
 #pragma mark - method
-- (NSMutableArray *)getIndexArray:(NSMutableArray *)groupArray {
-    if (groupArray.count <= 0) {
-        return nil;
-    }
-    NSMutableArray *temArray = [NSMutableArray array];
-    for (NSMutableDictionary* dic in groupArray) {
-        if ([RegexKit isNotChinsesWithUrl:dic[@"title"]]) {
-            [temArray addObject:dic[@"title"]];
-        }
-    }
-    return temArray;
-}
 - (void)setRightBarButtonItemWithEnable:(BOOL)enable withDispalyString:(NSString *)titleName withDisplayColor:(UIColor *)color {
     self.navigationItem.rightBarButtonItems = nil;
 
@@ -154,7 +143,7 @@ static NSString *friends = @"friends";
     bgView.backgroundColor = LMBasicBackgroudGray;
     UILabel *titleOneLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, VSIZE.width - 20, AUTO_HEIGHT(40))];
     titleOneLabel.backgroundColor = LMBasicBackgroudGray;
-    titleOneLabel.text = [NSString stringWithFormat:@"%@", self.sectionTitleArr[section]];
+    titleOneLabel.text = [self.dataArr[section] valueForKey:@"title"];
     titleOneLabel.font = [UIFont systemFontOfSize:FONT_SIZE(26)];
     titleOneLabel.textColor = [UIColor blackColor];
     titleOneLabel.textAlignment = NSTextAlignmentLeft;
@@ -163,7 +152,7 @@ static NSString *friends = @"friends";
 }
 
 - (NSArray<NSString *> *)sectionIndexTitlesForTableView:(UITableView *)tableView {
-    return self.sectionTitleArr;
+    return self.sectionIndexArr;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
@@ -230,8 +219,8 @@ static NSString *friends = @"friends";
 -(void)dealloc {
     [self.selectedList removeAllObjects];
     self.selectedList = nil;
-    [self.sectionTitleArr removeAllObjects];
-    self.sectionTitleArr = nil;
+    [self.sectionIndexArr removeAllObjects];
+    self.sectionIndexArr = nil;
     [self.dataArr removeAllObjects];
     self.dataArr = nil;
 

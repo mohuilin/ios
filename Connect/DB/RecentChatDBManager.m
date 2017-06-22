@@ -91,8 +91,7 @@ static RecentChatDBManager *manager = nil;
     return result;
 }
 
-- (NSArray *)getAllRecentChat {
-    
+- (NSArray *)getAllRecentChat {    
     NSMutableArray *recentChatArrayM = [NSMutableArray array];
     RLMResults <LMRecentChat *> *results = [LMRecentChat allObjects];
     //model trasfer

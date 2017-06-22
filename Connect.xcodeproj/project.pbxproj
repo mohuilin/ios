@@ -871,6 +871,9 @@
 		D9E857071D48A3E0001C35A2 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857061D48A3E0001C35A2 /* MapKit.framework */; };
 		E39C2CB69BB018BF89D2831C /* libPods-ConnectTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA05F3C052536B3AAD8C0B5 /* libPods-ConnectTests.a */; };
 		F116E9601EA06AA500DCAED4 /* LMMessageExtendManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */; };
+		F11CF9A51EFA6CA400750437 /* LMContactAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */; };
+		F11CF9A81EFA724400750437 /* LMRamAddressBook.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A71EFA724400750437 /* LMRamAddressBook.m */; };
+		F11CF9AB1EFA742C00750437 /* LMFriendRequestInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */; };
 		F156BB621EC4681B00512743 /* LMlockGestureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F156BB611EC4681B00512743 /* LMlockGestureViewController.m */; };
 		F16FD7B81EC3205B002F9395 /* allocators.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16FADB31EC3203E002F9395 /* allocators.cpp */; };
 		F16FD7B91EC3205B002F9395 /* base58.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16FADB51EC3203E002F9395 /* base58.cpp */; };
@@ -1018,6 +1021,8 @@
 		F172A66F1EB8843C006E186C /* MMMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F172A66E1EB8843C006E186C /* MMMessage.m */; };
 		F17CBE2F1ED40C700067234D /* LMselectCountryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */; };
 		F17CBE321ED536920067234D /* LMDisplayProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE311ED536920067234D /* LMDisplayProgressView.m */; };
+		F1ADBAF01EF90C3500570DF6 /* LMRamGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */; };
+		F1ADBAF31EF97F6500570DF6 /* LMRamAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */; };
 		F1B363D21E85255600B65086 /* LMSearchTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F1B363D11E85255600B65086 /* LMSearchTextField.m */; };
 		F1CC2E941E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2E931E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m */; };
 		F1CC2ED91E95F0BA0045FBB7 /* NSArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2ED81E95F0BA0045FBB7 /* NSArray+LMSafeMethod.m */; };
@@ -2640,6 +2645,12 @@
 		DB39D5B93F12A5570FB2900B /* Pods-ConnectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConnectTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ConnectTests/Pods-ConnectTests.release.xcconfig"; sourceTree = "<group>"; };
 		F116E95E1EA06AA500DCAED4 /* LMMessageExtendManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMMessageExtendManager.h; sourceTree = "<group>"; };
 		F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMMessageExtendManager.m; sourceTree = "<group>"; };
+		F11CF9A31EFA6CA400750437 /* LMContactAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMContactAccountInfo.h; sourceTree = "<group>"; };
+		F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMContactAccountInfo.m; sourceTree = "<group>"; };
+		F11CF9A61EFA724400750437 /* LMRamAddressBook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamAddressBook.h; sourceTree = "<group>"; };
+		F11CF9A71EFA724400750437 /* LMRamAddressBook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamAddressBook.m; sourceTree = "<group>"; };
+		F11CF9A91EFA742C00750437 /* LMFriendRequestInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRequestInfo.h; sourceTree = "<group>"; };
+		F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRequestInfo.m; sourceTree = "<group>"; };
 		F156BB601EC4681B00512743 /* LMlockGestureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMlockGestureViewController.h; sourceTree = "<group>"; };
 		F156BB611EC4681B00512743 /* LMlockGestureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMlockGestureViewController.m; sourceTree = "<group>"; };
 		F16FADB31EC3203E002F9395 /* allocators.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = allocators.cpp; sourceTree = "<group>"; };
@@ -12571,6 +12582,10 @@
 		F17CBE311ED536920067234D /* LMDisplayProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMDisplayProgressView.m; sourceTree = "<group>"; };
 		F198A98A1EAF6043008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F198A98B1EAF6048008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F1ADBAEE1EF90C3500570DF6 /* LMRamGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamGroupInfo.h; sourceTree = "<group>"; };
+		F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamGroupInfo.m; sourceTree = "<group>"; };
+		F1ADBAF11EF97F6500570DF6 /* LMRamAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamAccountInfo.h; sourceTree = "<group>"; };
+		F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamAccountInfo.m; sourceTree = "<group>"; };
 		F1B363D01E85255600B65086 /* LMSearchTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSearchTextField.h; sourceTree = "<group>"; };
 		F1B363D11E85255600B65086 /* LMSearchTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMSearchTextField.m; sourceTree = "<group>"; };
 		F1CC2E921E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+LMSafeMethod.h"; sourceTree = "<group>"; };
@@ -15285,6 +15300,8 @@
 			children = (
 				D96104121EF7B453001A0998 /* LMBaseModel.h */,
 				D96104131EF7B453001A0998 /* LMBaseModel.m */,
+				F1ADBAEE1EF90C3500570DF6 /* LMRamGroupInfo.h */,
+				F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */,
 				D961041E1EF7D5F0001A0998 /* LMRecentChat.h */,
 				D961041F1EF7D5F0001A0998 /* LMRecentChat.m */,
 				D96104241EFA27B5001A0998 /* LMRecentChatSetting.h */,
@@ -15293,6 +15310,14 @@
 				D96104281EFA60AA001A0998 /* LMMessage.m */,
 				D961042A1EFA61C4001A0998 /* LMMessageExt.h */,
 				D961042B1EFA61C4001A0998 /* LMMessageExt.m */,
+				F1ADBAF11EF97F6500570DF6 /* LMRamAccountInfo.h */,
+				F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */,
+				F11CF9A31EFA6CA400750437 /* LMContactAccountInfo.h */,
+				F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */,
+				F11CF9A61EFA724400750437 /* LMRamAddressBook.h */,
+				F11CF9A71EFA724400750437 /* LMRamAddressBook.m */,
+				F11CF9A91EFA742C00750437 /* LMFriendRequestInfo.h */,
+				F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -32268,7 +32293,7 @@
 					};
 					D9217ECD1CE03D9100953F51 = {
 						CreatedOnToolsVersion = 7.3;
-						DevelopmentTeam = T3YMFT8962;
+						DevelopmentTeam = 9U6ZRRA66C;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -32823,6 +32848,7 @@
 				D9222FD81E822A3100D67110 /* YYDiskCache.m in Sources */,
 				D92232931E822BF800D67110 /* UIImageView+LMSetImageUrl.m in Sources */,
 				D9222FBC1E822A3100D67110 /* NSDate+YYAdd.m in Sources */,
+				F11CF9A81EFA724400750437 /* LMRamAddressBook.m in Sources */,
 				D92232771E822BF800D67110 /* UUImageAvatarBrowser.m in Sources */,
 				D9222FBB1E822A3100D67110 /* NSData+YYAdd.m in Sources */,
 				D92232EE1E822BF900D67110 /* GJCFCoreTextKeywordAttributedStringStyle.m in Sources */,
@@ -32847,6 +32873,7 @@
 				D92232541E822BF800D67110 /* Adapter.m in Sources */,
 				D95C04401E810902006C5C8A /* ChatNameCardCell.m in Sources */,
 				192350691E81200D0022D844 /* AccountWListCell.m in Sources */,
+				F11CF9AB1EFA742C00750437 /* LMFriendRequestInfo.m in Sources */,
 				D922329B1E822BF800D67110 /* UIView+ScreenShot.m in Sources */,
 				D9222FE81E822A3100D67110 /* YYAsyncLayer.m in Sources */,
 				D9C73AEB1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m in Sources */,
@@ -32897,6 +32924,7 @@
 				D9ACCD061EDFC6BC009A5869 /* NSObject+Swing.m in Sources */,
 				D92232A51E822BF800D67110 /* FXKeychain.m in Sources */,
 				D922325D1E822BF800D67110 /* GestureLockItem.m in Sources */,
+				F1ADBAF01EF90C3500570DF6 /* LMRamGroupInfo.m in Sources */,
 				D95C047C1E810902006C5C8A /* GJGCIconSeprateButton.m in Sources */,
 				F16FD7C31EC3205B002F9395 /* ecies.c in Sources */,
 				D92232861E822BF800D67110 /* NSString+iTunes.m in Sources */,
@@ -32961,6 +32989,7 @@
 				D92232E81E822BF900D67110 /* GJCFCoreTextRun.m in Sources */,
 				D95845211ECAF970004C8984 /* LMMessageAdapter.m in Sources */,
 				192352A21E81275B0022D844 /* LMRootModel.m in Sources */,
+				F1ADBAF31EF97F6500570DF6 /* LMRamAccountInfo.m in Sources */,
 				D92232E31E822BF900D67110 /* GJCFAssetsPreviewController.m in Sources */,
 				D92232B31E822BF800D67110 /* Language.m in Sources */,
 				19234F6F1E81160A0022D844 /* SearchResultController.m in Sources */,
@@ -33396,6 +33425,7 @@
 				F16FD7C21EC3205B002F9395 /* ecdsa.c in Sources */,
 				19234FD11E811B380022D844 /* BaseViewController.m in Sources */,
 				D95C04971E810902006C5C8A /* MemberHeaderView.m in Sources */,
+				F11CF9A51EFA6CA400750437 /* LMContactAccountInfo.m in Sources */,
 				D95C04411E810902006C5C8A /* ChatPayReceiptCell.m in Sources */,
 				D92233101E822BF900D67110 /* TZAssetModel.m in Sources */,
 				D9222D6E1E82283400D67110 /* LMHistoryCacheManager.m in Sources */,
@@ -33732,7 +33762,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = T3YMFT8962;
+				DEVELOPMENT_TEAM = 9U6ZRRA66C;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -33791,7 +33821,7 @@
 					"\"SystemConfiguration\"",
 				);
 				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = dev.connect.im;
+				PRODUCT_BUNDLE_IDENTIFIER = connect.im;
 				PRODUCT_NAME = Connect;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -33813,7 +33843,7 @@
 				CODE_SIGN_ENTITLEMENTS = Connect/Connect.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = T3YMFT8962;
+				DEVELOPMENT_TEAM = 9U6ZRRA66C;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -33879,7 +33909,7 @@
 					"\"SystemConfiguration\"",
 				);
 				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = dev.connect.im;
+				PRODUCT_BUNDLE_IDENTIFIER = connect.im;
 				PRODUCT_NAME = Connect;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

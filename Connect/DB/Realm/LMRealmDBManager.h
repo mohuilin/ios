@@ -11,6 +11,8 @@
 
 @interface LMRealmDBManager : NSObject
 
-+ (void)migartion;
++ (void)dataMigrationWithComplete:(void (^)(CGFloat progress))complete;
+
++ (void)saveInfo:(LMBaseModel *)ramModel;
 
 @end
