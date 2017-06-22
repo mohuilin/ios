@@ -195,10 +195,13 @@ static FMDatabaseQueue *queue;
             ramInfo.groupNicksName = info.groupNickName;
             ramInfo.pubKey = info.pub_key;
             ramInfo.isGroupAdmin = info.isGroupAdmin;
-            ramInfo.univerStr = [NSString stringWithFormat:@"%@%@",ramInfo.address,ramGroup.groupIdentifer];
+            if (info.isGroupAdmin) {
+              ramGroup.admin = ramInfo;
+            }
+            ramInfo.univerStr = [[NSString stringWithFormat:@"%@%@",ramInfo.address,ramGroup.groupIdentifer] sha1String];
             [ramMemberArray addObject:ramInfo];
         }
-        ramGroup.membersArray = ramMemberArray;
+        [ramGroup.membersArray addObjects:ramMemberArray];
         [groupsArray objectAddObject:ramGroup];
     }
     if (groupsArray.count > 0) {

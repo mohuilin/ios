@@ -28,5 +28,7 @@
 // groupSummary
 @property  NSString *summary;
 
+@property  LMRamAccountInfo *admin;
+
 @property RLMArray<LMRamAccountInfo *><LMRamAccountInfo> *membersArray;
 @end
