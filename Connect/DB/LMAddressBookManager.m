@@ -45,7 +45,7 @@ static LMAddressBookManager *manager = nil;
     ramBook.address = address;
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     [realm beginWriteTransaction];
-    [realm addObject:ramBook];
+    [realm addOrUpdateObject:ramBook];
     [realm commitWriteTransaction];
     
     
@@ -73,7 +73,7 @@ static LMAddressBookManager *manager = nil;
     if (bitchValues.count > 0) {
         RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
         [realm beginWriteTransaction];
-        [realm addObjects:bitchValues];
+        [realm addOrUpdateObjectsFromArray:bitchValues];
         [realm commitWriteTransaction];
     }
 }
