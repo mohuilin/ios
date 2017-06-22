@@ -7,6 +7,8 @@
 //
 
 #import "LMBaseModel.h"
+#import "RecentChatModel.h"
+#import "LMRecentChatSetting.h"
 
 @interface LMRecentChat : LMBaseModel
 
@@ -18,10 +20,14 @@
 @property NSString *draft;
 @property BOOL isTopChat;
 @property BOOL stranger;
-@property BOOL notifyStatus;
 @property BOOL groupNoteMyself;
 @property int unReadCount;
-@property int snapChatDeleteTime;
 @property int talkType;
+
+@property (nonatomic ,strong) LMRecentChatSetting *chatSetting;
+
+- (LMRecentChat *)initWithRecentModel:(RecentChatModel *)model;
+
+- (RecentChatModel *)recentModel;
 
 @end

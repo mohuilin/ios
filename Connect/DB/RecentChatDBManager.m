@@ -15,7 +15,6 @@
 #import "LMBaseSSDBManager.h"
 #import "LMConversionManager.h"
 #import "LMRealmDBManager.h"
-#import "RLMRealm+LMRLMRealm.h"
 
 
 static RecentChatDBManager *manager = nil;
@@ -47,12 +46,10 @@ static RecentChatDBManager *manager = nil;
 
 - (void)deleteAllMessageTable {
     NSArray *recentChatArray = [self getAllRecentChat];
-
     for (RecentChatModel *model in recentChatArray) {
         if (GJCFStringIsNull(model.identifier)) {
             continue;
         }
-
         BOOL result = [self dropTableWithTableName:model.identifier.sha1String];
         if (result) {
             DDLogInfo(@"delete table failed");
@@ -67,7 +64,6 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-
     BOOL result = [self dropTableWithTableName:identifer.sha1String];
     if (result) {
         DDLogInfo(@"delete table failed");
@@ -84,10 +80,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(messageid)) {
         return NO;
     }
-
-
     BOOL result = [self deleteTableName:identifer.sha1String conditions:@{@"message_id": messageid}];
-
     if (result) {
         NSString *msg = [NSString stringWithFormat:@"delete message success ：%@ --msg id：%@", identifer.sha1String, messageid];
         DDLogInfo(@"%@", msg);
@@ -95,38 +88,22 @@ static RecentChatDBManager *manager = nil;
         NSString *msg = [NSString stringWithFormat:@"delete message failed ：%@ --msgid：%@", identifer.sha1String, messageid];
         DDLogInfo(@"%@", msg);
     }
-
     return result;
-
 }
 
 - (NSArray *)getAllRecentChat {
-    NSMutableArray *recentChatArrayM = [NSMutableArray array];
-    DDLogInfo(@"sqllite db");
-    NSString *querySql = @"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier order by c.last_time desc";
-    NSArray *resultArray = [self queryWithSql:querySql];
     
-    for (NSDictionary *resultDict in resultArray) {
-        RecentChatModel *model = [RecentChatModel new];
-        model.identifier = [resultDict safeObjectForKey:@"identifier"];
-        model.name = [resultDict safeObjectForKey:@"name"];
-        model.headUrl = [resultDict safeObjectForKey:@"avatar"];
-        model.draft = [resultDict safeObjectForKey:@"draft"];
-        model.stranger = [[resultDict safeObjectForKey:@"stranger"] boolValue];
-        model.time = [[resultDict safeObjectForKey:@"last_time"] stringValue];
-        model.unReadCount = [[resultDict safeObjectForKey:@"unread_count"] intValue];
-        model.isTopChat = [[resultDict safeObjectForKey:@"top"] boolValue];
-        model.groupNoteMyself = [[resultDict safeObjectForKey:@"notice"] boolValue];
-        model.talkType = [[resultDict safeObjectForKey:@"type"] integerValue];
-        model.content = [resultDict safeObjectForKey:@"content"];
-        model.snapChatDeleteTime = [[resultDict safeObjectForKey:@"snap_time"] intValue];
-        model.notifyStatus = [[resultDict safeObjectForKey:@"disturb"] boolValue];
+    NSMutableArray *recentChatArrayM = [NSMutableArray array];
+    RLMResults <LMRecentChat *> *results = [LMRecentChat allObjects];
+    //model trasfer
+    for (LMRecentChat *realmModel in results) {
+        RecentChatModel *model = [realmModel recentModel];
         [recentChatArrayM addObject:model];
     }
-    
     //sort
     [recentChatArrayM sortUsingSelector:@selector(comparedata:)];
     return recentChatArrayM;
+
 }
 
 - (void)getAllRecentChatWithComplete:(void (^)(NSArray *))complete {
@@ -138,22 +115,10 @@ static RecentChatDBManager *manager = nil;
 }
 
 - (void)getTopChatCountWithComplete:(void (^)(int count))complete {
-    [GCDQueue executeInGlobalQueue:^{
-        if (complete) {
-            NSString *sql = [NSString stringWithFormat:@"SELECT count(*) as count FROM %@ WHERE top_chat = 1", RecentChatTable];
-            NSDictionary *dict = [[self queryWithSql:sql] lastObject];
-            int count = [[dict safeObjectForKey:@"count"] intValue];
-            [GCDQueue executeInMainQueue:^{
-                if (complete) {
-                    complete(count);
-                }
-            }];
-        }
-    }];
-}
-
-- (void)getAllBaseInfoRecentChatWithComplete:(void (^)(NSArray *recentChats))complete {
-
+    RLMResults <LMRecentChat *> *results = [LMRecentChat objectsWhere:@"top_chat = 1"];
+    if (complete) {
+        complete((int)results.count);
+    }
 }
 
 - (void)save:(RecentChatModel *)model {
@@ -164,32 +129,14 @@ static RecentChatDBManager *manager = nil;
         return;
     }
 
-    NSMutableArray *bitchValues = [NSMutableArray array];
-    [bitchValues objectAddObject:@[model.identifier,
-            model.name,
-            model.headUrl,
-            model.draft,
-            @(model.stranger),
-            model.time,
-            @(model.unReadCount),
-            @(model.isTopChat),
-            @(model.groupNoteMyself),
-            @(model.talkType),
-            model.content]];
-    BOOL result = [self executeUpdataOrInsertWithTable:RecentChatTable fields:@[@"identifier", @"name", @"avatar", @"draft", @"stranger", @"last_time", @"unread_count", @"top", @"notice", @"type", @"content"] batchValues:bitchValues];
-    if (result) {
-
-        [[SessionManager sharedManager] setRecentChat:model];
-        DDLogInfo(@"Save success");
-    } else {
-        DDLogInfo(@"Save fail");
-    }
-
-    [bitchValues removeAllObjects];
-    [bitchValues objectAddObject:@[model.identifier,
-            @(model.snapChatDeleteTime),
-            @(model.notifyStatus)]];
-    [self executeUpdataOrInsertWithTable:RecentChatTableSetting fields:@[@"identifier", @"snap_time", @"disturb"] batchValues:bitchValues];
+    LMRecentChat *realmModel = [[LMRecentChat alloc] initWithRecentModel:model];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [realm addOrUpdateObject:realmModel];
+    [realm commitWriteTransaction];
+    
+    //add to session
+    [[SessionManager sharedManager] setRecentChat:model];
 }
 
 - (void)deleteByIdentifier:(NSString *)identifier {
@@ -197,13 +144,13 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    BOOL result = [self deleteTableName:RecentChatTable conditions:@{@"identifier": identifier}];
-    //remove draft
-    [self removeDraftWithIdentifier:identifier];
-    if (result) {
-        DDLogInfo(@"success");
-    } else {
-        DDLogError(@"fail");
+    
+    RLMResults <LMRecentChat *> *results = [LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]];
+    if (results.firstObject) {
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        [realm deleteObject:[results firstObject]];
+        [realm commitWriteTransaction];
     }
     [[LMConversionManager sharedManager] deleteConversationWithIdentifier:identifier];
 }
@@ -212,18 +159,22 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    [self deleteTableName:RecentChatTableSetting conditions:@{@"identifier": identifier}];
+    RLMResults <LMRecentChat *> *results = [LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]];
+    if (results.firstObject) {
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        [realm deleteObject:[results firstObject]];
+        [realm commitWriteTransaction];
+    }
 }
 
 - (void)getAllUnReadCountWithComplete:(void (^)(int count))complete {
-    NSString *sql = @"select sum(c.unread_count) as unreadcount from t_conversion c,t_conversion_setting s where c.identifier = s.identifier and s.disturb = 0";
-    NSDictionary *dict = [[self queryWithSql:sql] lastObject];
-    id totalUnreadCount = [dict safeObjectForKey:@"unreadcount"];
-    int count = 0;
-    if (totalUnreadCount != [NSNull null]) {
-        count = [totalUnreadCount intValue];
-    }
     if (complete) {
+        RLMResults <LMRecentChat *> *results = [LMRecentChat objectsWhere:@"chatSetting.notifyStatus == 0"];
+        int count = 0;
+        for (LMRecentChat *realmModel in results) {
+            count += realmModel.unReadCount;
+        }
         complete(count);
     }
 }
@@ -235,18 +186,21 @@ static RecentChatDBManager *manager = nil;
     if (snapTime < 0) {
         snapTime = 0;
     }
-    [self updateTableName:RecentChatTableSetting fieldsValues:@{@"snap_time": @(snapTime)} conditions:@{@"identifier": identifier}];
+    
+    LMRecentChatSetting *setting = [[LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    setting.snapChatDeleteTime = snapTime;
+    [realm commitWriteTransaction];
 }
 
 - (int)getSnapTimeWithChatIdentifer:(NSString *)identifier {
     if (GJCFStringIsNull(identifier)) {
         return 0;
     }
-    NSDictionary *snapTime = [[self getDatasFromTableName:RecentChatTableSetting conditions:@{@"identifier": identifier} fields:@[@"snap_time"]] lastObject];
-    if (snapTime) {
-        return [[snapTime safeObjectForKey:@"snap_time"] intValue];
-    }
-    return 0;
+    LMRecentChatSetting *setting = [[LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    return setting.snapChatDeleteTime;
 }
 
 
@@ -254,29 +208,14 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return nil;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier and s.identifier = '%@'", identifier];
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSDictionary *resultDict = [resultArray lastObject];
-    RecentChatModel *model = nil;
-    if (resultDict) {
-        model = [RecentChatModel new];
-        model.identifier = [resultDict safeObjectForKey:@"identifier"];
-        model.name = [resultDict safeObjectForKey:@"name"];
-        model.headUrl = [resultDict safeObjectForKey:@"avatar"];
-        model.draft = [resultDict safeObjectForKey:@"draft"];
-        model.stranger = [[resultDict safeObjectForKey:@"stranger"] boolValue];
-        model.time = [resultDict safeObjectForKey:@"last_time"];
-        model.unReadCount = [[resultDict safeObjectForKey:@"unread_count"] intValue];
-        model.isTopChat = [[resultDict safeObjectForKey:@"top"] boolValue];
-        model.groupNoteMyself = [[resultDict safeObjectForKey:@"notice"] boolValue];
-        model.talkType = [[resultDict safeObjectForKey:@"type"] integerValue];
-        model.content = [resultDict safeObjectForKey:@"content"];
-        model.snapChatDeleteTime = [[resultDict safeObjectForKey:@"snap_time"] intValue];
-        model.notifyStatus = [[resultDict safeObjectForKey:@"disturb"] boolValue];
-
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    RecentChatModel *model = [realmModel recentModel];
+    if (model) {
         [[SessionManager sharedManager] setRecentChat:model];
+        return model;
+    } else {
+        return nil;
     }
-    return model;
 }
 
 
@@ -285,8 +224,8 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    int count = (int) [self getCountFromCurrentDBWithTableName:RecentChatTable condition:@{@"identifier": identifier} symbol:0];
-    if (count == 0) {
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    if (!realmModel) {
         RecentChatModel *model = [RecentChatModel new];
         model.identifier = identifier;
         LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:identifier];
@@ -307,11 +246,11 @@ static RecentChatDBManager *manager = nil;
         model.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
         [self save:model];
     } else {
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        [self                     updateTableName:RecentChatTable fieldsValues:@{@"top": @(1),
-                @"last_time": @(time)} conditions:@{@"identifier": identifier}];
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmModel.isTopChat = YES;
+        [realm commitWriteTransaction];
     }
-    
     [[LMConversionManager sharedManager] chatTop:YES identifier:identifier];
 }
 
@@ -319,8 +258,13 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    BOOL result = [self updateTableName:RecentChatTable fieldsValues:@{@"top": @(0)} conditions:@{@"identifier": identifier}];
-    if (result) {
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    if (realmModel) {
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmModel.isTopChat = NO;
+        [realm commitWriteTransaction];
+        
         [[LMConversionManager sharedManager] chatTop:NO identifier:identifier];
     }
 }
@@ -329,9 +273,8 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return NO;
     }
-
-    NSDictionary *temD = [[self getDatasFromTableName:RecentChatTable conditions:@{@"identifier": identifier} fields:@[@"top"]] lastObject];
-    return [[temD safeObjectForKey:@"top"] boolValue];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    return realmModel.isTopChat;
 }
 
 
@@ -340,38 +283,44 @@ static RecentChatDBManager *manager = nil;
         return;
     }
     draft = draft ? draft : @"";
-    //update
-    NSString *key = [NSString stringWithFormat:@"%@_draft",identifier];
-    LMBaseSSDBManager *manager = [LMBaseSSDBManager open:@"system_message"];
-    [manager set:key string:draft];
-    [manager close];
-    [GCDQueue executeInMainQueue:^{
-        SendNotify(SendDraftChangeNotification, (@{@"identifier": identifier,
-                                                   @"draft": draft}));
-    }];
-//    [self updateTableName:RecentChatTable fieldsValues:@{@"draft": draft} conditions:@{@"identifier": identifier}];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.draft = draft;
+    [realm commitWriteTransaction];
 }
 
 - (void)removeDraftWithIdentifier:(NSString *)identifier {
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    NSString *key = [NSString stringWithFormat:@"%@_draft",identifier];
-    LMBaseSSDBManager *manager = [LMBaseSSDBManager open:@"system_message"];
-    [manager set:key string:@""];
-    [manager close];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.draft = @"";
+    [realm commitWriteTransaction];
 }
 
 - (void)removeLastContentWithIdentifier:(NSString *)identifier {
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    [self updateTableName:RecentChatTable fieldsValues:@{@"content": @""} conditions:@{@"identifier": identifier}];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.content = @"";
+    [realm commitWriteTransaction];
 }
 
 
 - (void)removeAllLastContent {
-    [self updateTableName:RecentChatTable fieldsValues:@{@"content": @""} conditions:nil];
+    RLMResults <LMRecentChat *> *results = [LMRecentChat allObjects];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    for (LMRecentChat *realmModel in results) {
+        realmModel.content = @"";
+    }
+    [realm commitWriteTransaction];
 }
 
 
@@ -379,54 +328,57 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return @"";
     }
-    NSString *key = [NSString stringWithFormat:@"%@_draft",identifier];
-    LMBaseSSDBManager *manager = [LMBaseSSDBManager open:@"system_message"];
-    NSString *draft;
-    [manager get:key string:&draft];
-    [manager close];
-    return draft;
-//    NSDictionary *temD = [[self getDatasFromTableName:RecentChatTable conditions:@{@"identifier": identifier} fields:@[@"draft"]] lastObject];
-//    return [temD safeObjectForKey:@"draft"];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    return realmModel.draft;
 }
 
 - (void)updataUnReadCount:(int)unreadCount idetifier:(NSString *)idetifier {
     if (GJCFStringIsNull(idetifier)) {
         return;
     }
-    [self updateTableName:RecentChatTable fieldsValues:@{@"unread_count": @(unreadCount)} conditions:@{@"identifier": idetifier}];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",idetifier]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.unReadCount = unreadCount;
+    [realm commitWriteTransaction];
 }
 
 - (void)updataStrangerStatus:(BOOL)stranger idetifier:(NSString *)idetifier{
     if (GJCFStringIsNull(idetifier)) {
         return;
     }
-    [self updateTableName:RecentChatTable fieldsValues:@{@"stranger": @(stranger)} conditions:@{@"identifier": idetifier}];
+    
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",idetifier]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.stranger = stranger;
+    [realm commitWriteTransaction];
 }
 
 - (void)clearUnReadCountWithIdetifier:(NSString *)idetifier {
     [self updataUnReadCount:0 idetifier:idetifier];
 }
 
-- (void)customUpdateRecentChatTableWithFieldsValues:(NSDictionary *)fieldsValues withIdentifier:(NSString *)identifier {
-
-    if (GJCFStringIsNull(identifier)) {
-        return;
-    }
-    [self updateTableName:RecentChatTable fieldsValues:fieldsValues conditions:@{@"identifier": identifier}];
-}
-
 - (void)setGroupNoteMyselfWithIdentifer:(NSString *)identifer {
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    [self updateTableName:RecentChatTable fieldsValues:@{@"notice": @(1)} conditions:@{@"identifier": identifer}];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.groupNoteMyself = YES;
+    [realm commitWriteTransaction];
 }
 
 - (void)clearGroupNoteMyselfWithIdentifer:(NSString *)identifer {
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    [self updateTableName:RecentChatTable fieldsValues:@{@"notice": @(0)} conditions:@{@"identifier": identifer}];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.groupNoteMyself = NO;
+    [realm commitWriteTransaction];
 }
 
 
@@ -434,17 +386,23 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-
-    [self updateTableName:RecentChatTableSetting fieldsValues:@{@"disturb": @(1)} conditions:@{@"identifier": identifer}];
-
-    [self updateTableName:RecentChatTable fieldsValues:@{@"unread_count": @(0)} conditions:@{@"identifier": identifer}];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.unReadCount = 0;
+    realmModel.chatSetting.notifyStatus = YES;
+    [realm commitWriteTransaction];
 }
 
 - (void)removeMuteWithIdentifer:(NSString *)identifer {
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    [self updateTableName:RecentChatTableSetting fieldsValues:@{@"disturb": @(0)} conditions:@{@"identifier": identifer}];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.chatSetting.notifyStatus = NO;
+    [realm commitWriteTransaction];
 }
 
 
@@ -452,8 +410,8 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return NO;
     }
-    NSDictionary *dict = [[self getDatasFromTableName:RecentChatTableSetting conditions:@{@"identifier": identifer} fields:@[@"disturb"]] lastObject];
-    return [[dict safeObjectForKey:@"disturb"] boolValue];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    return realmModel.chatSetting.notifyStatus;
 }
 
 - (void)openSnapChatWithIdentifier:(NSString *)identifier snapTime:(int)snapTime openOrCloseByMyself:(BOOL)flag {
@@ -471,14 +429,14 @@ static RecentChatDBManager *manager = nil;
         }
         recentChat.time = last_time;
         recentChat.snapChatDeleteTime = snapTime;
-
-        [self openOrCloseSnapChatWithTime:snapTime chatIdentifer:identifier];
-
-        NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-        [fieldsValues safeSetObject:@(recentChat.unReadCount) forKey:@"unread_count"];
-        [fieldsValues safeSetObject:recentChat.time forKey:@"last_time"];
-
-        [self customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:identifier];
+        //update
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentChat.identifier]] firstObject];
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmModel.unReadCount = recentChat.unReadCount;
+        realmModel.time = recentChat.time;
+        realmModel.chatSetting.snapChatDeleteTime = recentChat.snapChatDeleteTime;
+        [realm commitWriteTransaction];
     } else {
         AccountInfo *contact = [[UserDBManager sharedManager] getUserByPublickey:identifier];
         if (!contact) {
@@ -493,6 +451,7 @@ static RecentChatDBManager *manager = nil;
         int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
         recentChat.time = [NSString stringWithFormat:@"%lld", time];
         recentChat.identifier = identifier;
+        
         recentChat.unReadCount = 0;
         recentChat.snapChatDeleteTime = snapTime;
         recentChat.chatUser = contact;
@@ -513,9 +472,13 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    int long long time = [[NSDate date] timeIntervalSince1970];
-    NSString *last_time = [NSString stringWithFormat:@"%lld", time];
-    [self updateTableName:RecentChatTable fieldsValues:@{@"last_time": last_time} conditions:@{@"identifier": identifer}];
+    int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
+    //update
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmModel.time = [NSString stringWithFormat:@"%lld", time];
+    [realm commitWriteTransaction];
 }
 
 
@@ -535,11 +498,15 @@ static RecentChatDBManager *manager = nil;
         recentChat.content = content;
         recentChat.time = last_time;
         recentChat.content = content;
-        NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-        [fieldsValues safeSetObject:@(recentChat.unReadCount) forKey:@"unread_count"];
-        [fieldsValues safeSetObject:recentChat.content forKey:@"content"];
-        [fieldsValues safeSetObject:recentChat.time forKey:@"last_time"];
-        [self customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:identifier];
+
+        //update
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentChat.identifier]] firstObject];
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmModel.unReadCount = recentChat.unReadCount;
+        realmModel.time = recentChat.time;
+        realmModel.content = recentChat.content;
+        [realm commitWriteTransaction];
     } else {
         if (groupChat) {
             int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
@@ -629,13 +596,15 @@ static RecentChatDBManager *manager = nil;
         }
         recentChat.content = content;
         recentChat.time = last_time;
-
-        NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-        [fieldsValues safeSetObject:@(recentChat.unReadCount) forKey:@"unread_count"];
-        [fieldsValues safeSetObject:recentChat.content forKey:@"content"];
-        [fieldsValues safeSetObject:recentChat.time forKey:@"last_time"];
-
-        [self customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:identifier];
+        
+        //update
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentChat.identifier]] firstObject];
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmModel.unReadCount = recentChat.unReadCount;
+        realmModel.time = recentChat.time;
+        realmModel.content = recentChat.content;
+        [realm commitWriteTransaction];
 
         [GCDQueue executeInMainQueue:^{
             SendNotify(ConnnectRecentChatChangeNotification, recentChat);
@@ -731,13 +700,15 @@ static RecentChatDBManager *manager = nil;
             recentChat.unReadCount++;
         }
         recentChat.time = last_time;
-
-        NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-        [fieldsValues safeSetObject:@(recentChat.unReadCount) forKey:@"unread_count"];
-        [fieldsValues safeSetObject:recentChat.content forKey:@"content"];
-        [fieldsValues safeSetObject:recentChat.time forKey:@"last_time"];
-
-        [self customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:user.pub_key];
+        
+        //update
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentChat.identifier]] firstObject];
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmModel.unReadCount = recentChat.unReadCount;
+        realmModel.time = recentChat.time;
+        realmModel.content = recentChat.content;
+        [realm commitWriteTransaction];
 
     } else {
         recentChat = [[RecentChatModel alloc] init];
@@ -793,17 +764,18 @@ static RecentChatDBManager *manager = nil;
         }
         int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
         NSString *last_time = [NSString stringWithFormat:@"%lld", time];
-
         model.unReadCount = unRead;
         model.content = message.content;
-
         model.time = last_time;
-        NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-        [fieldsValues safeSetObject:@(model.unReadCount) forKey:@"unread_count"];
-        [fieldsValues safeSetObject:model.content forKey:@"content"];
-        [fieldsValues safeSetObject:model.time forKey:@"last_time"];
-
-        [self customUpdateRecentChatTableWithFieldsValues:fieldsValues withIdentifier:kSystemIdendifier];
+        
+        //update
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",model.identifier]] firstObject];
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmModel.unReadCount = model.unReadCount;
+        realmModel.time = model.time;
+        realmModel.content = model.content;
+        [realm commitWriteTransaction];
 
     } else {
         model = [[RecentChatModel alloc] init];

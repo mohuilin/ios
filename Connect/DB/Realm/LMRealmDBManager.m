@@ -11,7 +11,7 @@
 #import "BaseDB.h"
 #import "RecentChatModel.h"
 #import "LMRecentChat.h"
-#import "RLMRealm+LMRLMRealm.h"
+#import "LMMessage.h"
 
 @implementation LMRealmDBManager
 
@@ -23,14 +23,57 @@
         olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
         if (GJCFFileIsExist(olddbPath)) {
             //data migration
-            
-            [self saveRecentChatToRealm];
-            
-            
+//            [self saveRecentChatToRealm];
+//            
+//            
+//            [self saveMessagesToRealm];
             
             //remove old database
             
         }
+    }
+}
+
+
++ (void)saveMessagesToRealm{
+    //query
+    NSString *querySql = @"select message_id,message_ower,content,send_status,snap_time,read_time,state,createtime from t_message";
+    NSArray *resultArray = [self queryWithSql:querySql];
+    NSMutableArray *chatMessages = [NSMutableArray array];
+    for (NSDictionary *temD in resultArray) {
+        ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
+        chatMessage.ID = [[temD safeObjectForKey:@"id"] integerValue];
+        chatMessage.messageOwer = [temD safeObjectForKey:@"message_ower"];
+        chatMessage.messageId = [temD safeObjectForKey:@"message_id"];
+        chatMessage.createTime = [[temD safeObjectForKey:@"createtime"] integerValue];
+        chatMessage.readTime = [[temD safeObjectForKey:@"read_time"] integerValue];
+        chatMessage.snapTime = [[temD safeObjectForKey:@"snap_time"] integerValue];
+        chatMessage.sendstatus = [[temD safeObjectForKey:@"send_status"] integerValue];
+        chatMessage.state = [[temD safeObjectForKey:@"state"] intValue];
+        if (chatMessage.state == 0) {
+            chatMessage.state = chatMessage.readTime > 0 ? 1 : 0;
+        }
+        
+        NSDictionary *contentDict = [[temD safeObjectForKey:@"content"] mj_JSONObject];
+        NSString *aad = [contentDict safeObjectForKey:@"aad"];
+        NSString *iv = [contentDict safeObjectForKey:@"iv"];
+        NSString *tag = [contentDict safeObjectForKey:@"tag"];
+        NSString *ciphertext = [contentDict safeObjectForKey:@"ciphertext"];
+        NSString *messageString = [KeyHandle xtalkDecodeAES_GCM:[[LKUserCenter shareCenter] getLocalGCDEcodePass] data:ciphertext aad:aad iv:iv tag:tag];
+        
+        chatMessage.message = [MMMessage mj_objectWithKeyValues:messageString];
+        chatMessage.message.sendstatus = chatMessage.sendstatus;
+        chatMessage.message.isRead = chatMessage.readTime > 0;
+        chatMessage.messageType = chatMessage.message.type;
+        
+        LMMessage *realmModel = [[LMMessage alloc] initWithChatMessage:chatMessage];
+        [chatMessages objectAddObject:realmModel];
+    }
+    if (chatMessages.count) {
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        [realm addOrUpdateObjectsFromArray:chatMessages];
+        [realm commitWriteTransaction];
     }
 }
 
@@ -58,20 +101,7 @@
         
         
         //package bradge model
-        LMRecentChat *realmModel = [LMRecentChat new];
-        realmModel.identifier = model.identifier;
-        realmModel.name = model.name;
-        realmModel.headUrl = model.headUrl;
-        realmModel.time = model.time;
-        realmModel.content = model.content;
-        realmModel.isTopChat = model.isTopChat;
-        realmModel.stranger = model.stranger;
-        realmModel.notifyStatus = model.notifyStatus;
-        realmModel.groupNoteMyself = model.groupNoteMyself;
-        realmModel.snapChatDeleteTime = model.snapChatDeleteTime;
-        realmModel.unReadCount = model.unReadCount;
-        realmModel.talkType = (int)model.talkType;
-        realmModel.draft = model.draft;
+        LMRecentChat *realmModel = [[LMRecentChat alloc] initWithRecentModel:model];
         
         [recentChatArrayM addObject:realmModel];
     }
