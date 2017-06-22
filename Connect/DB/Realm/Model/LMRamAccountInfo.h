@@ -19,6 +19,7 @@
 @property  NSString *pubKey;
 @property  BOOL isGroupAdmin;
 @property  NSString *univerStr;
+@property  LMRamAccountInfo *admin;
 
 @end
 

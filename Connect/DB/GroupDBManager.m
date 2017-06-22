@@ -53,12 +53,21 @@ static GroupDBManager *manager = nil;
     if (textString == nil) {
         textString = @"";
     }
-    NSMutableDictionary *fieldValues = @{}.mutableCopy;
-    [fieldValues safeSetObject:textString forKey:@"summary"];
-    BOOL result = [self updateTableName:GroupInformationTable fieldsValues:fieldValues conditions:@{@"identifier": groupId}];
-    if (!result) {
-        DDLogInfo(@"failed");
-    }
+//    NSMutableDictionary *fieldValues = @{}.mutableCopy;
+//    [fieldValues safeSetObject:textString forKey:@"summary"];
+//    BOOL result = [self updateTableName:GroupInformationTable fieldsValues:fieldValues conditions:@{@"identifier": groupId}];
+//    if (!result) {
+//        DDLogInfo(@"failed");
+//    }
+    LMRamGroupInfo *ramGroupInfo = [LMRamGroupInfo new];
+    ramGroupInfo.groupIdentifer = groupId;
+    ramGroupInfo.summary = textString;
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [LMRamGroupInfo createInRealm:realm withValue:ramGroupInfo];
+    [realm commitWriteTransaction];
+    
+    
 }
 
 - (LMGroupInfo *)addMember:(NSArray *)newMembers ToGroupChat:(NSString *)groupId {
@@ -194,6 +203,7 @@ static GroupDBManager *manager = nil;
     
     
     
+    
 }
 
 - (void)updateGroup:(LMGroupInfo *)group {
@@ -281,19 +291,35 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(name) || GJCFStringIsNull(groupId)) {
         return;
     }
-    NSMutableDictionary *fieldValues = @{}.mutableCopy;
-    [fieldValues safeSetObject:name forKey:@"name"];
-    [self updateTableName:GroupInformationTable fieldsValues:fieldValues conditions:@{@"identifier": groupId}];
-
+//    NSMutableDictionary *fieldValues = @{}.mutableCopy;
+//    [fieldValues safeSetObject:name forKey:@"name"];
+//    [self updateTableName:GroupInformationTable fieldsValues:fieldValues conditions:@{@"identifier": groupId}];
+    LMRamGroupInfo *ramGroupInfo = [LMRamGroupInfo new];
+    ramGroupInfo.groupIdentifer = groupId;
+    ramGroupInfo.groupName = name;
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [LMRamGroupInfo createInRealm:realm withValue:ramGroupInfo];
+    [realm commitWriteTransaction];
+    
 }
 
 - (void)updateGroupAvatarUrl:(NSString *)avatarUrl groupId:(NSString *)groupId {
     if (GJCFStringIsNull(avatarUrl) || GJCFStringIsNull(groupId)) {
         return;
     }
-    NSMutableDictionary *fieldValues = @{}.mutableCopy;
-    [fieldValues safeSetObject:avatarUrl forKey:@"avatar"];
-    [self updateTableName:GroupInformationTable fieldsValues:fieldValues conditions:@{@"identifier": groupId}];
+//    NSMutableDictionary *fieldValues = @{}.mutableCopy;
+//    [fieldValues safeSetObject:avatarUrl forKey:@"avatar"];
+//    [self updateTableName:GroupInformationTable fieldsValues:fieldValues conditions:@{@"identifier": groupId}];
+    LMRamGroupInfo *ramGroupInfo = [LMRamGroupInfo new];
+    ramGroupInfo.groupIdentifer = groupId;
+    ramGroupInfo.avatarUrl = avatarUrl;
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [LMRamGroupInfo createInRealm:realm withValue:ramGroupInfo];
+    [realm commitWriteTransaction];
+    
+    
 }
 
 
@@ -472,9 +498,12 @@ static GroupDBManager *manager = nil;
         return NO;
     }
 
-    NSDictionary *dict = [[self getDatasFromTableName:GroupInformationTable conditions:@{@"identifier": groupid} fields:@[@"pub"]] lastObject];
-
-    return [[dict safeObjectForKey:@"pub"] boolValue];
+//    NSDictionary *dict = [[self getDatasFromTableName:GroupInformationTable conditions:@{@"identifier": groupid} fields:@[@"pub"]] lastObject];
+//
+//    return [[dict safeObjectForKey:@"pub"] boolValue];
+    RLMResults<LMRamGroupInfo *> *ramGroupInfoResult = [LMRamGroupInfo objectsWhere:@"groupIdentifer = '%@'",groupid];
+    LMRamGroupInfo *ramGroupInfo = [ramGroupInfoResult firstObject];
+    return ramGroupInfo.isPublic;
 }
 
 - (void)getAllgroupsWithComplete:(void (^)(NSArray *groups))complete {
@@ -548,28 +577,44 @@ static GroupDBManager *manager = nil;
         return;
     }
 
-    BOOL result = [self updateTableName:GroupInformationTable fieldsValues:@{@"pub": @(1)} conditions:@{@"identifier": groupid}];
-    if (result) {
-        DDLogInfo(@"success");
-    } else {
-        DDLogError(@"failed");
-    }
+//    BOOL result = [self updateTableName:GroupInformationTable fieldsValues:@{@"pub": @(1)} conditions:@{@"identifier": groupid}];
+//    if (result) {
+//        DDLogInfo(@"success");
+//    } else {
+//        DDLogError(@"failed");
+//    }
+    LMRamGroupInfo *ramGroupInfo = [LMRamGroupInfo new];
+    ramGroupInfo.groupIdentifer = groupid;
+    ramGroupInfo.isPublic = YES;
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [LMRamGroupInfo createInRealm:realm withValue:ramGroupInfo];
+    [realm commitWriteTransaction];
+    
 }
 
 - (void)updateGroupPublic:(BOOL)isPublic groupId:(NSString *)groupid {
     if (GJCFStringIsNull(groupid)) {
         return;
     }
-    int value = 0;
-    if (isPublic) {
-        value = 1;
-    }
-    BOOL result = [self updateTableName:GroupInformationTable fieldsValues:@{@"pub": @(value)} conditions:@{@"identifier": groupid}];
-    if (result) {
-        DDLogInfo(@"success ");
-    } else {
-        DDLogError(@"failed");
-    }
+//    int value = 0;
+//    if (isPublic) {
+//        value = 1;
+//    }
+//    BOOL result = [self updateTableName:GroupInformationTable fieldsValues:@{@"pub": @(value)} conditions:@{@"identifier": groupid}];
+//    if (result) {
+//        DDLogInfo(@"success ");
+//    } else {
+//        DDLogError(@"failed");
+//    }
+    LMRamGroupInfo *ramGroupInfo = [LMRamGroupInfo new];
+    ramGroupInfo.groupIdentifer = groupid;
+    ramGroupInfo.isPublic = isPublic;
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [LMRamGroupInfo createInRealm:realm withValue:ramGroupInfo];
+    [realm commitWriteTransaction];
+    
 
 }
 
@@ -578,12 +623,20 @@ static GroupDBManager *manager = nil;
         return;
     }
 
-    BOOL result = [self updateTableName:GroupInformationTable fieldsValues:@{@"pub": @(0)} conditions:@{@"identifier": groupid}];
-    if (result) {
-        DDLogInfo(@"success");
-    } else {
-        DDLogError(@"failed");
-    }
+//    BOOL result = [self updateTableName:GroupInformationTable fieldsValues:@{@"pub": @(0)} conditions:@{@"identifier": groupid}];
+//    if (result) {
+//        DDLogInfo(@"success");
+//    } else {
+//        DDLogError(@"failed");
+//    }
+    LMRamGroupInfo *ramGroupInfo = [LMRamGroupInfo new];
+    ramGroupInfo.groupIdentifer = groupid;
+    ramGroupInfo.isPublic = NO;
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [LMRamGroupInfo createInRealm:realm withValue:ramGroupInfo];
+    [realm commitWriteTransaction];
+    
 }
 
 - (void)setGroupNewAdmin:(NSString *)address groupId:(NSString *)groupId {
