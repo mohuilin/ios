@@ -82,7 +82,7 @@ static LMRecommandFriendManager *manager = nil;
         accountInfo.pub_key = user.pubKey;
         accountInfo.recommandStatus = 1;
         LMFriendRequestInfo *ramFriendInfo = [self changeToRamModel:accountInfo];
-        if (ramFriendInfo.address) {
+        if (ramFriendInfo.username.length > 0) {
             [addArray addObject:ramFriendInfo];
         }
     }
@@ -100,42 +100,35 @@ static LMRecommandFriendManager *manager = nil;
     }
     RLMResults<LMFriendRequestInfo *> *results = [LMFriendRequestInfo allObjects];
     NSMutableArray *resultArray = [NSMutableArray array];
-    NSInteger number = 10;
-    if(number <= ((page - 1) * 20)){
-        number = ((page - 1) * 20);
-    }
+    NSInteger number = (page * 20);
+    NSInteger previousNumber = (page - 1) * 20;
     if (results.count >= number) {
-        for (NSInteger index = 0; index < number; index ++) {
+        
+        for (NSInteger index = previousNumber; index < number; index ++) {
             LMFriendRequestInfo *ramFriendInfo = results[index];
             AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
             [resultArray addObject:info];
         }
+        
     }else {
-          for (NSInteger index = 0; index < results.count; index ++) {
-              LMFriendRequestInfo *ramFriendInfo = results[index];
-              AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
-              [resultArray addObject:info];
-          }
+        
+        for (NSInteger index = previousNumber; index < results.count; index ++) {
+            LMFriendRequestInfo *ramFriendInfo = results[index];
+            AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
+            [resultArray addObject:info];
+        }
+        
     }
     if (resultArray.count > 0) {
-        return resultArray.copy;
+        NSArray *result = resultArray.copy;
+        result = [result sortedArrayUsingComparator:^NSComparisonResult(AccountInfo *obj1, AccountInfo *obj2) {
+            return [obj2.pub_key compare:obj1.pub_key];
+        }];
+        return result;
     }
     return nil;
 }
-
-- (BOOL)getUserInfoWith:(AccountInfo *)userInfo {
-    if (GJCFStringIsNull(userInfo.address)) {
-        return NO;
-    }
-    RLMResults<LMFriendRequestInfo *> *results = [LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ",userInfo.address]];
-    if (results.count > 0) {
-        return YES;
-    }else {
-        return NO;
-    }
-}
-
-- (BOOL)getUserInfoWithAddress:(NSString *)address {
+- (BOOL)isExistUser:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return NO;
     }
@@ -166,22 +159,24 @@ static LMRecommandFriendManager *manager = nil;
     
     RLMResults<LMFriendRequestInfo *> *results = [LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"status = %d ",status]];
     NSMutableArray *resultArray = [NSMutableArray array];
-    NSInteger number = 10;
-    if(number <= ((page - 1) * 20)){
-        number = ((page - 1) * 20);
-    }
+    NSInteger number = (page * 20);
+    NSInteger previousNumber = (page - 1) * 20;
     if (results.count >= number) {
-        for (NSInteger index = 0; index < number; index ++) {
+        
+        for (NSInteger index = previousNumber; index < number; index ++) {
             LMFriendRequestInfo *ramFriendInfo = results[index];
             AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
             [resultArray addObject:info];
         }
+        
     }else {
-        for (NSInteger index = 0; index < results.count; index ++) {
+        
+        for (NSInteger index = previousNumber; index < results.count; index ++) {
             LMFriendRequestInfo *ramFriendInfo = results[index];
             AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
             [resultArray addObject:info];
         }
+        
     }
     if (resultArray.count > 0) {
         NSArray *result = resultArray.copy;

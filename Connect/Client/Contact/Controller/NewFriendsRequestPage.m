@@ -177,7 +177,7 @@
         accountInfo.pub_key = user.pubKey;
         accountInfo.address = user.address;
         accountInfo.recommandStatus = 1;
-        if (![[LMRecommandFriendManager sharedManager] getUserInfoWith:accountInfo]) {
+        if (![[LMRecommandFriendManager sharedManager] isExistUser:accountInfo.address]) {
             [tmpArray objectAddObject:user];
         }
     }
@@ -201,13 +201,13 @@
 
 - (void)setMaxArray {
     for (AccountInfo *user in self.friendRequests) {
-        if ([[LMRecommandFriendManager sharedManager] getUserInfoWithAddress:user.address]) {
+        if ([[LMRecommandFriendManager sharedManager] isExistUser:user.address]) {
             [[LMRecommandFriendManager sharedManager] deleteRecommandFriendWithAddress:user.address];
         }
     }
     // filter contacts
     for (AccountInfo *user in [LMLinkManDataManager sharedManager].getListFriendsArr) {
-        if ([[LMRecommandFriendManager sharedManager] getUserInfoWithAddress:user.address]) {
+        if ([[LMRecommandFriendManager sharedManager] isExistUser:user.address]) {
             [[LMRecommandFriendManager sharedManager] deleteRecommandFriendWithAddress:user.address];
         }
     }
