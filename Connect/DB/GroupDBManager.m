@@ -266,9 +266,7 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(groupid)) {
         return nil;
     }
-
-    NSString *selectName = [NSString stringWithFormat:@"identifier = %@", groupid];
-    RLMResults<LMRamMemberInfo *> *ramAccountInfoResults = [LMRamMemberInfo objectsWhere:selectName];
+    RLMResults<LMRamMemberInfo *> *ramAccountInfoResults = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' ", groupid]];
     AccountInfo *admin = nil;
     NSMutableArray *mutableMembers = [NSMutableArray array];
     for (LMRamMemberInfo *ramAccountInfo in ramAccountInfoResults) {
