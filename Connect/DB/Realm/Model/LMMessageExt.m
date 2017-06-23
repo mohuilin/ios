@@ -10,7 +10,7 @@
 
 @implementation LMMessageExt
 
-+ (NSString *)primaryKey{
++ (NSString *)primaryKey {
     return @"messageId";
 }
 

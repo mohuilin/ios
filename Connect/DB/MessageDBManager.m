@@ -7,7 +7,6 @@
 //
 
 #import "MessageDBManager.h"
-#import "LMMessageExtendManager.h"
 #import "ConnectTool.h"
 #import "LMMessage.h"
 
@@ -49,7 +48,7 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageOwer) || GJCFStringIsNull(messageId)) {
         return NO;
     }
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageOwer, messageId]] firstObject];
     if (message) {
         return YES;
     } else {
@@ -198,7 +197,7 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageId) || GJCFStringIsNull(messageOwer)) {
         return;
     }
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageOwer, messageId]] firstObject];
     [self executeRealmWithBlock:^{
         message.sendstatus = sendStatus;
     }];
@@ -208,7 +207,7 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageId) || GJCFStringIsNull(messageId)) {
         return NO;
     }
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageOwer, messageId]] firstObject];
     if (message) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
             [realm deleteObject:message];
@@ -223,9 +222,9 @@ static MessageDBManager *manager = nil;
 
 - (void)updataMessage:(ChatMessageInfo *)messageInfo {
     if (messageInfo &&
-        !GJCFStringIsNull(messageInfo.messageOwer) &&
-        !GJCFStringIsNull(messageInfo.messageId)) {
-        LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageInfo.messageOwer,messageInfo.messageId]] firstObject];
+            !GJCFStringIsNull(messageInfo.messageOwer) &&
+            !GJCFStringIsNull(messageInfo.messageId)) {
+        LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageInfo.messageOwer, messageInfo.messageId]] firstObject];
         LMMessage *realmMsg = [[LMMessage alloc] initWithNormalInfo:messageInfo];
         //update message
         [self executeRealmWithBlock:^{
@@ -244,7 +243,7 @@ static MessageDBManager *manager = nil;
         return;
     }
     long long createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageOwer, messageId]] firstObject];
     [self executeRealmWithBlock:^{
         message.createTime = createTime;
     }];
@@ -256,7 +255,7 @@ static MessageDBManager *manager = nil;
         return;
     }
     long long readTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@' and readTime = 0",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@' and readTime = 0", messageOwer, messageId]] firstObject];
     [self executeRealmWithBlock:^{
         message.readTime = readTime;
     }];
@@ -270,7 +269,7 @@ static MessageDBManager *manager = nil;
 
     long long readTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
 
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@' and readTime = 0",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@' and readTime = 0", messageOwer, messageId]] firstObject];
     [self executeRealmWithBlock:^{
         message.readTime = readTime;
         message.state = 2;
@@ -282,8 +281,8 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageId) || GJCFStringIsNull(messageOwer)) {
         return;
     }
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
-    
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageOwer, messageId]] firstObject];
+
     [self executeRealmWithBlock:^{
         message.state = 2;
     }];
@@ -294,7 +293,7 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageId) || GJCFStringIsNull(messageOwer)) {
         return 0;
     }
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageOwer, messageId]] firstObject];
     return message.readTime;
 }
 
@@ -304,7 +303,7 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageId) || GJCFStringIsNull(messageOwer)) {
         return nil;
     }
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageOwer, messageId]] firstObject];
     if (message) {
         return message.normalInfo;
     } else {
@@ -314,14 +313,13 @@ static MessageDBManager *manager = nil;
 
 
 - (GJGCChatFriendSendMessageStatus)getMessageSendStatusByMessageid:(NSString *)messageId messageOwer:(NSString *)messageOwer {
-    
+
     if (GJCFStringIsNull(messageId) || GJCFStringIsNull(messageOwer)) {
         return GJGCChatFriendSendMessageStatusFaild;
     }
-    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
+    LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", messageOwer, messageId]] firstObject];
     return message.sendstatus;
 }
-
 
 
 - (NSArray *)getAllMessagesWithMessageOwer:(NSString *)messageOwer {
@@ -329,8 +327,8 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageOwer)) {
         return @[];
     }
-    RLMResults <LMMessage *> *results = [LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@'",messageOwer]];
-    
+    RLMResults <LMMessage *> *results = [LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@'", messageOwer]];
+
     NSMutableArray *chatMessages = [NSMutableArray array];
     //model trasfer
     for (LMMessage *realmModel in results) {
@@ -344,7 +342,7 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageOwer)) {
         return 0;
     }
-    RLMResults <LMMessage *> *results = [LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@'",messageOwer]];
+    RLMResults <LMMessage *> *results = [LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@'", messageOwer]];
     return results.count;
 }
 
@@ -353,7 +351,7 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageOwer)) {
         return;
     }
-    RLMResults <LMMessage *> *results = [LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@'",messageOwer]];
+    RLMResults <LMMessage *> *results = [LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@'", messageOwer]];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         for (LMMessage *realmMsg in results) {
             [realm deleteObject:realmMsg];
@@ -374,13 +372,13 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageOwer)) {
         return @[];
     }
-    
-    NSMutableString *where = [NSMutableString stringWithFormat:@"messageOwer = '%@'",messageOwer];
+
+    NSMutableString *where = [NSMutableString stringWithFormat:@"messageOwer = '%@'", messageOwer];
     if (time > 0) {
-        [where appendFormat:@" and ID < %ld and createTime <= %lld",autoMsgid,time];
+        [where appendFormat:@" and ID < %ld and createTime <= %lld", autoMsgid, time];
     }
     RLMResults<LMMessage *> *results = [[LMMessage objectsWhere:where]
-                                     sortedResultsUsingKeyPath:@"createTime" ascending:YES];
+            sortedResultsUsingKeyPath:@"createTime" ascending:YES];
     NSMutableArray *chatMessages = [NSMutableArray array];
     if (results.count <= limit) {
         for (LMMessage *realmModel in results) {
@@ -388,8 +386,8 @@ static MessageDBManager *manager = nil;
             [chatMessages addObject:chatMessage];
         }
     } else {
-        
-        for (int i = (int)results.count - limit; i < results.count; i ++) {
+
+        for (int i = (int) results.count - limit; i < results.count; i++) {
             LMMessage *realmModel = results[i];
             ChatMessageInfo *chatMessage = realmModel.normalInfo;
             [chatMessages addObject:chatMessage];
@@ -402,13 +400,13 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageOwer)) {
         return @[];
     }
-    NSMutableString *where = [NSMutableString stringWithFormat:@"messageOwer = '%@'",messageOwer];
+    NSMutableString *where = [NSMutableString stringWithFormat:@"messageOwer = '%@'", messageOwer];
     if (time > 0) {
-        [where appendFormat:@" and createTime <= %lld",time];
+        [where appendFormat:@" and createTime <= %lld", time];
     }
     RLMResults<LMMessage *> *results = [[LMMessage objectsWhere:where]
-                                  sortedResultsUsingKeyPath:@"createTime" ascending:YES];
-    
+            sortedResultsUsingKeyPath:@"createTime" ascending:YES];
+
     NSMutableArray *chatMessages = [NSMutableArray array];
     if (results.count <= limit) {
         for (LMMessage *realmModel in results) {
@@ -416,7 +414,7 @@ static MessageDBManager *manager = nil;
             [chatMessages addObject:chatMessage];
         }
     } else {
-        for (int i = (int)results.count - limit; i < results.count; i ++) {
+        for (int i = (int) results.count - limit; i < results.count; i++) {
             LMMessage *realmModel = results[i];
             ChatMessageInfo *chatMessage = realmModel.normalInfo;
             [chatMessages addObject:chatMessage];
@@ -426,7 +424,7 @@ static MessageDBManager *manager = nil;
 }
 
 
-- (void)createTipMessageWithMessageOwer:(NSString *)messageOwer isnoRelationShipType:(BOOL)isnoRelationShipType content:(NSString *)content{
+- (void)createTipMessageWithMessageOwer:(NSString *)messageOwer isnoRelationShipType:(BOOL)isnoRelationShipType content:(NSString *)content {
     GJGCChatFriendContentType type = GJGCChatFriendContentTypeStatusTip;
     if (isnoRelationShipType) {
         type = GJGCChatFriendContentTypeNoRelationShipTip;

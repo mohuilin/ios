@@ -29,10 +29,6 @@ static LMMessageExtendManager *manager = nil;
     manager = nil;
 }
 
-- (void)dealloc {
-    DDLogInfo(@"释放对象");
-}
-
 + (id)allocWithZone:(NSZone *)zone {
     @synchronized (self) {
         if (manager == nil) {
@@ -56,7 +52,7 @@ static LMMessageExtendManager *manager = nil;
         msgExt.status = [[dic safeObjectForKey:@"status"] intValue];
         msgExt.payCount = [[dic safeObjectForKey:@"pay_count"] intValue];
         msgExt.crowdCount = [[dic safeObjectForKey:@"crowd_count"] intValue];
-        
+
         [temArray addObject:msgExt];
     }
 
@@ -69,14 +65,14 @@ static LMMessageExtendManager *manager = nil;
     if (!dic) {
         return;
     }
-    
+
     LMMessageExt *msgExt = [[LMMessageExt alloc] init];
     msgExt.messageId = [dic safeObjectForKey:@"message_id"];
     msgExt.hashid = [dic safeObjectForKey:@"hashid"];
     msgExt.status = [[dic safeObjectForKey:@"status"] intValue];
     msgExt.payCount = [[dic safeObjectForKey:@"pay_count"] intValue];
     msgExt.crowdCount = [[dic safeObjectForKey:@"crowd_count"] intValue];
-    
+
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm addOrUpdateObject:msgExt];
     }];
@@ -86,8 +82,8 @@ static LMMessageExtendManager *manager = nil;
     if (GJCFStringIsNull(hashId)) {
         return;
     }
-    
-    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'", hashId]] lastObject];
     if (msgExt) {
         [self executeRealmWithBlock:^{
             msgExt.status = status;
@@ -100,7 +96,7 @@ static LMMessageExtendManager *manager = nil;
     if (GJCFStringIsNull(hashId)) {
         return;
     }
-    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'", hashId]] lastObject];
     if (msgExt) {
         [self executeRealmWithBlock:^{
             msgExt.payCount = payCount;
@@ -112,7 +108,7 @@ static LMMessageExtendManager *manager = nil;
     if (GJCFStringIsNull(hashId)) {
         return;
     }
-    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'", hashId]] lastObject];
     if (msgExt) {
         [self executeRealmWithBlock:^{
             msgExt.status = status;
@@ -126,8 +122,8 @@ static LMMessageExtendManager *manager = nil;
     if (GJCFStringIsNull(hashId)) {
         return 0;
     }
-    
-    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'", hashId]] lastObject];
     return msgExt.status;
 }
 
@@ -135,7 +131,7 @@ static LMMessageExtendManager *manager = nil;
     if (GJCFStringIsNull(hashId)) {
         return 0;
     }
-    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'", hashId]] lastObject];
     return msgExt.payCount;
 }
 
@@ -143,7 +139,7 @@ static LMMessageExtendManager *manager = nil;
     if (GJCFStringIsNull(hashId)) {
         return nil;
     }
-    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'", hashId]] lastObject];
     return msgExt.messageId;
 }
 

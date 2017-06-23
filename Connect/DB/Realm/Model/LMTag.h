@@ -10,7 +10,7 @@
 
 @interface LMTag : LMBaseModel
 
-@property (nonatomic ,copy) NSString *tag;
+@property(nonatomic, copy) NSString *tag;
 
 @end
 

@@ -41,6 +41,7 @@
  * @param groupId
  */
 - (void)updateGroupSummary:(NSString *)textString withGroupId:(NSString *)groupId;
+
 /**
  * update group public statue
  * @param isPublic

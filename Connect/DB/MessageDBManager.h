@@ -192,7 +192,12 @@
  */
 - (GJGCChatFriendSendMessageStatus)getMessageSendStatusByMessageid:(NSString *)messageid messageOwer:(NSString *)messageOwer;
 
-
+/**
+ * create tip message
+ * @param messageOwer
+ * @param isnoRelationShipType
+ * @param content
+ */
 - (void)createTipMessageWithMessageOwer:(NSString *)messageOwer isnoRelationShipType:(BOOL)isnoRelationShipType content:(NSString *)content;
 
 @end

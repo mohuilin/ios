@@ -8,6 +8,7 @@
 
 #import "LMAddressBookManager.h"
 #import "LMRamAddressBook.h"
+
 static LMAddressBookManager *manager = nil;
 
 @implementation LMAddressBookManager
@@ -39,7 +40,7 @@ static LMAddressBookManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return;
     }
-    LMRamAddressBook* ramBook = [LMRamAddressBook new];
+    LMRamAddressBook *ramBook = [LMRamAddressBook new];
     ramBook.creatTime = [[NSDate date] timeIntervalSince1970] * 1000;
     ramBook.tag = @"";
     ramBook.address = address;
@@ -47,8 +48,8 @@ static LMAddressBookManager *manager = nil;
     [realm beginWriteTransaction];
     [realm addOrUpdateObject:ramBook];
     [realm commitWriteTransaction];
-    
-    
+
+
 }
 
 - (void)saveBitchAddressBook:(NSArray *)addressBooks {
@@ -79,13 +80,13 @@ static LMAddressBookManager *manager = nil;
 }
 
 - (NSArray *)getAllAddressBooks {
-    
+
     RLMResults<LMRamAddressBook *> *ramBooks = [LMRamAddressBook allObjects];
     if (ramBooks.count <= 0) {
         return nil;
     }
     NSMutableArray *temM = [NSMutableArray array];
-    for (LMRamAddressBook * ramBook in ramBooks) {
+    for (LMRamAddressBook *ramBook in ramBooks) {
         AddressBookInfo *info = [[AddressBookInfo alloc] init];
         info.address = ramBook.address;
         info.tag = ramBook.tag;
@@ -98,28 +99,28 @@ static LMAddressBookManager *manager = nil;
     if (GJCFStringIsNull(tag) || GJCFStringIsNull(address)) {
         return;
     }
-   LMRamAddressBook *ramBook = [[LMRamAddressBook objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
+    LMRamAddressBook *ramBook = [[LMRamAddressBook objectsWhere:[NSString stringWithFormat:@"address = '%@' ", address]] lastObject];
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     [realm beginWriteTransaction];
     ramBook.tag = tag;
     [realm commitWriteTransaction];
-    
+
 }
 
 - (void)deleteAddressBookWithAddress:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return;
     }
-    LMRamAddressBook *ramBook = [[LMRamAddressBook objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
+    LMRamAddressBook *ramBook = [[LMRamAddressBook objectsWhere:[NSString stringWithFormat:@"address = '%@' ", address]] lastObject];
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     [realm beginWriteTransaction];
     [realm deleteObject:ramBook];
     [realm commitWriteTransaction];
 }
 
-- (void)clearAllAddress{
-   RLMResults<LMRamAddressBook *> *ramBooks = [LMRamAddressBook allObjects];
-   RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+- (void)clearAllAddress {
+    RLMResults<LMRamAddressBook *> *ramBooks = [LMRamAddressBook allObjects];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     for (LMRamAddressBook *info in ramBooks) {
         [realm beginWriteTransaction];
         [realm deleteObject:info];

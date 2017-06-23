@@ -10,14 +10,14 @@
 
 @implementation LMContactAccountInfo
 
-+ (NSString *)primaryKey{
++ (NSString *)primaryKey {
     return @"address";
 }
 
-- (LMBaseModel *)initWithNormalInfo:(id)info{
+- (LMBaseModel *)initWithNormalInfo:(id)info {
     if (self = [super init]) {
         if ([info isKindOfClass:[AccountInfo class]]) {
-            AccountInfo *user = (AccountInfo *)info;
+            AccountInfo *user = (AccountInfo *) info;
             self.address = user.address;
             self.pub_key = user.pub_key;
             self.avatar = user.avatar;
@@ -36,7 +36,7 @@
     return self;
 }
 
-- (id)normalInfo{
+- (id)normalInfo {
     AccountInfo *accountInfo = [[AccountInfo alloc] init];
     accountInfo.address = self.address;
     accountInfo.pub_key = self.pub_key;

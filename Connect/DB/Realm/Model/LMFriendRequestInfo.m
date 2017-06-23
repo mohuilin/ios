@@ -10,25 +10,25 @@
 
 @implementation LMFriendRequestInfo
 
-+(NSString *)primaryKey {
++ (NSString *)primaryKey {
     return @"address";
 }
 
-+ (NSDictionary *)defaultPropertyValues{
++ (NSDictionary *)defaultPropertyValues {
     NSMutableDictionary *defaultValues = [super defaultPropertyValues].mutableCopy;
     if (defaultValues) {
         [defaultValues setObject:[NSDate date] forKey:@"createTime"];
         return defaultValues;
-    } else{
-        return @{@"createTime":[NSDate date]};
+    } else {
+        return @{@"createTime": [NSDate date]};
     }
 }
 
 
-- (LMBaseModel *)initWithNormalInfo:(id)info{
+- (LMBaseModel *)initWithNormalInfo:(id)info {
     if (self = [super init]) {
         if ([info isKindOfClass:[AccountInfo class]]) {
-            AccountInfo *user = (AccountInfo *)info;
+            AccountInfo *user = (AccountInfo *) info;
             self.address = user.address;
             self.pubKey = user.pub_key;
             self.avatar = user.avatar;
@@ -42,7 +42,7 @@
     return self;
 }
 
-- (id)normalInfo{
+- (id)normalInfo {
     AccountInfo *accountInfo = [[AccountInfo alloc] init];
     accountInfo.address = self.address;
     accountInfo.pub_key = self.pubKey;

@@ -11,7 +11,7 @@
 @implementation BaseDB
 
 
-- (void)executeRealmWithBlock:(void (^)())executeBlock{
+- (void)executeRealmWithBlock:(void (^)())executeBlock {
     if (executeBlock) {
         RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
         [realm beginWriteTransaction];
@@ -20,7 +20,7 @@
     }
 }
 
-- (void)executeRealmWithRealmBlock:(void (^)(RLMRealm *realm))executeBlock{
+- (void)executeRealmWithRealmBlock:(void (^)(RLMRealm *realm))executeBlock {
     if (executeBlock) {
         RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
         [realm beginWriteTransaction];

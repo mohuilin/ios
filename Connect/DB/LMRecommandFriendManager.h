@@ -39,6 +39,7 @@
  * @return
  */
 - (NSArray *)getRecommandFriendsWithPage:(int)page;
+
 /**
  * check recommand user is saved
  * @param userInfo

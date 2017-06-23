@@ -11,21 +11,20 @@
 
 @implementation LMMessage
 
-+ (NSString *)primaryKey{
++ (NSString *)primaryKey {
     return @"uniqueId";
 }
 
-
-- (LMBaseModel *)initWithNormalInfo:(id)info{
+- (LMBaseModel *)initWithNormalInfo:(id)info {
     if (self = [super init]) {
         if ([info isKindOfClass:[info class]]) {
-            ChatMessageInfo *chatMessage = (ChatMessageInfo *)info;
+            ChatMessageInfo *chatMessage = (ChatMessageInfo *) info;
             self.messageId = chatMessage.messageId;
             self.messageOwer = chatMessage.messageOwer;
-            
+
             //set uniqueid  ,ensure message unique
-            self.uniqueId = [[NSString stringWithFormat:@"%@_%@",self.messageId,self.messageOwer] sha1String];
-            
+            self.uniqueId = [[NSString stringWithFormat:@"%@_%@", self.messageId, self.messageOwer] sha1String];
+
             //message encrypt
             NSString *aad = [[NSString stringWithFormat:@"%d", arc4random() % 100 + 1000] sha1String];
             NSString *iv = [[NSString stringWithFormat:@"%d", arc4random() % 100 + 1000] sha1String];
@@ -37,7 +36,7 @@
             [content safeSetObject:iv forKey:@"iv"];
             [content safeSetObject:ciphertext forKey:@"ciphertext"];
             [content safeSetObject:tag forKey:@"tag"];
-            
+
             self.messageContent = [content mj_JSONString];
             self.createTime = chatMessage.createTime;
             self.readTime = chatMessage.readTime;
@@ -45,20 +44,20 @@
             self.sendstatus = chatMessage.sendstatus;
             self.state = chatMessage.state;
             switch (chatMessage.messageType) {
-                case GJGCChatFriendContentTypeTransfer:{
+                case GJGCChatFriendContentTypeTransfer: {
                     LMMessageExt *msgExt = [[LMMessageExt alloc] init];
                     msgExt.messageId = chatMessage.messageId;
                     msgExt.status = 1;
                     self.msgExt = msgExt;
                 }
                     break;
-                case GJGCChatFriendContentTypePayReceipt:{
+                case GJGCChatFriendContentTypePayReceipt: {
                     LMMessageExt *msgExt = [[LMMessageExt alloc] init];
                     msgExt.messageId = chatMessage.messageId;
                     self.msgExt = msgExt;
                 }
                     break;
-                    
+
                 default:
                     break;
             }
@@ -68,7 +67,7 @@
 }
 
 
-- (id)normalInfo{
+- (id)normalInfo {
     ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
     chatMessage.ID = self.ID;
     chatMessage.messageOwer = self.messageOwer;
@@ -91,7 +90,7 @@
     chatMessage.message.sendstatus = chatMessage.sendstatus;
     chatMessage.message.isRead = chatMessage.readTime > 0;
     chatMessage.messageType = chatMessage.message.type;
-    
+
     return chatMessage;
 }
 

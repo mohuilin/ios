@@ -82,7 +82,7 @@ static UserDBManager *manager = nil;
     //delete request
     [self deleteRequestUserByAddress:[KeyHandle getAddressByPubkey:pubKey]];
     //delete user
-    RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'",pubKey]];
+    RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'", pubKey]];
     if (results.firstObject) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
             [realm deleteObject:[results firstObject]];
@@ -104,7 +104,7 @@ static UserDBManager *manager = nil;
             GJCFStringIsNull(user.username)) {
         return;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'",user.pub_key]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'", user.pub_key]] firstObject];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         realmUser.avatar = user.avatar;
         realmUser.username = user.username;
@@ -118,7 +118,7 @@ static UserDBManager *manager = nil;
     if (!remark) {
         remark = @"";
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         realmUser.remarks = remark;
         realmUser.isOffenContact = commonContact;
@@ -140,7 +140,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return nil;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     return realmUser.pub_key;
 }
 
@@ -148,7 +148,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return nil;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     return realmUser.normalInfo;
 }
 
@@ -189,7 +189,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return NO;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     return realmUser != nil;
 }
 
@@ -198,17 +198,17 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(publickey)) {
         return 0;
     }
-    
-    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"pubKey = '%@'",publickey]] firstObject];
-    return (long long)([realmUser.createTime timeIntervalSince1970] * 1000);
+
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"pubKey = '%@'", publickey]] firstObject];
+    return (long long) ([realmUser.createTime timeIntervalSince1970] * 1000);
 }
 
 - (NSString *)getRequestTipsByUserPublickey:(NSString *)publickey {
     if (GJCFStringIsNull(publickey)) {
         return 0;
     }
-    
-    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"pubKey = '%@'",publickey]] firstObject];
+
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"pubKey = '%@'", publickey]] firstObject];
     return realmUser.tips;
 }
 
@@ -227,7 +227,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return nil;
     }
-    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     return realmUser.normalInfo;
 }
 
@@ -235,7 +235,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return RequestFriendStatusAdd;
     }
-    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     return realmUser.status;
 }
 
@@ -243,7 +243,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return;
     }
-    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm deleteObject:realmUser];
     }];
@@ -292,7 +292,7 @@ static UserDBManager *manager = nil;
     if (status < 0) {
         status = 0;
     }
-    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     [self executeRealmWithBlock:^{
         realmUser.status = status;
     }];
@@ -303,7 +303,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return nil;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     NSMutableArray *tags = [NSMutableArray array];
     for (LMTag *realmModel in realmUser.tags) {
         if (realmModel.tag) {
@@ -341,7 +341,7 @@ static UserDBManager *manager = nil;
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm addOrUpdateObject:realmTag];
     }];
-    
+
     return YES;
 }
 
@@ -349,7 +349,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(tag)) {
         return NO;
     }
-    LMTag *realmModel = [[LMTag objectsWhere:[NSString stringWithFormat:@"tag = '%@'",tag]] firstObject];
+    LMTag *realmModel = [[LMTag objectsWhere:[NSString stringWithFormat:@"tag = '%@'", tag]] firstObject];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm deleteObject:realmModel];
     }];
@@ -358,12 +358,12 @@ static UserDBManager *manager = nil;
 
 - (BOOL)saveAddress:(NSString *)address toTag:(NSString *)tag {
     if (GJCFStringIsNull(address) ||
-        GJCFStringIsNull(tag)) {
+            GJCFStringIsNull(tag)) {
         return NO;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
-    
-    LMTag *realmModel = [[LMTag objectsWhere:[NSString stringWithFormat:@"tag = '%@'",tag]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
+
+    LMTag *realmModel = [[LMTag objectsWhere:[NSString stringWithFormat:@"tag = '%@'", tag]] firstObject];
     if (![realmModel.tag isEqualToString:tag]) {
         LMTag *realmTag = [LMTag new];
         realmTag.tag = tag;
@@ -376,10 +376,10 @@ static UserDBManager *manager = nil;
 
 - (BOOL)removeAddress:(NSString *)address fromTag:(NSString *)tag {
     if (GJCFStringIsNull(address) ||
-        GJCFStringIsNull(tag)) {
+            GJCFStringIsNull(tag)) {
         return NO;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     LMTag *realmTag = [LMTag new];
     realmTag.tag = tag;
     NSInteger index = [realmUser.tags indexOfObject:realmTag];
@@ -388,7 +388,7 @@ static UserDBManager *manager = nil;
             [realmUser.tags removeObjectAtIndex:index];
         }];
     }
-    
+
     return YES;
 }
 
@@ -408,7 +408,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     [self executeRealmWithBlock:^{
         realmUser.isBlackMan = YES;
     }];
@@ -419,7 +419,7 @@ static UserDBManager *manager = nil;
         return;
     }
 
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     [self executeRealmWithBlock:^{
         realmUser.isBlackMan = NO;
     }];
@@ -429,7 +429,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return NO;
     }
-    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
     return realmUser.isBlackMan;
 }
 

@@ -13,8 +13,17 @@
 
 @interface BaseDB : NSObject
 
+/**
+ * update realm model value
+ * @param executeBlock
+ */
 - (void)executeRealmWithBlock:(void (^)())executeBlock;
 
+
+/**
+ * save or update realm model ,call with realm handler
+ * @param executeBlock
+ */
 - (void)executeRealmWithRealmBlock:(void (^)(RLMRealm *realm))executeBlock;
 
 @end

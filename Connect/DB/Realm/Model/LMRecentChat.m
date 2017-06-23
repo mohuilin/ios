@@ -10,14 +10,14 @@
 
 @implementation LMRecentChat
 
-+ (NSString *)primaryKey{
++ (NSString *)primaryKey {
     return @"identifier";
 }
 
-- (LMBaseModel *)initWithNormalInfo:(id)info{
+- (LMBaseModel *)initWithNormalInfo:(id)info {
     if (self = [super init]) {
         if ([info isKindOfClass:[RecentChatModel class]]) {
-            RecentChatModel *model = (RecentChatModel *)info;
+            RecentChatModel *model = (RecentChatModel *) info;
             //package bradge model
             self.identifier = model.identifier;
             self.name = model.name;
@@ -26,16 +26,16 @@
             self.content = model.content;
             self.isTopChat = model.isTopChat;
             self.stranger = model.stranger;
-            
+
             LMRecentChatSetting *setting = [[LMRecentChatSetting alloc] init];
             setting.snapChatDeleteTime = model.snapChatDeleteTime;
             setting.notifyStatus = model.notifyStatus;
             setting.identifier = model.identifier;
             self.chatSetting = setting;
-            
+
             self.groupNoteMyself = model.groupNoteMyself;
             self.unReadCount = model.unReadCount;
-            self.talkType = (int)model.talkType;
+            self.talkType = (int) model.talkType;
             self.draft = model.draft;
         }
     }
@@ -43,7 +43,7 @@
 
 }
 
-- (id)normalInfo{
+- (id)normalInfo {
     RecentChatModel *model = [RecentChatModel new];
     model.identifier = self.identifier;
     model.name = self.name;

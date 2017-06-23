@@ -10,7 +10,7 @@
 
 @implementation LMTag
 
-+ (NSString *)primaryKey{
++ (NSString *)primaryKey {
     return @"tag";
 }
 
