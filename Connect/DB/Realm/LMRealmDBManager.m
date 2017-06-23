@@ -73,6 +73,12 @@ static FMDatabaseQueue *queue;
                     complete(0.5);
                 }
             }
+            //t_friend_recommand
+            if ([self friendRecommandNewDataMigration]) {
+                if (complete) {
+                    complete(0.5);
+                }
+            }
         }
     }
 }
@@ -168,7 +174,26 @@ static FMDatabaseQueue *queue;
     return YES;
     
 }
-
++ (BOOL)friendRecommandNewDataMigration {
+    NSString *querySql = @"select * from t_friendrequest";
+    NSArray *resultArray = [self recentQueryWithSql:querySql];
+    NSMutableArray *temM = [NSMutableArray array];
+    for (NSDictionary *dic in resultArray) {
+        LMFriendRecommandInfo *recommandInfo = [[LMFriendRecommandInfo alloc] init];
+        recommandInfo.username = [dic safeObjectForKey:@"username"];
+        recommandInfo.address = [dic safeObjectForKey:@"address"];
+        recommandInfo.avatar = [dic safeObjectForKey:@"avatar"];
+        recommandInfo.pubKey = [dic safeObjectForKey:@"pub_key"];
+        recommandInfo.status = [[dic safeObjectForKey:@"status"] intValue];
+        if (recommandInfo.username.length > 0) {
+            [temM objectAddObject:recommandInfo];
+        }
+    }
+    if (temM.count > 0) {
+        [self realmAddObject:temM];
+    }
+    return YES;
+}
 
 + (BOOL)groupNewDataMigration {
     NSString *querySql = @"select c.identifier,c.name,c.ecdh_key,c.common,c.verify,c.pub,c.avatar,c.summary from t_group c";
