@@ -65,10 +65,9 @@ static MessageDBManager *manager = nil;
         return;
     }
     LMMessage *realmModel = [[LMMessage alloc] initWithChatMessage:messageInfo];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm addOrUpdateObject:realmModel];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObject:realmModel];
+    }];
 }
 
 - (void)saveBitchMessage:(NSArray *)messages {
@@ -83,10 +82,9 @@ static MessageDBManager *manager = nil;
         LMMessage *realmModel = [[LMMessage alloc] initWithChatMessage:messageInfo];
         [bitchRealmMessages addObject:realmModel];
     }
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm addOrUpdateObjectsFromArray:bitchRealmMessages];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObjectsFromArray:bitchRealmMessages];
+    }];
 }
 
 
@@ -201,10 +199,9 @@ static MessageDBManager *manager = nil;
         return;
     }
     LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    message.sendstatus = sendStatus;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+        message.sendstatus = sendStatus;
+    }];
 }
 
 - (BOOL)deleteMessageByMessageId:(NSString *)messageId messageOwer:(NSString *)messageOwer {
@@ -213,10 +210,9 @@ static MessageDBManager *manager = nil;
     }
     LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
     if (message) {
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        [realm deleteObject:message];
-        [realm commitWriteTransaction];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm deleteObject:message];
+        }];
     }
     return YES;
 }
@@ -232,15 +228,14 @@ static MessageDBManager *manager = nil;
         LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageInfo.messageOwer,messageInfo.messageId]] firstObject];
         LMMessage *realmMsg = [[LMMessage alloc] initWithChatMessage:messageInfo];
         //update message
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        message.messageContent = realmMsg.messageContent;
-        message.createTime = realmMsg.createTime;
-        message.readTime = realmMsg.readTime;
-        message.snapTime = realmMsg.snapTime;
-        message.sendstatus = realmMsg.sendstatus;
-        message.state = realmMsg.state;
-        [realm commitWriteTransaction];
+        [self executeRealmWithBlock:^{
+            message.messageContent = realmMsg.messageContent;
+            message.createTime = realmMsg.createTime;
+            message.readTime = realmMsg.readTime;
+            message.snapTime = realmMsg.snapTime;
+            message.sendstatus = realmMsg.sendstatus;
+            message.state = realmMsg.state;
+        }];
     }
 }
 
@@ -250,10 +245,9 @@ static MessageDBManager *manager = nil;
     }
     long long createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
     LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    message.createTime = createTime;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+        message.createTime = createTime;
+    }];
 }
 
 - (void)updateMessageReadTimeWithMsgID:(NSString *)messageId messageOwer:(NSString *)messageOwer {
@@ -261,14 +255,11 @@ static MessageDBManager *manager = nil;
     if (GJCFStringIsNull(messageId) || GJCFStringIsNull(messageOwer)) {
         return;
     }
-
     long long readTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-
     LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@' and readTime = 0",messageOwer,messageId]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    message.readTime = readTime;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+        message.readTime = readTime;
+    }];
 }
 
 - (void)updateAudioMessageWithMsgID:(NSString *)messageId messageOwer:(NSString *)messageOwer {
@@ -280,11 +271,10 @@ static MessageDBManager *manager = nil;
     long long readTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
 
     LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@' and readTime = 0",messageOwer,messageId]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    message.readTime = readTime;
-    message.state = 2;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+        message.readTime = readTime;
+        message.state = 2;
+    }];
 }
 
 - (void)updateAudioMessageReadCompleteWithMsgID:(NSString *)messageId messageOwer:(NSString *)messageOwer {
@@ -293,10 +283,10 @@ static MessageDBManager *manager = nil;
         return;
     }
     LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    message.state = 2;
-    [realm commitWriteTransaction];
+    
+    [self executeRealmWithBlock:^{
+        message.state = 2;
+    }];
 }
 
 
@@ -364,22 +354,20 @@ static MessageDBManager *manager = nil;
         return;
     }
     RLMResults <LMMessage *> *results = [LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@'",messageOwer]];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    for (LMMessage *realmMsg in results) {
-        [realm deleteObject:realmMsg];
-    }
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        for (LMMessage *realmMsg in results) {
+            [realm deleteObject:realmMsg];
+        }
+    }];
 }
 
 - (void)deleteAllMessages {
     RLMResults <LMMessage *> *results = [LMMessage allObjects];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    for (LMMessage *realmMsg in results) {
-        [realm deleteObject:realmMsg];
-    }
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        for (LMMessage *realmMsg in results) {
+            [realm deleteObject:realmMsg];
+        }
+    }];
 }
 
 - (NSArray *)getMessagesWithMessageOwer:(NSString *)messageOwer Limit:(int)limit beforeTime:(long long int)time messageAutoID:(NSInteger)autoMsgid {

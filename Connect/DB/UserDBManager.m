@@ -13,10 +13,6 @@
 #import "LMContactAccountInfo.h"
 #import "LMFriendRequestInfo.h"
 
-#define ContactTable @"t_contact"
-#define NewFriendTable @"t_friendrequest"
-#define TagsTable @"t_tag"
-
 static UserDBManager *manager = nil;
 
 @implementation UserDBManager
@@ -56,11 +52,9 @@ static UserDBManager *manager = nil;
     }
 
     LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithAccountInfo:user];
-    
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm addOrUpdateObject:realmModel];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObject:realmModel];
+    }];
 }
 
 - (void)batchSaveUsers:(NSArray *)users {
@@ -70,11 +64,9 @@ static UserDBManager *manager = nil;
         LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithAccountInfo:user];
         [bitchRealmModel addObject:realmModel];
     }
-    
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm addOrUpdateObjectsFromArray:bitchRealmModel];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObjectsFromArray:bitchRealmModel];
+    }];
 }
 
 - (void)deleteUserBypubkey:(NSString *)pubKey {
@@ -92,10 +84,9 @@ static UserDBManager *manager = nil;
     //delete user
     RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'",pubKey]];
     if (results.firstObject) {
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        [realm deleteObject:[results firstObject]];
-        [realm commitWriteTransaction];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm deleteObject:[results firstObject]];
+        }];
     }
 }
 
@@ -113,14 +104,11 @@ static UserDBManager *manager = nil;
             GJCFStringIsNull(user.username)) {
         return;
     }
-    
     LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'",user.pub_key]] firstObject];
-
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    realmUser.avatar = user.avatar;
-    realmUser.username = user.username;
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        realmUser.avatar = user.avatar;
+        realmUser.username = user.username;
+    }];
 }
 
 - (void)setUserCommonContact:(BOOL)commonContact AndSetNewRemark:(NSString *)remark withAddress:(NSString *)address {
@@ -130,14 +118,11 @@ static UserDBManager *manager = nil;
     if (!remark) {
         remark = @"";
     }
-    
     LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
-    
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    realmUser.remarks = remark;
-    realmUser.isOffenContact = commonContact;
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        realmUser.remarks = remark;
+        realmUser.isOffenContact = commonContact;
+    }];
 }
 
 - (AccountInfo *)getUserByPublickey:(NSString *)publickey {
@@ -259,10 +244,9 @@ static UserDBManager *manager = nil;
         return;
     }
     LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm deleteObject:realmUser];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm deleteObject:realmUser];
+    }];
 }
 
 - (void)saveNewFriend:(AccountInfo *)user {
@@ -296,10 +280,9 @@ static UserDBManager *manager = nil;
 
     //save to realm
     LMFriendRequestInfo *realmModel = [[LMFriendRequestInfo alloc] initWithAccountInfo:user];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm addOrUpdateObject:realmModel];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObject:realmModel];
+    }];
 }
 
 - (void)updateNewFriendStatusAddress:(NSString *)address withStatus:(int)status {
@@ -310,10 +293,9 @@ static UserDBManager *manager = nil;
         status = 0;
     }
     LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    realmUser.status = status;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+        realmUser.status = status;
+    }];
 }
 
 
@@ -356,10 +338,9 @@ static UserDBManager *manager = nil;
     }
     LMTag *realmTag = [[LMTag alloc] init];
     realmTag.tag = tag;
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm addOrUpdateObject:realmTag];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObject:realmTag];
+    }];
     
     return YES;
 }
@@ -369,10 +350,9 @@ static UserDBManager *manager = nil;
         return NO;
     }
     LMTag *realmModel = [[LMTag objectsWhere:[NSString stringWithFormat:@"tag = '%@'",tag]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm deleteObject:realmModel];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm deleteObject:realmModel];
+    }];
     return YES;
 }
 
@@ -387,10 +367,9 @@ static UserDBManager *manager = nil;
     if (![realmModel.tag isEqualToString:tag]) {
         LMTag *realmTag = [LMTag new];
         realmTag.tag = tag;
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        [realmUser.tags addObject:realmTag];
-        [realm commitWriteTransaction];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realmUser.tags addObject:realmTag];
+        }];
     }
     return YES;
 }
@@ -406,9 +385,9 @@ static UserDBManager *manager = nil;
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     NSInteger index = [realmUser.tags indexOfObject:realmTag];
     if (index != NSNotFound) {
-        [realm beginWriteTransaction];
-        [realmUser.tags removeObjectAtIndex:index];
-        [realm commitWriteTransaction];
+        [self executeRealmWithBlock:^{
+            [realmUser.tags removeObjectAtIndex:index];
+        }];
     }
     
     return YES;
@@ -431,11 +410,9 @@ static UserDBManager *manager = nil;
         return;
     }
     LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
-    
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    realmUser.isBlackMan = YES;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+        realmUser.isBlackMan = YES;
+    }];
 }
 
 - (void)removeUserFromBlackList:(NSString *)address {
@@ -444,11 +421,9 @@ static UserDBManager *manager = nil;
     }
 
     LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
-    
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    realmUser.isBlackMan = NO;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+        realmUser.isBlackMan = NO;
+    }];
 }
 
 - (BOOL)userIsInBlackList:(NSString *)address {
