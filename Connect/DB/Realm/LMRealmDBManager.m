@@ -221,7 +221,6 @@ static FMDatabaseQueue *queue;
             ramInfo.roleInGroup = info.roleInGroup;
             ramInfo.groupNicksName = info.groupNickName;
             ramInfo.pubKey = info.pub_key;
-            ramInfo.isGroupAdmin = info.isGroupAdmin;
             if (info.isGroupAdmin) {
               ramGroup.admin = ramInfo;
             }

@@ -22,13 +22,6 @@
 - (void)updateGroup:(LMGroupInfo *)group;
 
 /**
- * update myself groupNickname in group
- * @param name
- * @param groupId
- */
-- (void)updateMyGroupNickName:(NSString *)name groupId:(NSString *)groupId;
-
-/**
  * update group name
  * @param name
  * @param groupId
@@ -47,20 +40,7 @@
  * @param textString
  * @param groupId
  */
-- (void)addGroupSummary:(NSString *)textString withGroupId:(NSString *)groupId;
-
-/**
- * set group public
- * @param groupid
- */
-- (void)setGroupNeedPublic:(NSString *)groupid;
-
-/**
- * set group not public
- * @param groupid
- */
-- (void)setGroupNeedNotPublic:(NSString *)groupid;
-
+- (void)updateGroupSummary:(NSString *)textString withGroupId:(NSString *)groupId;
 /**
  * update group public statue
  * @param isPublic
@@ -100,7 +80,7 @@
  * @param groupid
  * @return
  */
-- (LMGroupInfo *)getgroupByGroupIdentifier:(NSString *)groupid;
+- (LMGroupInfo *)getGroupByGroupIdentifier:(NSString *)groupid;
 
 /**
  * get all group info

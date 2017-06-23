@@ -493,7 +493,7 @@
     upDataUserNick.nick = myName;
     upDataUserNick.identifier = groupid;
     //update nickname
-    [[GroupDBManager sharedManager] updateMyGroupNickName:myName groupId:groupid];
+    [[GroupDBManager sharedManager] updateGroupMembserNick:myName address:[LKUserCenter shareCenter].currentLoginUser.address groupId:groupid];
     
     [NetWorkOperationTool POSTWithUrlString:GroupMemberUpdateUrl postProtoData:upDataUserNick.data complete:^(id response) {
         
@@ -741,7 +741,7 @@
         NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
         if (data) {
             //Save to the database
-            LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:identifer];
+            LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifer];
             if (GJCFStringIsNull(group.groupEcdhKey)) {
                 [self downGroupEcdhKeyWithGroupIdentifier:identifer complete:^(NSString *groupKey, NSError *error) {
                     GroupInfo *groupInfo = [GroupInfo parseFromData:data error:nil];
@@ -1363,7 +1363,7 @@
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    LMGroupInfo *lmGroup = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:identifier];
+    LMGroupInfo *lmGroup = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
     if (lmGroup) {
         if (complete) {
             complete(lmGroup,nil);

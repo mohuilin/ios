@@ -621,7 +621,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
     if (self.offenFriends.count > 0) {
         index = 2;
     }
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:identifier];
+    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
     // filter
     if (![self.commonGroup containsObject:group]) {
         if (group != nil) {

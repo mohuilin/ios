@@ -78,7 +78,7 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
 }
 
 - (UIView *)creatTableView {
-    LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:self.model.groupIdentifier];
+    LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.model.groupIdentifier];
     LMVerifyTableHeadView *headView = [[[NSBundle mainBundle] loadNibNamed:@"LMVerifyTableHeadView" owner:nil options:nil] lastObject];
     headView.frame = CGRectMake(0, 0, DEVICE_SIZE.width, 185);
     [headView.groupHeaderImageView setImageWithAvatarUrl:groupInfo.avatarUrl];
@@ -411,7 +411,7 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
     }
     nav.viewControllers = controllers;
 
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:self.model.groupIdentifier];
+    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.model.groupIdentifier];
     GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
     talk.talkType = GJGCChatFriendTalkTypeGroup;
     talk.chatIdendifier = group.groupIdentifer;

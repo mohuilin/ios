@@ -16,7 +16,6 @@
 @property  int roleInGroup;
 @property  NSString *groupNicksName;
 @property  NSString *pubKey;
-@property  BOOL isGroupAdmin;
 @property  NSString *univerStr;
 
 @property (readonly) RLMLinkingObjects *group;

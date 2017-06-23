@@ -130,7 +130,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 - (void)grouInfoChange:(NSNotification *)note {
     NSString *groupIdentifer = (NSString *) note.object;
 
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:groupIdentifer];
+    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
     self.talkModel.chatGroupInfo = group;
     self.members = group.groupMembers;
     NSMutableArray *avatars = [NSMutableArray array];

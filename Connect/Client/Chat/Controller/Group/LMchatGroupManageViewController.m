@@ -156,7 +156,7 @@
         HttpResponse *hReponse = (HttpResponse *) response;
         if (hReponse.code == successCode) {
             if (isPublic) {
-                [[GroupDBManager sharedManager] setGroupNeedPublic:self.talkModel.chatIdendifier];
+                [[GroupDBManager sharedManager] updateGroupPublic:YES groupId:self.talkModel.chatIdendifier];
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Open Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
                 }];
@@ -168,7 +168,7 @@
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Close Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
                 }];
-                [[GroupDBManager sharedManager] setGroupNeedNotPublic:self.talkModel.chatIdendifier];
+                [[GroupDBManager sharedManager] updateGroupPublic:NO groupId:self.talkModel.chatIdendifier];
 
                 if (self.switchChangeBlock) {
                     self.switchChangeBlock(isPublic);

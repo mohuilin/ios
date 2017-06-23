@@ -150,7 +150,7 @@
     [NetWorkOperationTool POSTWithUrlString:GroupShareUrl postProtoData:groupId.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *) response;
         if (hResponse.code != successCode) { //非公开，不可以分享
-            [[GroupDBManager sharedManager] setGroupNeedNotPublic:weakSelf.talkModel.chatIdendifier];
+            [[GroupDBManager sharedManager] updateGroupPublic:NO groupId:weakSelf.talkModel.chatIdendifier];
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Link The group is not public Not Share", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
                 return;
@@ -158,7 +158,7 @@
         } else {                               //公开，可以分享
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
             if (data) {
-                [[GroupDBManager sharedManager] setGroupNeedPublic:weakSelf.talkModel.chatIdendifier];
+                [[GroupDBManager sharedManager] updateGroupPublic:NO groupId:weakSelf.talkModel.chatIdendifier];
                 GroupUrl *qrUrl = [GroupUrl parseFromData:data error:nil];
                 if (qrUrl.URL.length <= 0) {
                     [GCDQueue executeInMainQueue:^{

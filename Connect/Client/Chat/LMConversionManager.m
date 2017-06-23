@@ -152,7 +152,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
             recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:lastMessage.messageOwer];
             if (!recentModel) {
                 
-                LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:lastMessage.messageOwer];
+                LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:lastMessage.messageOwer];
                 recentModel = [[RecentChatModel alloc] init];
                 recentModel.headUrl = group.avatarUrl;
                 recentModel.name = group.groupName;
@@ -243,7 +243,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
 - (void)getNewMessagesWithLastMessage:(ChatMessageInfo *)lastMessage newMessageCount:(int)messageCount  groupNoteMyself:(BOOL)groupNoteMyself{
     RecentChatModel *recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:lastMessage.messageOwer];
     if (!recentModel) {
-        LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:lastMessage.messageOwer];
+        LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:lastMessage.messageOwer];
         recentModel = [[RecentChatModel alloc] init];
         recentModel.headUrl = group.avatarUrl;
         recentModel.name = group.groupName;
@@ -617,7 +617,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     NSInteger index = [[SessionManager sharedManager].allRecentChats indexOfObject:recentChat];
     if (recentChat.talkType == GJGCChatFriendTalkTypeGroup) {
         if (recentChat.chatGroupInfo.groupMembers.count == 0) {
-            LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:recentChat.identifier];
+            LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:recentChat.identifier];
             recentChat.chatGroupInfo = group;
             recentChat.name = group.groupName;
         }
@@ -653,7 +653,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     }
     RecentChatModel *findModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:groupIdentifer];
     if (findModel) {
-        LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:groupIdentifer];
+        LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
         findModel.name = group.groupName;
         findModel.chatGroupInfo = group;
         [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
@@ -715,7 +715,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 }
                 changeFlag = YES;
             } else if(!model.chatGroupInfo){
-                LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:model.identifier];
+                LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:model.identifier];
                 model.chatGroupInfo = groupInfo;
                 if (!model.name) {
                     model.name = groupInfo.groupName;
