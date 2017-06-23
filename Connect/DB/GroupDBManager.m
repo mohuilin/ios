@@ -74,7 +74,7 @@ static GroupDBManager *manager = nil;
         ramInfo.roleInGroup = info.roleInGroup;
         ramInfo.groupNicksName = info.groupNickName;
         ramInfo.pubKey = info.pub_key;
-        if (info.isGroupAdmin) {
+        if (ramInfo.roleInGroup == 1) {
             ramGroupInfo.admin = ramInfo;
         }
         ramInfo.univerStr = [[NSString stringWithFormat:@"%@%@",ramInfo.address,groupId] sha1String];
@@ -431,7 +431,7 @@ static GroupDBManager *manager = nil;
         return;
     }
     
-    RLMResults <LMRamMemberInfo *> *ramAccoutResults = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND isGroupAdmin == 1",groupId]];
+    RLMResults <LMRamMemberInfo *> *ramAccoutResults = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND roleInGroup = 1",groupId]];
     LMRamMemberInfo *ramAccoutnInfo = [ramAccoutResults firstObject];
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     [realm beginWriteTransaction];
@@ -484,7 +484,7 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(groupId)) {
         return nil;
     }
-    RLMResults<LMRamMemberInfo *> *ramAccountResult = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND isGroupAdmin == 1 ",groupId]];
+    RLMResults<LMRamMemberInfo *> *ramAccountResult = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND roleInGroup = 1 ",groupId]];
     LMRamMemberInfo *ramAccountInfo = [ramAccountResult lastObject];
     if (ramAccountInfo) {
         AccountInfo *accountInfo = [AccountInfo new];
@@ -571,9 +571,8 @@ static GroupDBManager *manager = nil;
         ramInfo.roleInGroup = info.roleInGroup;
         ramInfo.groupNicksName = info.groupNickName;
         ramInfo.pubKey = info.pub_key;
-        if (info.isGroupAdmin) {
+        if (info.roleInGroup == 1) {
             ramGroup.admin = ramInfo;
-            ramInfo.roleInGroup = 1;
         }
         ramInfo.univerStr = [[NSString stringWithFormat:@"%@%@",ramInfo.address,ramGroup.groupIdentifer] sha1String];
         [ramGroup.membersArray addObject:ramInfo];
@@ -600,8 +599,9 @@ static GroupDBManager *manager = nil;
         accountInfo.roleInGroup = info.roleInGroup;
         accountInfo.groupNickName = info.groupNicksName;
         accountInfo.pub_key = info.pubKey;
-        if (accountInfo.isGroupAdmin) {
-            accountInfo.roleInGroup = 1;
+        if (info.roleInGroup == 1) {
+            accountInfo.isGroupAdmin = YES;
+            groupInfo.admin = accountInfo;
         }
         [temArray addObject:accountInfo];
     }
