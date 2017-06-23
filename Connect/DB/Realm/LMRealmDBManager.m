@@ -18,7 +18,7 @@
 #import "LMContactAccountInfo.h"
 #import "RLMRealm+LMRLMRealm.h"
 #import "LMRamGroupInfo.h"
-#import "LMRamAccountInfo.h"
+#import "LMRamMemberInfo.h"
 #import "LMRamAddressBook.h"
 #import "BaseDB.h"
 #import "RecentChatModel.h"
@@ -185,9 +185,9 @@ static FMDatabaseQueue *queue;
         ramGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
         ramGroup.summary = [dict safeObjectForKey:@"summary"];
         NSMutableArray *memberArray = [self getgroupMemberByGroupIdentifier:ramGroup.groupIdentifer];
-        NSMutableArray <LMRamAccountInfo *> *ramMemberArray = [NSMutableArray array];
+        NSMutableArray <LMRamMemberInfo *> *ramMemberArray = [NSMutableArray array];
         for (AccountInfo *info in memberArray) {
-            LMRamAccountInfo *ramInfo = [LMRamAccountInfo new];
+            LMRamMemberInfo *ramInfo = [LMRamMemberInfo new];
             ramInfo.identifier = ramGroup.groupIdentifer;
             ramInfo.username = info.username;
             ramInfo.avatar = info.avatar;

@@ -7,7 +7,7 @@
 //
 
 #import "LMBaseModel.h"
-#import "LMRamAccountInfo.h"
+#import "LMRamMemberInfo.h"
 
 @interface LMRamGroupInfo : LMBaseModel
 
@@ -28,7 +28,7 @@
 // groupSummary
 @property  NSString *summary;
 
-@property  LMRamAccountInfo *admin;
+@property  LMRamMemberInfo *admin;
 
-@property RLMArray<LMRamAccountInfo *><LMRamAccountInfo> *membersArray;
+@property RLMArray<LMRamMemberInfo *><LMRamMemberInfo> *membersArray;
 @end
