@@ -39,20 +39,12 @@
  * @return
  */
 - (NSArray *)getRecommandFriendsWithPage:(int)page;
-
 /**
  * check recommand user is saved
  * @param userInfo
  * @return
  */
-- (BOOL)getUserInfoWith:(AccountInfo *)userInfo;
-
-/**
- * check recommand user is saved
- * @param userInfo
- * @return
- */
-- (BOOL)getUserInfoWithAddress:(NSString *)address;
+- (BOOL)isExistUser:(NSString *)address;
 
 /**
  * update recommand status

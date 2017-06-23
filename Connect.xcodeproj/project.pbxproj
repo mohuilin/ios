@@ -864,6 +864,7 @@
 		D9B4365B1E8E5272006C816C /* LMSetLanguagePage.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B4365A1E8E5272006C816C /* LMSetLanguagePage.m */; };
 		D9B4365D1E8E5366006C816C /* LanguageConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9B4365C1E8E5366006C816C /* LanguageConfig.plist */; };
 		D9B7422F1EFB9D330072DC72 /* LMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B7422E1EFB9D330072DC72 /* LMTag.m */; };
+		D9B906D81EFCE7AE006BAE49 /* LMFriendRequestInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */; };
 		D9C73AEB1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C73AEA1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m */; };
 		D9C9CC271E8111B90048DE92 /* MMLaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C9CC251E8111B90048DE92 /* MMLaunchViewController.m */; };
 		D9C9CC281E8111B90048DE92 /* MMLaunchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9C9CC261E8111B90048DE92 /* MMLaunchViewController.xib */; };
@@ -871,10 +872,11 @@
 		D9E857051D48A3D7001C35A2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857041D48A3D7001C35A2 /* CoreLocation.framework */; };
 		D9E857071D48A3E0001C35A2 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857061D48A3E0001C35A2 /* MapKit.framework */; };
 		E39C2CB69BB018BF89D2831C /* libPods-ConnectTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA05F3C052536B3AAD8C0B5 /* libPods-ConnectTests.a */; };
+		F10F2C701EFCC0D20017C32C /* LMFriendRecommandInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */; };
+		F10F2C731EFCC2A70017C32C /* LMRamMemberInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F10F2C721EFCC2A70017C32C /* LMRamMemberInfo.m */; };
 		F116E9601EA06AA500DCAED4 /* LMMessageExtendManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */; };
 		F11CF9A51EFA6CA400750437 /* LMContactAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */; };
 		F11CF9A81EFA724400750437 /* LMRamAddressBook.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A71EFA724400750437 /* LMRamAddressBook.m */; };
-		F11CF9AB1EFA742C00750437 /* LMFriendRequestInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */; };
 		F156BB621EC4681B00512743 /* LMlockGestureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F156BB611EC4681B00512743 /* LMlockGestureViewController.m */; };
 		F16FD7B81EC3205B002F9395 /* allocators.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16FADB31EC3203E002F9395 /* allocators.cpp */; };
 		F16FD7B91EC3205B002F9395 /* base58.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16FADB51EC3203E002F9395 /* base58.cpp */; };
@@ -1023,7 +1025,6 @@
 		F17CBE2F1ED40C700067234D /* LMselectCountryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */; };
 		F17CBE321ED536920067234D /* LMDisplayProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE311ED536920067234D /* LMDisplayProgressView.m */; };
 		F1ADBAF01EF90C3500570DF6 /* LMRamGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */; };
-		F1ADBAF31EF97F6500570DF6 /* LMRamAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */; };
 		F1B363D21E85255600B65086 /* LMSearchTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F1B363D11E85255600B65086 /* LMSearchTextField.m */; };
 		F1CC2E941E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2E931E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m */; };
 		F1CC2ED91E95F0BA0045FBB7 /* NSArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2ED81E95F0BA0045FBB7 /* NSArray+LMSafeMethod.m */; };
@@ -2635,6 +2636,8 @@
 		D9B4365C1E8E5366006C816C /* LanguageConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LanguageConfig.plist; sourceTree = "<group>"; };
 		D9B7422D1EFB9D330072DC72 /* LMTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTag.h; sourceTree = "<group>"; };
 		D9B7422E1EFB9D330072DC72 /* LMTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTag.m; sourceTree = "<group>"; };
+		D9B906D61EFCE7AE006BAE49 /* LMFriendRequestInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRequestInfo.h; sourceTree = "<group>"; };
+		D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRequestInfo.m; sourceTree = "<group>"; };
 		D9C73AE91E8CD5E7002BF3B7 /* NSDictionary+NilSafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NilSafe.h"; sourceTree = "<group>"; };
 		D9C73AEA1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NilSafe.m"; sourceTree = "<group>"; };
 		D9C9CC241E8111B90048DE92 /* MMLaunchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMLaunchViewController.h; sourceTree = "<group>"; };
@@ -2646,14 +2649,16 @@
 		D9E857061D48A3E0001C35A2 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		D9F86ED21E6CF5E700398C66 /* Connect.IMUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Connect.IMUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB39D5B93F12A5570FB2900B /* Pods-ConnectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConnectTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ConnectTests/Pods-ConnectTests.release.xcconfig"; sourceTree = "<group>"; };
+		F10F2C6E1EFCC0D20017C32C /* LMFriendRecommandInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRecommandInfo.h; sourceTree = "<group>"; };
+		F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRecommandInfo.m; sourceTree = "<group>"; };
+		F10F2C711EFCC2A70017C32C /* LMRamMemberInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamMemberInfo.h; sourceTree = "<group>"; };
+		F10F2C721EFCC2A70017C32C /* LMRamMemberInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamMemberInfo.m; sourceTree = "<group>"; };
 		F116E95E1EA06AA500DCAED4 /* LMMessageExtendManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMMessageExtendManager.h; sourceTree = "<group>"; };
 		F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMMessageExtendManager.m; sourceTree = "<group>"; };
 		F11CF9A31EFA6CA400750437 /* LMContactAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMContactAccountInfo.h; sourceTree = "<group>"; };
 		F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMContactAccountInfo.m; sourceTree = "<group>"; };
 		F11CF9A61EFA724400750437 /* LMRamAddressBook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamAddressBook.h; sourceTree = "<group>"; };
 		F11CF9A71EFA724400750437 /* LMRamAddressBook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamAddressBook.m; sourceTree = "<group>"; };
-		F11CF9A91EFA742C00750437 /* LMFriendRequestInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRequestInfo.h; sourceTree = "<group>"; };
-		F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRequestInfo.m; sourceTree = "<group>"; };
 		F156BB601EC4681B00512743 /* LMlockGestureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMlockGestureViewController.h; sourceTree = "<group>"; };
 		F156BB611EC4681B00512743 /* LMlockGestureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMlockGestureViewController.m; sourceTree = "<group>"; };
 		F16FADB31EC3203E002F9395 /* allocators.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = allocators.cpp; sourceTree = "<group>"; };
@@ -12587,8 +12592,6 @@
 		F198A98B1EAF6048008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F1ADBAEE1EF90C3500570DF6 /* LMRamGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamGroupInfo.h; sourceTree = "<group>"; };
 		F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamGroupInfo.m; sourceTree = "<group>"; };
-		F1ADBAF11EF97F6500570DF6 /* LMRamAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamAccountInfo.h; sourceTree = "<group>"; };
-		F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamAccountInfo.m; sourceTree = "<group>"; };
 		F1B363D01E85255600B65086 /* LMSearchTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSearchTextField.h; sourceTree = "<group>"; };
 		F1B363D11E85255600B65086 /* LMSearchTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMSearchTextField.m; sourceTree = "<group>"; };
 		F1CC2E921E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+LMSafeMethod.h"; sourceTree = "<group>"; };
@@ -15313,16 +15316,18 @@
 				D96104281EFA60AA001A0998 /* LMMessage.m */,
 				D961042A1EFA61C4001A0998 /* LMMessageExt.h */,
 				D961042B1EFA61C4001A0998 /* LMMessageExt.m */,
-				F1ADBAF11EF97F6500570DF6 /* LMRamAccountInfo.h */,
-				F1ADBAF21EF97F6500570DF6 /* LMRamAccountInfo.m */,
 				F11CF9A31EFA6CA400750437 /* LMContactAccountInfo.h */,
 				F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */,
 				D9B7422D1EFB9D330072DC72 /* LMTag.h */,
 				D9B7422E1EFB9D330072DC72 /* LMTag.m */,
+				F10F2C711EFCC2A70017C32C /* LMRamMemberInfo.h */,
+				F10F2C721EFCC2A70017C32C /* LMRamMemberInfo.m */,
 				F11CF9A61EFA724400750437 /* LMRamAddressBook.h */,
 				F11CF9A71EFA724400750437 /* LMRamAddressBook.m */,
-				F11CF9A91EFA742C00750437 /* LMFriendRequestInfo.h */,
-				F11CF9AA1EFA742C00750437 /* LMFriendRequestInfo.m */,
+				F10F2C6E1EFCC0D20017C32C /* LMFriendRecommandInfo.h */,
+				F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */,
+				D9B906D61EFCE7AE006BAE49 /* LMFriendRequestInfo.h */,
+				D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -32878,7 +32883,6 @@
 				D92232541E822BF800D67110 /* Adapter.m in Sources */,
 				D95C04401E810902006C5C8A /* ChatNameCardCell.m in Sources */,
 				192350691E81200D0022D844 /* AccountWListCell.m in Sources */,
-				F11CF9AB1EFA742C00750437 /* LMFriendRequestInfo.m in Sources */,
 				D922329B1E822BF800D67110 /* UIView+ScreenShot.m in Sources */,
 				D9222FE81E822A3100D67110 /* YYAsyncLayer.m in Sources */,
 				D9C73AEB1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m in Sources */,
@@ -32983,6 +32987,7 @@
 				1923529B1E81275B0022D844 /* LMChatRedLuckyViewController.m in Sources */,
 				192350BD1E81213F0022D844 /* LMSetMoneyResultViewController.m in Sources */,
 				D9222F9D1E822A3000D67110 /* MSSBrowseModel.m in Sources */,
+				F10F2C731EFCC2A70017C32C /* LMRamMemberInfo.m in Sources */,
 				F16FD7D51EC3205B002F9395 /* key.cpp in Sources */,
 				1923506E1E81200D0022D844 /* NewFriendCell.m in Sources */,
 				D92232FC1E822BF900D67110 /* GJCUImageBrowserItemViewController.m in Sources */,
@@ -32994,7 +32999,6 @@
 				D92232E81E822BF900D67110 /* GJCFCoreTextRun.m in Sources */,
 				D95845211ECAF970004C8984 /* LMMessageAdapter.m in Sources */,
 				192352A21E81275B0022D844 /* LMRootModel.m in Sources */,
-				F1ADBAF31EF97F6500570DF6 /* LMRamAccountInfo.m in Sources */,
 				D92232E31E822BF900D67110 /* GJCFAssetsPreviewController.m in Sources */,
 				D92232B31E822BF800D67110 /* Language.m in Sources */,
 				19234F6F1E81160A0022D844 /* SearchResultController.m in Sources */,
@@ -33328,6 +33332,7 @@
 				F16FD7DD1EC3205B002F9395 /* sync.cpp in Sources */,
 				D95C045D1E810902006C5C8A /* NoRelationShipTipCell.m in Sources */,
 				D922325B1E822BF800D67110 /* DALabeledCircularProgressView.m in Sources */,
+				D9B906D81EFCE7AE006BAE49 /* LMFriendRequestInfo.m in Sources */,
 				D9B084CB1E810DDC0067EC4A /* MyAddressQRPage.m in Sources */,
 				1923517A1E8123C60022D844 /* LMOtherModel.m in Sources */,
 				19234FBD1E8119BB0022D844 /* RecentChatTitleView.m in Sources */,
@@ -33466,6 +33471,7 @@
 				F16FD7CB1EC3205B002F9395 /* sha2.c in Sources */,
 				D97FDCBF1E86664800B161C8 /* YYTextView.m in Sources */,
 				1923517C1E8123C60022D844 /* PhoneContactInfo.m in Sources */,
+				F10F2C701EFCC0D20017C32C /* LMFriendRecommandInfo.m in Sources */,
 				D9222FDE1E822A3100D67110 /* UIButton+YYWebImage.m in Sources */,
 				F16FD7BF1EC3205B002F9395 /* bignum.c in Sources */,
 				D9222F8E1E822A3000D67110 /* MJPropertyKey.m in Sources */,

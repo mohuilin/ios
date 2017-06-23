@@ -1,14 +1,14 @@
 //
-//  LMRamAccountInfo.m
+//  LMRamMemberInfo.m
 //  Connect
 //
-//  Created by Connect on 2017/6/21.
+//  Created by Connect on 2017/6/23.
 //  Copyright © 2017年 Connect. All rights reserved.
 //
-
-#import "LMRamAccountInfo.h"
+#import "LMRamMemberInfo.h"
 #import "LMRamGroupInfo.h"
-@implementation LMRamAccountInfo
+
+@implementation LMRamMemberInfo
 
 +(NSString *)primaryKey {
     return @"univerStr";

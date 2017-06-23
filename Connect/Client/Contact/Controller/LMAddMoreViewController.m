@@ -41,13 +41,13 @@
     }
     NSMutableArray *friendArray = [[UserDBManager sharedManager] getAllNewFirendRequest].mutableCopy;
     for (AccountInfo *user in friendArray) {
-        if ([[LMRecommandFriendManager sharedManager] getUserInfoWithAddress:user.address]) {
+        if ([[LMRecommandFriendManager sharedManager] isExistUser:user.address]) {
             [[LMRecommandFriendManager sharedManager] deleteRecommandFriendWithAddress:user.address];
         }
     }
     // filter contacts
     for (AccountInfo *user in [LMLinkManDataManager sharedManager].getListFriendsArr) {
-        if ([[LMRecommandFriendManager sharedManager] getUserInfoWithAddress:user.address]) {
+        if ([[LMRecommandFriendManager sharedManager] isExistUser:user.address]) {
             [[LMRecommandFriendManager sharedManager] deleteRecommandFriendWithAddress:user.address];
         }
     }
@@ -71,10 +71,7 @@
             [weakSelf.tableView.mj_footer endRefreshingWithNoMoreData];
         }
     }];
-    
-    
 }
-
 #pragma mark - 配置tableview
 
 - (void)configTableView {

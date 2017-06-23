@@ -18,11 +18,12 @@
 #import "LMContactAccountInfo.h"
 #import "RLMRealm+LMRLMRealm.h"
 #import "LMRamGroupInfo.h"
-#import "LMRamAccountInfo.h"
+#import "LMRamMemberInfo.h"
 #import "LMRamAddressBook.h"
 #import "BaseDB.h"
 #import "RecentChatModel.h"
 #import "RLMRealm+LMRLMRealm.h"
+#import "LMFriendRecommandInfo.h"
 #import "LMFriendRequestInfo.h"
 #import "MMMessage.h"
 
@@ -158,6 +159,7 @@ static FMDatabaseQueue *queue;
         LMRamAddressBook *info = [[LMRamAddressBook alloc] init];
         info.address = [temD safeObjectForKey:@"address"];
         info.tag = [temD safeObjectForKey:@"tag"];
+        info.creatTime = [[NSDate date] timeIntervalSince1970] * 1000;
         [temM objectAddObject:info];
     }
     if (temM.count > 0) {
@@ -184,9 +186,9 @@ static FMDatabaseQueue *queue;
         ramGroup.avatarUrl = [dict safeObjectForKey:@"avatar"];
         ramGroup.summary = [dict safeObjectForKey:@"summary"];
         NSMutableArray *memberArray = [self getgroupMemberByGroupIdentifier:ramGroup.groupIdentifer];
-        NSMutableArray <LMRamAccountInfo *> *ramMemberArray = [NSMutableArray array];
+        NSMutableArray <LMRamMemberInfo *> *ramMemberArray = [NSMutableArray array];
         for (AccountInfo *info in memberArray) {
-            LMRamAccountInfo *ramInfo = [LMRamAccountInfo new];
+            LMRamMemberInfo *ramInfo = [LMRamMemberInfo new];
             ramInfo.identifier = ramGroup.groupIdentifer;
             ramInfo.username = info.username;
             ramInfo.avatar = info.avatar;
@@ -195,7 +197,10 @@ static FMDatabaseQueue *queue;
             ramInfo.groupNicksName = info.groupNickName;
             ramInfo.pubKey = info.pub_key;
             ramInfo.isGroupAdmin = info.isGroupAdmin;
-            ramInfo.univerStr = [NSString stringWithFormat:@"%@%@",ramInfo.address,ramGroup.groupIdentifer];
+            if (info.isGroupAdmin) {
+              ramGroup.admin = ramInfo;
+            }
+            ramInfo.univerStr = [[NSString stringWithFormat:@"%@%@",ramInfo.address,ramGroup.groupIdentifer] sha1String];
             [ramMemberArray addObject:ramInfo];
         }
         [ramGroup.membersArray addObjects:ramMemberArray];

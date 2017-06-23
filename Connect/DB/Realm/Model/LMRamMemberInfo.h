@@ -1,14 +1,13 @@
 //
-//  LMRamAccountInfo.h
+//  LMRamMemberInfo.h
 //  Connect
 //
-//  Created by Connect on 2017/6/21.
+//  Created by Connect on 2017/6/23.
 //  Copyright © 2017年 Connect. All rights reserved.
 //
 
 #import "LMBaseModel.h"
-
-@interface LMRamAccountInfo : LMBaseModel
+@interface LMRamMemberInfo : LMBaseModel
 
 @property  NSString *identifier;
 @property  NSString *username;
@@ -24,4 +23,4 @@
 
 @end
 
-RLM_ARRAY_TYPE(LMRamAccountInfo)
+RLM_ARRAY_TYPE(LMRamMemberInfo)
