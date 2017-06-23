@@ -9,12 +9,11 @@
 #import "LMBaseModel.h"
 
 @interface LMFriendRecommandInfo : LMBaseModel
+
 @property  NSString *address;
 @property  NSString *pubKey;
 @property  NSString *avatar;
 @property  NSString *username;
-@property  int source;
 @property  int status;
-@property  int read;
-@property  NSString *tips;
+
 @end

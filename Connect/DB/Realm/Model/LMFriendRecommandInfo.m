@@ -9,9 +9,11 @@
 #import "LMFriendRecommandInfo.h"
 
 @implementation LMFriendRecommandInfo
+
 +(NSString *)primaryKey {
     
     return @"address";
     
 }
+
 @end
