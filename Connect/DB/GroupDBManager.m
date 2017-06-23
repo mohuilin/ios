@@ -58,26 +58,19 @@ static GroupDBManager *manager = nil;
     RLMResults<LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ", groupId]];
     LMRamGroupInfo *ramGroupInfo = [results lastObject];
     ramGroupInfo.groupIdentifer = groupId;
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     for (AccountInfo *info in newMembers) {
-        LMRamMemberInfo *ramInfo = [LMRamMemberInfo new];
+        LMRamMemberInfo *ramInfo = [[LMRamMemberInfo alloc] initWithNormalInfo:info];
         ramInfo.identifier = groupId;
-        ramInfo.username = info.username;
-        ramInfo.avatar = info.avatar;
-        ramInfo.address = info.address;
-        ramInfo.roleInGroup = info.roleInGroup;
-        ramInfo.groupNicksName = info.groupNickName;
-        ramInfo.pubKey = info.pub_key;
-        if (ramInfo.roleInGroup == 1) {
+        if (ramInfo.isGroupAdmin) {
             ramGroupInfo.admin = ramInfo;
         }
         ramInfo.univerStr = [[NSString stringWithFormat:@"%@%@", ramInfo.address, groupId] sha1String];
         [ramGroupInfo.membersArray addObject:ramInfo];
     }
-    [realm beginWriteTransaction];
-    [LMRamGroupInfo createInRealm:realm withValue:ramGroupInfo];
-    [realm commitWriteTransaction];
-    LMGroupInfo *groupInfo = [self ramModelToCommonModel:[results lastObject]];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObject:ramGroupInfo];
+    }];
+    LMGroupInfo *groupInfo = (LMGroupInfo *)[results lastObject].normalInfo;
     return groupInfo;
 
 }
@@ -87,7 +80,7 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(group.groupIdentifer)) {
         return;
     }
-    LMRamGroupInfo *ramGroupInfo = [self changeToRamModel:group];
+    LMRamGroupInfo *ramGroupInfo = [[LMRamGroupInfo alloc] initWithNormalInfo:group];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
        [realm addOrUpdateObject:ramGroupInfo];
     }];
@@ -146,8 +139,7 @@ static GroupDBManager *manager = nil;
            [realm deleteObject:info];
        }];
     }
-    LMRamGroupInfo *ramGroupInfo = [self changeToRamModel:group];
-    ramGroupInfo.groupIdentifer = group.groupIdentifer;
+    LMRamGroupInfo *ramGroupInfo = [[LMRamGroupInfo alloc] initWithNormalInfo:group];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
        [realm addOrUpdateObject:ramGroupInfo];
     }];
@@ -184,7 +176,6 @@ static GroupDBManager *manager = nil;
 
 
 }
-
 - (void)updateGroupMembserNick:(NSString *)nickName address:(NSString *)address groupId:(NSString *)groupId {
     if (GJCFStringIsNull(groupId) || GJCFStringIsNull(address)) {
         return;
@@ -205,12 +196,12 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(groupId) || GJCFStringIsNull(address)) {
         return;
     }
-
+    BOOL flag = (role != 0);
     RLMResults<LMRamMemberInfo *> *ramAccountInfos = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND address = '%@'", groupId, address]];
     LMRamMemberInfo *ramAccountInfo = [ramAccountInfos lastObject];
     if (ramAccountInfo) {
         [self executeRealmWithBlock:^{
-           ramAccountInfo.roleInGroup = role;
+           ramAccountInfo.isGroupAdmin = flag;
         }];
     }
 
@@ -251,7 +242,7 @@ static GroupDBManager *manager = nil;
     RLMResults<LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@'", groupid]];
     if (results.count > 0) {
         LMRamGroupInfo *ramGroupInfo = [results lastObject];
-        LMGroupInfo *groupInfo = [self ramModelToCommonModel:ramGroupInfo];
+        LMGroupInfo *groupInfo = (LMGroupInfo *)ramGroupInfo.normalInfo;
         return groupInfo;
     }
     return nil;
@@ -281,21 +272,15 @@ static GroupDBManager *manager = nil;
     AccountInfo *admin = nil;
     NSMutableArray *mutableMembers = [NSMutableArray array];
     for (LMRamMemberInfo *ramAccountInfo in ramAccountInfoResults) {
-        AccountInfo *accountInfo = [[AccountInfo alloc] init];
-        accountInfo.username = ramAccountInfo.username;
-        accountInfo.avatar = ramAccountInfo.avatar;
-        accountInfo.address = ramAccountInfo.address;
+        AccountInfo *accountInfo = (AccountInfo *)ramAccountInfo.normalInfo;
         NSString *remark = ramAccountInfo.groupNicksName;
         if (GJCFStringIsNull(remark) || [remark isEqual:[NSNull null]]) {
             accountInfo.groupNickName = ramAccountInfo.username;
         } else {
             accountInfo.groupNickName = remark;
         }
-        accountInfo.roleInGroup = ramAccountInfo.roleInGroup;
-        accountInfo.pub_key = ramAccountInfo.pubKey;
-        if (accountInfo.roleInGroup == 1) {
+        if (accountInfo.isGroupAdmin) {
             admin = accountInfo;
-            accountInfo.isGroupAdmin = YES;
         } else {
             [mutableMembers objectAddObject:accountInfo];
         }
@@ -327,7 +312,7 @@ static GroupDBManager *manager = nil;
         return nil;
     }
     for (LMRamGroupInfo *ramGroupInfo  in ramGroupResult) {
-        LMGroupInfo *groupInfo = [self ramModelToCommonModel:ramGroupInfo];
+        LMGroupInfo *groupInfo = (LMGroupInfo *)ramGroupInfo.normalInfo;
         [groupsArray addObject:groupInfo];
     }
     return groupsArray;
@@ -364,7 +349,7 @@ static GroupDBManager *manager = nil;
     }
     NSMutableArray *groupArray = [NSMutableArray array];
     for (LMRamGroupInfo *ramGroupInfo in results) {
-        LMGroupInfo *groupInfo = [self ramModelToCommonModel:ramGroupInfo];
+        LMGroupInfo *groupInfo = (LMGroupInfo *)ramGroupInfo.normalInfo;
         [groupArray addObject:groupInfo];
     }
     return groupArray.copy;
@@ -412,15 +397,15 @@ static GroupDBManager *manager = nil;
         return;
     }
 
-    RLMResults <LMRamMemberInfo *> *ramAccoutResults = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND roleInGroup = 1",groupId]];
+    RLMResults <LMRamMemberInfo *> *ramAccoutResults = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND isGroupAdmin == 1",groupId]];
     LMRamMemberInfo *ramAccoutnInfo = [ramAccoutResults firstObject];
     [self executeRealmWithBlock:^{
-       ramAccoutnInfo.roleInGroup = 0;
+       ramAccoutnInfo.isGroupAdmin = NO;
     }];
     //add new admin
     LMRamMemberInfo *ramNewAccount = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND address = '%@' ",groupId,address]] lastObject];
     [self executeRealmWithBlock:^{
-        ramNewAccount.roleInGroup = 1;
+        ramNewAccount.isGroupAdmin = YES;
     }];
 }
 
@@ -462,16 +447,10 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(groupId)) {
         return nil;
     }
-    RLMResults<LMRamMemberInfo *> *ramAccountResult = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND roleInGroup = 1 ",groupId]];
+    RLMResults<LMRamMemberInfo *> *ramAccountResult = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND isGroupAdmin == 1 ",groupId]];
     LMRamMemberInfo *ramAccountInfo = [ramAccountResult lastObject];
     if (ramAccountInfo) {
-        AccountInfo *accountInfo = [AccountInfo new];
-        accountInfo.username = ramAccountInfo.username;
-        accountInfo.avatar = ramAccountInfo.avatar;
-        accountInfo.address = ramAccountInfo.address;
-        accountInfo.roleInGroup = 1;
-        accountInfo.groupNickName = ramAccountInfo.groupNicksName;
-        accountInfo.pub_key = ramAccountInfo.pubKey;
+        AccountInfo *accountInfo = (AccountInfo *)ramAccountInfo.normalInfo;
         return accountInfo;
     }
     return nil;
@@ -483,13 +462,7 @@ static GroupDBManager *manager = nil;
         return nil;
     }
     LMRamMemberInfo *info = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND address ='%@' ", groupId, address]] lastObject];
-    AccountInfo *accountInfo = [AccountInfo new];
-    accountInfo.username = info.username;
-    accountInfo.avatar = info.avatar;
-    accountInfo.address = info.address;
-    accountInfo.roleInGroup = info.roleInGroup;
-    accountInfo.groupNickName = info.groupNicksName;
-    accountInfo.pub_key = info.pubKey;
+    AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
     return accountInfo;
 
 }
@@ -525,67 +498,5 @@ static GroupDBManager *manager = nil;
 - (BOOL)checkLoginUserIsGroupAdminWithIdentifier:(NSString *)identifier {
     AccountInfo *admin = [self getAdminByGroupId:identifier];
     return [admin.address isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address];
-}
-
-#pragma mark private method
-
-- (LMRamGroupInfo *)changeToRamModel:(LMGroupInfo *)groupInfo {
-
-    LMRamGroupInfo *ramGroup = [[LMRamGroupInfo alloc] init];
-    ramGroup.groupIdentifer = groupInfo.groupIdentifer;
-    ramGroup.groupName = groupInfo.groupName;
-    ramGroup.groupEcdhKey = groupInfo.groupEcdhKey;
-    ramGroup.isCommonGroup = groupInfo.isCommonGroup;
-    ramGroup.isGroupVerify = groupInfo.isGroupVerify;
-    ramGroup.isPublic = groupInfo.isPublic;
-    ramGroup.avatarUrl = groupInfo.avatarUrl;
-    ramGroup.summary = groupInfo.summary;
-    NSMutableArray *memberArray = groupInfo.groupMembers;
-    for (AccountInfo *info in memberArray) {
-        LMRamMemberInfo *ramInfo = [LMRamMemberInfo new];
-        ramInfo.identifier = ramGroup.groupIdentifer;
-        ramInfo.username = info.username;
-        ramInfo.avatar = info.avatar;
-        ramInfo.address = info.address;
-        ramInfo.roleInGroup = info.roleInGroup;
-        ramInfo.groupNicksName = info.groupNickName;
-        ramInfo.pubKey = info.pub_key;
-        if (info.roleInGroup == 1) {
-            ramGroup.admin = ramInfo;
-        }
-        ramInfo.univerStr = [[NSString stringWithFormat:@"%@%@", ramInfo.address, ramGroup.groupIdentifer] sha1String];
-        [ramGroup.membersArray addObject:ramInfo];
-    }
-    return ramGroup;
-}
-
-- (LMGroupInfo *)ramModelToCommonModel:(LMRamGroupInfo *)ramGroupInfo {
-    LMGroupInfo *groupInfo = [[LMGroupInfo alloc] init];
-    groupInfo.groupIdentifer = ramGroupInfo.groupIdentifer;
-    groupInfo.groupName = ramGroupInfo.groupName;
-    groupInfo.groupEcdhKey = ramGroupInfo.groupEcdhKey;
-    groupInfo.isCommonGroup = ramGroupInfo.isCommonGroup;
-    groupInfo.isGroupVerify = ramGroupInfo.isGroupVerify;
-    groupInfo.isPublic = ramGroupInfo.isPublic;
-    groupInfo.avatarUrl = ramGroupInfo.avatarUrl;
-    groupInfo.summary = ramGroupInfo.summary;
-    NSMutableArray *temArray = [NSMutableArray array];
-    RLMArray<LMRamMemberInfo *> *membersArray = ramGroupInfo.membersArray;
-    for (LMRamMemberInfo *info in membersArray) {
-        AccountInfo *accountInfo = [AccountInfo new];
-        accountInfo.username = info.username;
-        accountInfo.avatar = info.avatar;
-        accountInfo.address = info.address;
-        accountInfo.roleInGroup = info.roleInGroup;
-        accountInfo.groupNickName = info.groupNicksName;
-        accountInfo.pub_key = info.pubKey;
-        if (info.roleInGroup == 1) {
-            accountInfo.isGroupAdmin = YES;
-            groupInfo.admin = accountInfo;
-        }
-        [temArray addObject:accountInfo];
-    }
-    groupInfo.groupMembers = temArray;
-    return groupInfo;
 }
 @end

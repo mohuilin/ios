@@ -10,12 +10,12 @@
 
 @implementation LMBaseModel
 
-- (LMBaseModel *)initWithNormalInfo:(id)info {
+- (LMBaseModel *)initWithNormalInfo:(BaseInfo *)info {
     if (self = [super init]) {}
     return self;
 }
 
-- (id)normalInfo {
+- (BaseInfo *)normalInfo {
     return nil;
 }
 

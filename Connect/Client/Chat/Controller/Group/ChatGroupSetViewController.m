@@ -639,6 +639,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         NSMutableArray *temMembers = self.talkModel.chatGroupInfo.groupMembers.mutableCopy;
         [temMembers moveObject:newAdmin toIndex:0];
         self.talkModel.chatGroupInfo.groupMembers = temMembers;
+        self.members = temMembers.copy;
     }
     [self reloadDataOnMainQueue];
 }

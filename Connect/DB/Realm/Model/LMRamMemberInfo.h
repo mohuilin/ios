@@ -14,7 +14,7 @@
 @property NSString *username;
 @property NSString *avatar;
 @property NSString *address;
-@property int roleInGroup;
+@property BOOL isGroupAdmin;
 @property NSString *groupNicksName;
 @property NSString *pubKey;
 @property NSString *univerStr;

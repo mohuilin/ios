@@ -60,12 +60,10 @@ static LMAddressBookManager *manager = nil;
             continue;
         }
         long long int time = [[NSDate date] timeIntervalSince1970] * 1000;
-        LMRamAddressBook *ramBook = [LMRamAddressBook new];
-        ramBook.address = addressBook.address;
+        LMRamAddressBook *ramBook = [[LMRamAddressBook alloc] initWithNormalInfo:addressBook];
         if (addressBook.tag.length <= 0) {
             addressBook.tag = @"";
         }
-        ramBook.tag = addressBook.tag;
         ramBook.creatTime = time;
         [bitchValues addObject:ramBook];
     }
@@ -84,9 +82,7 @@ static LMAddressBookManager *manager = nil;
     }
     NSMutableArray *temM = [NSMutableArray array];
     for (LMRamAddressBook *ramBook in ramBooks) {
-        AddressBookInfo *info = [[AddressBookInfo alloc] init];
-        info.address = ramBook.address;
-        info.tag = ramBook.tag;
+        AddressBookInfo *info = (AddressBookInfo *)ramBook.normalInfo;
         [temM objectAddObject:info];
     }
     return temM.copy;
