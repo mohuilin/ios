@@ -182,7 +182,7 @@ static GroupDBManager *manager = nil;
     LMRamGroupInfo *ramGroupInfo = [self changeToRamModel:group];
     ramGroupInfo.groupIdentifer = group.groupIdentifer;
     [rlmRealm beginWriteTransaction];
-    [LMRamGroupInfo createOrUpdateInRealm:rlmRealm withValue:ramGroupInfo];
+    [rlmRealm addOrUpdateObject:ramGroupInfo];
     [rlmRealm commitWriteTransaction];
     
 }
@@ -273,7 +273,6 @@ static GroupDBManager *manager = nil;
     }
 
     LMRamGroupInfo *ramGroupInfo = [[LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ",groupId]] lastObject];
-    ramGroupInfo.avatarUrl = avatarUrl;
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     [realm beginWriteTransaction];
     ramGroupInfo.avatarUrl = avatarUrl;
@@ -478,11 +477,12 @@ static GroupDBManager *manager = nil;
         return;
     }
     
-    RLMResults <LMRamMemberInfo *> *ramAccoutResults = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND roleInGroup = 1",groupId]];
+    RLMResults <LMRamMemberInfo *> *ramAccoutResults = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND isGroupAdmin == 1",groupId]];
     LMRamMemberInfo *ramAccoutnInfo = [ramAccoutResults firstObject];
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     [realm beginWriteTransaction];
     ramAccoutnInfo.roleInGroup = 0;
+    ramAccoutnInfo.isGroupAdmin = NO;
     [realm commitWriteTransaction];
     //add new admin
     LMRamMemberInfo *ramNewAccount = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND address = '%@' ",groupId,address]] lastObject];
