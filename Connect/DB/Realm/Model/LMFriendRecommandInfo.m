@@ -13,7 +13,6 @@
 +(NSString *)primaryKey {
     
     return @"address";
-    
 }
 
 @end

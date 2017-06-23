@@ -7,7 +7,6 @@
 //
 
 #import "LMBaseModel.h"
-@class LMRamGroupInfo;
 @interface LMRamMemberInfo : LMBaseModel
 
 @property  NSString *identifier;
@@ -20,6 +19,7 @@
 @property  BOOL isGroupAdmin;
 @property  NSString *univerStr;
 
+@property (readonly) RLMLinkingObjects *group;
 
 @end
 

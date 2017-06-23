@@ -405,8 +405,6 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     if (!conversationModel) {
         return NO;
     }
-    [[SessionManager sharedManager] removeRecentChatWithIdentifier:conversationModel.identifier];
-    [[RecentChatDBManager sharedManager] deleteByIdentifier:conversationModel.identifier];
     if (conversationModel.talkType != GJGCChatFriendTalkTypeGroup) {
         [[IMService instance] deleteSessionWithAddress:conversationModel.chatUser.address complete:nil];
         [ChatMessageFileManager deleteRecentChatAllMessageFilesByAddress:conversationModel.chatUser.address];
@@ -416,11 +414,14 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     if (conversationModel.isTopChat && [SessionManager sharedManager].topChatCount >= 1) {
         [SessionManager sharedManager].topChatCount--;
     }
-    if (conversationModel && conversationModel.identifier) {
-        [[RecentChatDBManager sharedManager] deleteByIdentifier:conversationModel.identifier];
-        [[MessageDBManager sharedManager] deleteAllMessageByMessageOwer:conversationModel.identifier]; //delete all message
-    }
     
+    
+    //delete recentchat
+    [[SessionManager sharedManager] removeRecentChatWithIdentifier:conversationModel.identifier];
+    [[RecentChatDBManager sharedManager] deleteByIdentifier:conversationModel.identifier];
+    
+    //delete all message
+    [[MessageDBManager sharedManager] deleteAllMessageByMessageOwer:conversationModel.identifier];
     if (conversationModel.unReadCount > 0) {
         [GCDQueue executeInMainQueue:^{
             if ([self.conversationListDelegate respondsToSelector:@selector(unreadMessageNumberDidChanged)]) {

@@ -12,6 +12,7 @@
 
 @interface LMMessage : LMBaseModel
 
+@property (nonatomic ,copy) NSString *uniqueId;
 @property (nonatomic ,copy) NSString *messageOwer;
 @property (nonatomic ,copy) NSString *messageId;
 @property (nonatomic ,copy) NSString *messageContent;

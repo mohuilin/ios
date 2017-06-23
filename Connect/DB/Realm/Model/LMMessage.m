@@ -12,14 +12,18 @@
 @implementation LMMessage
 
 + (NSString *)primaryKey{
-    return @"messageId";
+    return @"uniqueId";
 }
 
 
 - (LMMessage *)initWithChatMessage:(ChatMessageInfo *)chatMessage{
+
     if (self = [super init]) {
         self.messageId = chatMessage.messageId;
         self.messageOwer = chatMessage.messageOwer;
+        
+        //set uniqueid  ,ensure message unique
+        self.uniqueId = [[NSString stringWithFormat:@"%@_%@",self.messageId,self.messageOwer] sha1String];
         
         //message encrypt
         NSString *aad = [[NSString stringWithFormat:@"%d", arc4random() % 100 + 1000] sha1String];
@@ -34,7 +38,6 @@
         [content safeSetObject:tag forKey:@"tag"];
         
         self.messageContent = [content mj_JSONString];
-        self.messageOwer = chatMessage.messageOwer;
         self.createTime = chatMessage.createTime;
         self.readTime = chatMessage.readTime;
         self.snapTime = chatMessage.snapTime;

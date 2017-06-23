@@ -863,6 +863,8 @@
 		D9B084ED1E810E5A0067EC4A /* TextFieldRoundCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B084E11E810E5A0067EC4A /* TextFieldRoundCell.m */; };
 		D9B4365B1E8E5272006C816C /* LMSetLanguagePage.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B4365A1E8E5272006C816C /* LMSetLanguagePage.m */; };
 		D9B4365D1E8E5366006C816C /* LanguageConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9B4365C1E8E5366006C816C /* LanguageConfig.plist */; };
+		D9B7422F1EFB9D330072DC72 /* LMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B7422E1EFB9D330072DC72 /* LMTag.m */; };
+		D9B906D81EFCE7AE006BAE49 /* LMFriendRequestInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */; };
 		D9C73AEB1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C73AEA1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m */; };
 		D9C9CC271E8111B90048DE92 /* MMLaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C9CC251E8111B90048DE92 /* MMLaunchViewController.m */; };
 		D9C9CC281E8111B90048DE92 /* MMLaunchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9C9CC261E8111B90048DE92 /* MMLaunchViewController.xib */; };
@@ -2632,6 +2634,10 @@
 		D9B436591E8E5272006C816C /* LMSetLanguagePage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSetLanguagePage.h; sourceTree = "<group>"; };
 		D9B4365A1E8E5272006C816C /* LMSetLanguagePage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMSetLanguagePage.m; sourceTree = "<group>"; };
 		D9B4365C1E8E5366006C816C /* LanguageConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LanguageConfig.plist; sourceTree = "<group>"; };
+		D9B7422D1EFB9D330072DC72 /* LMTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTag.h; sourceTree = "<group>"; };
+		D9B7422E1EFB9D330072DC72 /* LMTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTag.m; sourceTree = "<group>"; };
+		D9B906D61EFCE7AE006BAE49 /* LMFriendRequestInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRequestInfo.h; sourceTree = "<group>"; };
+		D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRequestInfo.m; sourceTree = "<group>"; };
 		D9C73AE91E8CD5E7002BF3B7 /* NSDictionary+NilSafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NilSafe.h"; sourceTree = "<group>"; };
 		D9C73AEA1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NilSafe.m"; sourceTree = "<group>"; };
 		D9C9CC241E8111B90048DE92 /* MMLaunchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMLaunchViewController.h; sourceTree = "<group>"; };
@@ -15312,12 +15318,16 @@
 				D961042B1EFA61C4001A0998 /* LMMessageExt.m */,
 				F11CF9A31EFA6CA400750437 /* LMContactAccountInfo.h */,
 				F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */,
+				D9B7422D1EFB9D330072DC72 /* LMTag.h */,
+				D9B7422E1EFB9D330072DC72 /* LMTag.m */,
 				F10F2C711EFCC2A70017C32C /* LMRamMemberInfo.h */,
 				F10F2C721EFCC2A70017C32C /* LMRamMemberInfo.m */,
 				F11CF9A61EFA724400750437 /* LMRamAddressBook.h */,
 				F11CF9A71EFA724400750437 /* LMRamAddressBook.m */,
 				F10F2C6E1EFCC0D20017C32C /* LMFriendRecommandInfo.h */,
 				F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */,
+				D9B906D61EFCE7AE006BAE49 /* LMFriendRequestInfo.h */,
+				D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -32293,7 +32303,7 @@
 					};
 					D9217ECD1CE03D9100953F51 = {
 						CreatedOnToolsVersion = 7.3;
-						DevelopmentTeam = 9U6ZRRA66C;
+						DevelopmentTeam = T3YMFT8962;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -33322,6 +33332,7 @@
 				F16FD7DD1EC3205B002F9395 /* sync.cpp in Sources */,
 				D95C045D1E810902006C5C8A /* NoRelationShipTipCell.m in Sources */,
 				D922325B1E822BF800D67110 /* DALabeledCircularProgressView.m in Sources */,
+				D9B906D81EFCE7AE006BAE49 /* LMFriendRequestInfo.m in Sources */,
 				D9B084CB1E810DDC0067EC4A /* MyAddressQRPage.m in Sources */,
 				1923517A1E8123C60022D844 /* LMOtherModel.m in Sources */,
 				19234FBD1E8119BB0022D844 /* RecentChatTitleView.m in Sources */,
@@ -33447,6 +33458,7 @@
 				D95C044A1E810902006C5C8A /* GJGCChatFriendBaseCell.m in Sources */,
 				D92232D71E822BF900D67110 /* UIButton+GJCFAssetsPickerStyle.m in Sources */,
 				192352931E81275B0022D844 /* KQXPasswordInputController.m in Sources */,
+				D9B7422F1EFB9D330072DC72 /* LMTag.m in Sources */,
 				D9222FB71E822A3100D67110 /* XPathQuery.m in Sources */,
 				D92232911E822BF800D67110 /* UIImage+Color.m in Sources */,
 				1923506D1E81200D0022D844 /* MeunCell.m in Sources */,
@@ -33762,7 +33774,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 9U6ZRRA66C;
+				DEVELOPMENT_TEAM = T3YMFT8962;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -33821,7 +33833,7 @@
 					"\"SystemConfiguration\"",
 				);
 				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = connect.im;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.connect.im;
 				PRODUCT_NAME = Connect;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -33843,7 +33855,7 @@
 				CODE_SIGN_ENTITLEMENTS = Connect/Connect.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 9U6ZRRA66C;
+				DEVELOPMENT_TEAM = T3YMFT8962;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -33909,7 +33921,7 @@
 					"\"SystemConfiguration\"",
 				);
 				OTHER_LIBTOOLFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = connect.im;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.connect.im;
 				PRODUCT_NAME = Connect;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

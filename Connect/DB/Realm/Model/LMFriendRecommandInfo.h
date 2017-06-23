@@ -16,4 +16,5 @@
 @property  NSString *username;
 @property  int status;
 
+
 @end

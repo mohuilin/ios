@@ -135,9 +135,7 @@ static LMRecommandFriendManager *manager = nil;
     }else {
         return NO;
     }
-
 }
-
 - (void)updateRecommandFriendStatus:(int32_t)status withAddress:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return;
@@ -193,7 +191,7 @@ static LMRecommandFriendManager *manager = nil;
     ramFriendInfo.address = accountInfo.address;
     ramFriendInfo.avatar = accountInfo.avatar;
     ramFriendInfo.status = accountInfo.recommandStatus;
-    ramFriendInfo.source = accountInfo.source;
+    ramFriendInfo.pubKey = accountInfo.pub_key;
     return ramFriendInfo;
     
 }
@@ -204,7 +202,7 @@ static LMRecommandFriendManager *manager = nil;
     accountInfo.address = ramFriendInfo.address;
     accountInfo.avatar = ramFriendInfo.avatar;
     accountInfo.recommandStatus = ramFriendInfo.status;
-    accountInfo.source = ramFriendInfo.source;
+    accountInfo.pub_key = ramFriendInfo.pubKey;
     return accountInfo;
 }
 @end

@@ -24,6 +24,7 @@
 #import "RecentChatModel.h"
 #import "RLMRealm+LMRLMRealm.h"
 #import "LMFriendRecommandInfo.h"
+#import "LMFriendRequestInfo.h"
 #import "MMMessage.h"
 
 @implementation LMRealmDBManager
@@ -131,7 +132,7 @@ static FMDatabaseQueue *queue;
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *temM = [NSMutableArray array];
     for (NSDictionary *dic in resultArray) {
-        LMFriendRecommandInfo *accountInfo = [[LMFriendRecommandInfo alloc] init];
+        LMFriendRequestInfo *accountInfo = [[LMFriendRequestInfo alloc] init];
         accountInfo.username = [dic safeObjectForKey:@"username"];
         accountInfo.address = [dic safeObjectForKey:@"address"];
         accountInfo.avatar = [dic safeObjectForKey:@"avatar"];
@@ -323,7 +324,7 @@ static FMDatabaseQueue *queue;
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *findUsers = [NSMutableArray array];
     for (NSDictionary *resultDict in resultArray) {
-        LMContactAccountInfo *findUser = [LMContactAccountInfo new];
+        AccountInfo *findUser = [AccountInfo new];
         findUser.address = [resultDict safeObjectForKey:@"address"];
         findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
         findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
@@ -332,8 +333,10 @@ static FMDatabaseQueue *queue;
         findUser.source = [[resultDict safeObjectForKey:@"source"] intValue];
         findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
         findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
-        [findUsers addObject:findUser];
-        
+
+
+        LMContactAccountInfo *realmContact = [[LMContactAccountInfo alloc] initWithAccountInfo:findUser];
+        [findUsers addObject:realmContact];
     }
     if (findUsers.count > 0) {
         [self realmAddObject:findUsers];

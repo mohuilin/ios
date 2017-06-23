@@ -44,53 +44,6 @@ static RecentChatDBManager *manager = nil;
     return nil;
 }
 
-- (void)deleteAllMessageTable {
-    NSArray *recentChatArray = [self getAllRecentChat];
-    for (RecentChatModel *model in recentChatArray) {
-        if (GJCFStringIsNull(model.identifier)) {
-            continue;
-        }
-        BOOL result = [self dropTableWithTableName:model.identifier.sha1String];
-        if (result) {
-            DDLogInfo(@"delete table failed");
-        } else {
-            NSString *msg = [NSString stringWithFormat:@"delete table success：%@", model.identifier.sha1String];
-            DDLogInfo(msg);
-        }
-    }
-}
-
-- (void)deleteMessageTableByIdentifer:(NSString *)identifer {
-    if (GJCFStringIsNull(identifer)) {
-        return;
-    }
-    BOOL result = [self dropTableWithTableName:identifer.sha1String];
-    if (result) {
-        DDLogInfo(@"delete table failed");
-    } else {
-        NSString *msg = [NSString stringWithFormat:@"delete table success：%@", identifer.sha1String];
-        DDLogInfo(msg);
-    }
-}
-
-- (BOOL)deleteMessageTableByIdentifer:(NSString *)identifer messageid:(NSString *)messageid {
-    if (GJCFStringIsNull(identifer)) {
-        return NO;
-    }
-    if (GJCFStringIsNull(messageid)) {
-        return NO;
-    }
-    BOOL result = [self deleteTableName:identifer.sha1String conditions:@{@"message_id": messageid}];
-    if (result) {
-        NSString *msg = [NSString stringWithFormat:@"delete message success ：%@ --msg id：%@", identifer.sha1String, messageid];
-        DDLogInfo(@"%@", msg);
-    } else {
-        NSString *msg = [NSString stringWithFormat:@"delete message failed ：%@ --msgid：%@", identifer.sha1String, messageid];
-        DDLogInfo(@"%@", msg);
-    }
-    return result;
-}
-
 - (NSArray *)getAllRecentChat {    
     NSMutableArray *recentChatArrayM = [NSMutableArray array];
     RLMResults <LMRecentChat *> *results = [LMRecentChat allObjects];

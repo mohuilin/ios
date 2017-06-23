@@ -7,9 +7,17 @@
 //
 #import "LMRamMemberInfo.h"
 #import "LMRamGroupInfo.h"
+
 @implementation LMRamMemberInfo
+
 +(NSString *)primaryKey {
-    
     return @"univerStr";
 }
+
++ (NSDictionary<NSString *,RLMPropertyDescriptor *> *)linkingObjectsProperties{
+    return @{
+             @"group": [RLMPropertyDescriptor descriptorWithClass:LMRamGroupInfo.class propertyName:@"membersArray"],
+             };
+}
+
 @end
