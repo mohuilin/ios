@@ -23,7 +23,7 @@
 #import "BaseDB.h"
 #import "RecentChatModel.h"
 #import "RLMRealm+LMRLMRealm.h"
-#import "LMFriendRequestInfo.h"
+#import "LMFriendRecommandInfo.h"
 #import "MMMessage.h"
 
 @implementation LMRealmDBManager
@@ -131,7 +131,7 @@ static FMDatabaseQueue *queue;
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *temM = [NSMutableArray array];
     for (NSDictionary *dic in resultArray) {
-        LMFriendRequestInfo *accountInfo = [[LMFriendRequestInfo alloc] init];
+        LMFriendRecommandInfo *accountInfo = [[LMFriendRecommandInfo alloc] init];
         accountInfo.username = [dic safeObjectForKey:@"username"];
         accountInfo.address = [dic safeObjectForKey:@"address"];
         accountInfo.avatar = [dic safeObjectForKey:@"avatar"];
