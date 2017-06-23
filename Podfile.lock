@@ -24,10 +24,6 @@ PODS:
   - FMDB (2.6.2):
     - FMDB/standard (= 2.6.2)
   - FMDB/standard (2.6.2)
-  - FMDBMigrationManager (1.4.1):
-    - FMDBMigrationManager/System (= 1.4.1)
-  - FMDBMigrationManager/System (1.4.1):
-    - FMDB/standard (>= 2.3)
   - Kiwi (2.4.0)
   - KSCrash (1.6.0):
     - KSCrash/Installations (= 1.6.0)
@@ -106,7 +102,6 @@ DEPENDENCIES:
   - Bugly
   - CocoaLumberjack
   - FMDB
-  - FMDBMigrationManager
   - Kiwi
   - KSCrash (= 1.6.0)
   - libPhoneNumber-iOS (~> 0.8)
@@ -131,7 +126,6 @@ SPEC CHECKSUMS:
   Bugly: da3c02408c14838d498429320545a8e439392978
   CocoaLumberjack: 9b4aed7073d242f29cc2f62068d995faf67f703a
   FMDB: 854a0341b4726e53276f2a8996f06f1b80f9259a
-  FMDBMigrationManager: d52007f328ea0665e8985ca8a33500707aef084f
   Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8
   KSCrash: 73fc2bcec2b6bcd1d948d200e11904c39d532a0e
   libPhoneNumber-iOS: f721ae4d5854bce60934f9fb9b0b28e8e68913cb
@@ -141,6 +135,6 @@ SPEC CHECKSUMS:
   Protobuf: 265e9977d04a83eba9cefb0bed3ad07e41033b4a
   Realm: 07e5d3a9e0e41d65fd5f9f05150ed6295d0f093b
 
-PODFILE CHECKSUM: f125ef6582fe2282167b8fc0b47e8835ac852045
+PODFILE CHECKSUM: 5f18c102b7c613df38167d69ae4a793751a595c8
 
 COCOAPODS: 1.2.1

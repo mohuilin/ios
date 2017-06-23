@@ -5,7 +5,6 @@
 //  Created by MoHuilin on 2017/6/19.
 //  Copyright © 2017年 Connect. All rights reserved.
 //
-#import <FMDBMigrationManager/FMDBMigrationManager.h>
 #import "LMRealmDBManager.h"
 #import "RLMRealm+LMRLMRealm.h"
 #import "MMGlobal.h"
@@ -26,6 +25,8 @@
 #import "LMFriendRecommandInfo.h"
 #import "LMFriendRequestInfo.h"
 #import "MMMessage.h"
+#import <FMDB/FMDB.h>
+
 
 @implementation LMRealmDBManager
 static FMDatabaseQueue *queue;
@@ -70,7 +71,7 @@ static FMDatabaseQueue *queue;
             //t_friend
             if ([self friendRequestNewDataMigration]) {
                 if (complete) {
-                    complete(0.5);
+                    complete(1);
                 }
             }
         }

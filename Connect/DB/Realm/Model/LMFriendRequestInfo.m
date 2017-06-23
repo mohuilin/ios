@@ -10,6 +10,10 @@
 
 @implementation LMFriendRequestInfo
 
++(NSString *)primaryKey {
+    return @"address";
+}
+
 + (NSDictionary *)defaultPropertyValues{
     NSMutableDictionary *defaultValues = [super defaultPropertyValues].mutableCopy;
     if (defaultValues) {

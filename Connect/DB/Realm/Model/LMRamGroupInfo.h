@@ -31,4 +31,5 @@
 @property  LMRamMemberInfo *admin;
 
 @property RLMArray<LMRamMemberInfo *><LMRamMemberInfo> *membersArray;
+
 @end

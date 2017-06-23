@@ -7,9 +7,9 @@
 //
 
 #import "LMDBUpdataController.h"
-#import "LMDataMigrationHelper.h"
 #import "MMGlobal.h"
 #import "LMDisplayProgressView.h"
+#import "LMRealmDBManager.h"
 
 #define DisplayTime 4
 
@@ -65,7 +65,7 @@
         self.displayLable.hidden = NO;
         self.displayImage.hidden = NO;
         self.tipLable.hidden = NO;
-        [LMDataMigrationHelper dataMigrationWithComplete:^(CGFloat progress) {
+        [LMRealmDBManager dataMigrationWithComplete:^(CGFloat progress) {
             DDLogInfo(@"dataMigrationWithComplete progress %f",progress);
         }];
         [GCDQueue executeInMainQueue:^{

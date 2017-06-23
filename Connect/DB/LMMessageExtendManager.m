@@ -7,6 +7,7 @@
 //
 
 #import "LMMessageExtendManager.h"
+#import "LMMessageExt.h"
 
 #define MessageExtenTable @"t_transactiontable"
 
@@ -47,36 +48,51 @@ static LMMessageExtendManager *manager = nil;
         return;
     }
     NSMutableArray *temArray = [NSMutableArray array];
-    for (NSDictionary *dic  in array) {
-        [temArray addObject:@[[dic safeObjectForKey:@"message_id"], [dic safeObjectForKey:@"hashid"], @([[dic safeObjectForKey:@"status"] intValue]), @([[dic safeObjectForKey:@"pay_count"] intValue]), @([[dic safeObjectForKey:@"crowd_count"] intValue])]];
-    }
-    [self batchInsertTableName:MessageExtenTable fields:@[@"message_id", @"hashid", @"status", @"pay_count", @"crowd_count"] batchValues:temArray];
 
+    for (NSDictionary *dic  in array) {
+        LMMessageExt *msgExt = [[LMMessageExt alloc] init];
+        msgExt.messageId = [dic safeObjectForKey:@"message_id"];
+        msgExt.hashid = [dic safeObjectForKey:@"hashid"];
+        msgExt.status = [[dic safeObjectForKey:@"status"] intValue];
+        msgExt.payCount = [[dic safeObjectForKey:@"pay_count"] intValue];
+        msgExt.crowdCount = [[dic safeObjectForKey:@"crowd_count"] intValue];
+        
+        [temArray addObject:msgExt];
+    }
+
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObjectsFromArray:temArray];
+    }];
 }
 
 - (void)saveBitchMessageExtendDict:(NSDictionary *)dic {
-
     if (!dic) {
         return;
     }
-    if ([self isExisetWithHashId:[dic safeObjectForKey:@"hashid"]]) {
-        [self                                                                   updateTableName:MessageExtenTable fieldsValues:@{@"message_id": [dic safeObjectForKey:@"message_id"],
-                @"status": @([[dic safeObjectForKey:@"status"] intValue]),
-                @"pay_count": @([[dic safeObjectForKey:@"pay_count"] intValue]),
-                @"crowd_count": @([[dic safeObjectForKey:@"crowd_count"] intValue])} conditions:@{@"hashid": [dic safeObjectForKey:@"hashid"]}];
-    } else {
-        NSMutableArray *temArray = [NSMutableArray array];
-        [temArray addObject:@[[dic safeObjectForKey:@"message_id"], [dic safeObjectForKey:@"hashid"], @([[dic safeObjectForKey:@"status"] intValue]), @([[dic safeObjectForKey:@"pay_count"] intValue]), @([[dic safeObjectForKey:@"crowd_count"] intValue])]];
-        [self batchInsertTableName:MessageExtenTable fields:@[@"message_id", @"hashid", @"status", @"pay_count", @"crowd_count"] batchValues:temArray];
-    }
+    
+    LMMessageExt *msgExt = [[LMMessageExt alloc] init];
+    msgExt.messageId = [dic safeObjectForKey:@"message_id"];
+    msgExt.hashid = [dic safeObjectForKey:@"hashid"];
+    msgExt.status = [[dic safeObjectForKey:@"status"] intValue];
+    msgExt.payCount = [[dic safeObjectForKey:@"pay_count"] intValue];
+    msgExt.crowdCount = [[dic safeObjectForKey:@"crowd_count"] intValue];
+    
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+        [realm addOrUpdateObject:msgExt];
+    }];
 }
 
 - (void)updateMessageExtendStatus:(int)status withHashId:(NSString *)hashId {
     if (GJCFStringIsNull(hashId)) {
         return;
     }
-    [self updateTableName:MessageExtenTable fieldsValues:@{@"status": @(status)} conditions:@{@"hashid": hashId}];
-
+    
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    if (msgExt) {
+        [self executeRealmWithBlock:^{
+            msgExt.status = status;
+        }];
+    }
 }
 
 - (void)updateMessageExtendPayCount:(int)payCount withHashId:(NSString *)hashId {
@@ -84,67 +100,51 @@ static LMMessageExtendManager *manager = nil;
     if (GJCFStringIsNull(hashId)) {
         return;
     }
-    [self updateTableName:MessageExtenTable fieldsValues:@{@"pay_count": @(payCount)} conditions:@{@"hashid": hashId}];
-
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    if (msgExt) {
+        [self executeRealmWithBlock:^{
+            msgExt.payCount = payCount;
+        }];
+    }
 }
 
 - (void)updateMessageExtendPayCount:(int)payCount status:(int)status withHashId:(NSString *)hashId {
     if (GJCFStringIsNull(hashId)) {
         return;
     }
-    [self updateTableName:MessageExtenTable fieldsValues:@{@"pay_count": @(payCount), @"status": @(status)} conditions:@{@"hashid": hashId}];
-
-}
-
-- (BOOL)isExisetWithHashId:(NSString *)hashId {
-    if (GJCFStringIsNull(hashId)) {
-        return NO;
-    }
-    NSDictionary *temD = [[self getDatasFromTableName:MessageExtenTable conditions:@{@"hashid": hashId} fields:@[@"hashid"]] lastObject];
-
-    if (!temD) {
-        return NO;
-    } else {
-        return YES;
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    if (msgExt) {
+        [self executeRealmWithBlock:^{
+            msgExt.status = status;
+            msgExt.payCount = payCount;
+        }];
     }
 }
+
 
 - (int)getStatus:(NSString *)hashId {
     if (GJCFStringIsNull(hashId)) {
         return 0;
     }
-    NSDictionary *dic = [[self getDatasFromTableName:MessageExtenTable conditions:@{@"hashid": hashId} fields:@[@"status"]] lastObject];
-    if (!dic) {
-        return 0;
-    } else {
-        return [[dic safeObjectForKey:@"status"] intValue];
-    }
-
+    
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    return msgExt.status;
 }
 
 - (int)getPayCount:(NSString *)hashId {
     if (GJCFStringIsNull(hashId)) {
         return 0;
     }
-    NSDictionary *dic = [[self getDatasFromTableName:MessageExtenTable conditions:@{@"hashid": hashId} fields:@[@"pay_count"]] lastObject];
-    if (!dic) {
-        return 0;
-    } else {
-        return [[dic safeObjectForKey:@"pay_count"] intValue];
-    }
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    return msgExt.payCount;
 }
 
 - (NSString *)getMessageId:(NSString *)hashId {
     if (GJCFStringIsNull(hashId)) {
         return nil;
     }
-    NSDictionary *dic = [[self getDatasFromTableName:MessageExtenTable conditions:@{@"hashid": hashId} fields:@[@"message_id"]] lastObject];
-    if (!dic) {
-        return nil;
-    } else {
-        return [dic safeObjectForKey:@"message_id"];
-    }
-
+    LMMessageExt *msgExt = [[LMMessageExt objectsWhere:[NSString stringWithFormat:@"hashid = '%@'",hashId]] lastObject];
+    return msgExt.messageId;
 }
 
 @end

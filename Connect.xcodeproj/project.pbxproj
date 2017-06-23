@@ -224,7 +224,6 @@
 		D9217EDE1CE03D9100953F51 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9217EDD1CE03D9100953F51 /* Assets.xcassets */; };
 		D9217EE11CE03D9100953F51 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9217EDF1CE03D9100953F51 /* LaunchScreen.storyboard */; };
 		D9222D681E82283400D67110 /* BaseDB.m in Sources */ = {isa = PBXBuildFile; fileRef = D9222D451E82283400D67110 /* BaseDB.m */; };
-		D9222D691E82283400D67110 /* DBTableNameFormart.m in Sources */ = {isa = PBXBuildFile; fileRef = D9222D471E82283400D67110 /* DBTableNameFormart.m */; };
 		D9222D6B1E82283400D67110 /* GroupDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D9222D4B1E82283400D67110 /* GroupDBManager.m */; };
 		D9222D6D1E82283400D67110 /* LMBaseSSDBManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D9222D4F1E82283400D67110 /* LMBaseSSDBManager.mm */; };
 		D9222D6E1E82283400D67110 /* LMHistoryCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D9222D511E82283400D67110 /* LMHistoryCacheManager.m */; };
@@ -648,8 +647,6 @@
 		D943CD861EB1A5BB00BE94EF /* GJGCChatFriendSnapChatTipCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D943CD851EB1A5BB00BE94EF /* GJGCChatFriendSnapChatTipCell.m */; };
 		D943CD891EB1AB5000BE94EF /* GJGCChatSystemNotiConstans.m in Sources */ = {isa = PBXBuildFile; fileRef = D943CD881EB1AB5000BE94EF /* GJGCChatSystemNotiConstans.m */; };
 		D94BE0581EBC7252008BEB0B /* LMNotificationDefine.m in Sources */ = {isa = PBXBuildFile; fileRef = D94BE0561EBC7252008BEB0B /* LMNotificationDefine.m */; };
-		D95488F91E9CD53200F200DF /* LMDataMigrationHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = D95488F81E9CD53200F200DF /* LMDataMigrationHelper.m */; };
-		D95488FB1E9DC21800F200DF /* 20170412100148331_createnewtable.sql in Resources */ = {isa = PBXBuildFile; fileRef = D95488FA1E9DC21800F200DF /* 20170412100148331_createnewtable.sql */; };
 		D95488FF1E9DC89100F200DF /* LMDBUpdataController.m in Sources */ = {isa = PBXBuildFile; fileRef = D95488FD1E9DC89100F200DF /* LMDBUpdataController.m */; };
 		D95489001E9DC89100F200DF /* LMDBUpdataController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D95488FE1E9DC89100F200DF /* LMDBUpdataController.xib */; };
 		D95845131ECAAB7D004C8984 /* LMCommandAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = D95845121ECAAB7D004C8984 /* LMCommandAdapter.m */; };
@@ -1469,8 +1466,6 @@
 		D921A9921CE0434600953F51 /* Connect-PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Connect-PrefixHeader.pch"; sourceTree = "<group>"; };
 		D9222D441E82283400D67110 /* BaseDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseDB.h; sourceTree = "<group>"; };
 		D9222D451E82283400D67110 /* BaseDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseDB.m; sourceTree = "<group>"; };
-		D9222D461E82283400D67110 /* DBTableNameFormart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DBTableNameFormart.h; sourceTree = "<group>"; };
-		D9222D471E82283400D67110 /* DBTableNameFormart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DBTableNameFormart.m; sourceTree = "<group>"; };
 		D9222D4A1E82283400D67110 /* GroupDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupDBManager.h; sourceTree = "<group>"; };
 		D9222D4B1E82283400D67110 /* GroupDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GroupDBManager.m; sourceTree = "<group>"; };
 		D9222D4E1E82283400D67110 /* LMBaseSSDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseSSDBManager.h; sourceTree = "<group>"; };
@@ -2216,9 +2211,6 @@
 		D94BE0541EBC7252008BEB0B /* Define.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Define.h; sourceTree = "<group>"; };
 		D94BE0551EBC7252008BEB0B /* LMNotificationDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMNotificationDefine.h; sourceTree = "<group>"; };
 		D94BE0561EBC7252008BEB0B /* LMNotificationDefine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMNotificationDefine.m; sourceTree = "<group>"; };
-		D95488F71E9CD53200F200DF /* LMDataMigrationHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMDataMigrationHelper.h; sourceTree = "<group>"; };
-		D95488F81E9CD53200F200DF /* LMDataMigrationHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMDataMigrationHelper.m; sourceTree = "<group>"; };
-		D95488FA1E9DC21800F200DF /* 20170412100148331_createnewtable.sql */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 20170412100148331_createnewtable.sql; sourceTree = "<group>"; };
 		D95488FC1E9DC89100F200DF /* LMDBUpdataController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMDBUpdataController.h; sourceTree = "<group>"; };
 		D95488FD1E9DC89100F200DF /* LMDBUpdataController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMDBUpdataController.m; sourceTree = "<group>"; };
 		D95488FE1E9DC89100F200DF /* LMDBUpdataController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LMDBUpdataController.xib; sourceTree = "<group>"; };
@@ -12966,12 +12958,8 @@
 			isa = PBXGroup;
 			children = (
 				D96104101EF7B3D6001A0998 /* Realm */,
-				D95488E91E9CC0EC00F200DF /* DataMigartion */,
-				D9222D541E82283400D67110 /* Migration */,
 				D9222D441E82283400D67110 /* BaseDB.h */,
 				D9222D451E82283400D67110 /* BaseDB.m */,
-				D9222D461E82283400D67110 /* DBTableNameFormart.h */,
-				D9222D471E82283400D67110 /* DBTableNameFormart.m */,
 				D9222D4A1E82283400D67110 /* GroupDBManager.h */,
 				D9222D4B1E82283400D67110 /* GroupDBManager.m */,
 				F1F533DB1E9F4F9500138B39 /* LMRecommandFriendManager.h */,
@@ -12992,14 +12980,6 @@
 				D9222D511E82283400D67110 /* LMHistoryCacheManager.m */,
 			);
 			path = DB;
-			sourceTree = "<group>";
-		};
-		D9222D541E82283400D67110 /* Migration */ = {
-			isa = PBXGroup;
-			children = (
-				D95488FA1E9DC21800F200DF /* 20170412100148331_createnewtable.sql */,
-			);
-			path = Migration;
 			sourceTree = "<group>";
 		};
 		D9222D7C1E822A1800D67110 /* Xib */ = {
@@ -14464,15 +14444,6 @@
 				F1D91E1E1ECC2F81003DB234 /* NetDefines.h */,
 			);
 			path = Define;
-			sourceTree = "<group>";
-		};
-		D95488E91E9CC0EC00F200DF /* DataMigartion */ = {
-			isa = PBXGroup;
-			children = (
-				D95488F71E9CD53200F200DF /* LMDataMigrationHelper.h */,
-				D95488F81E9CD53200F200DF /* LMDataMigrationHelper.m */,
-			);
-			path = DataMigartion;
 			sourceTree = "<group>";
 		};
 		D95845141ECAD8C1004C8984 /* Model */ = {
@@ -32400,7 +32371,6 @@
 				D92230491E822A3100D67110 /* shock.gif in Resources */,
 				D92230521E822A3100D67110 /* sweaty_sad@3x.png in Resources */,
 				D922301B1E822A3100D67110 /* cool_man@3x.png in Resources */,
-				D95488FB1E9DC21800F200DF /* 20170412100148331_createnewtable.sql in Resources */,
 				D922302A1E822A3100D67110 /* gifCode.plist in Resources */,
 				D9B4365D1E8E5366006C816C /* LanguageConfig.plist in Resources */,
 				D922303C1E822A3100D67110 /* love_shock@3x.png in Resources */,
@@ -33279,7 +33249,6 @@
 				D9222FEE1E822A3100D67110 /* YYSentinel.m in Sources */,
 				192351911E81249D0022D844 /* HelpSupportModel.m in Sources */,
 				D95C03771E8108D8006C5C8A /* GJGCChatSystemNotiDataManager.m in Sources */,
-				D9222D691E82283400D67110 /* DBTableNameFormart.m in Sources */,
 				D9222FB61E822A3100D67110 /* TFHppleElement.m in Sources */,
 				D97B44A31DDBEC3800140A2D /* HandleUrlManager.m in Sources */,
 				D95C03661E8108D8006C5C8A /* LMApplyJoinToGroupViewController.m in Sources */,
@@ -33367,7 +33336,6 @@
 				D96104231EF923E9001A0998 /* RLMRealm+LMRLMRealm.m in Sources */,
 				D95C04551E810902006C5C8A /* GroupMembersCell.m in Sources */,
 				D95C03751E8108D8006C5C8A /* PlayViewController.m in Sources */,
-				D95488F91E9CD53200F200DF /* LMDataMigrationHelper.m in Sources */,
 				192351281E8121CB0022D844 /* LMaddTableViewCell.m in Sources */,
 				D95C04881E810902006C5C8A /* GJCUProgressView.m in Sources */,
 				192350411E811F520022D844 /* NCellArrow.m in Sources */,

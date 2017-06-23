@@ -120,8 +120,6 @@
     }
     self.selectedIndex = 0;
     
-    //Database migration
-    [BaseDB migrationWithUserPublicKey:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
     [LMRealmDBManager dataMigrationWithComplete:^(CGFloat progress) {
         
     }];

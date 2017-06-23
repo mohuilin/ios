@@ -110,8 +110,6 @@ static LKUserCenter *center = nil;
         if (decodeDict[@"is_success"]) {
             loginUser.prikey = decodeDict[@"prikey"];
             
-            // Database migration
-            [BaseDB migrationWithUserPublicKey:loginUser.pub_key];
             [LMRealmDBManager dataMigrationWithComplete:^(CGFloat progress) {
                 
             }];
@@ -261,8 +259,7 @@ static LKUserCenter *center = nil;
 
 - (void)registerUser:(AccountInfo *)user{
     self.loginUser = user;
-    // Database migration
-    [BaseDB migrationWithUserPublicKey:user.pub_key];
+    
     [LMRealmDBManager dataMigrationWithComplete:^(CGFloat progress) {
         
     }];

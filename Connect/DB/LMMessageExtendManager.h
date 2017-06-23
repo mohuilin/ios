@@ -49,13 +49,6 @@
 - (void)updateMessageExtendPayCount:(int)payCount status:(int)status withHashId:(NSString *)hashId;
 
 /**
- * Judge the existence of transaction ID
- * @param hashId
- * @return
- */
-- (BOOL)isExisetWithHashId:(NSString *)hashId;
-
-/**
  * Judge transaction ID, get status
  * @param hashId
  * @return

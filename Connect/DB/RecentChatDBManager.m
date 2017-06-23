@@ -122,7 +122,7 @@ static RecentChatDBManager *manager = nil;
 
 - (void)getAllUnReadCountWithComplete:(void (^)(int count))complete {
     if (complete) {
-        RLMResults <LMRecentChat *> *results = [LMRecentChat objectsWhere:@"chatSetting.notifyStatus == 0"];
+        RLMResults <LMRecentChat *> *results = [LMRecentChat objectsWhere:@"chatSetting.notifyStatus = 0"];
         int count = 0;
         for (LMRecentChat *realmModel in results) {
             count += realmModel.unReadCount;
@@ -316,10 +316,9 @@ static RecentChatDBManager *manager = nil;
         return;
     }
     LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    realmModel.groupNoteMyself = YES;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+        realmModel.groupNoteMyself = YES;
+    }];
 }
 
 - (void)clearGroupNoteMyselfWithIdentifer:(NSString *)identifer {

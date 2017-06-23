@@ -10,7 +10,6 @@ target 'Connect' do
     pod 'AFNetworking', '~> 3.0'
     source 'https://github.com/CocoaPods/Specs.git'
     pod 'libPhoneNumber-iOS', '~> 0.8'
-    pod 'FMDBMigrationManager'
     pod 'FMDB'
     pod 'Realm'
 end
