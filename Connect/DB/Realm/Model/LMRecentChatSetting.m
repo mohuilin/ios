@@ -10,19 +10,19 @@
 
 @implementation LMRecentChatSetting
 
-+ (NSString *)primaryKey{
++ (NSString *)primaryKey {
     return @"identifier";
 }
 
-+ (NSDictionary *)defaultPropertyValues{
++ (NSDictionary *)defaultPropertyValues {
     NSMutableDictionary *defaultValues = [super defaultPropertyValues].mutableCopy;
     if (defaultValues) {
         [defaultValues setObject:@(NO) forKey:@"notifyStatus"];
         [defaultValues setObject:@(0) forKey:@"snapChatDeleteTime"];
         return defaultValues;
-    } else{
-        return @{@"notifyStatus":@(NO),
-                 @"snapChatDeleteTime":@(0)};
+    } else {
+        return @{@"notifyStatus": @(NO),
+                @"snapChatDeleteTime": @(0)};
     }
 }
 

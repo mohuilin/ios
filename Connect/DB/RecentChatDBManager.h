@@ -14,9 +14,6 @@
 + (RecentChatDBManager *)sharedManager;
 
 + (void)tearDown;
-
-#pragma mark -会话公开方法
-
 /**
  * acync get all unread count
  * @param complete

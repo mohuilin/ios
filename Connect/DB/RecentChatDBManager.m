@@ -12,7 +12,6 @@
 #import "MessageDBManager.h"
 #import "IMService.h"
 #import "ConnectTool.h"
-#import "LMBaseSSDBManager.h"
 #import "LMConversionManager.h"
 #import "LMRealmDBManager.h"
 
@@ -44,7 +43,7 @@ static RecentChatDBManager *manager = nil;
     return nil;
 }
 
-- (NSArray *)getAllRecentChat {    
+- (NSArray *)getAllRecentChat {
     NSMutableArray *recentChatArrayM = [NSMutableArray array];
     RLMResults <LMRecentChat *> *results = [LMRecentChat allObjects];
     //model trasfer
@@ -69,7 +68,7 @@ static RecentChatDBManager *manager = nil;
 - (void)getTopChatCountWithComplete:(void (^)(int count))complete {
     RLMResults <LMRecentChat *> *results = [LMRecentChat objectsWhere:@"top_chat = 1"];
     if (complete) {
-        complete((int)results.count);
+        complete((int) results.count);
     }
 }
 
@@ -93,7 +92,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    RLMResults <LMRecentChat *> *results = [LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]];
+    RLMResults <LMRecentChat *> *results = [LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]];
     if (results.firstObject) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
             [realm deleteObject:[results firstObject]];
@@ -102,11 +101,11 @@ static RecentChatDBManager *manager = nil;
     }
 }
 
-- (void)deleteRecentChatSettingWithIdentifier:(NSString *)identifier{
+- (void)deleteRecentChatSettingWithIdentifier:(NSString *)identifier {
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    RLMResults <LMRecentChat *> *results = [LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]];
+    RLMResults <LMRecentChat *> *results = [LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]];
     if (results.firstObject) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
             [realm deleteObject:[results firstObject]];
@@ -121,7 +120,7 @@ static RecentChatDBManager *manager = nil;
         for (LMRecentChat *realmModel in results) {
             count += realmModel.unReadCount;
         }
-        complete(count);
+        complete(0);
     }
 }
 
@@ -132,7 +131,7 @@ static RecentChatDBManager *manager = nil;
     if (snapTime < 0) {
         snapTime = 0;
     }
-    LMRecentChatSetting *setting = [[LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChatSetting *setting = [[LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     [self executeRealmWithBlock:^{
         setting.snapChatDeleteTime = snapTime;
     }];
@@ -142,7 +141,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return 0;
     }
-    LMRecentChatSetting *setting = [[LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChatSetting *setting = [[LMRecentChatSetting objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     return setting.snapChatDeleteTime;
 }
 
@@ -151,7 +150,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return nil;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     RecentChatModel *model = realmModel.normalInfo;
     if (model) {
         [[SessionManager sharedManager] setRecentChat:model];
@@ -167,7 +166,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     if (!realmModel) {
         RecentChatModel *model = [RecentChatModel new];
         model.identifier = identifier;
@@ -186,7 +185,7 @@ static RecentChatDBManager *manager = nil;
                 model.headUrl = user.avatar;
             }
         }
-        model.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+        model.time = [NSString stringWithFormat:@"%lld", (long long) ([[NSDate date] timeIntervalSince1970] * 1000)];
         [self save:model];
     } else {
         [self executeRealmWithBlock:^{
@@ -200,7 +199,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     if (realmModel) {
         [self executeRealmWithBlock:^{
             realmModel.isTopChat = NO;
@@ -213,7 +212,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return NO;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     return realmModel.isTopChat;
 }
 
@@ -223,7 +222,7 @@ static RecentChatDBManager *manager = nil;
         return;
     }
     draft = draft ? draft : @"";
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.draft = draft;
     }];
@@ -233,7 +232,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.draft = @"";
     }];
@@ -243,7 +242,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.content = @"";
     }];
@@ -264,7 +263,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifier)) {
         return @"";
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifier]] firstObject];
     return realmModel.draft;
 }
 
@@ -272,17 +271,17 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(idetifier)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",idetifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", idetifier]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.unReadCount = unreadCount;
     }];
 }
 
-- (void)updataStrangerStatus:(BOOL)stranger idetifier:(NSString *)idetifier{
+- (void)updataStrangerStatus:(BOOL)stranger idetifier:(NSString *)idetifier {
     if (GJCFStringIsNull(idetifier)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",idetifier]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", idetifier]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.stranger = stranger;
     }];
@@ -296,7 +295,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifer]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.groupNoteMyself = YES;
     }];
@@ -306,7 +305,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifer]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.groupNoteMyself = NO;
     }];
@@ -317,7 +316,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifer]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.unReadCount = 0;
         realmModel.chatSetting.notifyStatus = YES;
@@ -328,7 +327,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifer]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.chatSetting.notifyStatus = NO;
     }];
@@ -339,7 +338,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return NO;
     }
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifer]] firstObject];
     return realmModel.chatSetting.notifyStatus;
 }
 
@@ -359,7 +358,7 @@ static RecentChatDBManager *manager = nil;
         recentChat.time = last_time;
         recentChat.snapChatDeleteTime = snapTime;
         //update
-        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentChat.identifier]] firstObject];
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", recentChat.identifier]] firstObject];
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = recentChat.unReadCount;
             realmModel.time = recentChat.time;
@@ -379,7 +378,7 @@ static RecentChatDBManager *manager = nil;
         int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
         recentChat.time = [NSString stringWithFormat:@"%lld", time];
         recentChat.identifier = identifier;
-        
+
         recentChat.unReadCount = 0;
         recentChat.snapChatDeleteTime = snapTime;
         recentChat.chatUser = contact;
@@ -402,7 +401,7 @@ static RecentChatDBManager *manager = nil;
     }
     int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
     //update
-    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifer]] firstObject];
+    LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifer]] firstObject];
     [self executeRealmWithBlock:^{
         realmModel.time = [NSString stringWithFormat:@"%lld", time];
     }];
@@ -426,7 +425,7 @@ static RecentChatDBManager *manager = nil;
         recentChat.time = last_time;
         recentChat.content = content;
         //update
-        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentChat.identifier]] firstObject];
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", recentChat.identifier]] firstObject];
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = recentChat.unReadCount;
             realmModel.time = recentChat.time;
@@ -521,10 +520,10 @@ static RecentChatDBManager *manager = nil;
         }
         recentChat.content = content;
         recentChat.time = last_time;
-        
+
         //update
-        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentChat.identifier]] firstObject];
-        
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", recentChat.identifier]] firstObject];
+
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = recentChat.unReadCount;
             realmModel.time = recentChat.time;
@@ -598,7 +597,7 @@ static RecentChatDBManager *manager = nil;
                     recentChat.unReadCount = 1;
                 }
                 recentChat.chatUser = contact;
-                
+
                 recentChat.notifyStatus = [self getMuteStatusWithIdentifer:recentChat.identifier];
                 recentChat.snapChatDeleteTime = [self getSnapTimeWithChatIdentifer:recentChat.identifier];
             }
@@ -625,9 +624,9 @@ static RecentChatDBManager *manager = nil;
             recentChat.unReadCount++;
         }
         recentChat.time = last_time;
-        
+
         //update
-        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentChat.identifier]] firstObject];
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", recentChat.identifier]] firstObject];
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = recentChat.unReadCount;
             realmModel.time = recentChat.time;
@@ -691,9 +690,9 @@ static RecentChatDBManager *manager = nil;
         model.unReadCount = unRead;
         model.content = message.content;
         model.time = last_time;
-        
+
         //update
-        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",model.identifier]] firstObject];
+        LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", model.identifier]] firstObject];
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = model.unReadCount;
             realmModel.time = model.time;

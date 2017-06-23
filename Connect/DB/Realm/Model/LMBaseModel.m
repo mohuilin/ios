@@ -10,16 +10,16 @@
 
 @implementation LMBaseModel
 
-- (LMBaseModel *)initWithNormalInfo:(id)info{
+- (LMBaseModel *)initWithNormalInfo:(id)info {
     if (self = [super init]) {}
     return self;
 }
 
-- (id)normalInfo{
+- (id)normalInfo {
     return nil;
 }
 
-+ (void)initialize{
++ (void)initialize {
     [self setDefaultRealm];
 }
 
@@ -28,9 +28,9 @@
 
     NSArray *docPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *path = [docPath objectAtIndex:0];
-    NSString *fileName = [NSString stringWithFormat:@"%@.realm",[[LKUserCenter shareCenter] currentLoginUser].address];
+    NSString *fileName = [NSString stringWithFormat:@"%@.realm", [[LKUserCenter shareCenter] currentLoginUser].address];
     NSString *filePath = [path stringByAppendingPathComponent:fileName];
-    NSLog(@"数据库目录 = %@",filePath);
+    NSLog(@"数据库目录 = %@", filePath);
     // Use the default directory, but replace the filename with the username
     config.fileURL = [NSURL URLWithString:filePath];
     config.readOnly = NO;
@@ -39,14 +39,14 @@
     [RLMRealmConfiguration setDefaultConfiguration:config];
 }
 
-+ (NSString *)primaryKey{
++ (NSString *)primaryKey {
     return @"ID";
 }
 
-+ (NSDictionary *)defaultPropertyValues{
++ (NSDictionary *)defaultPropertyValues {
     return @{
-        @"ID":@((long long)([[NSDate date] timeIntervalSince1970] * 1000))
-             };
+            @"ID": @((long long) ([[NSDate date] timeIntervalSince1970] * 1000))
+    };
 }
 
 @end

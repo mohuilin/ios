@@ -10,16 +10,16 @@
 
 @interface LMFriendRequestInfo : LMBaseModel
 
-@property  NSString *address;
-@property  NSString *pubKey;
-@property  NSString *avatar;
-@property  NSString *username;
-@property  int source;
-@property  int status;
-@property  int read;
-@property  NSString *tips;
+@property NSString *address;
+@property NSString *pubKey;
+@property NSString *avatar;
+@property NSString *username;
+@property int source;
+@property int status;
+@property int read;
+@property NSString *tips;
 
-@property (nonatomic ,assign) NSDate *createTime;
+@property(nonatomic, assign) NSDate *createTime;
 
 @end
 

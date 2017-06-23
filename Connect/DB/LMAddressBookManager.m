@@ -8,6 +8,7 @@
 
 #import "LMAddressBookManager.h"
 #import "LMRamAddressBook.h"
+
 static LMAddressBookManager *manager = nil;
 
 @implementation LMAddressBookManager
@@ -39,15 +40,14 @@ static LMAddressBookManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return;
     }
-    LMRamAddressBook* ramBook = [LMRamAddressBook new];
+    LMRamAddressBook *ramBook = [LMRamAddressBook new];
     ramBook.creatTime = [[NSDate date] timeIntervalSince1970] * 1000;
     ramBook.tag = @"";
     ramBook.address = address;
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
        [realm addOrUpdateObject:ramBook];
     }];
-    
-    
+
 }
 
 - (void)saveBitchAddressBook:(NSArray *)addressBooks {
@@ -77,13 +77,13 @@ static LMAddressBookManager *manager = nil;
 }
 
 - (NSArray *)getAllAddressBooks {
-    
+
     RLMResults<LMRamAddressBook *> *ramBooks = [LMRamAddressBook allObjects];
     if (ramBooks.count <= 0) {
         return nil;
     }
     NSMutableArray *temM = [NSMutableArray array];
-    for (LMRamAddressBook * ramBook in ramBooks) {
+    for (LMRamAddressBook *ramBook in ramBooks) {
         AddressBookInfo *info = [[AddressBookInfo alloc] init];
         info.address = ramBook.address;
         info.tag = ramBook.tag;
@@ -96,11 +96,11 @@ static LMAddressBookManager *manager = nil;
     if (GJCFStringIsNull(tag) || GJCFStringIsNull(address)) {
         return;
     }
+
    LMRamAddressBook *ramBook = [[LMRamAddressBook objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
     [self executeRealmWithBlock:^{
        ramBook.tag = tag;
     }];
-    
 }
 
 - (void)deleteAddressBookWithAddress:(NSString *)address {
@@ -113,9 +113,8 @@ static LMAddressBookManager *manager = nil;
     }];
 }
 
-- (void)clearAllAddress{
-    
-   RLMResults<LMRamAddressBook *> *ramBooks = [LMRamAddressBook allObjects];
+- (void)clearAllAddress {
+    RLMResults<LMRamAddressBook *> *ramBooks = [LMRamAddressBook allObjects];
     for (LMRamAddressBook *info in ramBooks) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
            [realm deleteObject:info];

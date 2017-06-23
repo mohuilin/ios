@@ -15,5 +15,4 @@
 @property long long creatTime;
 
 
-
 @end

@@ -56,7 +56,7 @@ static LMRecommandFriendManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return;
     }
-   LMFriendRecommandInfo *friendRequestInfo = [[LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
+    LMFriendRecommandInfo *friendRequestInfo = [[LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ", address]] lastObject];
     if (friendRequestInfo) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
            [realm deleteObject:friendRequestInfo];
@@ -97,21 +97,21 @@ static LMRecommandFriendManager *manager = nil;
     NSInteger number = (page * 20);
     NSInteger previousNumber = (page - 1) * 20;
     if (results.count >= number) {
-        
-        for (NSInteger index = previousNumber; index < number; index ++) {
+
+        for (NSInteger index = previousNumber; index < number; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
             AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
             [resultArray addObject:info];
         }
-        
-    }else {
-        
-        for (NSInteger index = previousNumber; index < results.count; index ++) {
+
+    } else {
+
+        for (NSInteger index = previousNumber; index < results.count; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
             AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
             [resultArray addObject:info];
         }
-        
+
     }
     if (resultArray.count > 0) {
         NSArray *result = resultArray.copy;
@@ -122,17 +122,19 @@ static LMRecommandFriendManager *manager = nil;
     }
     return nil;
 }
+
 - (BOOL)isExistUser:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return NO;
     }
-    RLMResults<LMFriendRecommandInfo *> *results = [LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]];
+    RLMResults<LMFriendRecommandInfo *> *results = [LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ", address]];
     if (results.count > 0) {
         return YES;
-    }else {
+    } else {
         return NO;
     }
 }
+
 - (void)updateRecommandFriendStatus:(int32_t)status withAddress:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return;
@@ -147,27 +149,27 @@ static LMRecommandFriendManager *manager = nil;
     if (page <= 0) {
         page = 1;
     }
-    
-    RLMResults<LMFriendRecommandInfo *> *results = [LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"status = %d ",status]];
+
+    RLMResults<LMFriendRecommandInfo *> *results = [LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"status = %d ", status]];
     NSMutableArray *resultArray = [NSMutableArray array];
     NSInteger number = (page * 20);
     NSInteger previousNumber = (page - 1) * 20;
     if (results.count >= number) {
-        
-        for (NSInteger index = previousNumber; index < number; index ++) {
+
+        for (NSInteger index = previousNumber; index < number; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
             AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
             [resultArray addObject:info];
         }
-        
-    }else {
-        
-        for (NSInteger index = previousNumber; index < results.count; index ++) {
+
+    } else {
+
+        for (NSInteger index = previousNumber; index < results.count; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
             AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
             [resultArray addObject:info];
         }
-        
+
     }
     if (resultArray.count > 0) {
         NSArray *result = resultArray.copy;
@@ -177,11 +179,12 @@ static LMRecommandFriendManager *manager = nil;
         return result;
     }
     return nil;
-    
+
 }
+
 - (LMFriendRecommandInfo *)changeToRamModel:(AccountInfo *)accountInfo {
-    
-    
+
+
     LMFriendRecommandInfo *ramFriendInfo = [[LMFriendRecommandInfo alloc] init];
     ramFriendInfo.username = accountInfo.username;
     ramFriendInfo.address = accountInfo.address;
@@ -189,10 +192,11 @@ static LMRecommandFriendManager *manager = nil;
     ramFriendInfo.status = accountInfo.recommandStatus;
     ramFriendInfo.pubKey = accountInfo.pub_key;
     return ramFriendInfo;
-    
+
 }
+
 - (AccountInfo *)realmChangeToAccount:(LMFriendRecommandInfo *)ramFriendInfo {
-    
+
     AccountInfo *accountInfo = [[AccountInfo alloc] init];
     accountInfo.username = ramFriendInfo.username;
     accountInfo.address = ramFriendInfo.address;

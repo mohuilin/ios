@@ -10,8 +10,8 @@
 
 @implementation LMRamAddressBook
 
-+(NSString *)primaryKey {
-   return @"address";
++ (NSString *)primaryKey {
+    return @"address";
 }
 
 @end

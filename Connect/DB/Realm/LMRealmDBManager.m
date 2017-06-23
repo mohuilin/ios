@@ -6,40 +6,25 @@
 //  Copyright © 2017年 Connect. All rights reserved.
 //
 #import "LMRealmDBManager.h"
-#import "RLMRealm+LMRLMRealm.h"
 #import "MMGlobal.h"
 #import "NSDictionary+LMSafety.h"
-#import "LMHistoryCacheManager.h"
-#import "LMRecentChat.h"
-#import "RecentChatModel.h"
-#import "LMRecentChat.h"
 #import "LMMessage.h"
 #import "LMContactAccountInfo.h"
-#import "RLMRealm+LMRLMRealm.h"
 #import "LMRamGroupInfo.h"
-#import "LMRamMemberInfo.h"
 #import "LMRamAddressBook.h"
-#import "BaseDB.h"
-#import "RecentChatModel.h"
-#import "RLMRealm+LMRLMRealm.h"
 #import "LMFriendRecommandInfo.h"
 #import "LMFriendRequestInfo.h"
-#import "MMMessage.h"
 #import <FMDB/FMDB.h>
 
 
 @implementation LMRealmDBManager
 static FMDatabaseQueue *queue;
-+ (void)saveInfo:(LMBaseModel *)ramModel{
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm addOrUpdateObject:ramModel];
-    [realm commitWriteTransaction];
-}
+
+
 + (void)dataMigrationWithComplete:(void (^)(CGFloat progress))complete {
     NSString *olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key.sha256String];
     if (GJCFFileIsExist(olddbPath)) {
-        
+
     } else {
         olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
         if (GJCFFileIsExist(olddbPath)) {
@@ -83,6 +68,7 @@ static FMDatabaseQueue *queue;
         }
     }
 }
+
 + (NSArray *)queryWithSql:(NSString *)sql {
     NSString *dbName = [[LKUserCenter shareCenter] currentLoginUser].pub_key.sha256String;
     if (!dbName) {
@@ -108,6 +94,7 @@ static FMDatabaseQueue *queue;
     [queue close];
     return arrayM.copy;
 }
+
 + (NSArray *)recentQueryWithSql:(NSString *)sql {
     NSString *dbName = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
     if (!dbName) {
@@ -149,7 +136,7 @@ static FMDatabaseQueue *queue;
         accountInfo.status = [[dic safeObjectForKey:@"status"] intValue];
         accountInfo.tips = [dic safeObjectForKey:@"tips"];
         if (accountInfo.address.length > 0) {
-           [temM objectAddObject:accountInfo];
+            [temM objectAddObject:accountInfo];
         }
     }
     if (temM.count > 0) {
@@ -158,6 +145,7 @@ static FMDatabaseQueue *queue;
     return YES;
 
 }
+
 + (BOOL)addressbookNewDataMigration {
     NSString *querySql = @"select * from t_addressbook";
     NSArray *resultArray = [self recentQueryWithSql:querySql];
@@ -173,8 +161,9 @@ static FMDatabaseQueue *queue;
         [self realmAddObject:temM];
     }
     return YES;
-    
+
 }
+
 + (BOOL)friendRecommandNewDataMigration {
     NSString *querySql = @"select * from t_friendrequest";
     NSArray *resultArray = [self recentQueryWithSql:querySql];
@@ -201,7 +190,7 @@ static FMDatabaseQueue *queue;
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *groupsArray = [NSMutableArray array];
     for (NSDictionary *dict in resultArray) {
-        
+
         LMRamGroupInfo *ramGroup = [[LMRamGroupInfo alloc] init];
         ramGroup.groupIdentifer = [dict safeObjectForKey:@"identifier"];
         ramGroup.groupName = [dict safeObjectForKey:@"name"];
@@ -223,9 +212,9 @@ static FMDatabaseQueue *queue;
             ramInfo.groupNicksName = info.groupNickName;
             ramInfo.pubKey = info.pub_key;
             if (info.isGroupAdmin) {
-              ramGroup.admin = ramInfo;
+                ramGroup.admin = ramInfo;
             }
-            ramInfo.univerStr = [[NSString stringWithFormat:@"%@%@",ramInfo.address,ramGroup.groupIdentifer] sha1String];
+            ramInfo.univerStr = [[NSString stringWithFormat:@"%@%@", ramInfo.address, ramGroup.groupIdentifer] sha1String];
             [ramMemberArray addObject:ramInfo];
         }
         [ramGroup.membersArray addObjects:ramMemberArray];
@@ -235,8 +224,9 @@ static FMDatabaseQueue *queue;
         [self realmAddObject:groupsArray];
     }
     return YES;
-    
+
 }
+
 + (NSMutableArray *)getgroupMemberByGroupIdentifier:(NSString *)groupid {
     if (GJCFStringIsNull(groupid)) {
         return nil;
@@ -267,14 +257,14 @@ static FMDatabaseQueue *queue;
             [mutableMembers objectAddObject:accountInfo];
         }
     }
-    
+
     if (admin) {
         [mutableMembers objectInsert:admin atIndex:0];
     }
     return mutableMembers;
 }
 
-+ (void)saveMessagesToRealm{
++ (void)saveMessagesToRealm {
     //query
     NSString *querySql = @"select message_id,message_ower,content,send_status,snap_time,read_time,state,createtime from t_message";
     NSArray *resultArray = [self queryWithSql:querySql];
@@ -292,19 +282,19 @@ static FMDatabaseQueue *queue;
         if (chatMessage.state == 0) {
             chatMessage.state = chatMessage.readTime > 0 ? 1 : 0;
         }
-        
+
         NSDictionary *contentDict = [[temD safeObjectForKey:@"content"] mj_JSONObject];
         NSString *aad = [contentDict safeObjectForKey:@"aad"];
         NSString *iv = [contentDict safeObjectForKey:@"iv"];
         NSString *tag = [contentDict safeObjectForKey:@"tag"];
         NSString *ciphertext = [contentDict safeObjectForKey:@"ciphertext"];
         NSString *messageString = [KeyHandle xtalkDecodeAES_GCM:[[LKUserCenter shareCenter] getLocalGCDEcodePass] data:ciphertext aad:aad iv:iv tag:tag];
-        
+
         chatMessage.message = [MMMessage mj_objectWithKeyValues:messageString];
         chatMessage.message.sendstatus = chatMessage.sendstatus;
         chatMessage.message.isRead = chatMessage.readTime > 0;
         chatMessage.messageType = chatMessage.message.type;
-        
+
         LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:chatMessage];
         [chatMessages objectAddObject:realmModel];
     }
@@ -313,7 +303,7 @@ static FMDatabaseQueue *queue;
     }
 }
 
-+ (BOOL)saveRecentChatToRealm{
++ (BOOL)saveRecentChatToRealm {
     //query
     NSString *querySql = @"select c.identifier,c.name,c.avatar,c.draft,c.stranger,c.last_time,c.unread_count,c.top,c.notice,c.type,c.content,s.snap_time,s.disturb from t_conversion c,t_conversion_setting s where c.identifier = s.identifier";
     NSArray *resultArray = [self queryWithSql:querySql];
@@ -333,10 +323,10 @@ static FMDatabaseQueue *queue;
         model.content = [resultDict safeObjectForKey:@"content"];
         model.snapChatDeleteTime = [[resultDict safeObjectForKey:@"snap_time"] intValue];
         model.notifyStatus = [[resultDict safeObjectForKey:@"disturb"] boolValue];
-        
+
         //package bradge model
         LMRecentChat *realmModel = [[LMRecentChat alloc] initWithNormalInfo:model];
-        
+
         [recentChatArrayM addObject:realmModel];
     }
     if (recentChatArrayM.count) {
@@ -344,6 +334,7 @@ static FMDatabaseQueue *queue;
     }
     return YES;
 }
+
 + (BOOL)contactNewDataMigration {
     NSString *querySql = @"select c.address,c.pub_key,c.avatar,c.username,c.remark,c.source,c.blocked,c.common from t_contact c";
     NSArray *resultArray = [self recentQueryWithSql:querySql];
@@ -367,16 +358,17 @@ static FMDatabaseQueue *queue;
         [self realmAddObject:findUsers];
     }
     return YES;
-    
+
 }
+
 + (void)realmAddObject:(NSMutableArray *)realmArray {
-    
+
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     [realm beginWriteTransaction];
     [realm addOrUpdateObjectsFromArray:realmArray];
     [realm commitWriteTransaction];
-    
-    
+
+
 }
 
 @end

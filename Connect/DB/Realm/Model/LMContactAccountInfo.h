@@ -11,16 +11,16 @@
 
 @interface LMContactAccountInfo : LMBaseModel
 
-@property  NSString *address;
-@property  NSString *pub_key;
-@property  NSString *avatar;
-@property  NSString *username;
-@property  NSString *remarks;
-@property  int source;
-@property  BOOL isBlackMan;
-@property  BOOL isOffenContact;
+@property NSString *address;
+@property NSString *pub_key;
+@property NSString *avatar;
+@property NSString *username;
+@property NSString *remarks;
+@property int source;
+@property BOOL isBlackMan;
+@property BOOL isOffenContact;
 
-@property RLMArray<LMTag *><LMTag> *tags;
+@property RLMArray<LMTag *> <LMTag> *tags;
 
 @end
 

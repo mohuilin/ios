@@ -10,14 +10,14 @@
 
 @implementation LMRamMemberInfo
 
-+(NSString *)primaryKey {
++ (NSString *)primaryKey {
     return @"univerStr";
 }
 
-+ (NSDictionary<NSString *,RLMPropertyDescriptor *> *)linkingObjectsProperties{
++ (NSDictionary<NSString *, RLMPropertyDescriptor *> *)linkingObjectsProperties {
     return @{
-             @"group": [RLMPropertyDescriptor descriptorWithClass:LMRamGroupInfo.class propertyName:@"membersArray"],
-             };
+            @"group": [RLMPropertyDescriptor descriptorWithClass:LMRamGroupInfo.class propertyName:@"membersArray"],
+    };
 }
 
 @end

@@ -24,6 +24,6 @@
 @property int unReadCount;
 @property int talkType;
 
-@property (nonatomic ,strong) LMRecentChatSetting *chatSetting;
+@property(nonatomic, strong) LMRecentChatSetting *chatSetting;
 
 @end

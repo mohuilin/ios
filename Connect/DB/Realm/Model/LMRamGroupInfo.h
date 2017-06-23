@@ -12,24 +12,24 @@
 @interface LMRamGroupInfo : LMBaseModel
 
 // group name
-@property  NSString *groupName;
+@property NSString *groupName;
 // group id
-@property  NSString *groupIdentifer;
+@property NSString *groupIdentifer;
 // group ecdhkey
-@property  NSString *groupEcdhKey;
+@property NSString *groupEcdhKey;
 // isCommonGroup
-@property  BOOL isCommonGroup;
+@property BOOL isCommonGroup;
 // isGroupVerify
-@property  BOOL isGroupVerify;
+@property BOOL isGroupVerify;
 // isPublic
-@property  BOOL isPublic;
+@property BOOL isPublic;
 // avatarUrl
-@property  NSString *avatarUrl;
+@property NSString *avatarUrl;
 // groupSummary
-@property  NSString *summary;
+@property NSString *summary;
 
-@property  LMRamMemberInfo *admin;
+@property LMRamMemberInfo *admin;
 
-@property RLMArray<LMRamMemberInfo *><LMRamMemberInfo> *membersArray;
+@property RLMArray<LMRamMemberInfo *> <LMRamMemberInfo> *membersArray;
 
 @end

@@ -10,10 +10,19 @@
 
 @interface LMBaseModel : RLMObject
 
-@property (nonatomic ,assign) NSInteger ID;
+@property(nonatomic, assign) NSInteger ID;
 
+/**
+ * init with normarl model eg:Accountinfo LMgroupinfo
+ * @param info
+ * @return
+ */
 - (LMBaseModel *)initWithNormalInfo:(id)info;
 
+/**
+ * get normarl info eg:Accountinfo LMgroupinfo
+ * @return
+ */
 - (id)normalInfo;
 
 @end

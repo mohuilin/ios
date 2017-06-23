@@ -47,6 +47,7 @@
  * @param address
  */
 - (void)deleteAddressBookWithAddress:(NSString *)address;
+
 /**
  * remove all
  *

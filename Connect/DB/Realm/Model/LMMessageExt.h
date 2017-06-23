@@ -10,10 +10,10 @@
 
 @interface LMMessageExt : LMBaseModel
 
-@property (nonatomic ,copy) NSString *messageId;
-@property (nonatomic ,copy) NSString *hashid;
-@property (nonatomic ,assign) int status;
-@property (nonatomic ,assign) int payCount;
-@property (nonatomic ,assign) int crowdCount;
+@property(nonatomic, copy) NSString *messageId;
+@property(nonatomic, copy) NSString *hashid;
+@property(nonatomic, assign) int status;
+@property(nonatomic, assign) int payCount;
+@property(nonatomic, assign) int crowdCount;
 
 @end

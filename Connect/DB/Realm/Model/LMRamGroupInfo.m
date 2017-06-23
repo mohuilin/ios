@@ -9,8 +9,9 @@
 #import "LMRamGroupInfo.h"
 
 @implementation LMRamGroupInfo
-+(NSString *)primaryKey {
 
++ (NSString *)primaryKey {
     return @"groupIdentifer";
 }
+
 @end
