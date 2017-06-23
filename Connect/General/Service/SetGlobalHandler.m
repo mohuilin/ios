@@ -161,7 +161,6 @@
         if (hResponse.code != successCode) {
             return;
         }
-        [[UserDBManager sharedManager] saveTag:tag];
     } fail:^(NSError *error) {
         
     }];
@@ -199,7 +198,6 @@
    * @param complete
  */
 + (void)tagListDownCompelete:(void (^)(NSArray *tags))complete{
-    
     [NetWorkOperationTool POSTWithUrlString:ContactTagListUrl postProtoData:nil complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
@@ -211,11 +209,9 @@
         NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
         if (data) {
             TagList *taglist = [TagList parseFromData:data error:nil];
-            
             for (NSString *tag in taglist.listArray) {
                 [[UserDBManager sharedManager] saveTag:tag];
             }
-            
             // Set the sync flag
             [[MMAppSetting sharedSetting] haveSyncUserTags];
             
@@ -229,8 +225,6 @@
             complete(nil);
         }
     }];
-
-    
 }
 
 /**
@@ -240,21 +234,16 @@
    * @param tag
  */
 + (void)setUserAddress:(NSString *)address ToTag:(NSString *)tag{
-    
-    
+
     SetingUserToTag *setToTag = [[SetingUserToTag alloc] init];
     setToTag.address = address;
     setToTag.name = tag;
-    
     [NetWorkOperationTool POSTWithUrlString:ContactTagSetUserTagUrl postProtoData:setToTag.data complete:^(id response) {
-        
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             return;
         }
         [[UserDBManager sharedManager] saveAddress:address toTag:tag];
-
-
     } fail:^(NSError *error) {
         DDLogInfo(@"Set user to tag error");
     }];

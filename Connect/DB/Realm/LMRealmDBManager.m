@@ -198,7 +198,7 @@ static FMDatabaseQueue *queue;
             ramInfo.univerStr = [NSString stringWithFormat:@"%@%@",ramInfo.address,ramGroup.groupIdentifer];
             [ramMemberArray addObject:ramInfo];
         }
-        ramGroup.membersArray = ramMemberArray;
+        [ramGroup.membersArray addObjects:ramMemberArray];
         [groupsArray objectAddObject:ramGroup];
     }
     if (groupsArray.count > 0) {
@@ -319,7 +319,7 @@ static FMDatabaseQueue *queue;
     NSArray *resultArray = [self recentQueryWithSql:querySql];
     NSMutableArray *findUsers = [NSMutableArray array];
     for (NSDictionary *resultDict in resultArray) {
-        LMContactAccountInfo *findUser = [LMContactAccountInfo new];
+        AccountInfo *findUser = [AccountInfo new];
         findUser.address = [resultDict safeObjectForKey:@"address"];
         findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
         findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
@@ -328,8 +328,10 @@ static FMDatabaseQueue *queue;
         findUser.source = [[resultDict safeObjectForKey:@"source"] intValue];
         findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
         findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
-        [findUsers addObject:findUser];
-        
+
+
+        LMContactAccountInfo *realmContact = [[LMContactAccountInfo alloc] initWithAccountInfo:findUser];
+        [findUsers addObject:realmContact];
     }
     if (findUsers.count > 0) {
         [self realmAddObject:findUsers];

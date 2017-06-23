@@ -9,6 +9,7 @@
 #import "LMBaseModel.h"
 
 @interface LMFriendRequestInfo : LMBaseModel
+
 @property  NSString *address;
 @property  NSString *pubKey;
 @property  NSString *avatar;
@@ -17,4 +18,11 @@
 @property  int status;
 @property  int read;
 @property  NSString *tips;
+
+@property (nonatomic ,assign) NSDate *createTime;
+
+- (LMFriendRequestInfo *)initWithAccountInfo:(AccountInfo *)info;
+
+- (AccountInfo *)accountInfo;
+
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "LMBaseModel.h"
+#import "LMTag.h"
 
 @interface LMContactAccountInfo : LMBaseModel
 
@@ -19,4 +20,12 @@
 @property  BOOL isBlackMan;
 @property  BOOL isOffenContact;
 
+@property RLMArray<LMTag *><LMTag> *tags;
+
+- (LMContactAccountInfo *)initWithAccountInfo:(AccountInfo *)info;
+
+- (AccountInfo *)accountInfo;
+
 @end
+
+RLM_ARRAY_TYPE(LMContactAccountInfo)

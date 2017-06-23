@@ -10,6 +10,8 @@
 #import "MessageDBManager.h"
 #import "RecentChatDBManager.h"
 #import "BadgeNumberManager.h"
+#import "LMContactAccountInfo.h"
+#import "LMFriendRequestInfo.h"
 
 #define ContactTable @"t_contact"
 #define NewFriendTable @"t_friendrequest"
@@ -53,41 +55,26 @@ static UserDBManager *manager = nil;
         return;
     }
 
-    NSMutableArray *bitchValues = [NSMutableArray array];
-    [bitchValues objectAddObject:@[user.address,
-            user.pub_key,
-            user.avatar,
-            user.username,
-            user.remarks,
-            @(user.source),
-            @(user.isBlackMan),
-            @(user.isOffenContact)]];
-    BOOL result = [self executeUpdataOrInsertWithTable:ContactTable fields:@[@"address", @"pub_key", @"avatar", @"username", @"remark", @"source", @"blocked", @"common"] batchValues:bitchValues];
-    if (result) {
-        DDLogInfo(@"Save success");
-    } else {
-        DDLogInfo(@"Save fail");
-    }
+    LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithAccountInfo:user];
+    
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [realm addOrUpdateObject:realmModel];
+    [realm commitWriteTransaction];
 }
 
 - (void)batchSaveUsers:(NSArray *)users {
 
-    NSMutableArray *bitchValues = [NSMutableArray array];
+    NSMutableArray *bitchRealmModel = [NSMutableArray array];
     for (AccountInfo *user in users) {
-        NSMutableArray *temArray = [NSMutableArray array];
-        [temArray addObject:user.address];
-        [temArray addObject:user.pub_key];
-        [temArray addObject:user.avatar];
-        [temArray addObject:user.username];
-        [temArray addObject:user.remarks];
-        [temArray addObject:@(user.source)];
-        [temArray addObject:@(user.isBlackMan)];
-        [temArray addObject:@(user.isOffenContact)];
-        [bitchValues objectAddObject:temArray];
+        LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithAccountInfo:user];
+        [bitchRealmModel addObject:realmModel];
     }
-    if (bitchValues.count) {
-        [self batchInsertTableName:ContactTable fields:@[@"address", @"pub_key", @"avatar", @"username", @"remark", @"source", @"blocked", @"common"] batchValues:bitchValues.copy];
-    }
+    
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [realm addOrUpdateObjectsFromArray:bitchRealmModel];
+    [realm commitWriteTransaction];
 }
 
 - (void)deleteUserBypubkey:(NSString *)pubKey {
@@ -103,35 +90,37 @@ static UserDBManager *manager = nil;
     //delete request
     [self deleteRequestUserByAddress:[KeyHandle getAddressByPubkey:pubKey]];
     //delete user
-    [self deleteTableName:ContactTable conditions:@{@"pub_key": pubKey}];
+    RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'",pubKey]];
+    if (results.firstObject) {
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        [realm deleteObject:[results firstObject]];
+        [realm commitWriteTransaction];
+    }
 }
 
 - (void)deleteUserByAddress:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return;
     }
-
     NSString *pubKey = [self getUserPubkeyByAddress:address];
-
-    [[MessageDBManager sharedManager] deleteAllMessageByMessageOwer:pubKey];
-
-    [[RecentChatDBManager sharedManager] deleteByIdentifier:pubKey];
-
-    [self deleteTableName:ContactTable conditions:@{@"address": address}];
+    [self deleteUserBypubkey:pubKey];
 }
 
 - (void)updateUserNameAndAvatar:(AccountInfo *)user {
-
     if (GJCFStringIsNull(user.pub_key) ||
             GJCFStringIsNull(user.avatar) ||
             GJCFStringIsNull(user.username)) {
         return;
     }
-    NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-    [fieldsValues safeSetObject:user.avatar forKey:@"avatar"];
-    [fieldsValues safeSetObject:user.username forKey:@"username"];
+    
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'",user.pub_key]] firstObject];
 
-    [self updateTableName:ContactTable fieldsValues:fieldsValues conditions:@{@"pub_key": user.pub_key}];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmUser.avatar = user.avatar;
+    realmUser.username = user.username;
+    [realm commitWriteTransaction];
 }
 
 - (void)setUserCommonContact:(BOOL)commonContact AndSetNewRemark:(NSString *)remark withAddress:(NSString *)address {
@@ -141,11 +130,14 @@ static UserDBManager *manager = nil;
     if (!remark) {
         remark = @"";
     }
-    NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-    [fieldsValues safeSetObject:remark forKey:@"remark"];
-    [fieldsValues safeSetObject:@(commonContact) forKey:@"common"];
-
-    [self updateTableName:ContactTable fieldsValues:fieldsValues conditions:@{@"address": address}];
+    
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmUser.remarks = remark;
+    realmUser.isOffenContact = commonContact;
+    [realm commitWriteTransaction];
 }
 
 - (AccountInfo *)getUserByPublickey:(NSString *)publickey {
@@ -163,57 +155,27 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return nil;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select c.pub_key from t_contact c where c.address = '%@'", address];
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSDictionary *resultDict = [resultArray firstObject];
-    if (resultDict) {
-        return [resultDict safeObjectForKey:@"pub_key"];
-    }
-    return nil;
-
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    return realmUser.pub_key;
 }
 
 - (AccountInfo *)getUserByAddress:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return nil;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select c.address,c.pub_key,c.avatar,c.username,c.remark,c.source,c.blocked,c.common from t_contact c where c.address = '%@'", address];
-
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSDictionary *resultDict = [resultArray firstObject];
-    AccountInfo *findUser = nil;
-    if (resultDict) {
-        findUser = [AccountInfo new];
-        findUser.address = [resultDict safeObjectForKey:@"address"];
-        findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
-        findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
-        findUser.username = [resultDict safeObjectForKey:@"username"];
-        findUser.remarks = [resultDict safeObjectForKey:@"remark"];
-        findUser.source = [[resultDict safeObjectForKey:@"source"] integerValue];
-        findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
-        findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
-    }
-    return findUser;
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    return realmUser.accountInfo;
 }
 
 - (NSArray *)getAllUsers {
-    NSString *querySql = @"select c.address,c.pub_key,c.avatar,c.username,c.remark,c.source,c.blocked,c.common from t_contact c";
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSMutableArray *findUsers = [NSMutableArray array];
-    for (NSDictionary *resultDict in resultArray) {
-        AccountInfo *findUser = [AccountInfo new];
-        findUser.address = [resultDict safeObjectForKey:@"address"];
-        findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
-        findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
-        findUser.username = [resultDict safeObjectForKey:@"username"];
-        findUser.remarks = [resultDict safeObjectForKey:@"remark"];
-        findUser.source = [[resultDict safeObjectForKey:@"source"] integerValue];
-        findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
-        findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
-
-        [findUsers addObject:findUser];
+    NSMutableArray *modelArray = [NSMutableArray array];
+    RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo allObjects];
+    //model trasfer
+    for (LMContactAccountInfo *realmModel in results) {
+        AccountInfo *model = [realmModel accountInfo];
+        [modelArray addObject:model];
     }
-    return findUsers;
+    return modelArray;
 }
 
 - (void)getAllUsersWithComplete:(void (^)(NSArray *))complete {
@@ -227,33 +189,23 @@ static UserDBManager *manager = nil;
 
 - (void)getAllUsersNoConnectWithComplete:(void (^)(NSArray *))complete {
     if (complete) {
-        [GCDQueue executeInGlobalQueue:^{
-            NSString *querySql = @"select c.address,c.pub_key,c.avatar,c.username,c.remark,c.source,c.blocked,c.common from t_contact c where c.pub_key <> 'connect'";
-            NSArray *resultArray = [self queryWithSql:querySql];
-            NSMutableArray *findUsers = [NSMutableArray array];
-            for (NSDictionary *resultDict in resultArray) {
-                AccountInfo *findUser = [AccountInfo new];
-                findUser.address = [resultDict safeObjectForKey:@"address"];
-                findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
-                findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
-                findUser.username = [resultDict safeObjectForKey:@"username"];
-                findUser.remarks = [resultDict safeObjectForKey:@"remark"];
-                findUser.source = [[resultDict safeObjectForKey:@"source"] intValue];
-                findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
-                findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
-
-                [findUsers addObject:findUser];
-            }
-            complete(findUsers);
-        }];
+        NSMutableArray *modelArray = [NSMutableArray array];
+        RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:@"pub_key != 'connect'"];
+        //model trasfer
+        for (LMContactAccountInfo *realmModel in results) {
+            AccountInfo *model = [realmModel accountInfo];
+            [modelArray addObject:model];
+        }
+        complete(modelArray);
     }
 }
 
 - (BOOL)isFriendByAddress:(NSString *)address {
-    NSString *querySql = [NSString stringWithFormat:@"select count(pub_key) as user_count from t_contact where address = '%@'", address];
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSDictionary *resultDict = [resultArray lastObject];
-    return [[resultDict safeObjectForKey:@"user_count"] boolValue];
+    if (GJCFStringIsNull(address)) {
+        return NO;
+    }
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    return realmUser != nil;
 }
 
 
@@ -261,85 +213,56 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(publickey)) {
         return 0;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select f.createtime,f.pub_key from t_friendrequest f where f.pub_key = '%@'", publickey];
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSDictionary *resultDict = [resultArray lastObject];
-    return [[resultDict safeObjectForKey:@"createtime"] longLongValue];
+    
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"pubKey = '%@'",publickey]] firstObject];
+    return (long long)([realmUser.createTime timeIntervalSince1970] * 1000);
 }
 
 - (NSString *)getRequestTipsByUserPublickey:(NSString *)publickey {
     if (GJCFStringIsNull(publickey)) {
         return 0;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select f.tips from t_friendrequest f where f.pub_key = '%@'", publickey];
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSDictionary *resultDict = [resultArray lastObject];
-    if (resultDict) {
-        return [resultDict safeObjectForKey:@"tips"];
-    }
-    return nil;
+    
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"pubKey = '%@'",publickey]] firstObject];
+    return realmUser.tips;
 }
 
 - (NSArray *)getAllNewFirendRequest {
-    NSString *querySql = @"select f.address,f.pub_key,f.avatar,f.username,f.source,f.status,f.read,f.tips from t_friendrequest f order by f.createtime desc";
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSMutableArray *findUsers = [NSMutableArray array];
-    for (NSDictionary *resultDict in resultArray) {
-        AccountInfo *findUser = [AccountInfo new];
-        findUser.address = [resultDict safeObjectForKey:@"address"];
-        findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
-        findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
-        findUser.username = [resultDict safeObjectForKey:@"username"];
-        findUser.source = [[resultDict safeObjectForKey:@"source"] intValue];
-        findUser.status = [[resultDict safeObjectForKey:@"status"] integerValue];
-        findUser.requestRead = [[resultDict safeObjectForKey:@"read"] boolValue];
-        findUser.message = [resultDict safeObjectForKey:@"tips"];
-
-        [findUsers addObject:findUser];
+    NSMutableArray *modelArray = [NSMutableArray array];
+    RLMResults <LMFriendRequestInfo *> *results = [LMFriendRequestInfo allObjects];
+    //model trasfer
+    for (LMFriendRequestInfo *realmModel in results) {
+        AccountInfo *model = [realmModel accountInfo];
+        [modelArray addObject:model];
     }
-    return findUsers;
+    return modelArray;
 }
 
 - (AccountInfo *)getFriendRequestBy:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return nil;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select f.address,f.pub_key,f.avatar,f.username,f.source,f.status,f.read,f.tips from t_friendrequest f where f.address = '%@'", address];
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSDictionary *resultDict = [resultArray lastObject];
-    AccountInfo *findUser = nil;
-    if (resultDict) {
-        findUser = [AccountInfo new];
-        findUser.address = [resultDict safeObjectForKey:@"address"];
-        findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
-        findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
-        findUser.username = [resultDict safeObjectForKey:@"username"];
-        findUser.source = [[resultDict safeObjectForKey:@"source"] integerValue];
-        findUser.status = [[resultDict safeObjectForKey:@"status"] integerValue];
-        findUser.requestRead = [[resultDict safeObjectForKey:@"read"] boolValue];
-        findUser.message = [resultDict safeObjectForKey:@"tips"];
-    }
-    return findUser;
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    return realmUser.accountInfo;
 }
 
 - (RequestFriendStatus)getFriendRequestStatusByAddress:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return RequestFriendStatusAdd;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select f.status from t_friendrequest f where f.address = '%@'", address];
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSDictionary *resultDict = [resultArray lastObject];
-    if (resultDict) {
-        return [[resultDict safeObjectForKey:@"status"] integerValue];
-    }
-    return RequestFriendStatusAdd;
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    return realmUser.status;
 }
 
 - (void)deleteRequestUserByAddress:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return;
     }
-    [self deleteTableName:NewFriendTable conditions:@{@"address": address}];
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [realm deleteObject:realmUser];
+    [realm commitWriteTransaction];
 }
 
 - (void)saveNewFriend:(AccountInfo *)user {
@@ -352,9 +275,6 @@ static UserDBManager *manager = nil;
             GJCFStringIsNull(user.username)) {
         return;
     }
-
-    int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-
     if (user.status == RequestFriendStatusAccept) {
         [[BadgeNumberManager shareManager] getBadgeNumber:ALTYPE_CategoryTwo_NewFriend Completion:^(BadgeNumber *badgeNumber) {
             if (!badgeNumber) {
@@ -374,37 +294,26 @@ static UserDBManager *manager = nil;
         }];
     }
 
-    NSMutableArray *bitchValues = [NSMutableArray array];
-    [bitchValues objectAddObject:@[user.address,
-            user.pub_key,
-            user.avatar,
-            user.username,
-            @(user.source),
-            @(user.status),
-            @(user.requestRead),
-            user.message ? user.message : @"",
-            @(time)]];
-    BOOL result = [self executeUpdataOrInsertWithTable:NewFriendTable fields:@[@"address", @"pub_key", @"avatar", @"username", @"source", @"status", @"read", @"tips", @"createtime"] batchValues:bitchValues];
-    if (result) {
-        DDLogInfo(@"Save success");
-    } else {
-        DDLogInfo(@"Save fail");
-    }
+    //save to realm
+    LMFriendRequestInfo *realmModel = [[LMFriendRequestInfo alloc] initWithAccountInfo:user];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [realm addOrUpdateObject:realmModel];
+    [realm commitWriteTransaction];
 }
 
 - (void)updateNewFriendStatusAddress:(NSString *)address withStatus:(int)status {
     if (GJCFStringIsNull(address)) {
         return;
     }
-
     if (status < 0) {
         status = 0;
     }
-
-    NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-    [fieldsValues safeSetObject:@(status) forKey:@"status"];
-
-    [self updateTableName:NewFriendTable fieldsValues:fieldsValues conditions:@{@"address": address}];
+    LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmUser.status = status;
+    [realm commitWriteTransaction];
 }
 
 
@@ -412,11 +321,12 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return nil;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select t.tag from t_usertag ut, t_tag t where ut.tag_id = t.id and ut.address = '%@'", address];
-    NSArray *queryArray = [self queryWithSql:querySql];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
     NSMutableArray *tags = [NSMutableArray array];
-    for (NSDictionary *queryDict in queryArray) {
-        [tags addObject:[queryDict safeObjectForKey:@"tag"]];
+    for (LMTag *realmModel in realmUser.tags) {
+        if (realmModel.tag) {
+            [tags addObject:realmModel.tag];
+        }
     }
     return tags;
 }
@@ -425,26 +335,17 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(tag)) {
         return nil;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select ut.address from t_usertag ut, t_tag t where ut.tag_id = t.id and t.tag = '%@'", tag];
-    NSArray *queryArray = [self queryWithSql:querySql];
-    NSMutableArray *users = [NSMutableArray array];
-    for (NSDictionary *queryDict in queryArray) {
-        NSString *address = [queryDict safeObjectForKey:@"address"];
-        AccountInfo *user = [self getUserByAddress:address];
-        if (user) {
-            [users addObject:user];
-        }
-    }
-    return users;
+    return nil;
 }
 
 
 - (NSArray *)tagList {
-    NSString *querySql = @"select tag from t_tag";
-    NSArray *queryArray = [self queryWithSql:querySql];
+    RLMResults <LMTag *> *results = [LMTag allObjects];
     NSMutableArray *tags = [NSMutableArray array];
-    for (NSDictionary *queryDict in queryArray) {
-        [tags addObject:[queryDict safeObjectForKey:@"tag"]];
+    for (LMTag *realmTag in results) {
+        if (realmTag.tag) {
+            [tags addObject:realmTag.tag];
+        }
     }
     return tags;
 }
@@ -453,74 +354,109 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(tag)) {
         return NO;
     }
-    return [self batchInsertTableName:TagsTable fields:@[@"tag"] batchValues:@[@[tag]]];
+    LMTag *realmTag = [[LMTag alloc] init];
+    realmTag.tag = tag;
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [realm addOrUpdateObject:realmTag];
+    [realm commitWriteTransaction];
+    
+    return YES;
 }
 
 - (BOOL)removeTag:(NSString *)tag {
     if (GJCFStringIsNull(tag)) {
         return NO;
     }
-    return [self deleteTableName:TagsTable conditions:@{@"tag": tag}];
+    LMTag *realmModel = [[LMTag objectsWhere:[NSString stringWithFormat:@"tag = '%@'",tag]] firstObject];
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    [realm deleteObject:realmModel];
+    [realm commitWriteTransaction];
+    return YES;
 }
 
 - (BOOL)saveAddress:(NSString *)address toTag:(NSString *)tag {
+    if (GJCFStringIsNull(address) ||
+        GJCFStringIsNull(tag)) {
+        return NO;
+    }
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    
+    LMTag *realmModel = [[LMTag objectsWhere:[NSString stringWithFormat:@"tag = '%@'",tag]] firstObject];
+    if (![realmModel.tag isEqualToString:tag]) {
+        LMTag *realmTag = [LMTag new];
+        realmTag.tag = tag;
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        [realmUser.tags addObject:realmTag];
+        [realm commitWriteTransaction];
+    }
     return YES;
 }
 
 - (BOOL)removeAddress:(NSString *)address fromTag:(NSString *)tag {
+    if (GJCFStringIsNull(address) ||
+        GJCFStringIsNull(tag)) {
+        return NO;
+    }
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    LMTag *realmTag = [LMTag new];
+    realmTag.tag = tag;
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    NSInteger index = [realmUser.tags indexOfObject:realmTag];
+    if (index != NSNotFound) {
+        [realm beginWriteTransaction];
+        [realmUser.tags removeObjectAtIndex:index];
+        [realm commitWriteTransaction];
+    }
+    
     return YES;
 }
 
 
 - (NSArray *)blackManList {
-    NSString *querySql = @"select c.address,c.pub_key,c.avatar,c.username,c.remark,c.source,c.blocked,c.common from t_contact c where c.blocked = 1";
-    NSArray *resultArray = [self queryWithSql:querySql];
-    NSMutableArray *findUsers = [NSMutableArray array];
-    for (NSDictionary *resultDict in resultArray) {
-        AccountInfo *findUser = [AccountInfo new];
-        findUser.address = [resultDict safeObjectForKey:@"address"];
-        findUser.pub_key = [resultDict safeObjectForKey:@"pub_key"];
-        findUser.avatar = [resultDict safeObjectForKey:@"avatar"];
-        findUser.username = [resultDict safeObjectForKey:@"username"];
-        findUser.remarks = [resultDict safeObjectForKey:@"remark"];
-        findUser.source = [[resultDict safeObjectForKey:@"source"] integerValue];
-        findUser.isBlackMan = [[resultDict safeObjectForKey:@"blocked"] boolValue];
-        findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
-
-        [findUsers addObject:findUser];
+    NSMutableArray *modelArray = [NSMutableArray array];
+    RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:@"isBlackMan = 1"];
+    //model trasfer
+    for (LMContactAccountInfo *realmModel in results) {
+        AccountInfo *model = [realmModel accountInfo];
+        [modelArray addObject:model];
     }
-    return findUsers;
-
+    return modelArray;
 }
 
 - (void)addUserToBlackListWithAddress:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return;
     }
-    NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-    [fieldsValues safeSetObject:@(1) forKey:@"blocked"];
-
-    [self updateTableName:ContactTable fieldsValues:fieldsValues conditions:@{@"address": address}];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmUser.isBlackMan = YES;
+    [realm commitWriteTransaction];
 }
 
 - (void)removeUserFromBlackList:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return;
     }
-    NSMutableDictionary *fieldsValues = [NSMutableDictionary dictionary];
-    [fieldsValues safeSetObject:@(0) forKey:@"blocked"];
 
-    [self updateTableName:ContactTable fieldsValues:fieldsValues conditions:@{@"address": address}];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    
+    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+    [realm beginWriteTransaction];
+    realmUser.isBlackMan = NO;
+    [realm commitWriteTransaction];
 }
 
 - (BOOL)userIsInBlackList:(NSString *)address {
     if (GJCFStringIsNull(address)) {
         return NO;
     }
-    NSString *querySql = [NSString stringWithFormat:@"select c.blocked  from t_contact c where c.address = '%@'", address];
-    NSArray *queryArray = [self queryWithSql:querySql];
-    NSDictionary *queryDict = [queryArray lastObject];
-    return [[queryDict safeObjectForKey:@"blocked"] boolValue];
+    LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
+    return realmUser.isBlackMan;
 }
 
 @end
