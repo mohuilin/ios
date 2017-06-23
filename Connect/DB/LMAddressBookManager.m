@@ -43,10 +43,9 @@ static LMAddressBookManager *manager = nil;
     ramBook.creatTime = [[NSDate date] timeIntervalSince1970] * 1000;
     ramBook.tag = @"";
     ramBook.address = address;
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm addOrUpdateObject:ramBook];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+       [realm addOrUpdateObject:ramBook];
+    }];
     
     
 }
@@ -71,10 +70,9 @@ static LMAddressBookManager *manager = nil;
         [bitchValues addObject:ramBook];
     }
     if (bitchValues.count > 0) {
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        [realm addOrUpdateObjectsFromArray:bitchValues];
-        [realm commitWriteTransaction];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+           [realm addOrUpdateObjectsFromArray:bitchValues];
+        }];
     }
 }
 
@@ -99,10 +97,9 @@ static LMAddressBookManager *manager = nil;
         return;
     }
    LMRamAddressBook *ramBook = [[LMRamAddressBook objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    ramBook.tag = tag;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+       ramBook.tag = tag;
+    }];
     
 }
 
@@ -111,19 +108,18 @@ static LMAddressBookManager *manager = nil;
         return;
     }
     LMRamAddressBook *ramBook = [[LMRamAddressBook objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    [realm deleteObject:ramBook];
-    [realm commitWriteTransaction];
+    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+      [realm deleteObject:ramBook];
+    }];
 }
 
 - (void)clearAllAddress{
+    
    RLMResults<LMRamAddressBook *> *ramBooks = [LMRamAddressBook allObjects];
-   RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     for (LMRamAddressBook *info in ramBooks) {
-        [realm beginWriteTransaction];
-        [realm deleteObject:info];
-        [realm commitWriteTransaction];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+           [realm deleteObject:info];
+        }];
     }
 }
 

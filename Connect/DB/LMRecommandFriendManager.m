@@ -45,11 +45,10 @@ static LMRecommandFriendManager *manager = nil;
 - (void)deleteAllRecommandFriend; {
 
     RLMResults<LMFriendRecommandInfo *> *results = [LMFriendRecommandInfo allObjects];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     for (LMFriendRecommandInfo *info in results) {
-        [realm beginWriteTransaction];
-        [realm deleteObject:info];
-        [realm commitWriteTransaction];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+           [realm deleteObject:info];
+        }];
     }
 }
 
@@ -59,10 +58,9 @@ static LMRecommandFriendManager *manager = nil;
     }
    LMFriendRecommandInfo *friendRequestInfo = [[LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
     if (friendRequestInfo) {
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        [realm deleteObject:friendRequestInfo];
-        [realm commitWriteTransaction];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+           [realm deleteObject:friendRequestInfo];
+        }];
     }
 }
 
@@ -83,11 +81,10 @@ static LMRecommandFriendManager *manager = nil;
             [addArray addObject:ramFriendInfo];
         }
     }
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     if (addArray.count > 0) {
-        [realm beginWriteTransaction];
-        [realm addOrUpdateObjectsFromArray:addArray];
-        [realm commitWriteTransaction];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+           [realm addOrUpdateObjectsFromArray:addArray];
+        }];
     }
 }
 
@@ -141,10 +138,9 @@ static LMRecommandFriendManager *manager = nil;
         return;
     }
    LMFriendRecommandInfo *friendRequest = [[LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-    [realm beginWriteTransaction];
-    friendRequest.status = status;
-    [realm commitWriteTransaction];
+    [self executeRealmWithBlock:^{
+       friendRequest.status = status;
+    }];
 }
 
 - (NSArray *)getRecommandFriendsWithPage:(int)page withStatus:(int)status {
