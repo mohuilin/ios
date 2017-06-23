@@ -25,21 +25,24 @@
 }
 
 
-- (LMFriendRequestInfo *)initWithAccountInfo:(AccountInfo *)info{
+- (LMBaseModel *)initWithNormalInfo:(id)info{
     if (self = [super init]) {
-        self.address = info.address;
-        self.pubKey = info.pub_key;
-        self.avatar = info.avatar;
-        self.username = info.username;
-        self.source = info.source;
-        self.status = info.status;
-        self.read = info.requestRead;
-        self.tips = info.message;
+        if ([info isKindOfClass:[AccountInfo class]]) {
+            AccountInfo *user = (AccountInfo *)info;
+            self.address = user.address;
+            self.pubKey = user.pub_key;
+            self.avatar = user.avatar;
+            self.username = user.username;
+            self.source = user.source;
+            self.status = user.status;
+            self.read = user.requestRead;
+            self.tips = user.message;
+        }
     }
     return self;
 }
 
-- (AccountInfo *)accountInfo{
+- (id)normalInfo{
     AccountInfo *accountInfo = [[AccountInfo alloc] init];
     accountInfo.address = self.address;
     accountInfo.pub_key = self.pubKey;
@@ -51,6 +54,5 @@
     accountInfo.message = self.tips;
     return accountInfo;
 }
-
 
 @end

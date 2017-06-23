@@ -305,7 +305,7 @@ static FMDatabaseQueue *queue;
         chatMessage.message.isRead = chatMessage.readTime > 0;
         chatMessage.messageType = chatMessage.message.type;
         
-        LMMessage *realmModel = [[LMMessage alloc] initWithChatMessage:chatMessage];
+        LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:chatMessage];
         [chatMessages objectAddObject:realmModel];
     }
     if (chatMessages.count) {
@@ -335,7 +335,7 @@ static FMDatabaseQueue *queue;
         model.notifyStatus = [[resultDict safeObjectForKey:@"disturb"] boolValue];
         
         //package bradge model
-        LMRecentChat *realmModel = [[LMRecentChat alloc] initWithRecentModel:model];
+        LMRecentChat *realmModel = [[LMRecentChat alloc] initWithNormalInfo:model];
         
         [recentChatArrayM addObject:realmModel];
     }
@@ -360,7 +360,7 @@ static FMDatabaseQueue *queue;
         findUser.isOffenContact = [[resultDict safeObjectForKey:@"common"] boolValue];
 
 
-        LMContactAccountInfo *realmContact = [[LMContactAccountInfo alloc] initWithAccountInfo:findUser];
+        LMContactAccountInfo *realmContact = [[LMContactAccountInfo alloc] initWithNormalInfo:findUser];
         [findUsers addObject:realmContact];
     }
     if (findUsers.count > 0) {

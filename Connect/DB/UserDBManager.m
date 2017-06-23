@@ -51,7 +51,7 @@ static UserDBManager *manager = nil;
         return;
     }
 
-    LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithAccountInfo:user];
+    LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithNormalInfo:user];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm addOrUpdateObject:realmModel];
     }];
@@ -61,7 +61,7 @@ static UserDBManager *manager = nil;
 
     NSMutableArray *bitchRealmModel = [NSMutableArray array];
     for (AccountInfo *user in users) {
-        LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithAccountInfo:user];
+        LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithNormalInfo:user];
         [bitchRealmModel addObject:realmModel];
     }
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
@@ -149,7 +149,7 @@ static UserDBManager *manager = nil;
         return nil;
     }
     LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
-    return realmUser.accountInfo;
+    return realmUser.normalInfo;
 }
 
 - (NSArray *)getAllUsers {
@@ -157,7 +157,7 @@ static UserDBManager *manager = nil;
     RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo allObjects];
     //model trasfer
     for (LMContactAccountInfo *realmModel in results) {
-        AccountInfo *model = [realmModel accountInfo];
+        AccountInfo *model = realmModel.normalInfo;
         [modelArray addObject:model];
     }
     return modelArray;
@@ -178,7 +178,7 @@ static UserDBManager *manager = nil;
         RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:@"pub_key != 'connect'"];
         //model trasfer
         for (LMContactAccountInfo *realmModel in results) {
-            AccountInfo *model = [realmModel accountInfo];
+            AccountInfo *model = realmModel.normalInfo;
             [modelArray addObject:model];
         }
         complete(modelArray);
@@ -217,7 +217,7 @@ static UserDBManager *manager = nil;
     RLMResults <LMFriendRequestInfo *> *results = [LMFriendRequestInfo allObjects];
     //model trasfer
     for (LMFriendRequestInfo *realmModel in results) {
-        AccountInfo *model = [realmModel accountInfo];
+        AccountInfo *model = realmModel.normalInfo;
         [modelArray addObject:model];
     }
     return modelArray;
@@ -228,7 +228,7 @@ static UserDBManager *manager = nil;
         return nil;
     }
     LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
-    return realmUser.accountInfo;
+    return realmUser.normalInfo;
 }
 
 - (RequestFriendStatus)getFriendRequestStatusByAddress:(NSString *)address {
@@ -279,7 +279,7 @@ static UserDBManager *manager = nil;
     }
 
     //save to realm
-    LMFriendRequestInfo *realmModel = [[LMFriendRequestInfo alloc] initWithAccountInfo:user];
+    LMFriendRequestInfo *realmModel = [[LMFriendRequestInfo alloc] initWithNormalInfo:user];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm addOrUpdateObject:realmModel];
     }];
@@ -382,7 +382,6 @@ static UserDBManager *manager = nil;
     LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'",address]] firstObject];
     LMTag *realmTag = [LMTag new];
     realmTag.tag = tag;
-    RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     NSInteger index = [realmUser.tags indexOfObject:realmTag];
     if (index != NSNotFound) {
         [self executeRealmWithBlock:^{
@@ -399,7 +398,7 @@ static UserDBManager *manager = nil;
     RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:@"isBlackMan = 1"];
     //model trasfer
     for (LMContactAccountInfo *realmModel in results) {
-        AccountInfo *model = [realmModel accountInfo];
+        AccountInfo *model = realmModel.normalInfo;
         [modelArray addObject:model];
     }
     return modelArray;

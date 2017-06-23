@@ -21,9 +21,5 @@
 
 @property (nonatomic ,assign) NSDate *createTime;
 
-- (LMFriendRequestInfo *)initWithAccountInfo:(AccountInfo *)info;
-
-- (AccountInfo *)accountInfo;
-
 @end
 

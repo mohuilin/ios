@@ -49,7 +49,7 @@ static RecentChatDBManager *manager = nil;
     RLMResults <LMRecentChat *> *results = [LMRecentChat allObjects];
     //model trasfer
     for (LMRecentChat *realmModel in results) {
-        RecentChatModel *model = [realmModel recentModel];
+        RecentChatModel *model = realmModel.normalInfo;
         [recentChatArrayM addObject:model];
     }
     //sort
@@ -80,7 +80,7 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(model.identifier)) {
         return;
     }
-    LMRecentChat *realmModel = [[LMRecentChat alloc] initWithRecentModel:model];
+    LMRecentChat *realmModel = [[LMRecentChat alloc] initWithNormalInfo:model];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm addOrUpdateObject:realmModel];
     }];
@@ -152,7 +152,7 @@ static RecentChatDBManager *manager = nil;
         return nil;
     }
     LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",identifier]] firstObject];
-    RecentChatModel *model = [realmModel recentModel];
+    RecentChatModel *model = realmModel.normalInfo;
     if (model) {
         [[SessionManager sharedManager] setRecentChat:model];
         return model;
