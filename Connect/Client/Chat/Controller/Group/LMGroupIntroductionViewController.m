@@ -25,7 +25,7 @@
     }
     self.view.backgroundColor = [UIColor whiteColor];
     [self setNavigationRight:LMLocalizedString(@"Set Save", nil) titleColor:LMBasicGreen];
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:self.talkModel.chatIdendifier];
+    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.talkModel.chatIdendifier];
     self.summaryTextView.text = [[GroupDBManager sharedManager] getGroupSummaryWithGroupID:group.groupIdentifer];
     if (self.summaryTextView.text == nil || [self.summaryTextView.text isEqualToString:@""]) {
         self.summaryTextView.text = self.talkModel.chatGroupInfo.groupName;
@@ -55,7 +55,7 @@
         HttpResponse *hReponse = (HttpResponse *) response;
         if (hReponse.code == successCode) {
 
-            [[GroupDBManager sharedManager] addGroupSummary:weakSelf.summaryTextView.text withGroupId:weakSelf.talkModel.chatGroupInfo.groupIdentifer];
+            [[GroupDBManager sharedManager] updateGroupSummary:weakSelf.summaryTextView.text withGroupId:weakSelf.talkModel.chatGroupInfo.groupIdentifer];
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Update successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
                     [weakSelf.navigationController popViewControllerAnimated:YES];

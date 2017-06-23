@@ -579,7 +579,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                             [[GroupDBManager sharedManager] updateGroupPublic:group.public_p groupId:group.identifier];
                         }
                         if (![group.summary isEqualToString:lmGroup.summary]) {
-                            [[GroupDBManager sharedManager] addGroupSummary:group.summary withGroupId:group.identifier];
+                            [[GroupDBManager sharedManager] updateGroupSummary:group.summary withGroupId:group.identifier];
                         }
                         if (![group.name isEqualToString:lmGroup.groupName]) {
                             group.name = [StringTool filterStr:group.name];

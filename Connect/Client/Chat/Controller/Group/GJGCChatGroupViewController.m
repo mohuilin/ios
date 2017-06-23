@@ -64,7 +64,7 @@
 
     NSString *groupIdentifer = (NSString *) note.object;
 
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:groupIdentifer];
+    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
     self.taklInfo.chatGroupInfo = group;
     self.taklInfo.name = [NSString stringWithFormat:@"%@(%lu)", group.groupName, group.groupMembers.count];
     self.dataSourceManager.title = self.taklInfo.name;

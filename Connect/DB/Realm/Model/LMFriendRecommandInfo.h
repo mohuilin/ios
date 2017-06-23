@@ -15,6 +15,6 @@
 @property  NSString *avatar;
 @property  NSString *username;
 @property  int status;
-@property  int source;
+
 
 @end

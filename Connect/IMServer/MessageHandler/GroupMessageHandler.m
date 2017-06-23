@@ -59,7 +59,7 @@
     NSMutableArray *messageExtendArray = [NSMutableArray array];
     for (MessagePost *msg in messages) {
         NSString *identifer = msg.msgData.receiverAddress;
-        LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:identifer];
+        LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifer];
         if (GJCFStringIsNull(group.groupEcdhKey)) {
             NSMutableArray *messages = [self.unHandleMessagees valueForKey:identifer];
             if (messages) {

@@ -171,7 +171,7 @@ static RecentChatDBManager *manager = nil;
     if (!realmModel) {
         RecentChatModel *model = [RecentChatModel new];
         model.identifier = identifier;
-        LMGroupInfo *group = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:identifier];
+        LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
         if (group) {
             model.talkType = GJGCChatFriendTalkTypeGroup;
             model.chatGroupInfo = group;
@@ -436,7 +436,7 @@ static RecentChatDBManager *manager = nil;
         if (groupChat) {
             int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
             NSString *timeStr = [NSString stringWithFormat:@"%lld", time];
-            LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:identifier];
+            LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
             if (GJCFStringIsNull(groupInfo.groupEcdhKey)) {
                 return nil;
             }
@@ -540,7 +540,7 @@ static RecentChatDBManager *manager = nil;
 
             int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
             NSString *timeStr = [NSString stringWithFormat:@"%lld", time];
-            LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getgroupByGroupIdentifier:identifier];
+            LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
             if (GJCFStringIsNull(ecdhKey)) {
                 ecdhKey = groupInfo.groupEcdhKey;
                 if (GJCFStringIsNull(ecdhKey)) {

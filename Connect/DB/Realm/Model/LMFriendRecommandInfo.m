@@ -10,8 +10,8 @@
 
 @implementation LMFriendRecommandInfo
 
-
 +(NSString *)primaryKey {
+    
     return @"address";
 }
 
