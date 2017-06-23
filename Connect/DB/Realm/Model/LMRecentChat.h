@@ -26,8 +26,4 @@
 
 @property (nonatomic ,strong) LMRecentChatSetting *chatSetting;
 
-- (LMRecentChat *)initWithRecentModel:(RecentChatModel *)model;
-
-- (RecentChatModel *)recentModel;
-
 @end

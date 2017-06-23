@@ -25,8 +25,4 @@
 @property (nonatomic ,strong) LMMessageExt *msgExt;
 
 
-- (LMMessage *)initWithChatMessage:(ChatMessageInfo *)chatMessage;
-
-- (ChatMessageInfo *)chatMessageInfo;
-
 @end

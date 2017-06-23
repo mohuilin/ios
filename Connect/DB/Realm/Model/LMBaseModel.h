@@ -12,4 +12,8 @@
 
 @property (nonatomic ,assign) NSInteger ID;
 
+- (LMBaseModel *)initWithNormalInfo:(id)info;
+
+- (id)normalInfo;
+
 @end

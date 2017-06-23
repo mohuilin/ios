@@ -10,6 +10,15 @@
 
 @implementation LMBaseModel
 
+- (LMBaseModel *)initWithNormalInfo:(id)info{
+    if (self = [super init]) {}
+    return self;
+}
+
+- (id)normalInfo{
+    return nil;
+}
+
 + (void)initialize{
     [self setDefaultRealm];
 }

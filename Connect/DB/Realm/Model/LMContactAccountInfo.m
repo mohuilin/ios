@@ -14,26 +14,29 @@
     return @"address";
 }
 
-- (LMContactAccountInfo *)initWithAccountInfo:(AccountInfo *)info{
+- (LMBaseModel *)initWithNormalInfo:(id)info{
     if (self = [super init]) {
-        self.address = info.address;
-        self.pub_key = info.pub_key;
-        self.avatar = info.avatar;
-        self.username = info.username;
-        self.remarks = info.remarks;
-        self.source = info.source;
-        self.isBlackMan = info.isBlackMan;
-        self.isOffenContact = info.isOffenContact;
-        for (NSString *tag in info.tags) {
-            LMTag *realmTag = [[LMTag alloc] init];
-            realmTag.tag = tag;
-            [self.tags addObject:realmTag];
+        if ([info isKindOfClass:[AccountInfo class]]) {
+            AccountInfo *user = (AccountInfo *)info;
+            self.address = user.address;
+            self.pub_key = user.pub_key;
+            self.avatar = user.avatar;
+            self.username = user.username;
+            self.remarks = user.remarks;
+            self.source = user.source;
+            self.isBlackMan = user.isBlackMan;
+            self.isOffenContact = user.isOffenContact;
+            for (NSString *tag in user.tags) {
+                LMTag *realmTag = [[LMTag alloc] init];
+                realmTag.tag = tag;
+                [self.tags addObject:realmTag];
+            }
         }
     }
     return self;
 }
 
-- (AccountInfo *)accountInfo{
+- (id)normalInfo{
     AccountInfo *accountInfo = [[AccountInfo alloc] init];
     accountInfo.address = self.address;
     accountInfo.pub_key = self.pub_key;

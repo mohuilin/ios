@@ -64,7 +64,7 @@ static MessageDBManager *manager = nil;
             GJCFStringIsNull(messageString)) {
         return;
     }
-    LMMessage *realmModel = [[LMMessage alloc] initWithChatMessage:messageInfo];
+    LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:messageInfo];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm addOrUpdateObject:realmModel];
     }];
@@ -79,7 +79,7 @@ static MessageDBManager *manager = nil;
                 GJCFStringIsNull(messageString)) {
             continue;
         }
-        LMMessage *realmModel = [[LMMessage alloc] initWithChatMessage:messageInfo];
+        LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:messageInfo];
         [bitchRealmMessages addObject:realmModel];
     }
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
@@ -226,7 +226,7 @@ static MessageDBManager *manager = nil;
         !GJCFStringIsNull(messageInfo.messageOwer) &&
         !GJCFStringIsNull(messageInfo.messageId)) {
         LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageInfo.messageOwer,messageInfo.messageId]] firstObject];
-        LMMessage *realmMsg = [[LMMessage alloc] initWithChatMessage:messageInfo];
+        LMMessage *realmMsg = [[LMMessage alloc] initWithNormalInfo:messageInfo];
         //update message
         [self executeRealmWithBlock:^{
             message.messageContent = realmMsg.messageContent;
@@ -306,7 +306,7 @@ static MessageDBManager *manager = nil;
     }
     LMMessage *message = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'",messageOwer,messageId]] firstObject];
     if (message) {
-        return [message chatMessageInfo];
+        return message.normalInfo;
     } else {
         return nil;
     }
@@ -334,7 +334,7 @@ static MessageDBManager *manager = nil;
     NSMutableArray *chatMessages = [NSMutableArray array];
     //model trasfer
     for (LMMessage *realmModel in results) {
-        ChatMessageInfo *model = [realmModel chatMessageInfo];
+        ChatMessageInfo *model = realmModel.normalInfo;
         [chatMessages addObject:model];
     }
     return chatMessages;
@@ -384,14 +384,14 @@ static MessageDBManager *manager = nil;
     NSMutableArray *chatMessages = [NSMutableArray array];
     if (results.count <= limit) {
         for (LMMessage *realmModel in results) {
-            ChatMessageInfo *chatMessage = [realmModel chatMessageInfo];
+            ChatMessageInfo *chatMessage = realmModel.normalInfo;
             [chatMessages addObject:chatMessage];
         }
     } else {
         
         for (int i = (int)results.count - limit; i < results.count; i ++) {
             LMMessage *realmModel = results[i];
-            ChatMessageInfo *chatMessage = [realmModel chatMessageInfo];
+            ChatMessageInfo *chatMessage = realmModel.normalInfo;
             [chatMessages addObject:chatMessage];
         }
     }
@@ -412,13 +412,13 @@ static MessageDBManager *manager = nil;
     NSMutableArray *chatMessages = [NSMutableArray array];
     if (results.count <= limit) {
         for (LMMessage *realmModel in results) {
-            ChatMessageInfo *chatMessage = [realmModel chatMessageInfo];
+            ChatMessageInfo *chatMessage = realmModel.normalInfo;
             [chatMessages addObject:chatMessage];
         }
     } else {
         for (int i = (int)results.count - limit; i < results.count; i ++) {
             LMMessage *realmModel = results[i];
-            ChatMessageInfo *chatMessage = [realmModel chatMessageInfo];
+            ChatMessageInfo *chatMessage = realmModel.normalInfo;
             [chatMessages addObject:chatMessage];
         }
     }
