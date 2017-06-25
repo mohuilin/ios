@@ -13,7 +13,7 @@
 + (NSString *)primaryKey {
     return @"groupIdentifer";
 }
-- (LMRamGroupInfo *)initWithNormalInfo:(BaseInfo *)groupInfos {
+- (LMRamGroupInfo *)initWithNormalInfo:(id)groupInfos {
     if (self = [super init]) {
         if ([groupInfos isKindOfClass:[LMGroupInfo class]]) {
             LMGroupInfo *groupInfo = (LMGroupInfo *)groupInfos;
@@ -41,7 +41,7 @@
     return self;
         
 }
-- (BaseInfo *)normalInfo {
+- (id)normalInfo {
     LMGroupInfo *groupInfo = [[LMGroupInfo alloc] init];
     groupInfo.groupIdentifer = self.groupIdentifer;
     groupInfo.groupName = self.groupName;

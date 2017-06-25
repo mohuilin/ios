@@ -17,12 +17,12 @@
  * @param info
  * @return
  */
-- (LMBaseModel *)initWithNormalInfo:(BaseInfo *)info;
+- (LMBaseModel *)initWithNormalInfo:(id)info;
 
 /**
  * get normarl info eg:Accountinfo LMgroupinfo
  * @return
  */
-- (BaseInfo *)normalInfo;
+- (id)normalInfo;
 
 @end

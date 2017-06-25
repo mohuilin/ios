@@ -19,7 +19,7 @@
             @"group": [RLMPropertyDescriptor descriptorWithClass:LMRamGroupInfo.class propertyName:@"membersArray"],
     };
 }
-- (LMBaseModel *)initWithNormalInfo:(BaseInfo *)accountInfos {
+- (LMBaseModel *)initWithNormalInfo:(id)accountInfos {
     if (self = [super init]) {
         if ([accountInfos isKindOfClass:[AccountInfo class]]) {
             
@@ -35,7 +35,7 @@
     }
     return self;
 }
-- (BaseInfo *)normalInfo {
+- (id)normalInfo {
     
     AccountInfo *accountInfo = [AccountInfo new];
     accountInfo.username = self.username;

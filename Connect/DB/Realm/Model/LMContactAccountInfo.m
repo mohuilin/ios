@@ -14,7 +14,7 @@
     return @"address";
 }
 
-- (LMBaseModel *)initWithNormalInfo:(BaseInfo *)info {
+- (LMBaseModel *)initWithNormalInfo:(id)info {
     if (self = [super init]) {
         if ([info isKindOfClass:[AccountInfo class]]) {
             AccountInfo *user = (AccountInfo *) info;
@@ -36,7 +36,7 @@
     return self;
 }
 
-- (BaseInfo *)normalInfo {
+- (id)normalInfo {
     AccountInfo *accountInfo = [[AccountInfo alloc] init];
     accountInfo.address = self.address;
     accountInfo.pub_key = self.pub_key;

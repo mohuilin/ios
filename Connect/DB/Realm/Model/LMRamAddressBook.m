@@ -13,7 +13,7 @@
 + (NSString *)primaryKey {
     return @"address";
 }
-- (LMBaseModel *)initWithNormalInfo:(BaseInfo *)info {
+- (LMBaseModel *)initWithNormalInfo:(id)info {
     if (self == [super init]) {
         if ([info isKindOfClass:[AddressBookInfo class]]) {
             AddressBookInfo * addressBook = (AddressBookInfo *)info;
@@ -23,7 +23,7 @@
     }
     return self;
 }
-- (BaseInfo *)normalInfo {
+- (id)normalInfo {
     AddressBookInfo * addressBook = [AddressBookInfo new];
     addressBook.tag = self.tag;
     addressBook.address = self.address;
