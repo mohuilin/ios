@@ -761,7 +761,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
                                 [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:1 lastContent:message.content ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
-                                member.roleInGroup = 1;
+                                member.isGroupAdmin = YES;
 
                                 [[GroupDBManager sharedManager] setGroupNewAdmin:member.address groupId:lmGroup.groupIdentifer];
 
@@ -769,7 +769,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                                     SendNotify(GroupAdminChangeNotification, chatMessage);
                                 }
                             } else {
-                                member.roleInGroup = 0;
+                                member.isGroupAdmin = NO;
                             }
                         }
                     }
@@ -976,7 +976,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                     accountInfo.username = member.username;
                     accountInfo.avatar = member.avatar;
                     accountInfo.address = member.address;
-                    accountInfo.roleInGroup = member.role;
+                    accountInfo.isGroupAdmin = (member.role != 0);
                     accountInfo.groupNickName = member.nick;
                     accountInfo.pub_key = member.pubKey;
                     [AccoutInfoArray objectAddObject:accountInfo];
