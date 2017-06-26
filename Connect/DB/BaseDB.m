@@ -13,19 +13,32 @@
 
 - (void)executeRealmWithBlock:(void (^)())executeBlock {
     if (executeBlock) {
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        executeBlock();
-        [realm commitWriteTransaction];
+        
+        [GCDQueue executeInGlobalQueue:^{
+            RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+            [realm beginWriteTransaction];
+            executeBlock();
+            NSError *error = nil;
+            [realm commitWriteTransaction:&error];
+            if (error) {
+                DDLogInfo(@"realm commit error %@",error);
+            }
+        }];
     }
 }
 
 - (void)executeRealmWithRealmBlock:(void (^)(RLMRealm *realm))executeBlock {
     if (executeBlock) {
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        executeBlock(realm);
-        [realm commitWriteTransaction];
+        [GCDQueue executeInGlobalQueue:^{
+            RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+            [realm beginWriteTransaction];
+            executeBlock(realm);
+            NSError *error = nil;
+            [realm commitWriteTransaction:&error];
+            if (error) {
+                DDLogInfo(@"realm commit error %@",error);
+            }
+        }];
     }
 }
 
