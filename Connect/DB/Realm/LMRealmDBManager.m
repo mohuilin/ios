@@ -28,41 +28,45 @@ static FMDatabaseQueue *queue;
     } else {
         olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
         if (GJCFFileIsExist(olddbPath)) {
-            [self saveMessagesToRealm];
             //data migration
-            //t_conversion
-            if ([self saveRecentChatToRealm]) {
+            if ([self saveMessagesToRealm]) {
                 if (complete) {
                     complete(0.1);
                 }
             }
+            //t_conversion
+            if ([self saveRecentChatToRealm]) {
+                if (complete) {
+                    complete(0.3);
+                }
+            }
             if ([self contactNewDataMigration]) {
                 if (complete) {
-                    complete(0.1);
+                    complete(0.4);
                 }
             }
             // t_group
             if ([self groupNewDataMigration]) {
                 if (complete) {
-                    complete(0.3);
+                    complete(0.5);
                 }
             }
             //t_addressbook
             if ([self addressbookNewDataMigration]) {
                 if (complete) {
-                    complete(0.5);
+                    complete(0.7);
                 }
             }
             //t_friend
             if ([self friendRequestNewDataMigration]) {
                 if (complete) {
-                    complete(1);
+                    complete(0.9);
                 }
             }
             //t_friend_recommand
             if ([self friendRecommandNewDataMigration]) {
                 if (complete) {
-                    complete(0.5);
+                    complete(1);
                 }
             }
         }
@@ -264,7 +268,7 @@ static FMDatabaseQueue *queue;
     return mutableMembers;
 }
 
-+ (void)saveMessagesToRealm {
++ (BOOL)saveMessagesToRealm {
     //query
     NSString *querySql = @"select message_id,message_ower,content,send_status,snap_time,read_time,state,createtime from t_message";
     NSArray *resultArray = [self queryWithSql:querySql];
@@ -301,6 +305,8 @@ static FMDatabaseQueue *queue;
     if (chatMessages.count) {
         [self realmAddObject:chatMessages];
     }
+    
+    return YES;
 }
 
 + (BOOL)saveRecentChatToRealm {
@@ -367,8 +373,6 @@ static FMDatabaseQueue *queue;
     [realm beginWriteTransaction];
     [realm addOrUpdateObjectsFromArray:realmArray];
     [realm commitWriteTransaction];
-
-
 }
 
 @end

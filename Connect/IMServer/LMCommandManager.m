@@ -916,6 +916,14 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 user.remarks = friend.remark;
                 [users objectAddObject:user];
             }
+            
+            AccountInfo *connect = [[AccountInfo alloc] init];
+            connect.address = @"Connect";
+            connect.pub_key = kSystemIdendifier;
+            connect.username = @"Connect";
+            connect.avatar = @"connect_logo";
+            [users addObject:connect];
+            
             if (users.count) {
                 [[UserDBManager sharedManager] batchSaveUsers:users];
             }
