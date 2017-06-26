@@ -350,7 +350,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
 }
 
 - (void)chatWithNewFriend:(AccountInfo *)chatUser{
-    if (!chatUser) {
+    if (!chatUser || [chatUser.pub_key isEqualToString:kSystemIdendifier]) {
         return;
     }
     MMMessage *message = [[MMMessage alloc] init];
