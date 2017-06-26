@@ -569,7 +569,7 @@
         [[GroupDBManager sharedManager] removeMemberWithAddress:willRemoveUser.address groupId:weakSelf.groupid];
 
         NSArray *groupArray = [[GroupDBManager sharedManager] getgroupMemberByGroupIdentifier:weakSelf.groupid];
-        if (groupArray.count < 3) {
+        if (groupArray.count < 2) {
             [GCDQueue executeInMainQueue:^{
                 SendNotify(ConnnectQuitGroupNotification, weakSelf.groupid);
                 [self.navigationController popToRootViewControllerAnimated:YES];
