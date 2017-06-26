@@ -13,10 +13,15 @@
 
 - (void)executeRealmWithBlock:(void (^)())executeBlock {
     if (executeBlock) {
+        
         RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
         [realm beginWriteTransaction];
         executeBlock();
-        [realm commitWriteTransaction];
+        NSError *error = nil;
+        [realm commitWriteTransaction:&error];
+        if (error) {
+            DDLogInfo(@"realm commit error %@",error);
+        }
     }
 }
 
@@ -25,7 +30,11 @@
         RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
         [realm beginWriteTransaction];
         executeBlock(realm);
-        [realm commitWriteTransaction];
+        NSError *error = nil;
+        [realm commitWriteTransaction:&error];
+        if (error) {
+            DDLogInfo(@"realm commit error %@",error);
+        }
     }
 }
 

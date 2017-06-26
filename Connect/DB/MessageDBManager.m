@@ -57,10 +57,9 @@ static MessageDBManager *manager = nil;
 }
 
 - (void)saveMessage:(ChatMessageInfo *)messageInfo {
-    NSString *messageString = [messageInfo.message mj_JSONString];
     if (GJCFStringIsNull(messageInfo.messageId) ||
             GJCFStringIsNull(messageInfo.messageOwer) ||
-            GJCFStringIsNull(messageString)) {
+            !messageInfo.message) {
         return;
     }
     LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:messageInfo];
@@ -72,10 +71,9 @@ static MessageDBManager *manager = nil;
 - (void)saveBitchMessage:(NSArray *)messages {
     NSMutableArray *bitchRealmMessages = [NSMutableArray array];
     for (ChatMessageInfo *messageInfo in messages) {
-        NSString *messageString = [messageInfo.message mj_JSONString];
         if (GJCFStringIsNull(messageInfo.messageId) ||
                 GJCFStringIsNull(messageInfo.messageOwer) ||
-                GJCFStringIsNull(messageString)) {
+                !messageInfo.message) {
             continue;
         }
         LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:messageInfo];

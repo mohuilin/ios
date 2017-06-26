@@ -157,7 +157,7 @@ CREATE_SHARED_MANAGER(LMHistoryCacheManager)
     return socketIp;
 }
 
-- (NSString *)cacheDBPassSaltData {
+- (NSData *)cacheDBPassSaltData {
     NSString *randomPubkey = [KeyHandle createPubkeyByPrikey:[KeyHandle creatNewPrivkey]];
     NSData *salt = [KeyHandle createRandom512bits];
     DBPassword *dbpass = [[DBPassword alloc] init];
@@ -169,11 +169,12 @@ CREATE_SHARED_MANAGER(LMHistoryCacheManager)
     [manager close];
 
 
-    NSData *ecdh = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:dbpass.pubKey];
-    return [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdh salt:dbpass.salt].hash256String;
+//    NSData *ecdh = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:dbpass.pubKey];
+//    return [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdh salt:dbpass.salt];
+    return salt;
 }
 
-- (NSString *)getDBPassword {
+- (NSData *)getDBPassword {
     LMBaseSSDBManager *manager = [LMBaseSSDBManager open:@"system_message"];
     NSData *data;
     NSString *key = [NSString stringWithFormat:@"%@_dbpassword", [[LKUserCenter shareCenter] currentLoginUser].address];
@@ -183,8 +184,10 @@ CREATE_SHARED_MANAGER(LMHistoryCacheManager)
         return [self cacheDBPassSaltData];
     }
     DBPassword *dbpass = [DBPassword parseFromData:data error:nil];
-    NSData *ecdh = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:dbpass.pubKey];
-    return [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdh salt:dbpass.salt].hash256String;
+//    NSData *ecdh = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:dbpass.pubKey];
+//    return [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdh salt:dbpass.salt];
+    
+    return dbpass.salt;
 }
 
 - (void)cacheNotificatedContacts:(NSData *)data {
