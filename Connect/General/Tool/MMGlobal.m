@@ -307,6 +307,9 @@
     for (AccountInfo *contact in contactArray) {
         NSString *prex = @"";
         NSString *name = contact.username;
+        if (contact.remarks && contact.remarks.length > 0) {
+            name = contact.remarks;
+        }
         if (name.length <= 0) {
             continue;
         }

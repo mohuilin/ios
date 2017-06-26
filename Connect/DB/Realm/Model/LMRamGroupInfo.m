@@ -59,10 +59,8 @@
         AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
         if (info.isGroupAdmin) {
             groupInfo.admin = accountInfo;
-            accountInfo.roleInGroup = 1;
             admin = accountInfo;
         }else {
-            accountInfo.roleInGroup = 0;
             [temArray addObject:accountInfo];
         }
         

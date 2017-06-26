@@ -64,7 +64,6 @@ typedef void(^AccountOperationWithUserInfo)(id userInfo);
 @property (nonatomic ,assign) BOOL isGroupAdmin;
 @property (nonatomic ,assign) BOOL isThisGroupMember;
 @property (nonatomic ,assign) BOOL stranger;
-@property (nonatomic ,assign) int  roleInGroup;
 @property (nonatomic ,assign) BOOL groupMute;
 @property (nonatomic ,assign) BOOL isBlackMan;
 @property (nonatomic ,assign) BOOL isOffenContact;

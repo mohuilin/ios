@@ -44,11 +44,7 @@
     accountInfo.isGroupAdmin = self.isGroupAdmin;
     accountInfo.groupNickName = self.groupNicksName;
     accountInfo.pub_key = self.pubKey;
-    if (self.isGroupAdmin) {
-        accountInfo.roleInGroup = 1;
-    }else {
-        accountInfo.roleInGroup = 0;
-    }
+    
     return accountInfo;
 }
 @end

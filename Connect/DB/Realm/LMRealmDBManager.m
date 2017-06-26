@@ -246,11 +246,10 @@ static FMDatabaseQueue *queue;
         } else {
             accountInfo.groupNickName = remark;
         }
-        accountInfo.roleInGroup = [[dic safeObjectForKey:@"role"] intValue];
+        accountInfo.isGroupAdmin = ([[dic safeObjectForKey:@"role"] intValue] != 0);
         accountInfo.pub_key = [dic safeObjectForKey:@"pub_key"];
-        if (accountInfo.roleInGroup == 1) {
+        if (accountInfo.isGroupAdmin) {
             admin = accountInfo;
-            accountInfo.isGroupAdmin = YES;
         } else {
             [mutableMembers objectAddObject:accountInfo];
         }

@@ -21,6 +21,7 @@
 #import "MessageDBManager.h"
 #import "MyInfoPage.h"
 #include "RecentChatDBManager.h"
+#import "LMConversionManager.h"
 
 
 @interface GroupMembersListViewController () <UITableViewDelegate, UITableViewDataSource, MGSwipeTableCellDelegate> {
@@ -55,8 +56,6 @@
         self.groupMembers = [NSMutableArray arrayWithArray:members];
         self.groupid = groupid;
         self.groupEcdhKey = groupEcdhKey;
-        NSAssert(!GJCFStringIsNull(groupEcdhKey), @"群组密钥不能为空");
-        NSAssert(!GJCFStringIsNull(groupid), @"群组ID不能为空");
         currentUser = [[LKUserCenter shareCenter] currentLoginUser];
     }
     return self;
@@ -92,7 +91,7 @@
 - (void)addNewGroupMembers:(NSArray *)contacts {
     __weak __typeof(&*self) weakSelf = self;
     [GCDQueue executeInMainQueue:^{
-        [MBProgressHUD showMessage:LMLocalizedString(@"Invite...", nil) toView:weakSelf.view];
+        [MBProgressHUD showMessage:LMLocalizedString(@"Common Loading", nil) toView:weakSelf.view];
     }];
     [self verifyWith:contacts];
 }
@@ -161,13 +160,13 @@
                     [[MessageDBManager sharedManager] updataMessage:chatMessage];
                     if (message.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
                         [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Group invitation has been sent", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
+                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Group invitation has been sent", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
 
                             }];
                         }];
                     } else {
                         [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Group invitation sent failed", nil) withType:ToastTypeFail showInView:self.view complete:^{
+                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Group invitation sent failed", nil) withType:ToastTypeFail showInView:self.view complete:^{
 
                             }];
                         }];
@@ -570,8 +569,11 @@
         [[GroupDBManager sharedManager] removeMemberWithAddress:willRemoveUser.address groupId:weakSelf.groupid];
 
         NSArray *groupArray = [[GroupDBManager sharedManager] getgroupMemberByGroupIdentifier:weakSelf.groupid];
-        if (groupArray.count <= 1) {
-            [[GroupDBManager sharedManager] deletegroupWithGroupId:weakSelf.groupid];
+        if (groupArray.count < 2) {
+            [GCDQueue executeInMainQueue:^{
+                SendNotify(ConnnectQuitGroupNotification, weakSelf.groupid);
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }];
         } else {
             [GCDQueue executeInMainQueue:^{
                 SendNotify(ConnnectGroupInfoDidChangeNotification, weakSelf.groupid);

@@ -92,10 +92,10 @@ static GroupDBManager *manager = nil;
         return;
     }
 
-    RLMResults<LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ", groupId]];
-    if ([results lastObject]) {
+    LMRamGroupInfo *groupInfo = [[LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ", groupId]] lastObject];
+    if (groupInfo) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-           [realm deleteObject:[results lastObject]];
+           [realm deleteObject:groupInfo];
         }];
     }
 
@@ -120,10 +120,10 @@ static GroupDBManager *manager = nil;
         return;
     }
 
-    RLMResults <LMRamMemberInfo *> *results = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND address = '%@' ", groupId, address]];
-    if ([results lastObject]) {
+    LMRamMemberInfo *memberInfo = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND address = '%@' ", groupId, address]] lastObject];
+    if (memberInfo) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-            [realm deleteObject:[results lastObject]];
+            [realm deleteObject:memberInfo];
         }];
     }
 }
