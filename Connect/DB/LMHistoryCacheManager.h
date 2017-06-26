@@ -80,9 +80,9 @@
  * db pass
  * @return
  */
-- (NSString *)cacheDBPassSaltData;
+- (NSData *)cacheDBPassSaltData;
 
-- (NSString *)getDBPassword;
+- (NSData *)getDBPassword;
 
 /**
  * recent tranfer user address
