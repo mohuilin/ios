@@ -148,7 +148,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 }
 - (NSMutableArray *)getListGroupsFriend:(AccountInfo *)shareContact {
     
-    if (shareContact.address.length <= 0 || self.groupsFriend.count <= 1) {
+    if (self.groupsFriend.count <= 1) {
         return nil;
     }
     //get prex
