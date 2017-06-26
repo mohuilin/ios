@@ -76,7 +76,7 @@ static LMRecommandFriendManager *manager = nil;
         accountInfo.avatar = user.avatar;
         accountInfo.pub_key = user.pubKey;
         accountInfo.recommandStatus = 1;
-        LMFriendRecommandInfo *ramFriendInfo = [self changeToRamModel:accountInfo];
+        LMFriendRecommandInfo *ramFriendInfo = [[LMFriendRecommandInfo alloc] initWithNormalInfo:accountInfo];
         if (ramFriendInfo.username.length > 0) {
             [addArray addObject:ramFriendInfo];
         }
@@ -100,7 +100,7 @@ static LMRecommandFriendManager *manager = nil;
 
         for (NSInteger index = previousNumber; index < number; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
-            AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
+            AccountInfo *info = (AccountInfo *)ramFriendInfo.normalInfo;
             [resultArray addObject:info];
         }
 
@@ -108,7 +108,7 @@ static LMRecommandFriendManager *manager = nil;
 
         for (NSInteger index = previousNumber; index < results.count; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
-            AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
+            AccountInfo *info = (AccountInfo *)ramFriendInfo.normalInfo;
             [resultArray addObject:info];
         }
 
@@ -158,7 +158,7 @@ static LMRecommandFriendManager *manager = nil;
 
         for (NSInteger index = previousNumber; index < number; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
-            AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
+            AccountInfo *info = (AccountInfo *)ramFriendInfo.normalInfo;
             [resultArray addObject:info];
         }
 
@@ -166,7 +166,7 @@ static LMRecommandFriendManager *manager = nil;
 
         for (NSInteger index = previousNumber; index < results.count; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
-            AccountInfo *info = [self realmChangeToAccount:ramFriendInfo];
+            AccountInfo *info = (AccountInfo *)ramFriendInfo.normalInfo;
             [resultArray addObject:info];
         }
 
@@ -180,30 +180,6 @@ static LMRecommandFriendManager *manager = nil;
     }
     return nil;
 
-}
-
-- (LMFriendRecommandInfo *)changeToRamModel:(AccountInfo *)accountInfo {
-
-
-    LMFriendRecommandInfo *ramFriendInfo = [[LMFriendRecommandInfo alloc] init];
-    ramFriendInfo.username = accountInfo.username;
-    ramFriendInfo.address = accountInfo.address;
-    ramFriendInfo.avatar = accountInfo.avatar;
-    ramFriendInfo.status = accountInfo.recommandStatus;
-    ramFriendInfo.pubKey = accountInfo.pub_key;
-    return ramFriendInfo;
-
-}
-
-- (AccountInfo *)realmChangeToAccount:(LMFriendRecommandInfo *)ramFriendInfo {
-
-    AccountInfo *accountInfo = [[AccountInfo alloc] init];
-    accountInfo.username = ramFriendInfo.username;
-    accountInfo.address = ramFriendInfo.address;
-    accountInfo.avatar = ramFriendInfo.avatar;
-    accountInfo.recommandStatus = ramFriendInfo.status;
-    accountInfo.pub_key = ramFriendInfo.pubKey;
-    return accountInfo;
 }
 @end
 

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface AddressBookInfo : NSObject
+@interface AddressBookInfo : BaseInfo
 
 @property (nonatomic ,copy) NSString *address;
 

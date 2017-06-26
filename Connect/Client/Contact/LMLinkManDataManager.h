@@ -65,16 +65,7 @@
  *  get share contact ,The outside world needs the method to share in use
  *
  */
-- (NSMutableArray *)getListGroupsFriend:(AccountInfo *)shareContact withTag:(BOOL)flag;
-/**
- *  get Friends Arr No Connect,Externally provided method, select transfer contact in use
- *
- */
-- (NSMutableArray *)getFriendsArrWithNoConnect;
-/**
- *  get Friends Arr No Connect，include contacts,Group members, not including connect
- *
- */
-- (NSMutableArray *)getFriendsArrWithArray:(NSArray *)selectArray;
+- (NSMutableArray *)getListGroupsFriend:(AccountInfo *)shareContact;
+
 
 @end

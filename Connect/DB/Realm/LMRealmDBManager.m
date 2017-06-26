@@ -207,14 +207,8 @@ static FMDatabaseQueue *queue;
         NSMutableArray *memberArray = [self getgroupMemberByGroupIdentifier:ramGroup.groupIdentifer];
         NSMutableArray <LMRamMemberInfo *> *ramMemberArray = [NSMutableArray array];
         for (AccountInfo *info in memberArray) {
-            LMRamMemberInfo *ramInfo = [LMRamMemberInfo new];
+            LMRamMemberInfo *ramInfo = [[LMRamMemberInfo alloc] initWithNormalInfo:info];
             ramInfo.identifier = ramGroup.groupIdentifer;
-            ramInfo.username = info.username;
-            ramInfo.avatar = info.avatar;
-            ramInfo.address = info.address;
-            ramInfo.roleInGroup = info.roleInGroup;
-            ramInfo.groupNicksName = info.groupNickName;
-            ramInfo.pubKey = info.pub_key;
             if (info.isGroupAdmin) {
                 ramGroup.admin = ramInfo;
             }
