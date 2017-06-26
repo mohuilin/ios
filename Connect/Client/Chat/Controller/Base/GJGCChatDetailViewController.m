@@ -175,6 +175,13 @@
     }
     GJGCChatFriendContentModel *contentModel = [self.dataSourceManager addMMMessage:chatMessage];
     contentModel.sendStatus = GJGCChatFriendSendMessageStatusSuccess;
+    if (contentModel.contentType == GJGCChatFriendContentTypeImage) {
+        contentModel.uploadSuccess = YES;
+    }
+    if (contentModel.contentType == GJGCChatFriendContentTypeVideo) {
+        contentModel.uploadSuccess = YES;
+        contentModel.videoIsDownload = YES;
+    }
     [self.chatListTable reloadData];
 }
 

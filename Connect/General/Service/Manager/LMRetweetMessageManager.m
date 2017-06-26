@@ -452,16 +452,17 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
 - (void)retweetFileWithFileOwer:(NSString *)ower
                   retweetModel:(LMRerweetModel *)retweetModel
                        message:(MMMessage *)message{
-    NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainVideoCacheDirectory];
-    cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
-                      stringByAppendingPathComponent:ower];
-    if (!GJCFFileDirectoryIsExist(cacheDirectory)) {
-        GJCFFileProtectCompleteDirectoryCreate(cacheDirectory);
-    }
-    
+
     switch (message.type) {
         case GJGCChatFriendContentTypeVideo:
         {
+            
+            NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainVideoCacheDirectory];
+            cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
+                              stringByAppendingPathComponent:ower];
+            if (!GJCFFileDirectoryIsExist(cacheDirectory)) {
+                GJCFFileProtectCompleteDirectoryCreate(cacheDirectory);
+            }
             NSString *videoFileName = [NSString stringWithFormat:@"%@.mp4",message.message_id];
             NSString *videoFileCoverImageName = [NSString stringWithFormat:@"%@-coverimage.jpg",message.message_id];
             NSString *videoFileLocalPath = [cacheDirectory stringByAppendingPathComponent:videoFileName];
@@ -474,12 +475,18 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
             break;
         case GJGCChatFriendContentTypeImage:
         {
+            NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainImageCacheDirectory];
+            cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
+                              stringByAppendingPathComponent:ower];
+            if (!GJCFFileDirectoryIsExist(cacheDirectory)) {
+                GJCFFileProtectCompleteDirectoryCreate(cacheDirectory);
+            }
             // big image
             NSString *imageName = [NSString stringWithFormat:@"%@.jpg",message.message_id];
             GJCFFileWrite(retweetModel.fileData, [cacheDirectory stringByAppendingPathComponent:imageName]);
             NSString *thumbImageName = [NSString stringWithFormat:@"%@-thumb.jpg",message.message_id];
             // small image
-            GJCFFileWrite(retweetModel.thumData, [cacheDirectory stringByAppendingPathComponent:thumbImageName]);
+            GJCFFileWrite(retweetModel.fileData, [cacheDirectory stringByAppendingPathComponent:thumbImageName]);
         }
             break;
             
