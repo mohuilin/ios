@@ -21,6 +21,7 @@
 #import "MessageDBManager.h"
 #import "MyInfoPage.h"
 #include "RecentChatDBManager.h"
+#import "LMConversionManager.h"
 
 
 @interface GroupMembersListViewController () <UITableViewDelegate, UITableViewDataSource, MGSwipeTableCellDelegate> {
@@ -568,8 +569,11 @@
         [[GroupDBManager sharedManager] removeMemberWithAddress:willRemoveUser.address groupId:weakSelf.groupid];
 
         NSArray *groupArray = [[GroupDBManager sharedManager] getgroupMemberByGroupIdentifier:weakSelf.groupid];
-        if (groupArray.count <= 1) {
-            [[GroupDBManager sharedManager] deletegroupWithGroupId:weakSelf.groupid];
+        if (groupArray.count < 3) {
+            [GCDQueue executeInMainQueue:^{
+                SendNotify(ConnnectQuitGroupNotification, weakSelf.groupid);
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }];
         } else {
             [GCDQueue executeInMainQueue:^{
                 SendNotify(ConnnectGroupInfoDidChangeNotification, weakSelf.groupid);

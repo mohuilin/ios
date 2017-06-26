@@ -29,7 +29,7 @@
             for (AccountInfo *info in memberArray) {
                 LMRamMemberInfo *ramInfo = [[LMRamMemberInfo alloc] initWithNormalInfo:info];
                 ramInfo.identifier = self.groupIdentifer;
-                if (info.isGroupAdmin) {
+                if (info.isGroupAdmin || info.roleInGroup == 1) {
                     self.admin = ramInfo;
                     
                 }

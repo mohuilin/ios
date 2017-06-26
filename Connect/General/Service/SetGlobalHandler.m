@@ -757,6 +757,7 @@
                         accountInfo.avatar = member.avatar;
                         accountInfo.address = member.address;
                         accountInfo.roleInGroup = member.role;
+                        accountInfo.isGroupAdmin = (member.role != 0);
                         accountInfo.groupNickName = member.nick;
                         accountInfo.pub_key = member.pubKey;
                         [AccoutInfoArray objectAddObject:accountInfo];
@@ -786,6 +787,7 @@
                     accountInfo.avatar = member.avatar;
                     accountInfo.address = member.address;
                     accountInfo.roleInGroup = member.role;
+                    accountInfo.isGroupAdmin = (member.role != 0);
                     accountInfo.groupNickName = member.nick;
                     accountInfo.pub_key = member.pubKey;
                     [AccoutInfoArray objectAddObject:accountInfo];
