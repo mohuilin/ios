@@ -15,9 +15,6 @@
 #import "PrivacyPage.h"
 #import "IMService.h"
 #import "CommonClausePage.h"
-#import "LMContactAccountInfo.h"
-#import "RLMRealm+LMRLMRealm.h"
-
 
 @interface MainSetPage () <UITableViewDelegate>
 
@@ -93,9 +90,6 @@
 
     }];
     CellItem *pricy = [CellItem itemWithTitle:LMLocalizedString(@"Set Privacy", nil) type:CellItemTypeArrow operation:^{
-        
-        
-        
         PrivacyPage *page = [[PrivacyPage alloc] init];
         [weakSelf pushControllerHideBar:page];
     }];
@@ -150,7 +144,6 @@
 }
 
 - (void)logOut {
-    __weak typeof(&*self) weakSelf = self;
 #if (TARGET_IPHONE_SIMULATOR)
     // in the case of simulator
     [[LKUserCenter shareCenter] loginOutByServerWithInfo:nil];
@@ -233,18 +226,6 @@
     if (item.type == CellItemTypeLogoutCell) {
         cell.separatorInset = UIEdgeInsetsMake(0.f, cell.bounds.size.width, 0.f, 0.f);
     }
-    
-    if (!self.results2) {
-        RLMResults *results = [LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", @"1oZNecL2KaQkM6iRBqBRh63T7Fcbx3V6u"]];
-        self.results = results;
-        self.token =[self.results addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-            
-        }];
-        self.results2 = [LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", @"1oZNecL2KaQkM6iRBqBRh63T7Fcbx3V6u"]];
-    }
-
-    DDLogInfo(@"self.results %@",self.results);
-    DDLogInfo(@"self.results2 %@",self.results2);
 }
 
 @end
