@@ -7,10 +7,7 @@
 //
 
 #import "BaseDB.h"
-#import "AddressBookInfo.h"
 
-
-#define AddressBookTable @"t_addressbook"
 
 @interface LMAddressBookManager : BaseDB
 + (LMAddressBookManager *)sharedManager;

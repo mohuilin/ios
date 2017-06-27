@@ -158,7 +158,7 @@ static FMDatabaseQueue *queue;
         LMRamAddressBook *info = [[LMRamAddressBook alloc] init];
         info.address = [temD safeObjectForKey:@"address"];
         info.tag = [temD safeObjectForKey:@"tag"];
-        info.creatTime = [[NSDate date] timeIntervalSince1970] * 1000;
+        info.creatTime = [NSDate date];
         [temM objectAddObject:info];
     }
     if (temM.count > 0) {

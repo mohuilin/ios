@@ -12,7 +12,7 @@
 
 @property NSString *address;
 @property NSString *tag;
-@property long long creatTime;
+@property NSDate *creatTime;
 
 
 @end
