@@ -16,10 +16,13 @@
 #import "IMService.h"
 #import "CommonClausePage.h"
 
-
 @interface MainSetPage () <UITableViewDelegate>
 
 @property(nonatomic, strong) AccountInfo *userInfo;
+
+@property (nonatomic ,strong) RLMResults *results;
+@property (nonatomic ,strong) RLMResults *results2;
+@property (nonatomic ,strong) RLMNotificationToken *token;
 
 @end
 
@@ -141,7 +144,6 @@
 }
 
 - (void)logOut {
-    __weak typeof(&*self) weakSelf = self;
 #if (TARGET_IPHONE_SIMULATOR)
     // in the case of simulator
     [[LKUserCenter shareCenter] loginOutByServerWithInfo:nil];

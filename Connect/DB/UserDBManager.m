@@ -152,6 +152,11 @@ static UserDBManager *manager = nil;
     return realmUser.normalInfo;
 }
 
+- (RLMResults *)getRealmUsers {
+    RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo allObjects];
+    return results;
+}
+
 - (NSArray *)getAllUsers {
     NSMutableArray *modelArray = [NSMutableArray array];
     RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo allObjects];

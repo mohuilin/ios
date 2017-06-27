@@ -175,6 +175,8 @@
  */
 - (void)getAllgroupsWithComplete:(void (^)(NSArray *groups))complete;
 
+- (RLMResults *)realmCommonGroupList;
+- (NSArray *)commonGroupList;
 - (void)getCommonGroupListWithComplete:(void (^)(NSArray *commonGroups))complete;
 
 /**
