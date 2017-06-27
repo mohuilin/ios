@@ -233,4 +233,6 @@
 - (BOOL)userIsInBlackList:(NSString *)address;
 
 
+- (RLMResults *)getRealmUsers;
+
 @end

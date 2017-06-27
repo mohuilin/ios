@@ -19,6 +19,9 @@
 #import "ConnectTool.h"
 #import "AddressBookCallBack.h"
 #import "LMHistoryCacheManager.h"
+#import "LMContactAccountInfo.h"
+#import "LMRamGroupInfo.h"
+#import "NSString+Pinyin.h"
 
 
 @interface LMLinkManDataManager ()<NSMutableCopying>
@@ -39,6 +42,13 @@
 @property(nonatomic, strong) NSMutableArray *indexs;
 // point members
 @property(assign, nonatomic) NSUInteger redCount;
+
+@property (nonatomic ,strong) RLMResults *contactResults;
+@property (nonatomic ,strong) RLMResults *commonGroupResults;
+
+
+@property (nonatomic ,strong) RLMNotificationToken *contactResultsToken;
+@property (nonatomic ,strong) RLMNotificationToken *commonGroupResultsToken;
 
 @end
 
@@ -234,7 +244,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         prex = [[name transformToPinyin] substringToIndex:1];
     }
     // to leave
-    if ([self preIsInAtoZ:prex]) {
+    if ([prex preIsInAtoZ]) {
         prex = [prex uppercaseString];
     } else {
         prex = @"#";
@@ -283,16 +293,16 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
     RegisterNotify(kAcceptNewFriendRequestNotification, @selector(addNewUser:));
     RegisterNotify(kFriendListChangeNotification, @selector(downAllContacts));
     RegisterNotify(kNewFriendRequestNotification, @selector(newFriendRequest:));
-    RegisterNotify(ConnnectContactDidChangeNotification, @selector(ContactChange:));
+//    RegisterNotify(ConnnectContactDidChangeNotification, @selector(ContactChange:));
     RegisterNotify(ConnnectContactDidChangeDeleteUserNotification, @selector(deleteUser:));
     RegisterNotify(ConnnectUserAddressChangeNotification, @selector(AddressBookChange:));
-    RegisterNotify(ConnnectRemoveCommonGroupNotification, @selector(RemoveCommonGroup:));
-    RegisterNotify(ConnnectAddCommonGroupNotification, @selector(AddCommonGroup:));
+//    RegisterNotify(ConnnectRemoveCommonGroupNotification, @selector(RemoveCommonGroup:));
+//    RegisterNotify(ConnnectAddCommonGroupNotification, @selector(AddCommonGroup:));
     RegisterNotify(ConnnectDownAllCommonGroupCompleteNotification, @selector(downAllCommomGroup:));
     RegisterNotify(BadgeNumberManagerBadgeChangeNotification, @selector(badgeValueChange));
     RegisterNotify(ConnnectQuitGroupNotification, @selector(quitGroup:));
-    RegisterNotify(ConnectUpdateMyNickNameNotification, @selector(groupNicknameChange));
-    RegisterNotify(ConnnectGroupInfoDidChangeNotification, @selector(groupInfoChnage:));
+//    RegisterNotify(ConnectUpdateMyNickNameNotification, @selector(groupNicknameChange));
+//    RegisterNotify(ConnnectGroupInfoDidChangeNotification, @selector(groupInfoChnage:));
     CFErrorRef *error = nil;
     ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(nil, error);
     if (!error) {
@@ -717,29 +727,56 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 }
 
 - (void)formartFiendsGrouping {
-    [[UserDBManager sharedManager] getAllUsersWithComplete:^(NSArray *contacts) {
-        [GCDQueue executeInMainQueue:^{
-            
-            [self.offenFriends removeAllObjects];
-            [self.normalFriends removeAllObjects];
-            [self.friendsArr removeAllObjects];
-            for (AccountInfo *contact in contacts) {
-                if (contact.isOffenContact) {
-                    if (![self.offenFriends containsObject:contact]) {
-                        [self.offenFriends objectAddObject:contact];
-                    }
-                } else {
-                    if (![self.normalFriends containsObject:contact]) {
-                        [self.normalFriends objectAddObject:contact];
+    
+    if (!self.contactResults ||
+        !self.commonGroupResults) {
+        self.contactResults = [[UserDBManager sharedManager] getRealmUsers];
+        self.commonGroupResults = [[GroupDBManager sharedManager] realmCommonGroupList];
+        __weak __typeof(&*self)weakSelf = self;
+        //register notification
+        self.contactResultsToken = [self.contactResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+            if (!error) {
+                ///reload data
+                NSMutableArray *contacts = [NSMutableArray array];
+                for (LMContactAccountInfo *contact in results) {
+                    AccountInfo *info = (AccountInfo *)contact.normalInfo;
+                    if (info) {
+                        [contacts addObject:info];
                     }
                 }
-                if (![self.friendsArr containsObject:contact]) {
-                    [self.friendsArr objectAddObject:contact];
+                [weakSelf.offenFriends removeAllObjects];
+                [weakSelf.normalFriends removeAllObjects];
+                [weakSelf.friendsArr removeAllObjects];
+                for (AccountInfo *contact in contacts) {
+                    if (contact.isOffenContact) {
+                        if (![weakSelf.offenFriends containsObject:contact]) {
+                            [weakSelf.offenFriends objectAddObject:contact];
+                        }
+                    } else {
+                        if (![weakSelf.normalFriends containsObject:contact]) {
+                            [weakSelf.normalFriends objectAddObject:contact];
+                        }
+                    }
+                    if (![weakSelf.friendsArr containsObject:contact]) {
+                        [weakSelf.friendsArr objectAddObject:contact];
+                    }
                 }
+                [weakSelf addDataToGroupArray];
             }
-            [self addDataToGroupArray];
         }];
-    }];
+        self.commonGroupResultsToken = [self.commonGroupResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+            if (!error) {
+                [weakSelf.commonGroup removeAllObjects];
+                for (LMRamGroupInfo *realmGroup in results) {
+                    LMGroupInfo *group = (LMGroupInfo *)realmGroup.normalInfo;
+                    if (group) {
+                        [weakSelf.commonGroup addObject:group];
+                    }
+                }
+                [weakSelf addDataToGroupArray];
+            }
+        }];
+    }
 }
 
 - (void)addDataToGroupArray {
@@ -755,7 +792,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
             prex = [[name transformToPinyin] substringToIndex:1];
         }
         // to leave
-        if ([self preIsInAtoZ:prex]) {
+        if ([prex preIsInAtoZ]) {
             prex = [prex uppercaseString];
         } else {
             prex = @"#";
@@ -830,12 +867,10 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
 - (void)dealloc {
     RemoveNofify;
-}
-
-#pragma mark - 拼音的方法
-
-- (BOOL)preIsInAtoZ:(NSString *)str {
-    return [@"QWERTYUIOPLKJHGFDSAZXCVBNM" containsString:str] || [[@"QWERTYUIOPLKJHGFDSAZXCVBNM" lowercaseString] containsString:str];
+    [self.commonGroupResultsToken stop];
+    [self.contactResultsToken stop];
+    self.contactResultsToken = nil;
+    self.commonGroupResultsToken = nil;
 }
 
 @end

@@ -241,7 +241,6 @@
             AccountInfo *user = (AccountInfo *) data;
             if ([user.pub_key isEqualToString:kSystemIdendifier]) {
                 GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
-                talk.talkType = GJGCChatFriendTalkTypePrivate;
                 talk.chatIdendifier = user.pub_key;
                 talk.snapChatOutDataTime = 0;
                 talk.talkType = GJGCChatFriendTalkTypePostSystem;

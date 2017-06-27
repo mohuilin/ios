@@ -339,9 +339,15 @@ static GroupDBManager *manager = nil;
 }
 
 
+- (RLMResults *)realmCommonGroupList {
+    
+    RLMResults <LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:@"isCommonGroup == 1"];
+    return results;
+}
+
 - (NSArray *)commonGroupList {
 
-    RLMResults <LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:@"isCommonGroup == 1 "];
+    RLMResults <LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:@"isCommonGroup == 1"];
     if (results.count <= 0) {
         return nil;
     }
