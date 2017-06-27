@@ -26,6 +26,9 @@
 #import "LMAddMoreViewController.h"
 #import "LMLinkManDataManager.h"
 #import "LMHistoryCacheManager.h"
+#import "LMFriendRecommandInfo.h"
+
+
 
 #define  RECOMMAND_COUNT  4
 
@@ -87,7 +90,7 @@
     // creat recommond man
     [self getArrayFromNetWork];
 }
-#pragma mark - method 
+#pragma mark - method
 - (void)registAction {
     RegisterNotify(ConnnectSendAddRequestSuccennNotification, @selector(newFriendRequest:));
     RegisterNotify(kNewFriendRequestNotification, @selector(newFriendRequest:));
@@ -108,7 +111,6 @@
         self.friendRequests = [NSMutableArray array];
     }
     self.friendRequests = [[UserDBManager sharedManager] getAllNewFirendRequest].mutableCopy;
-    
     __weak __typeof(&*self) weakSelf = self;
     for (AccountInfo *user in _friendRequests) {
         NSString *address = user.address;
@@ -135,7 +137,7 @@
         self.isLoading = NO;
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeContact withErrorCode:error.code withUrl:RecommendFindMe] withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-             // creat data source
+            // creat data source
             [weakSelf creatAllArray];
         }];
     }];
@@ -146,12 +148,8 @@
         if (data) {
             NSError *error = nil;
             UsersInfo *usersInfo = [UsersInfo parseFromData:data error:&error];
-            self.recommandFriendArray = [[LMRecommandFriendManager sharedManager] getRecommandFriendsWithPage:1].mutableCopy;
-            if (self.recommandFriendArray.count <= 0) {
-                [[LMRecommandFriendManager sharedManager] saveRecommandFriend:usersInfo.usersArray];
-            } else {
-                [self detailDBArrayWith:usersInfo.usersArray];
-            }
+             self.recommandFriendArray = [[LMRecommandFriendManager sharedManager] getRecommandFriendsWithPage:1].mutableCopy;
+            [self detailDBArrayWith:usersInfo.usersArray];
         }
     } else {
         [GCDQueue executeInMainQueue:^{
@@ -168,22 +166,21 @@
  */
 - (void)detailDBArrayWith:(NSArray *)array {
     NSMutableArray *tmpArray = [NSMutableArray array];
-
     for (UserInfo *user in array) {
-        // set userinfo - accountInfo
-        AccountInfo *accountInfo = [[AccountInfo alloc] init];
+        // set userinfo - LMFriendRecommandInfo
+        LMFriendRecommandInfo *accountInfo = [[LMFriendRecommandInfo alloc] init];
         accountInfo.username = user.username;
         accountInfo.avatar = user.avatar;
-        accountInfo.pub_key = user.pubKey;
+        accountInfo.pubKey = user.pubKey;
         accountInfo.address = user.address;
-        accountInfo.recommandStatus = 1;
+        accountInfo.status = 1;
         if (![[LMRecommandFriendManager sharedManager] isExistUser:accountInfo.address]) {
-            [tmpArray objectAddObject:user];
+            [tmpArray objectAddObject:accountInfo];
         }
     }
     [[LMRecommandFriendManager sharedManager] saveRecommandFriend:tmpArray];
     self.recommandFriendArray = [[LMRecommandFriendManager sharedManager] getRecommandFriendsWithPage:1].mutableCopy;
-
+    
 }
 
 
@@ -215,8 +212,8 @@
     if (self.recommandFriendArray.count > RECOMMAND_COUNT) {
         NSMutableArray *tmpArray = [NSMutableArray array];
         for (NSInteger index = 0; index < RECOMMAND_COUNT; index++) {
-            AccountInfo *userInfo = self.recommandFriendArray[index];
-            if (userInfo.address.length > 0) {
+            LMFriendRecommandInfo *userInfo = self.recommandFriendArray[index];
+            if (!(userInfo.address.length <= 0 || userInfo.username.length <= 0)) {
                 [tmpArray objectAddObject:userInfo];
             }
         }
@@ -272,7 +269,7 @@
         phoneInfo.mobile = [KeyHandle getHash256:@"13281226591"];
         [hashMobiles objectAddObject:phoneInfo];
 #else
-
+        
 #endif
         [SetGlobalHandler syncPhoneContactWithHashContact:hashMobiles complete:^(NSTimeInterval time) {
             if (time) {
@@ -280,11 +277,11 @@
             }
         }];
     }];
-
+    
 }
 
 - (void)getRegisterUserByNet {
-
+    
     [NetWorkOperationTool POSTWithUrlString:ContactPhoneBookUrl signNoEncryptPostData:nil
                                    complete:^(id response) {
                                        HttpResponse *hResponse = (HttpResponse *) response;
@@ -298,7 +295,7 @@
                                        [GCDQueue executeInMainQueue:^{
                                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Network Server error", nil) withType:ToastTypeFail showInView:nil complete:nil];
                                        }];
-            }];
+                                   }];
 }
 - (void)syncPhoneBook:(HttpResponse *)hResponse {
     
@@ -355,7 +352,7 @@
 }
 
 - (void)newFriendRequest:(NSNotification *)note {
-
+    
     self.friendRequests = [[UserDBManager sharedManager] getAllNewFirendRequest].mutableCopy;
     if (!self.friendRequests) {
         self.friendRequests = [NSMutableArray array];
@@ -381,14 +378,14 @@
         if (badgeNumber) {
             badgeNumber.count--;
             [[BadgeNumberManager shareManager] setBadgeNumber:badgeNumber Completion:^(BOOL result) {
-
+                
             }];
         }
     }];
-
+    
     //accept new friend request
     [GCDQueue executeInMainQueue:^{
-      [MBProgressHUD showLoadingMessageToView:self.view];
+        [MBProgressHUD showLoadingMessageToView:self.view];
     }];
     [[IMService instance] acceptAddRequestWithAddress:address source:source comlete:^(NSError *error, id data) {
         [GCDQueue executeInMainQueue:^{
@@ -518,9 +515,9 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     __weak typeof(self) weakSelf = self;
-    NSArray *array = (NSArray *) self.allArray[indexPath.section];
+    NSArray *array = (NSArray *)self.allArray[indexPath.section];
     NewFriendCell *fcell = [tableView dequeueReusableCellWithIdentifier:@"NewFriendCellID" forIndexPath:indexPath];
-    fcell.addButtonBlock = ^(AccountInfo *userInfo) {
+    fcell.addButtonBlock = ^(LMFriendRecommandInfo *userInfo) {
         [weakSelf clickRecommandWithUserInfo:userInfo];
     };
     fcell.delegate = self;
@@ -548,7 +545,7 @@
         MGSwipeButton *trashButton = [MGSwipeButton buttonWithTitle:@"" icon:[UIImage imageNamed:@"message_trash"] backgroundColor:[UIColor whiteColor] padding:padding callback:^BOOL(MGSwipeTableCell *sender) {
             if (weakSelf.allArray.count == 1) {
                 if (weakSelf.recommandFriendArray.count > 0) {
-                    UserInfo *userInfo = weakSelf.recommandFriendArray[indexPath.row];
+                    LMFriendRecommandInfo *userInfo = weakSelf.recommandFriendArray[indexPath.row];
                     // not interested
                     [weakSelf NotInterestedWithAddress:userInfo.address];
                 } else {
@@ -557,7 +554,7 @@
                 }
             } else {
                 if (indexPath.section == 0) {
-                    UserInfo *userInfo = weakSelf.recommandFriendArray[indexPath.row];
+                    LMFriendRecommandInfo *userInfo = weakSelf.recommandFriendArray[indexPath.row];
                     // not interested
                     [weakSelf NotInterestedWithAddress:userInfo.address];
                 } else {
@@ -590,11 +587,11 @@
     [[IMService instance] setRecommandUserNoInterestAdress:oldAddress comlete:^(NSError *error, id data) {
         if (error == nil) {
             [GCDQueue executeInMainQueue:^{
+                [[LMRecommandFriendManager sharedManager] updateRecommandFriendStatus:3 withAddress:oldAddress];
+                [self creatAllArray];
                 [MBProgressHUD hideHUDForView:self.view];
             }];
-            NSString *address = (NSString *) data;
-            [[LMRecommandFriendManager sharedManager] updateRecommandFriendStatus:3 withAddress:address];
-            [self creatAllArray];
+            
         } else {
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Operation failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
@@ -616,13 +613,11 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-
+    
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSArray *array = (NSArray *) self.allArray[indexPath.section];
     id data = array[indexPath.row];
-
-    AccountInfo *user = (AccountInfo *) data;
-    if (user.recommandStatus != 1) {
+    if ([data isKindOfClass:[AccountInfo class]]) {
         // my invite
         AccountInfo *user = (AccountInfo *) data;
         
@@ -656,28 +651,34 @@
         }
     } else           // recommand man
     {
-        [self clickRecommandWithUserInfo:user];
+        [self clickRecommandWithUserInfo:data];
     }
 }
 
-- (void)clickRecommandWithUserInfo:(AccountInfo *)userInfo {
-    userInfo.source = UserSourceTypeRecommend;
-    userInfo.stranger = YES;
-    InviteUserPage *page = [[InviteUserPage alloc] initWithUser:userInfo];
-    page.sourceType = UserSourceTypeRecommend;
-    [self.navigationController pushViewController:page animated:YES];
+- (void)clickRecommandWithUserInfo:(id)data {
+    if ([data isKindOfClass:[LMFriendRecommandInfo class]]) {
+        
+        LMFriendRecommandInfo *recommandFrind = (LMFriendRecommandInfo *)data;
+        AccountInfo *userInfo = (AccountInfo *)recommandFrind.normalInfo;
+        userInfo.source = UserSourceTypeRecommend;
+        userInfo.stranger = YES;
+        InviteUserPage *page = [[InviteUserPage alloc] initWithUser:userInfo];
+        page.sourceType = UserSourceTypeRecommend;
+        [self.navigationController pushViewController:page animated:YES];
+        
+    }
 }
 
 - (UIView *)topView {
     if (!_topView) {
         _topView = [UIView new];
-
+        
         UIView *contentView = [[UIView alloc] init];
         _topView.frame = CGRectMake(0, 0, DEVICE_SIZE.width, AUTO_HEIGHT(225));
         contentView.frame = CGRectMake(0, 0, DEVICE_SIZE.width, AUTO_HEIGHT(225));
         [_topView addSubview:contentView];
         _topView.backgroundColor = [UIColor whiteColor];
-
+        
         NSMutableArray *icons = @[@"contract_add_scan", @"contract_add_contacts", @"contract_add_more"].mutableCopy;
         NSMutableArray *titles = @[LMLocalizedString(@"Link Scan", nil), LMLocalizedString(@"Link Contacts", nil), LMLocalizedString(@"Link More", nil)].mutableCopy;
         CGFloat marginY = AUTO_HEIGHT(45);
@@ -699,7 +700,7 @@
             [contentView addSubview:item];
         }
     }
-
+    
     return _topView;
 }
 
@@ -745,7 +746,7 @@
     }];
     scanPage.showMyQrCode = YES;
     [self presentViewController:scanPage animated:NO completion:nil];
-
+    
 }
 - (void)contactAction {
     [[BadgeNumberManager shareManager] clearBadgeNumber:ALTYPE_CategoryTwo_PhoneContact Completion:^{
@@ -767,3 +768,7 @@
     }
 }
 @end
+
+
+
+

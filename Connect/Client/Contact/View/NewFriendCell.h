@@ -8,7 +8,9 @@
 
 #import "BaseSwipeCell.h"
 #import "Protofile.pbobjc.h"
-typedef void (^AddButtonBlock) (AccountInfo*);
+#import "LMFriendRecommandInfo.h"
+
+typedef void (^AddButtonBlock) (LMFriendRecommandInfo *);
 @interface NewFriendCell : BaseSwipeCell
 
 @property(strong, nonatomic)AddButtonBlock addButtonBlock;

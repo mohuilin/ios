@@ -43,11 +43,11 @@ static LMRecommandFriendManager *manager = nil;
 }
 
 - (void)deleteAllRecommandFriend; {
-
+    
     RLMResults<LMFriendRecommandInfo *> *results = [LMFriendRecommandInfo allObjects];
     for (LMFriendRecommandInfo *info in results) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-           [realm deleteObject:info];
+            [realm deleteObject:info];
         }];
     }
 }
@@ -59,7 +59,7 @@ static LMRecommandFriendManager *manager = nil;
     LMFriendRecommandInfo *friendRequestInfo = [[LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ", address]] lastObject];
     if (friendRequestInfo) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-           [realm deleteObject:friendRequestInfo];
+            [realm deleteObject:friendRequestInfo];
         }];
     }
 }
@@ -69,21 +69,14 @@ static LMRecommandFriendManager *manager = nil;
         return;
     }
     NSMutableArray *addArray = [NSMutableArray array];
-    for (UserInfo *user in friendArray) {
-        AccountInfo *accountInfo = [[AccountInfo alloc] init];
-        accountInfo.username = user.username;
-        accountInfo.address = user.address;
-        accountInfo.avatar = user.avatar;
-        accountInfo.pub_key = user.pubKey;
-        accountInfo.recommandStatus = 1;
-        LMFriendRecommandInfo *ramFriendInfo = [[LMFriendRecommandInfo alloc] initWithNormalInfo:accountInfo];
-        if (ramFriendInfo.username.length > 0) {
-            [addArray addObject:ramFriendInfo];
+    for (LMFriendRecommandInfo *recommandInfo in friendArray) {
+        if (!(recommandInfo.username.length <= 0 || recommandInfo.address.length <= 0)) {
+            [addArray addObject:recommandInfo];
         }
     }
     if (addArray.count > 0) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-           [realm addOrUpdateObjectsFromArray:addArray];
+            [realm addOrUpdateObjectsFromArray:addArray];
         }];
     }
 }
@@ -97,26 +90,24 @@ static LMRecommandFriendManager *manager = nil;
     NSInteger number = (page * 20);
     NSInteger previousNumber = (page - 1) * 20;
     if (results.count >= number) {
-
+        
         for (NSInteger index = previousNumber; index < number; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
-            AccountInfo *info = (AccountInfo *)ramFriendInfo.normalInfo;
-            [resultArray addObject:info];
+            [resultArray addObject:ramFriendInfo];
         }
-
+        
     } else {
-
+        
         for (NSInteger index = previousNumber; index < results.count; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
-            AccountInfo *info = (AccountInfo *)ramFriendInfo.normalInfo;
-            [resultArray addObject:info];
+            [resultArray addObject:ramFriendInfo];
         }
-
+        
     }
     if (resultArray.count > 0) {
         NSArray *result = resultArray.copy;
-        result = [result sortedArrayUsingComparator:^NSComparisonResult(AccountInfo *obj1, AccountInfo *obj2) {
-            return [obj2.pub_key compare:obj1.pub_key];
+        result = [result sortedArrayUsingComparator:^NSComparisonResult(LMFriendRecommandInfo *obj1, LMFriendRecommandInfo *obj2) {
+            return [obj2.pubKey compare:obj1.pubKey];
         }];
         return result;
     }
@@ -139,9 +130,9 @@ static LMRecommandFriendManager *manager = nil;
     if (GJCFStringIsNull(address)) {
         return;
     }
-   LMFriendRecommandInfo *friendRequest = [[LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
+    LMFriendRecommandInfo *recommandInfo = [[LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"address = '%@' ",address]] lastObject];
     [self executeRealmWithBlock:^{
-       friendRequest.status = status;
+        recommandInfo.status = status;
     }];
 }
 
@@ -149,37 +140,34 @@ static LMRecommandFriendManager *manager = nil;
     if (page <= 0) {
         page = 1;
     }
-
+    
     RLMResults<LMFriendRecommandInfo *> *results = [LMFriendRecommandInfo objectsWhere:[NSString stringWithFormat:@"status = %d ", status]];
     NSMutableArray *resultArray = [NSMutableArray array];
     NSInteger number = (page * 20);
     NSInteger previousNumber = (page - 1) * 20;
     if (results.count >= number) {
-
+        
         for (NSInteger index = previousNumber; index < number; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
-            AccountInfo *info = (AccountInfo *)ramFriendInfo.normalInfo;
-            [resultArray addObject:info];
+            [resultArray addObject:ramFriendInfo];
         }
-
+        
     } else {
-
+        
         for (NSInteger index = previousNumber; index < results.count; index++) {
             LMFriendRecommandInfo *ramFriendInfo = results[index];
-            AccountInfo *info = (AccountInfo *)ramFriendInfo.normalInfo;
-            [resultArray addObject:info];
+            [resultArray addObject:ramFriendInfo];
         }
-
+        
     }
     if (resultArray.count > 0) {
         NSArray *result = resultArray.copy;
-        result = [result sortedArrayUsingComparator:^NSComparisonResult(AccountInfo *obj1, AccountInfo *obj2) {
-            return [obj2.pub_key compare:obj1.pub_key];
+        result = [result sortedArrayUsingComparator:^NSComparisonResult(LMFriendRecommandInfo *obj1, LMFriendRecommandInfo *obj2) {
+            return [obj2.pubKey compare:obj1.pubKey];
         }];
         return result;
     }
     return nil;
-
 }
 @end
 
