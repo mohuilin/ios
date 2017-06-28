@@ -19,6 +19,7 @@
 #import "GroupDBManager.h"
 #import "CameraTool.h"
 #import <Photos/Photos.h>
+#import "LMMessage.h"
 
 @implementation LMMessageTool
 
@@ -44,9 +45,25 @@
 }
 
 + (void)updateSendMessageStatus:(MMMessage *)message {
-    ChatMessageInfo *messageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:[SessionManager sharedManager].chatSession];
-    messageInfo.message = message;
-    [[MessageDBManager sharedManager] updataMessage:messageInfo];
+    //update message send status
+    LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", message.publicKey, message.message_id]] firstObject];
+    if (realmMessage) {
+        //message encrypt
+        NSString *aad = [[NSString stringWithFormat:@"%d", arc4random() % 100 + 1000] sha1String];
+        NSString *iv = [[NSString stringWithFormat:@"%d", arc4random() % 100 + 1000] sha1String];
+        NSDictionary *encodeDict = [KeyHandle xtalkEncodeAES_GCM:[[LKUserCenter shareCenter] getLocalGCDEcodePass] data:[message mj_JSONString] aad:aad iv:iv];
+        NSString *ciphertext = encodeDict[@"encryptedDatastring"];
+        NSString *tag = encodeDict[@"tagstring"];
+        NSMutableDictionary *content = [NSMutableDictionary dictionary];
+        [content safeSetObject:aad forKey:@"aad"];
+        [content safeSetObject:iv forKey:@"iv"];
+        [content safeSetObject:ciphertext forKey:@"ciphertext"];
+        [content safeSetObject:tag forKey:@"tag"];
+        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+        [realm beginWriteTransaction];
+        realmMessage.messageContent = [content mj_JSONString];
+        [realm commitWriteTransaction];
+    }
 }
 
 + (NSData *)formateVideoLoacalPath:(GJGCChatFriendContentModel *)messageContent {

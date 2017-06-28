@@ -19,6 +19,7 @@
 #import "SystemMessageHandler.h"
 #import "GJCFFileUploadManager.h"
 #import "LMMessageTool.h"
+#import "LMMessage.h"
 
 @interface GJGCChatDetailDataSourceManager () <MessageHandlerGetNewMessage>
 
@@ -954,26 +955,17 @@
             [self.delegate dataSourceManagerUpdateUploadprogress:self progress:progressValue index:index];
         }
     } chatEcdhKey:self.taklInfo.group_ecdhKey contentModel:messageContent sendMessageCompletion:^(MMMessage *messageInfo, NSError *error) {
-        if (!messageInfo) {
-            return;
+        if (messageInfo && messageInfo.type != 12) {
+            //update message send_status and create tip message
+            [self updateMessageState:messageInfo state:messageInfo.sendstatus];
+            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccessUnArrive) { //show blocked tips
+                [self showUnArriveMessageCell];
+            } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNoRelationShip){ //show without relationcship tips
+                [self showNoRelationShipTipMessageCell];
+            } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNotInGroup) { //show you are not in group chat tips
+                [self showNoInfoGroupMessageCell];
+            }
         }
-        if (messageInfo.type == 12) {
-            DDLogInfo(@"Read receipt of the message of success！！！");
-            return;
-        }
-        //update message send_status
-        [self updateMessageState:messageInfo state:messageInfo.sendstatus];
-        if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccessUnArrive) { //show blocked tips
-            [self showUnArriveMessageCell];
-        } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNoRelationShip){ //show without relationcship tips
-            [self showNoRelationShipTipMessageCell];
-        } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNotInGroup) { //show you are not in group chat tips
-            [self showNoInfoGroupMessageCell];
-        }
-        ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:self.taklInfo.chatIdendifier];
-        chatMessage.message = messageInfo;
-        chatMessage.sendstatus = messageInfo.sendstatus;
-        [[MessageDBManager sharedManager] updataMessage:chatMessage];
     }];
     
     return YES;
