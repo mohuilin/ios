@@ -78,9 +78,6 @@ extern NSString *const ConnnectSendAddRequestSuccennNotification;
 
 extern NSString *const kFriendListChangeNotification;
 
-// Received a friend request
-
-extern NSString *const kNewFriendRequestNotification;
 
 // Accept a friend request a successful notification
 

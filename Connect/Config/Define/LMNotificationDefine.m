@@ -69,10 +69,6 @@ NSString *const ConnnectSendAddRequestSuccennNotification = @"ConnnectSendAddReq
 
 NSString *const kFriendListChangeNotification = @"kFriendListChangeNotification";
 
-// Received a friend request
-
-NSString *const kNewFriendRequestNotification = @"kNewFriendRequestNotification";
-
 // Accept a friend request a successful notification
 
 NSString *const kAcceptNewFriendRequestNotification = @"kAcceptNewFriendRequestNotification";

@@ -521,9 +521,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
         newFriend.status = RequestFriendStatusAccept;
 
         [[UserDBManager sharedManager] saveNewFriend:newFriend];
-        [GCDQueue executeInMainQueue:^{
-            SendNotify(kNewFriendRequestNotification, newFriend);
-        }];
     } else {
         
         switch (command.errNo) {

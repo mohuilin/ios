@@ -27,6 +27,7 @@
 #import "LMLinkManDataManager.h"
 #import "LMHistoryCacheManager.h"
 #import "LMFriendRecommandInfo.h"
+#import "LMFriendRequestInfo.h"
 
 
 
@@ -42,6 +43,10 @@
 @property(strong, nonatomic) UIView *topView;
 // Phone address book icon
 @property(nonatomic, strong) TopImageBottomItem *contactItem;
+
+@property(nonatomic, strong) RLMResults *allNewFriendResults;
+@property(nonatomic, strong) RLMNotificationToken *allNewFriendToken;
+
 
 @end
 
@@ -78,7 +83,7 @@
     [self creatFriendRequestsAction];
     [self configTableView];
     [self bridgeNumberAction];
-    [self registAction];
+    [self friendRequestNotification];
 #if (!TARGET_IPHONE_SIMULATOR)
     // in the case of wifi
     if (![[MMAppSetting sharedSetting] isHavePhoneContactRegister]) {
@@ -91,10 +96,36 @@
     [self getArrayFromNetWork];
 }
 #pragma mark - method
-- (void)registAction {
-    RegisterNotify(ConnnectSendAddRequestSuccennNotification, @selector(newFriendRequest:));
-    RegisterNotify(kNewFriendRequestNotification, @selector(newFriendRequest:));
-    RegisterNotify(kAcceptNewFriendRequestNotification, @selector(newFriendRequest:));
+- (void)friendRequestNotification {
+
+    if (!self.allNewFriendResults) {
+       self.allNewFriendResults = [[UserDBManager sharedManager] getAllNewFriendResults];
+    }
+    __weak typeof(self)weakSelf = self;
+    self.allNewFriendToken = [self.allNewFriendResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+       if (!error) {
+           NSMutableArray *temArray = [NSMutableArray array];
+           for (LMFriendRequestInfo* info in results) {
+               AccountInfo *accountInfo = ( AccountInfo *)info.normalInfo;
+               [temArray addObject:accountInfo];
+           }
+           weakSelf.friendRequests = temArray;
+           if (!weakSelf.friendRequests) {
+               weakSelf.friendRequests = [NSMutableArray array];
+           }
+           for (AccountInfo *user in weakSelf.friendRequests) {
+               NSString *address = user.address;
+               int source = user.source;
+               if (user.status == RequestFriendStatusAccept) {
+                   user.customOperation = ^() {
+                       DDLogInfo(@"Accept request operation");
+                       [weakSelf acceptRequest:address source:source];
+                   };
+               }
+           }
+           [weakSelf creatAllArray];
+       }
+    }];
 }
 - (void)bridgeNumberAction {
     [[BadgeNumberManager shareManager] getBadgeNumber:ALTYPE_CategoryTwo_PhoneContact Completion:^(BadgeNumber *badgeNumber) {
@@ -350,27 +381,6 @@
         }
     }
 }
-
-- (void)newFriendRequest:(NSNotification *)note {
-    
-    self.friendRequests = [[UserDBManager sharedManager] getAllNewFirendRequest].mutableCopy;
-    if (!self.friendRequests) {
-        self.friendRequests = [NSMutableArray array];
-    }
-    __weak __typeof(&*self) weakSelf = self;
-    for (AccountInfo *user in _friendRequests) {
-        NSString *address = user.address;
-        int source = user.source;
-        if (user.status == RequestFriendStatusAccept) {
-            user.customOperation = ^() {
-                DDLogInfo(@"Accept request operation");
-                [weakSelf acceptRequest:address source:source];
-            };
-        }
-    }
-    [self creatAllArray];
-}
-
 
 - (void)acceptRequest:(NSString *)address source:(int)source {
     // Clear a reminder

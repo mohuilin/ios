@@ -317,22 +317,8 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
 - (void)addNotification {
     RegisterNotify(ConnnectUserAddressChangeNotification, @selector(AddressBookChange:));
-    
     RegisterNotify(kFriendListChangeNotification, @selector(downAllContacts));
     
-    
-//    RegisterNotify(ConnnectDownAllCommonGroupCompleteNotification, @selector(downAllCommomGroup:));
-//    RegisterNotify(BadgeNumberManagerBadgeChangeNotification, @selector(badgeValueChange));
-//    RegisterNotify(kNewFriendRequestNotification, @selector(newFriendRequest:));
-//    RegisterNotify(kAcceptNewFriendRequestNotification, @selector(addNewUser:));
-//    RegisterNotify(ConnnectContactDidChangeNotification, @selector(ContactChange:));
-//    RegisterNotify(ConnnectContactDidChangeDeleteUserNotification, @selector(deleteUser:));
-//    RegisterNotify(ConnnectRemoveCommonGroupNotification, @selector(RemoveCommonGroup:));
-//    RegisterNotify(ConnnectAddCommonGroupNotification, @selector(AddCommonGroup:));
-//    RegisterNotify(ConnnectQuitGroupNotification, @selector(quitGroup:));
-//    RegisterNotify(ConnectUpdateMyNickNameNotification, @selector(groupNicknameChange));
-//    RegisterNotify(ConnnectGroupInfoDidChangeNotification, @selector(groupInfoChnage:));
-
     CFErrorRef *error = nil;
     ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(nil, error);
     if (!error) {
