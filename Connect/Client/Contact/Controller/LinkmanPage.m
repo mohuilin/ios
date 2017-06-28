@@ -39,7 +39,11 @@
 @implementation LinkmanPage
 
 - (NSMutableArray *)groupsFriend {
-    return [[LMLinkManDataManager sharedManager] getListGroupsFriend];
+    if (!_groupsFriend) {
+        _groupsFriend = [NSMutableArray array];
+        [_groupsFriend addObjectsFromArray:[[LMLinkManDataManager sharedManager] getListGroupsFriend]];
+    }
+    return _groupsFriend;
 }
 
 - (void)viewDidLoad {
@@ -152,7 +156,8 @@
 #pragma mark - linkmandatalist - delegate
 
 - (void)listChange:(NSMutableArray *)linkDataArray withTabBarCount:(NSUInteger)count {
-    self.groupsFriend = linkDataArray.mutableCopy;
+    [self.groupsFriend removeAllObjects];
+    [self.groupsFriend  addObjectsFromArray:linkDataArray.copy];;
     [GCDQueue executeInMainQueue:^{
         [self setTableViewFoot];
         [self.tableView reloadData];

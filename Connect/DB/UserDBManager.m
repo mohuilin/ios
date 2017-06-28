@@ -227,6 +227,12 @@ static UserDBManager *manager = nil;
     }
     return modelArray;
 }
+- (RLMResults *)getAllNewFriendResults {
+    
+    RLMResults <LMFriendRequestInfo *> *results = [LMFriendRequestInfo allObjects];
+    return results;
+}
+
 
 - (AccountInfo *)getFriendRequestBy:(NSString *)address {
     if (GJCFStringIsNull(address)) {
@@ -249,9 +255,11 @@ static UserDBManager *manager = nil;
         return;
     }
     LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
-    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-        [realm deleteObject:realmUser];
-    }];
+    if (realmUser) {
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm deleteObject:realmUser];
+        }];
+    }
 }
 
 - (void)saveNewFriend:(AccountInfo *)user {

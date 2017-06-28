@@ -573,6 +573,7 @@
             [GCDQueue executeInMainQueue:^{
                 SendNotify(ConnnectQuitGroupNotification, weakSelf.groupid);
                 [self.navigationController popToRootViewControllerAnimated:YES];
+                [[GroupDBManager sharedManager] deletegroupWithGroupId:weakSelf.groupid];
             }];
         } else {
             [GCDQueue executeInMainQueue:^{
