@@ -22,7 +22,7 @@
             self.identifier = model.identifier;
             self.name = model.name;
             self.headUrl = model.headUrl;
-            self.time = model.time;
+            self.createTime = model.createTime;
             self.content = model.content;
             self.isTopChat = model.isTopChat;
             self.stranger = model.stranger;
@@ -48,7 +48,7 @@
     model.identifier = self.identifier;
     model.name = self.name;
     model.headUrl = self.headUrl;
-    model.time = self.time;
+    model.createTime = self.createTime;
     model.content = self.content;
     model.isTopChat = self.isTopChat;
     model.stranger = self.stranger;

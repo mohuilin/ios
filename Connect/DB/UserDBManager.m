@@ -249,9 +249,11 @@ static UserDBManager *manager = nil;
         return;
     }
     LMFriendRequestInfo *realmUser = [[LMFriendRequestInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
-    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-        [realm deleteObject:realmUser];
-    }];
+    if (realmUser) {
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm deleteObject:realmUser];
+        }];
+    }
 }
 
 - (void)saveNewFriend:(AccountInfo *)user {
@@ -355,9 +357,11 @@ static UserDBManager *manager = nil;
         return NO;
     }
     LMTag *realmModel = [[LMTag objectsWhere:[NSString stringWithFormat:@"tag = '%@'", tag]] firstObject];
-    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-        [realm deleteObject:realmModel];
-    }];
+    if (realmModel) {
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm deleteObject:realmModel];
+        }];
+    }
     return YES;
 }
 

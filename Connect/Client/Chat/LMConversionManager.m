@@ -100,7 +100,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 recentModel.headUrl = contact.avatar;
                 recentModel.name = contact.username;
                 recentModel.talkType = GJGCChatFriendTalkTypePrivate;
-                recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+                recentModel.createTime = [NSDate date];
                 recentModel.identifier = lastMessage.messageOwer;
                 recentModel.unReadCount = messageCount;
                 recentModel.chatUser = contact;
@@ -123,7 +123,8 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 if ([[SessionManager sharedManager].chatSession isEqualToString:recentModel.identifier]) {
                     recentModel.unReadCount = 0;
                 }
-                recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+                NSDate *time = [NSDate date];
+                recentModel.createTime = time;
 
                 if (lastMessage.message.type == GJGCChatFriendContentTypeSnapChat) {
                     recentModel.snapChatDeleteTime = [lastMessage.message.content intValue];
@@ -134,7 +135,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
                 [realm beginWriteTransaction];
                 realmModel.unReadCount = recentModel.unReadCount;
-                realmModel.time = recentModel.time;
+                realmModel.createTime = time;
                 realmModel.stranger = recentModel.stranger;
                 realmModel.content = recentModel.content;
                 if (snapChatTime >= 0 &&
@@ -156,7 +157,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 recentModel = [[RecentChatModel alloc] init];
                 recentModel.headUrl = group.avatarUrl;
                 recentModel.name = group.groupName;
-                recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+                recentModel.createTime = [NSDate date];
                 recentModel.identifier = lastMessage.messageOwer;
                 recentModel.unReadCount = messageCount;
                 NSString *sendName = nil;
@@ -185,14 +186,15 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 } else{
                     recentModel.unReadCount += messageCount;
                 }
-                recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+                NSDate *time = [NSDate date];
+                recentModel.createTime = time;
                 
                 //update
                 LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
                 RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
                 [realm beginWriteTransaction];
                 realmModel.unReadCount = recentModel.unReadCount;
-                realmModel.time = recentModel.time;
+                realmModel.createTime = time;
                 realmModel.content = recentModel.content;
                 [realm commitWriteTransaction];
             }
@@ -209,7 +211,8 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 } else{
                     recentModel.unReadCount += messageCount;
                 }
-                recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+                NSDate *time = [NSDate date];
+                recentModel.createTime = time;
                 recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content];
                 
                 
@@ -218,13 +221,13 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
                 [realm beginWriteTransaction];
                 realmModel.unReadCount = recentModel.unReadCount;
-                realmModel.time = recentModel.time;
+                realmModel.createTime = time;
                 realmModel.content = recentModel.content;
                 [realm commitWriteTransaction];
             } else{
                 recentModel = [[RecentChatModel alloc] init];
                 recentModel.talkType = GJGCChatFriendTalkTypePostSystem;
-                recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+                recentModel.createTime = [NSDate date];
                 recentModel.unReadCount = messageCount;
                 recentModel.name = @"Connect";
                 recentModel.headUrl = @"connect_logo";
@@ -247,7 +250,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
         recentModel = [[RecentChatModel alloc] init];
         recentModel.headUrl = group.avatarUrl;
         recentModel.name = group.groupName;
-        recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+        recentModel.createTime = [NSDate date];
         recentModel.identifier = lastMessage.messageOwer;
         recentModel.content = lastMessage.message.content;
         recentModel.unReadCount = messageCount;
@@ -285,14 +288,15 @@ CREATE_SHARED_MANAGER(LMConversionManager)
         } else{
             recentModel.unReadCount += messageCount;
         }
-        recentModel.time = [NSString stringWithFormat:@"%lld",(long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+        NSDate *time = [NSDate date];
+        recentModel.createTime = time;
         
         //update
         LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
         RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
         [realm beginWriteTransaction];
         realmModel.unReadCount = recentModel.unReadCount;
-        realmModel.time = recentModel.time;
+        realmModel.createTime = time;
         realmModel.groupNoteMyself = recentModel.groupNoteMyself;
         realmModel.content = recentModel.content;
         [realm commitWriteTransaction];

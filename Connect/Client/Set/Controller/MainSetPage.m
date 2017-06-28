@@ -151,7 +151,7 @@
     [MBProgressHUD showMessage:LMLocalizedString(@"Set Logging out", nil) toView:self.view];
     [[IMService instance] unBindDeviceTokenWithDeviceToken:[IMService instance].deviceToken complete:^(NSError *error, id data) {
         [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:weakSelf.view];
+            [MBProgressHUD hideHUDForView:self.view];
         }];
         if (!error) {
             [[LKUserCenter shareCenter] loginOutByServerWithInfo:nil];
@@ -160,7 +160,7 @@
                 [[LKUserCenter shareCenter] loginOutByServerWithInfo:nil];
             } else{
                 [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Set Log Out Fail", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Set Log Out Fail", nil) withType:ToastTypeFail showInView:self.view complete:nil];
                 }];
             }
         }

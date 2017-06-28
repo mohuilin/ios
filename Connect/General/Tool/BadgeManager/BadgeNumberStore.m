@@ -28,7 +28,6 @@
     return instance;
 }
 
-
 //-----------------------------------------
 #pragma mark --Get the path to the plist table--
 
@@ -53,7 +52,7 @@
 
 //-----------------------------------------
 - (NSMutableDictionary *)RootDic {
-    // Determine whether the file exists under the path
+    /// Determine whether the file exists under the path
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.plistPath] == NO) {
         // Create a file
         NSFileManager *fm = [NSFileManager defaultManager];
@@ -65,7 +64,7 @@
     } else {
         _RootDic = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistPath];
         if (!_RootDic) {
-            // Create a file
+            /// Create a file
             NSFileManager *fm = [NSFileManager defaultManager];
             [fm createFileAtPath:self.plistPath contents:nil attributes:nil];
             _RootDic = [[NSMutableDictionary alloc] init];
@@ -160,17 +159,6 @@
     NSString *key = [NSString stringWithFormat:@"%lu", type];
     [self.RootDic removeObjectForKey:key];
     [self writeRootDicToPlistFile];
-}
-
-
-- (BadgeNumber *)getBadgeNumberWithChatIdentifier:(NSString *)identifier {
-
-
-    return nil;
-}
-
-- (NSUInteger)getMessageBadgeNumber {
-    return 0;
 }
 
 @end

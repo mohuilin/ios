@@ -104,10 +104,8 @@
     if (!parseDict) {
         parseDict = [[GJGCChatContentEmojiParser sharedParser] parseContent:model.content];
     }
-
     //time
-    int long long sendTime = [model.time integerValue];
-    NSAttributedString *timeA = [RecentChatStyle formateTime:sendTime / 1000];
+    NSAttributedString *timeA = [RecentChatStyle formateTime:[model.createTime timeIntervalSince1970]];
     self.timeLabel.text = timeA.string;
     //last content
     self.contentLabel.attributedText = model.contentAttrStr;

@@ -314,7 +314,7 @@ static FMDatabaseQueue *queue;
         model.headUrl = [resultDict safeObjectForKey:@"avatar"];
         model.draft = [resultDict safeObjectForKey:@"draft"];
         model.stranger = [[resultDict safeObjectForKey:@"stranger"] boolValue];
-        model.time = [[resultDict safeObjectForKey:@"last_time"] stringValue];
+        model.createTime = [NSDate dateWithTimeIntervalSince1970:[[resultDict safeObjectForKey:@"last_time"] longLongValue] / 1000];
         model.unReadCount = [[resultDict safeObjectForKey:@"unread_count"] intValue];
         model.isTopChat = [[resultDict safeObjectForKey:@"top"] boolValue];
         model.groupNoteMyself = [[resultDict safeObjectForKey:@"notice"] boolValue];

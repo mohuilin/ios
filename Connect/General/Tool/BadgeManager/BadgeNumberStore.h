@@ -12,16 +12,11 @@
 @interface BadgeNumberStore : NSObject
 
 #define BadgeNumberPlistName @"appBadgeNumber.plist"
-#define TypeChatMappingPlistName @"typeChatMapping.plist"
 
 /** singleton */
 + (instancetype)shareManager;
 
 - (BadgeNumber *)getBadgeNumber:(NSUInteger)type;
-
-- (BadgeNumber *)getBadgeNumberWithChatIdentifier:(NSString *)identifier;
-
-- (NSUInteger)getMessageBadgeNumber; //Message total badge
 
 - (NSUInteger)getBadgeNumberCountWithMin:(NSUInteger)typeMin max:(NSUInteger)typeMax;
 

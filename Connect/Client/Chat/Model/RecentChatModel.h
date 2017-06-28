@@ -13,7 +13,6 @@
 
 @property(nonatomic, strong) NSString *headUrl;
 @property(nonatomic, strong) NSString *name;
-@property(nonatomic, strong) NSString *time;
 @property(nonatomic, strong) NSString *content;
 
 @property(nonatomic, strong) NSString *identifier;
@@ -38,6 +37,9 @@
 @property (nonatomic ,assign) BOOL groupNoteMyself;
 
 @property (nonatomic ,copy) NSMutableAttributedString *contentAttrStr;
+
+
+@property(nonatomic, strong) NSDate *createTime;
 
 - (NSComparisonResult)comparedata:(RecentChatModel *)r2;
 

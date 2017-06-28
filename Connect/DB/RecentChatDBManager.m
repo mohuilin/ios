@@ -45,14 +45,17 @@ static RecentChatDBManager *manager = nil;
 
 - (NSArray *)getAllRecentChat {
     NSMutableArray *recentChatArrayM = [NSMutableArray array];
-    RLMResults <LMRecentChat *> *results = [LMRecentChat allObjects];
+    RLMResults <LMRecentChat *> *topResults = [[LMRecentChat objectsWhere:@"isTopChat = 1"] sortedResultsUsingKeyPath:@"createTime" ascending:NO];
+    RLMResults <LMRecentChat *> *normalResults = [[LMRecentChat objectsWhere:@"isTopChat = 0"] sortedResultsUsingKeyPath:@"createTime" ascending:NO];
     //model trasfer
-    for (LMRecentChat *realmModel in results) {
+    for (LMRecentChat *realmModel in topResults) {
         RecentChatModel *model = realmModel.normalInfo;
         [recentChatArrayM addObject:model];
     }
-    //sort
-    [recentChatArrayM sortUsingSelector:@selector(comparedata:)];
+    for (LMRecentChat *realmModel in normalResults) {
+        RecentChatModel *model = realmModel.normalInfo;
+        [recentChatArrayM addObject:model];
+    }
     return recentChatArrayM;
 
 }
@@ -185,7 +188,7 @@ static RecentChatDBManager *manager = nil;
                 model.headUrl = user.avatar;
             }
         }
-        model.time = [NSString stringWithFormat:@"%lld", (long long) ([[NSDate date] timeIntervalSince1970] * 1000)];
+        model.createTime = [NSDate date];
         [self save:model];
     } else {
         [self executeRealmWithBlock:^{
@@ -348,20 +351,19 @@ static RecentChatDBManager *manager = nil;
         recentChat = [self getRecentModelByIdentifier:identifier];
     }
     if (recentChat) {
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        NSString *last_time = [NSString stringWithFormat:@"%lld", time];
+        NSDate *time = [NSDate date];
         if (flag) {
             recentChat.unReadCount = 0;
         } else {
             recentChat.unReadCount += 1;
         }
-        recentChat.time = last_time;
+        recentChat.createTime = time;
         recentChat.snapChatDeleteTime = snapTime;
         //update
         LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", recentChat.identifier]] firstObject];
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = recentChat.unReadCount;
-            realmModel.time = recentChat.time;
+            realmModel.createTime = time;
             realmModel.chatSetting.snapChatDeleteTime = recentChat.snapChatDeleteTime;
         }];
     } else {
@@ -375,8 +377,7 @@ static RecentChatDBManager *manager = nil;
         recentChat = [[RecentChatModel alloc] init];
         recentChat.headUrl = contact.avatar;
         recentChat.name = contact.username;
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        recentChat.time = [NSString stringWithFormat:@"%lld", time];
+        recentChat.createTime = [NSDate date];
         recentChat.identifier = identifier;
 
         recentChat.unReadCount = 0;
@@ -399,11 +400,10 @@ static RecentChatDBManager *manager = nil;
     if (GJCFStringIsNull(identifer)) {
         return;
     }
-    int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
     //update
     LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", identifer]] firstObject];
     [self executeRealmWithBlock:^{
-        realmModel.time = [NSString stringWithFormat:@"%lld", time];
+        realmModel.createTime = [NSDate date];
     }];
 }
 
@@ -416,25 +416,22 @@ static RecentChatDBManager *manager = nil;
     }
 
     if (recentChat) {
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        NSString *last_time = [NSString stringWithFormat:@"%lld", time];
+        NSDate *time = [NSDate date];
         if (![[SessionManager sharedManager].chatSession isEqualToString:identifier] && lastContentShowType == 0) {
             recentChat.unReadCount++;
         }
         recentChat.content = content;
-        recentChat.time = last_time;
+        recentChat.createTime = time;
         recentChat.content = content;
         //update
         LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", recentChat.identifier]] firstObject];
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = recentChat.unReadCount;
-            realmModel.time = recentChat.time;
+            realmModel.createTime = time;
             realmModel.content = recentChat.content;
         }];
     } else {
         if (groupChat) {
-            int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-            NSString *timeStr = [NSString stringWithFormat:@"%lld", time];
             LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
             if (GJCFStringIsNull(groupInfo.groupEcdhKey)) {
                 return nil;
@@ -442,7 +439,7 @@ static RecentChatDBManager *manager = nil;
             recentChat = [[RecentChatModel alloc] init];
             recentChat.talkType = GJGCChatFriendTalkTypeGroup;
             recentChat.identifier = identifier;
-            recentChat.time = timeStr;
+            recentChat.createTime = [NSDate date];
             recentChat.content = content;
             if (![[SessionManager sharedManager].chatSession isEqualToString:identifier] && lastContentShowType == 0) {
                 recentChat.unReadCount = 1;
@@ -469,8 +466,7 @@ static RecentChatDBManager *manager = nil;
                 recentChat = [[RecentChatModel alloc] init];
                 recentChat.headUrl = contact.avatar;
                 recentChat.name = contact.normalShowName;
-                int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-                recentChat.time = [NSString stringWithFormat:@"%lld", time];
+                recentChat.createTime = [NSDate date];
                 recentChat.identifier = identifier;
                 recentChat.talkType = GJGCChatFriendTalkTypePrivate;
                 recentChat.content = content;
@@ -482,8 +478,7 @@ static RecentChatDBManager *manager = nil;
                 recentChat = [[RecentChatModel alloc] init];
                 recentChat.headUrl = contact.avatar;
                 recentChat.name = contact.normalShowName;
-                int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-                recentChat.time = [NSString stringWithFormat:@"%lld", time];
+                recentChat.createTime = [NSDate date];
                 recentChat.talkType = GJGCChatFriendTalkTypePostSystem;
                 recentChat.identifier = identifier;
                 recentChat.content = content;
@@ -513,20 +508,18 @@ static RecentChatDBManager *manager = nil;
     }
 
     if (recentChat) {
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        NSString *last_time = [NSString stringWithFormat:@"%lld", time];
+        NSDate *time = [NSDate date];
         if (![[SessionManager sharedManager].chatSession isEqualToString:identifier] && lastContentShowType == 0) {
             recentChat.unReadCount++;
         }
         recentChat.content = content;
-        recentChat.time = last_time;
-
+        recentChat.createTime = time;
         //update
         LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", recentChat.identifier]] firstObject];
 
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = recentChat.unReadCount;
-            realmModel.time = recentChat.time;
+            realmModel.createTime = time;
             realmModel.content = recentChat.content;
         }];
 
@@ -536,9 +529,6 @@ static RecentChatDBManager *manager = nil;
 
     } else {
         if (groupChat) {
-
-            int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-            NSString *timeStr = [NSString stringWithFormat:@"%lld", time];
             LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
             if (GJCFStringIsNull(ecdhKey)) {
                 ecdhKey = groupInfo.groupEcdhKey;
@@ -549,7 +539,7 @@ static RecentChatDBManager *manager = nil;
             recentChat = [[RecentChatModel alloc] init];
             recentChat.talkType = GJGCChatFriendTalkTypeGroup;
             recentChat.identifier = identifier;
-            recentChat.time = timeStr;
+            recentChat.createTime = [NSDate date];
             recentChat.content = content;
             if (![[SessionManager sharedManager].chatSession isEqualToString:identifier] && lastContentShowType == 0) {
                 recentChat.unReadCount = 1;
@@ -576,8 +566,7 @@ static RecentChatDBManager *manager = nil;
             if ([contact.pub_key isEqualToString:kSystemIdendifier]) {
                 recentChat = [[RecentChatModel alloc] init];
                 recentChat.talkType = GJGCChatFriendTalkTypePostSystem;
-                int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-                recentChat.time = [NSString stringWithFormat:@"%lld", time];
+                recentChat.createTime = [NSDate date];
                 recentChat.unReadCount = 0;
                 recentChat.name = @"Connect";
                 recentChat.headUrl = @"connect_logo";
@@ -588,8 +577,7 @@ static RecentChatDBManager *manager = nil;
                 recentChat = [[RecentChatModel alloc] init];
                 recentChat.headUrl = contact.avatar;
                 recentChat.name = contact.normalShowName;
-                int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-                recentChat.time = [NSString stringWithFormat:@"%lld", time];
+                recentChat.createTime = [NSDate date];
                 recentChat.identifier = identifier;
                 recentChat.talkType = GJGCChatFriendTalkTypePrivate;
                 recentChat.content = content;
@@ -618,18 +606,16 @@ static RecentChatDBManager *manager = nil;
         recentChat = [self getRecentModelByIdentifier:user.pub_key];
     }
     if (recentChat) {
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        NSString *last_time = [NSString stringWithFormat:@"%lld", time];
+        NSDate *time = [NSDate date];
         if (![[SessionManager sharedManager].chatSession isEqualToString:user.pub_key]) {
             recentChat.unReadCount++;
         }
-        recentChat.time = last_time;
-
+        recentChat.createTime = time;
         //update
         LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", recentChat.identifier]] firstObject];
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = recentChat.unReadCount;
-            realmModel.time = recentChat.time;
+            realmModel.createTime = time;
             realmModel.content = recentChat.content;
         }];
 
@@ -638,8 +624,7 @@ static RecentChatDBManager *manager = nil;
         recentChat.headUrl = user.avatar;
         recentChat.name = user.username;
         recentChat.stranger = YES;
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        recentChat.time = [NSString stringWithFormat:@"%lld", time];
+        recentChat.createTime = [NSDate date];
         recentChat.identifier = user.pub_key;
         if (![[SessionManager sharedManager].chatSession isEqualToString:recentChat.identifier]) {
             recentChat.unReadCount = 1;
@@ -685,24 +670,22 @@ static RecentChatDBManager *manager = nil;
         if (![[SessionManager sharedManager].chatSession isEqualToString:kSystemIdendifier]) {
             unRead++;
         }
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        NSString *last_time = [NSString stringWithFormat:@"%lld", time];
+        NSDate *time = [NSDate date];
         model.unReadCount = unRead;
         model.content = message.content;
-        model.time = last_time;
+        model.createTime = time;
 
         //update
         LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", model.identifier]] firstObject];
         [self executeRealmWithBlock:^{
             realmModel.unReadCount = model.unReadCount;
-            realmModel.time = model.time;
+            realmModel.createTime = time;
             realmModel.content = model.content;
         }];
     } else {
         model = [[RecentChatModel alloc] init];
         model.talkType = GJGCChatFriendTalkTypePostSystem;
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        model.time = [NSString stringWithFormat:@"%lld", time];
+        model.createTime = [NSDate date];
         if (![[SessionManager sharedManager].chatSession isEqualToString:kSystemIdendifier]) {
             model.unReadCount = 1;
         }

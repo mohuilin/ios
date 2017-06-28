@@ -14,7 +14,6 @@
 
 @property NSString *headUrl;
 @property NSString *name;
-@property NSString *time;
 @property NSString *content;
 @property NSString *identifier;
 @property NSString *draft;
@@ -23,6 +22,7 @@
 @property BOOL groupNoteMyself;
 @property int unReadCount;
 @property int talkType;
+@property (nonatomic ,strong) NSDate *createTime;
 
 @property(nonatomic, strong) LMRecentChatSetting *chatSetting;
 

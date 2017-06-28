@@ -44,13 +44,6 @@
     return _draft;
 }
 
-- (NSString *)time{
-    if (!_time) {
-        _time = @"";
-    }
-    return _time;
-}
-
 - (NSString *)content{
     if (!_content) {
         _content = @"";
@@ -96,8 +89,8 @@
 - (NSComparisonResult)comparedata:(RecentChatModel *)r2 {
 
     RecentChatModel *r1 = self;
-    int long long time1 = [r1.time longLongValue];
-    int long long time2 = [r2.time longLongValue];
+    int long long time1 = [r1.createTime timeIntervalSince1970];
+    int long long time2 = [r2.createTime timeIntervalSince1970];
 
     if (r1.isTopChat && r2.isTopChat) {
         if (time1 > time2) {

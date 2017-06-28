@@ -211,9 +211,7 @@
         [[MessageDBManager sharedManager] saveMessage:messageInfo];
 
         // top session
-        int long long time = [[NSDate date] timeIntervalSince1970] * 1000;
-        NSString *last_time = [NSString stringWithFormat:@"%lld", time];
-        recentModel.time = last_time;
+        recentModel.createTime = [NSDate date];
         [[RecentChatDBManager sharedManager] updataRecentChatLastTimeByIdentifer:recentModel.identifier];
         SendNotify(ConnnectRecentChatChangeNotification, recentModel);
 
