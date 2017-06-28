@@ -204,7 +204,10 @@
 
     NSDictionary *groupDict = [self.groupsFriend objectAtIndex:indexPath.section];
     NSArray *items = [groupDict valueForKey:@"items"];
-    id data = [items objectAtIndex:indexPath.row];
+    id data = nil;
+    if (items.count > 0) {
+      data = [items objectAtIndex:indexPath.row];
+    }
     if (indexPath.section == 0) {
         NewFriendTipCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NewFriendTipCellID" forIndexPath:indexPath];
         cell.data = data;

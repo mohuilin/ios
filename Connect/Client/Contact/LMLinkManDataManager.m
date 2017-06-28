@@ -317,11 +317,11 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
 - (void)addNotification {
     RegisterNotify(ConnnectUserAddressChangeNotification, @selector(AddressBookChange:));
-    RegisterNotify(ConnnectDownAllCommonGroupCompleteNotification, @selector(downAllCommomGroup:));
+    
     RegisterNotify(kFriendListChangeNotification, @selector(downAllContacts));
     
     
-    
+//    RegisterNotify(ConnnectDownAllCommonGroupCompleteNotification, @selector(downAllCommomGroup:));
 //    RegisterNotify(BadgeNumberManagerBadgeChangeNotification, @selector(badgeValueChange));
 //    RegisterNotify(kNewFriendRequestNotification, @selector(newFriendRequest:));
 //    RegisterNotify(kAcceptNewFriendRequestNotification, @selector(addNewUser:));
@@ -476,26 +476,6 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
             }];
 }
-/**
- * download all data
- */
-- (void)downAllCommomGroup:(NSNotification *)note {
-    NSInteger count = [note.object integerValue];
-    if (count != self.commonGroup.count) {
-        [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
-            [GCDQueue executeInMainQueue:^{
-                [self.commonGroup removeAllObjects];
-                for (LMGroupInfo *group in groups) {
-                    if (![self.commonGroup containsObject:group]) {
-                        [self.commonGroup objectAddObject:group];
-                    }
-                }
-                [self detailGroupFriendFormat];
-            }];
-        }];
-    }
-}
-
 - (void)clearUnreadCountWithType:(int)type {
     [[BadgeNumberManager shareManager] clearBadgeNumber:ALTYPE_CategoryTwo_NewFriend Completion:^{
         self.friendNewItem.addMeUser = nil;
