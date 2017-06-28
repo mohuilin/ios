@@ -7,68 +7,73 @@
 //
 
 #import "BadgeNumberStore.h"
-#import "RecentChatDBManager.h"
-@interface BadgeNumberStore()
 
-@property(nonatomic,copy) NSString *plistPath;
+@interface BadgeNumberStore ()
 
-@property(nonatomic,strong) NSMutableDictionary * RootDic;
+@property(nonatomic, copy) NSString *plistPath;
+
+@property(nonatomic, strong) NSMutableDictionary *RootDic;
 
 @end
 
 @implementation BadgeNumberStore
 
-+ (instancetype)shareManager
-{
++ (instancetype)shareManager {
     static dispatch_once_t onceToken;
     static BadgeNumberStore *instance = nil;
     dispatch_once(&onceToken, ^{
-        instance = [[BadgeNumberStore alloc]init];
+        instance = [[BadgeNumberStore alloc] init];
     });
-    
-    return  instance;
+
+    return instance;
 }
 
 
 //-----------------------------------------
 #pragma mark --Get the path to the plist table--
+
 //-----------------------------------------
-- (NSString *)plistPath
-{
-    NSArray * path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+- (NSString *)plistPath {
+    NSArray *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *docPath = [path objectAtIndexCheck:0];
-    NSString * folderPath = [docPath stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address];
+    NSString *folderPath = [docPath stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address];
     if (![[NSFileManager defaultManager] fileExistsAtPath:folderPath]) {
         // Create a directory
         [[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:nil];
     }
-    
+
     _plistPath = [folderPath stringByAppendingPathComponent:BadgeNumberPlistName];
-    
-    DDLogInfo(@"plistPath===%@",_plistPath);
+
+    DDLogInfo(@"plistPath===%@", _plistPath);
     return _plistPath;
 }
 
 //-----------------------------------------
 #pragma mark -- Get rootDiC -
+
 //-----------------------------------------
-- (NSMutableDictionary *)RootDic
-{
+- (NSMutableDictionary *)RootDic {
     // Determine whether the file exists under the path
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.plistPath] == NO) {
-        
         // Create a file
-        NSFileManager * fm = [NSFileManager defaultManager];
+        NSFileManager *fm = [NSFileManager defaultManager];
         [fm createFileAtPath:self.plistPath contents:nil attributes:nil];
-        _RootDic = [[NSMutableDictionary alloc]init];
+        _RootDic = [[NSMutableDictionary alloc] init];
         if ([_RootDic allValues].count > 0) {
             [_RootDic writeToFile:self.plistPath atomically:YES];
         }
-    }else
-    {
-        _RootDic = [[NSMutableDictionary alloc]initWithContentsOfFile:self.plistPath];
+    } else {
+        _RootDic = [[NSMutableDictionary alloc] initWithContentsOfFile:self.plistPath];
+        if (!_RootDic) {
+            // Create a file
+            NSFileManager *fm = [NSFileManager defaultManager];
+            [fm createFileAtPath:self.plistPath contents:nil attributes:nil];
+            _RootDic = [[NSMutableDictionary alloc] init];
+            if ([_RootDic allValues].count > 0) {
+                [_RootDic writeToFile:self.plistPath atomically:YES];
+            }
+        }
     }
-    
     return _RootDic;
 }
 
@@ -77,13 +82,12 @@
 
 //-----------------------------------------
 #pragma mark -- 讲 rootDic 写入 plist--
+
 //-----------------------------------------
--(void)writeRootDicToPlistFile
-{
+- (void)writeRootDicToPlistFile {
     if (_RootDic) {
         [_RootDic writeToFile:self.plistPath atomically:YES];
-    }else
-    {
+    } else {
         DDLogError(@"_RootDic not exiset");
     }
 }
@@ -97,16 +101,15 @@
    *
    * @return BadgeNumber object
  */
-- (BadgeNumber *)getBadgeNumber:(NSUInteger) type
-{
-    NSString *key = [NSString stringWithFormat:@"%lu",type];
+- (BadgeNumber *)getBadgeNumber:(NSUInteger)type {
+    NSString *key = [NSString stringWithFormat:@"%lu", type];
     NSDictionary *objDic = [self.RootDic objectForKey:key];
     if (objDic) {
-        BadgeNumber * badge = [[BadgeNumber alloc]init];
+        BadgeNumber *badge = [[BadgeNumber alloc] init];
         [badge setValuesForKeysWithDictionary:objDic];
         return badge;
     }
-    
+
     return nil;
 }
 
@@ -117,12 +120,11 @@
  *
  *  @return
  */
-- (NSUInteger)getBadgeNumberCountWithMin:(NSUInteger)typeMin max:(NSUInteger)typeMax
-{
+- (NSUInteger)getBadgeNumberCountWithMin:(NSUInteger)typeMin max:(NSUInteger)typeMax {
     NSUInteger count = 0;
     NSArray *allValues = [self.RootDic allValues];
-    for (NSDictionary * objDic in allValues) {
-        BadgeNumber * badge = [BadgeNumber mj_objectWithKeyValues:objDic];
+    for (NSDictionary *objDic in allValues) {
+        BadgeNumber *badge = [BadgeNumber mj_objectWithKeyValues:objDic];
         if (badge.type >= typeMin && badge.type <= typeMax) {
             count += badge.count;
         }
@@ -136,16 +138,14 @@
    *
    * @param badgeNumber
  */
-- (BOOL)setBadgeNumber:(BadgeNumber *)badgeNumber
-{
+- (BOOL)setBadgeNumber:(BadgeNumber *)badgeNumber {
     if (badgeNumber) {
-        NSString * key = [NSString stringWithFormat:@"%lu",badgeNumber.type];
+        NSString *key = [NSString stringWithFormat:@"%lu", badgeNumber.type];
         NSDictionary *objDic = [badgeNumber mj_JSONObject];
         [self.RootDic setObject:objDic forKey:key];
         [self writeRootDicToPlistFile];
         return YES;
-    }else
-    {
+    } else {
         DDLogInfo(@"badgeNumber  == nil");
         return NO;
     }
@@ -156,21 +156,20 @@
    *
    * @param type
  */
-- (void)clearBadgeNumber:(NSUInteger) type
-{
-    NSString *key = [NSString stringWithFormat:@"%lu",type];
+- (void)clearBadgeNumber:(NSUInteger)type {
+    NSString *key = [NSString stringWithFormat:@"%lu", type];
     [self.RootDic removeObjectForKey:key];
     [self writeRootDicToPlistFile];
 }
 
 
-- (BadgeNumber *)getBadgeNumberWithChatIdentifier:(NSString *)identifier{
-    
-    
+- (BadgeNumber *)getBadgeNumberWithChatIdentifier:(NSString *)identifier {
+
+
     return nil;
 }
 
-- (NSUInteger)getMessageBadgeNumber{
+- (NSUInteger)getMessageBadgeNumber {
     return 0;
 }
 

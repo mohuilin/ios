@@ -10,15 +10,12 @@
 
 @implementation BadgeNumber
 
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"{ type = %lu , count = %lu , displayMode = %lu }",self.type,self.count,self.displayMode];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"{ type = %lu , count = %lu , displayMode = %lu }", self.type, self.count, self.displayMode];
 }
 
 
-
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.displayMode = ALDisplayMode_Dot;

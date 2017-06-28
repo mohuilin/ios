@@ -22,14 +22,14 @@ typedef enum : NSUInteger {
  * The index that belongs to the beginning of the second ALCategory_One message
  */
 typedef enum : NSUInteger {
-    ALTYPE_CategoryTwo_ChatBadgeBegin =  (ALCategory_One << 16) + 0x1,  // begin
+    ALTYPE_CategoryTwo_ChatBadgeBegin = (ALCategory_One << 16) + 0x1,  // begin
 } ALTYPE_CategoryOne;
 
 /**
  * Belongs to the second ALCategoryTwo number type definition
  */
 typedef enum : NSUInteger {
-    ALTYPE_CategoryTwo_NewFriend =  (ALCategory_Two << 16) + 0x1,  // New friend
+    ALTYPE_CategoryTwo_NewFriend = (ALCategory_Two << 16) + 0x1,  // New friend
     ALTYPE_CategoryTwo_PhoneContact = (ALCategory_Two << 16) + 0x2,  //Phone contact person
 } ALTYPE_CategoryTwo;
 
@@ -41,11 +41,11 @@ typedef enum : NSUInteger {
 @interface BadgeNumber : NSObject
 
 /** type */
-@property (nonatomic,assign) NSUInteger  type;
+@property(nonatomic, assign) NSUInteger type;
 
 /** number */
-@property (nonatomic,assign) NSUInteger  count;
+@property(nonatomic, assign) NSUInteger count;
 /** The display type defaults to red dot*/
-@property (nonatomic,assign) ALDisplayMode displayMode;
+@property(nonatomic, assign) ALDisplayMode displayMode;
 
 @end

@@ -10,8 +10,11 @@
 #import "BadgeNumberStore.h"
 
 typedef void(^setBadgeCompletion)(BOOL result);
-typedef void(^getBadgeCompletion)(BadgeNumber * badgeNumber);
+
+typedef void(^getBadgeCompletion)(BadgeNumber *badgeNumber);
+
 typedef void(^getBadgeCountCompletion)(NSUInteger count);
+
 typedef void(^clearBadgeCompletion)();
 
 @interface BadgeNumberManager : NSObject

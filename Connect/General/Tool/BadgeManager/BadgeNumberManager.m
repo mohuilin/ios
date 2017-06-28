@@ -10,14 +10,13 @@
 
 @implementation BadgeNumberManager
 
-+ (instancetype)shareManager
-{
++ (instancetype)shareManager {
     static dispatch_once_t onceToken;
     static BadgeNumberManager *instance = nil;
     dispatch_once(&onceToken, ^{
-        instance = [[BadgeNumberManager alloc]init];
+        instance = [[BadgeNumberManager alloc] init];
     });
-    return  instance;
+    return instance;
 }
 
 
@@ -28,11 +27,10 @@
    * Set badgeNumber
    * (Asynchronous)
  */
-- (void)setBadgeNumber:(BadgeNumber *)badgeNumber Completion:(setBadgeCompletion)completion
-{
+- (void)setBadgeNumber:(BadgeNumber *)badgeNumber Completion:(setBadgeCompletion)completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         BOOL result = [[BadgeNumberStore shareManager] setBadgeNumber:badgeNumber];
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             SendNotify(BadgeNumberManagerBadgeChangeNotification, nil);
             if (completion) {
@@ -45,10 +43,9 @@
 /**
  *  Asynchronous return BadgeNumber
  */
-- (void)getBadgeNumber:(NSUInteger)type Completion:(getBadgeCompletion)completion
-{
+- (void)getBadgeNumber:(NSUInteger)type Completion:(getBadgeCompletion)completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        BadgeNumber * badge = [[BadgeNumberStore shareManager]getBadgeNumber:type];
+        BadgeNumber *badge = [[BadgeNumberStore shareManager] getBadgeNumber:type];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) {
                 completion(badge);
@@ -60,10 +57,9 @@
 /**
  *  Asynchronous access to count
  */
-- (void)getBadgeNumberCountWithMin:(NSUInteger)typeMin max:(NSUInteger)typeMax Completion:(getBadgeCountCompletion)completion
-{
+- (void)getBadgeNumberCountWithMin:(NSUInteger)typeMin max:(NSUInteger)typeMax Completion:(getBadgeCountCompletion)completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        NSUInteger count = [[BadgeNumberStore shareManager]getBadgeNumberCountWithMin:typeMin max:typeMax];
+        NSUInteger count = [[BadgeNumberStore shareManager] getBadgeNumberCountWithMin:typeMin max:typeMax];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) {
                 completion(count);
@@ -75,15 +71,14 @@
 /**
  *  Asynchronous Clear BadgeNumber
  */
-- (void)clearBadgeNumber:(NSUInteger)type Completion:(clearBadgeCompletion)completion
-{
+- (void)clearBadgeNumber:(NSUInteger)type Completion:(clearBadgeCompletion)completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [[BadgeNumberStore shareManager] clearBadgeNumber:type];
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
-            
+
             SendNotify(BadgeNumberManagerBadgeChangeNotification, nil);
-            
+
             if (completion) {
                 completion();
             }

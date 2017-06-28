@@ -17,7 +17,7 @@
 /** singleton */
 + (instancetype)shareManager;
 
-- (BadgeNumber *)getBadgeNumber:(NSUInteger) type;
+- (BadgeNumber *)getBadgeNumber:(NSUInteger)type;
 
 - (BadgeNumber *)getBadgeNumberWithChatIdentifier:(NSString *)identifier;
 
@@ -27,6 +27,6 @@
 
 - (BOOL)setBadgeNumber:(BadgeNumber *)badgeNumber;
 
-- (void)clearBadgeNumber:(NSUInteger) type;
+- (void)clearBadgeNumber:(NSUInteger)type;
 
 @end
