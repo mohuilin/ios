@@ -325,6 +325,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
                         [[YYImageCache sharedCache] removeImageForKey:weakSelf.talkModel.chatGroupInfo.avatarUrl];
                         [MBProgressHUD hideHUDForView:weakSelf.view];
                         SendNotify(ConnnectQuitGroupNotification, weakSelf.talkModel.chatIdendifier);
+                        [[GroupDBManager sharedManager] deletegroupWithGroupId:weakSelf.talkModel.chatIdendifier];
                         [weakSelf.navigationController popToRootViewControllerAnimated:NO];
                     } else {
                         [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat Network connection failed please check network", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];

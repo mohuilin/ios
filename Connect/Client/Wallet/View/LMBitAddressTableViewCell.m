@@ -28,7 +28,7 @@
     self.BitAddressLabel.font = [UIFont systemFontOfSize:FONT_SIZE(26)];
 }
 
-- (void)setAddressWithAddressBookInfo:(AddressBookInfo *)info {
+- (void)setAddressWithAddressBookInfo:(LMRamAddressBook *)info {
     self.listLabel.text = info.tag;
     self.BitAddressLabel.text = info.address;
 }

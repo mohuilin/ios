@@ -7,9 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AddressBookInfo.h"
 
+#import "LMRamAddressBook.h"
 @interface LMBitAddressTableViewCell : UITableViewCell
 
-- (void)setAddressWithAddressBookInfo:(AddressBookInfo *)info;
+- (void)setAddressWithAddressBookInfo:(LMRamAddressBook *)info;
 @end

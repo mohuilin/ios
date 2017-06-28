@@ -10,6 +10,7 @@
 #import "MMGlobal.h"
 #import "NSString+Hash.h"
 #import "NSDictionary+LMSafety.h"
+#import <Realm/Realm.h>
 
 @interface BaseDB : NSObject
 

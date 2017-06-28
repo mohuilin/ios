@@ -130,6 +130,11 @@
  * @return
  */
 - (NSArray *)getAllNewFirendRequest;
+/**
+ * get all new friend request
+ * @return
+ */
+- (RLMResults *)getAllNewFriendResults;
 
 /**
  * get friend request

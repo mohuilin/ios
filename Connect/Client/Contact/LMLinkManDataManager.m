@@ -22,6 +22,7 @@
 #import "LMContactAccountInfo.h"
 #import "LMRamGroupInfo.h"
 #import "NSString+Pinyin.h"
+#import "LMFriendRequestInfo.h"
 
 
 @interface LMLinkManDataManager ()<NSMutableCopying>
@@ -45,10 +46,13 @@
 
 @property (nonatomic ,strong) RLMResults *contactResults;
 @property (nonatomic ,strong) RLMResults *commonGroupResults;
+@property (nonatomic ,strong) RLMResults *allNewFriendRequest;
 
 
 @property (nonatomic ,strong) RLMNotificationToken *contactResultsToken;
 @property (nonatomic ,strong) RLMNotificationToken *commonGroupResultsToken;
+@property (nonatomic, strong) RLMNotificationToken *allNewFriendRequestTolen;
+
 
 @end
 
@@ -61,11 +65,10 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
     if (self = [super init]) {
         [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
             [GCDQueue executeInMainQueue:^{
+                [self.commonGroup removeAllObjects];
                 for (LMGroupInfo *group in groups) {
                     if (![self.commonGroup containsObject:group]) {
                         [self.commonGroup objectAddObject:group];
-                    } else {
-                        [self.commonGroup replaceObjectAtIndex:[self.commonGroup indexOfObject:group] withObject:group];
                     }
                 }
                 [self formartFiendsGrouping];
@@ -78,7 +81,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
 }
 
-#pragma mark -  懒加载
+#pragma mark -  lazy
 
 - (NSMutableArray *)friendsArr {
     if (!_friendsArr) {
@@ -134,7 +137,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
     return _indexs;
 }
 
-#pragma mark - lazy
+#pragma mark - back methods
 
 - (NSMutableArray *)getListCommonGroup {
     return self.commonGroup;
@@ -158,7 +161,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 }
 - (NSMutableArray *)getListGroupsFriend:(AccountInfo *)shareContact {
     
-    if (shareContact.address.length <= 0 || self.groupsFriend.count <= 1) {
+    if (self.groupsFriend.count <= 1) {
         return nil;
     }
     //get prex
@@ -268,7 +271,30 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
     self.friendNewItem = nil;
 }
-
+/**
+ *  detail user array
+ */
+- (void)detailGroupFriendFormat {
+    NSArray *contacts = [[UserDBManager sharedManager] getAllUsers];
+    [self.offenFriends removeAllObjects];
+    [self.normalFriends removeAllObjects];
+    [self.friendsArr removeAllObjects];
+    for (AccountInfo *contact in contacts) {
+        if (contact.isOffenContact) {
+            if (![self.offenFriends containsObject:contact]) {
+                [self.offenFriends objectAddObject:contact];
+            }
+        } else {
+            if (![self.normalFriends containsObject:contact]) {
+                [self.normalFriends objectAddObject:contact];
+            }
+        }
+        if (![self.friendsArr containsObject:contact]) {
+            [self.friendsArr objectAddObject:contact];
+        }
+    }
+    [self addDataToGroupArray];
+}
 /**
  *  get all user array
  */
@@ -282,7 +308,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
                     [self.commonGroup objectAddObject:group];
                 }
             }
-            [self formartFiendsGrouping];
+            [self detailGroupFriendFormat];
         }];
     }];
 }
@@ -290,19 +316,9 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 #pragma mark - notification method
 
 - (void)addNotification {
-    RegisterNotify(kAcceptNewFriendRequestNotification, @selector(addNewUser:));
-    RegisterNotify(kFriendListChangeNotification, @selector(downAllContacts));
-    RegisterNotify(kNewFriendRequestNotification, @selector(newFriendRequest:));
-//    RegisterNotify(ConnnectContactDidChangeNotification, @selector(ContactChange:));
-    RegisterNotify(ConnnectContactDidChangeDeleteUserNotification, @selector(deleteUser:));
     RegisterNotify(ConnnectUserAddressChangeNotification, @selector(AddressBookChange:));
-//    RegisterNotify(ConnnectRemoveCommonGroupNotification, @selector(RemoveCommonGroup:));
-//    RegisterNotify(ConnnectAddCommonGroupNotification, @selector(AddCommonGroup:));
-    RegisterNotify(ConnnectDownAllCommonGroupCompleteNotification, @selector(downAllCommomGroup:));
-    RegisterNotify(BadgeNumberManagerBadgeChangeNotification, @selector(badgeValueChange));
-    RegisterNotify(ConnnectQuitGroupNotification, @selector(quitGroup:));
-//    RegisterNotify(ConnectUpdateMyNickNameNotification, @selector(groupNicknameChange));
-//    RegisterNotify(ConnnectGroupInfoDidChangeNotification, @selector(groupInfoChnage:));
+    RegisterNotify(kFriendListChangeNotification, @selector(downAllContacts));
+    
     CFErrorRef *error = nil;
     ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(nil, error);
     if (!error) {
@@ -446,240 +462,12 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
             }];
 }
-
-/**
- *  group mesage exchange
- */
-- (void)groupInfoChnage:(NSNotification *)note {
-    [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *commonGroups) {
-        [GCDQueue executeInMainQueue:^{
-            for (LMGroupInfo *group in commonGroups) {
-                if (![self.commonGroup containsObject:group]) {
-                    [self.commonGroup objectAddObject:group];
-                } else {
-                    [self.commonGroup replaceObjectAtIndex:[self.commonGroup indexOfObject:group] withObject:group];
-                }
-            }
-            [self formartFiendsGrouping];
-        }];
-    }];
-
-}
-
-
-/**
- *  group nick exchange
- */
-- (void)groupNicknameChange {
-    [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
-        [GCDQueue executeInMainQueue:^{
-            // replace data
-            for (LMGroupInfo *group in groups) {
-                if (![self.commonGroup containsObject:group]) {
-                    [self.commonGroup objectAddObject:group];
-                } else {
-                    [self.commonGroup replaceObjectAtIndex:[self.commonGroup indexOfObject:group] withObject:group];
-                }
-            }
-            if (groups.count > 0) {
-                if ([self.delegate respondsToSelector:@selector(listChange:withTabBarCount:)]) {
-                    [self.delegate listChange:self.groupsFriend withTabBarCount:self.redCount];
-                }
-            }
-        }];
-    }];
-}
-
-/**
- * quit group
- */
-- (void)quitGroup:(NSNotification *)note {
-    NSString *groupid = note.object;
-    if (GJCFStringIsNull(groupid)) {
-        return;
-    }
-    // delete common man
-    for (LMGroupInfo *group in self.commonGroup) {
-        if ([group.groupIdentifer isEqualToString:groupid]) {
-            [[GroupDBManager sharedManager] deletegroupWithGroupId:group.groupIdentifer];
-            [self.commonGroup removeObject:group];
-            // exchange ui
-            NSInteger index = 1;
-            if (self.offenFriends.count > 0) {
-                index = 2;
-            }
-            NSMutableDictionary *commonGroup = [self.groupsFriend objectAtIndexCheck:index];
-            if (self.commonGroup.count <= 0) {
-                [self.groupsFriend removeObject:commonGroup];
-                if ([self.delegate respondsToSelector:@selector(listChange:withTabBarCount:)]) {
-                    [self.delegate listChange:self.groupsFriend withTabBarCount:self.redCount];
-                }
-            } else {
-                if ([self.delegate respondsToSelector:@selector(listChange:withTabBarCount:)]) {
-                    [self.delegate listChange:self.groupsFriend withTabBarCount:self.redCount];
-                }
-            }
-            break;
-        }
-    }
-}
-
-- (void)badgeValueChange {
-    [self reloadBadgeValue];
-}
-
-/**
- * download all data
- */
-- (void)downAllCommomGroup:(NSNotification *)note {
-    NSInteger count = [note.object integerValue];
-    if (count != self.commonGroup.count) {
-        [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
-            [GCDQueue executeInMainQueue:^{
-                for (LMGroupInfo *group in groups) {
-                    if (![self.commonGroup containsObject:group]) {
-                        [self.commonGroup objectAddObject:group];
-                    } else {
-                        [self.commonGroup replaceObjectAtIndex:[self.commonGroup indexOfObject:group] withObject:group];
-                    }
-                }
-                [self formartFiendsGrouping];
-            }];
-        }];
-    }
-}
-
-/**
- *  join common group
- */
-- (void)AddCommonGroup:(NSNotification *)note {
-    NSString *identifier = note.object;
-    if (GJCFStringIsNull(identifier)) {
-        return;
-    }
-    NSInteger index = 1;
-    if (self.offenFriends.count > 0) {
-        index = 2;
-    }
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
-    // filter
-    if (![self.commonGroup containsObject:group]) {
-        if (group != nil) {
-            [self.commonGroup objectAddObject:group];
-        }
-    }
-    if (self.commonGroup.count == 1) {
-        self.commonGroup = [[GroupDBManager sharedManager] commonGroupList].mutableCopy;
-        NSMutableDictionary *commonGroup = [NSMutableDictionary dictionary];
-        commonGroup[@"title"] = LMLocalizedString(@"Link Group Common", nil);
-        commonGroup[@"titleicon"] = @"contract_group_chat";
-        commonGroup[@"items"] = self.commonGroup;
-        if (self.groupsFriend.count <= 0) {
-            index = 0;
-        }
-        [_groupsFriend objectInsert:commonGroup atIndex:index];
-
-    }
-    if ([self.delegate respondsToSelector:@selector(listChange:withTabBarCount:)]) {
-        [self.delegate listChange:self.groupsFriend withTabBarCount:self.redCount];
-    }
-}
-
-/**
- *  delete common group
- */
-- (void)RemoveCommonGroup:(NSNotification *)note {
-
-    NSString *identifier = note.object;
-    if (GJCFStringIsNull(identifier)) {
-        return;
-    }
-    NSInteger index = 1;
-    if (self.offenFriends.count > 0) {
-        index = 2;
-    }
-    NSMutableDictionary *commonGroup = [self.groupsFriend objectAtIndexCheck:index];
-    for (LMGroupInfo *group in self.commonGroup) {
-        if ([group.groupIdentifer isEqualToString:identifier]) {
-            [self.commonGroup removeObject:group];
-            break;
-        }
-    }
-    if (self.commonGroup.count <= 0) {
-        [self.groupsFriend removeObject:commonGroup];
-    }
-    if ([self.delegate respondsToSelector:@selector(listChange:withTabBarCount:)]) {
-        [self.delegate listChange:self.groupsFriend withTabBarCount:self.redCount];
-    }
-}
-
 - (void)clearUnreadCountWithType:(int)type {
     [[BadgeNumberManager shareManager] clearBadgeNumber:ALTYPE_CategoryTwo_NewFriend Completion:^{
         self.friendNewItem.addMeUser = nil;
         [self reloadBadgeValue];
     }];
 }
-
-/**
- *  delete user
- */
-- (void)deleteUser:(NSNotification *)note {
-    AccountInfo *userInfo = note.object;
-    if (!userInfo) {
-        return;
-    }
-    for (AccountInfo *user in self.offenFriends) {
-        if ([userInfo.address isEqualToString:user.address]) {
-            [self.offenFriends removeObject:user];
-            break;
-        }
-    }
-    for (AccountInfo *user in self.friendsArr) {
-        if ([userInfo.address isEqualToString:user.address]) {
-            [self.friendsArr removeObject:user];
-            break;
-        }
-    }
-    for (AccountInfo *user in self.normalFriends) {
-        if ([userInfo.address isEqualToString:user.address]) {
-            [self.normalFriends removeObject:user];
-            break;
-        }
-    }
-    [self addDataToGroupArray];
-}
-
-/**
- * contact exchange
- */
-- (void)ContactChange:(NSNotification *)note {
-
-    AccountInfo *changeUser = note.object;
-    if (!changeUser) {
-        return;
-    }
-    if (!changeUser.isOffenContact && [self.offenFriends containsObject:changeUser]) {
-        [self.offenFriends removeObject:changeUser];
-    } else if (changeUser.isOffenContact) {
-        [self.normalFriends removeObject:changeUser];
-    }
-    [self formartFiendsGrouping];
-    return;
-}
-
-/**
- *  new friend request
- */
-- (void)newFriendRequest:(NSNotification *)note {
-
-    AccountInfo *newFriend = note.object;
-    if (!newFriend) {
-        return;
-    }
-    self.friendNewItem.addMeUser = newFriend;
-    [self reloadBadgeValue];
-}
-
 - (void)reloadBadgeValue {
     //badge
     [[BadgeNumberManager shareManager] getBadgeNumberCountWithMin:ALTYPE_CategoryTwo_NewFriend max:ALTYPE_CategoryTwo_PhoneContact Completion:^(NSUInteger count) {
@@ -707,31 +495,16 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
  *  get all contacts
  */
 - (void)downAllContacts {
-    [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *commonGroups) {
-        [self.commonGroup removeAllObjects];
-        self.commonGroup = commonGroups.mutableCopy;
-        [self formartFiendsGrouping];
-    }];
-}
-
-/**
- *  add new user
- */
-- (void)addNewUser:(NSNotification *)note {
-    AccountInfo *userInfo = note.object;
-
-    if (!userInfo) {
-        return;
-    }
-    [self formartFiendsGrouping];
+    [self detailGroupFriendFormat];
 }
 
 - (void)formartFiendsGrouping {
     
     if (!self.contactResults ||
-        !self.commonGroupResults) {
+        !self.commonGroupResults||!self.allNewFriendRequest) {
         self.contactResults = [[UserDBManager sharedManager] getRealmUsers];
         self.commonGroupResults = [[GroupDBManager sharedManager] realmCommonGroupList];
+        self.allNewFriendRequest = [[UserDBManager sharedManager] getAllNewFriendResults];
         __weak __typeof(&*self)weakSelf = self;
         //register notification
         self.contactResultsToken = [self.contactResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
@@ -776,6 +549,22 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
                 [weakSelf addDataToGroupArray];
             }
         }];
+        self.allNewFriendRequestTolen = [self.allNewFriendRequest addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+            if (!error) {
+                
+                DDLogInfo(@"%@",results);
+                LMFriendRequestInfo *friendRequestInfo = [results lastObject];
+                if (friendRequestInfo) {
+                    AccountInfo *newFriend = (AccountInfo *)friendRequestInfo.normalInfo;
+                    if (!newFriend) {
+                        return;
+                    }
+                    weakSelf.friendNewItem.addMeUser = newFriend;
+                    [weakSelf reloadBadgeValue];
+                }
+            }
+        }];
+        
     }
 }
 
@@ -835,7 +624,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
     [self.groupsFriend objectAddObject:newGroup];
     
     // common
-    if (self.offenFriends.count) {
+    if (self.offenFriends.count > 0) {
         NSMutableDictionary *offenFriendGroup = [NSMutableDictionary dictionary];
         offenFriendGroup[@"title"] = LMLocalizedString(@"Link Favorite Friend", nil);
         offenFriendGroup[@"titleicon"] = @"table_header_favorite";
@@ -843,7 +632,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         [self.groupsFriend objectAddObject:offenFriendGroup];
     }
     // common group
-    if (self.commonGroup.count) {
+    if (self.commonGroup.count > 0) {
         NSMutableDictionary *commonGroup = [NSMutableDictionary dictionary];
         commonGroup[@"title"] = LMLocalizedString(@"Link Group Common", nil);
         commonGroup[@"titleicon"] = @"contract_group_chat";
@@ -871,6 +660,8 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
     [self.contactResultsToken stop];
     self.contactResultsToken = nil;
     self.commonGroupResultsToken = nil;
+    [self.allNewFriendRequestTolen stop];
+    self.allNewFriendRequestTolen = nil;
 }
 
 @end

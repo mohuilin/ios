@@ -361,7 +361,7 @@
 "Link contact count group count"="%1$d位联系人,%2$d个群组";
 "Link contact loading failed check the contact pression"="获取联系人失败，请到手机设置中检查联系人权限";
 "Link enter the group"="%@加入群聊";
-"Link group count"=",%d个群组";
+"Link group count"="%d个群组";
 "Link have joined the group"="你已经加入这个群组";
 "Link invite encrypted chat with APP Download"="%@ 邀请您使用Connect开始加密聊天，Connect是一个开源的P2P加密聊天APP。下载地址: https://connect.im";
 "Link invite you to start encrypted chat with Connect"="%@邀请你使用Connect加密聊天";

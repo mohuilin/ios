@@ -227,6 +227,12 @@ static UserDBManager *manager = nil;
     }
     return modelArray;
 }
+- (RLMResults *)getAllNewFriendResults {
+    
+    RLMResults <LMFriendRequestInfo *> *results = [LMFriendRequestInfo allObjects];
+    return results;
+}
+
 
 - (AccountInfo *)getFriendRequestBy:(NSString *)address {
     if (GJCFStringIsNull(address)) {

@@ -21,13 +21,13 @@
 
 @implementation NewFriendCell
 - (IBAction)rithtButtonAction:(id)sender {
-    AccountInfo *user = (AccountInfo *)self.data;
-    if (user.recommandStatus != 1) {
+    if ([self.data isKindOfClass:[AccountInfo class]]) {
+        AccountInfo *user = (AccountInfo *)self.data;
         user.customOperation?user.customOperation():nil;
-    }else  // recommand man
-    {
+    }else {
         if (self.addButtonBlock) {
-            self.addButtonBlock(user);
+            LMFriendRecommandInfo *recommandInfo = (LMFriendRecommandInfo *)self.data;
+            self.addButtonBlock(recommandInfo);
         }
     }
 }
@@ -58,13 +58,12 @@
     [_addButton setBackgroundImage:[UIImage imageWithColor:XCColor(55, 198, 92)] forState:UIControlStateNormal];
     [_addButton setBackgroundImage:[UIImage imageWithColor:XCColor(242, 242, 242)] forState:UIControlStateDisabled];
     [_addButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
-
+    
 }
 
 - (void)setData:(id)data{
     [super setData:data];
-     AccountInfo *user = (AccountInfo *)data;
-    if (user.recommandStatus!=1) {
+    if ([data isKindOfClass:[AccountInfo class]]) {
         AccountInfo *user = (AccountInfo *)data;
         self.messageLabel.hidden = NO;
         if (user.remarks && user.remarks.length) {
@@ -100,14 +99,15 @@
         [self.avatarView setPlaceholderImageWithAvatarUrl:user.avatar];
     }else   // recommand man
     {
-         self.messageLabel.hidden = YES;
-        [_addButton setTitle:LMLocalizedString(@"Link Add", nil) forState:UIControlStateNormal];
-        _addButton.enabled = YES;
-        _nameLabel.text = user.username;
-        [self.avatarView setPlaceholderImageWithAvatarUrl:user.avatar];
+        if ([data isKindOfClass:[LMFriendRecommandInfo class]]) {
+            LMFriendRecommandInfo *recommandInfo = (LMFriendRecommandInfo *)data;
+            self.messageLabel.hidden = YES;
+            [_addButton setTitle:LMLocalizedString(@"Link Add", nil) forState:UIControlStateNormal];
+            _addButton.enabled = YES;
+            _nameLabel.text = recommandInfo.username;
+            [self.avatarView setPlaceholderImageWithAvatarUrl:recommandInfo.avatar];
+        }
     }
-    
-   
 }
 
 @end

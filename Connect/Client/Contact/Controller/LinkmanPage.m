@@ -39,7 +39,11 @@
 @implementation LinkmanPage
 
 - (NSMutableArray *)groupsFriend {
-    return [[LMLinkManDataManager sharedManager] getListGroupsFriend];
+    if (!_groupsFriend) {
+        _groupsFriend = [NSMutableArray array];
+        [_groupsFriend addObjectsFromArray:[[LMLinkManDataManager sharedManager] getListGroupsFriend]];
+    }
+    return _groupsFriend;
 }
 
 - (void)viewDidLoad {
@@ -152,7 +156,8 @@
 #pragma mark - linkmandatalist - delegate
 
 - (void)listChange:(NSMutableArray *)linkDataArray withTabBarCount:(NSUInteger)count {
-    self.groupsFriend = linkDataArray.mutableCopy;
+    [self.groupsFriend removeAllObjects];
+    [self.groupsFriend  addObjectsFromArray:linkDataArray.copy];;
     [GCDQueue executeInMainQueue:^{
         [self setTableViewFoot];
         [self.tableView reloadData];
@@ -199,7 +204,10 @@
 
     NSDictionary *groupDict = [self.groupsFriend objectAtIndex:indexPath.section];
     NSArray *items = [groupDict valueForKey:@"items"];
-    id data = [items objectAtIndex:indexPath.row];
+    id data = nil;
+    if (items.count > 0) {
+      data = [items objectAtIndex:indexPath.row];
+    }
     if (indexPath.section == 0) {
         NewFriendTipCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NewFriendTipCellID" forIndexPath:indexPath];
         cell.data = data;

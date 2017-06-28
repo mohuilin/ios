@@ -12,6 +12,7 @@
 #import "LMAddressBookManager.h"
 #import "ScanAddPage.h"
 #import "StringTool.h"
+#import "LMRamAddressBook.h"
 
 @interface LMBitAddressBookViewController () <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
 
@@ -88,10 +89,10 @@ static NSString *address = @"address";
             [self.dataArr removeAllObjects];
             AddressBook *books = [AddressBook parseFromData:data error:nil];
             for (AddressBook_AddressInfo *book in books.addressInfoArray) {
-                DDLogInfo(@"Address:%@,tag = %@", book.address, book.tag);
-                AddressBookInfo *info = [[AddressBookInfo alloc] init];
+                LMRamAddressBook *info = [[LMRamAddressBook alloc] init];
                 info.address = book.address;
                 info.tag = book.tag;
+                info.creatTime = [NSDate date];
                 [self.dataArr addObject:info];
             }
             [[LMAddressBookManager sharedManager] saveBitchAddressBook:weakSelf.dataArr];
@@ -132,7 +133,7 @@ static NSString *address = @"address";
     if (!cell) {
         cell = [[LMBitAddressTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:address];
     }
-    AddressBookInfo *info = self.dataArr[indexPath.section];
+    LMRamAddressBook *info = self.dataArr[indexPath.section];
     [cell setAddressWithAddressBookInfo:info];
     return cell;
 }
@@ -142,7 +143,7 @@ static NSString *address = @"address";
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    AddressBookInfo *info = self.dataArr[indexPath.section];
+    LMRamAddressBook *info = self.dataArr[indexPath.section];
     if (self.didGetBitAddress) {
         self.didGetBitAddress(info.address);
     }
@@ -152,7 +153,7 @@ static NSString *address = @"address";
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
 
     __weak typeof(self) weakself = self;
-    AddressBookInfo *bitInfo = self.dataArr[indexPath.section];
+    LMRamAddressBook *bitInfo = self.dataArr[indexPath.section];
     UITableViewRowAction *listAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:LMLocalizedString(@"Wallet Tags", nil) handler:^(UITableViewRowAction *_Nonnull action, NSIndexPath *_Nonnull indexPath) {
 
         UIAlertController *alertView = [UIAlertController alertControllerWithTitle:LMLocalizedString(@"Link Set Tag", nil) message:@"" preferredStyle:UIAlertControllerStyleAlert];
@@ -170,14 +171,17 @@ static NSString *address = @"address";
             addressProtoData.address = bitInfo.address;
             addressProtoData.tag = textField.text;
 
-            [[LMAddressBookManager sharedManager] updateAddressTag:textField.text address:bitInfo.address];
             [NetWorkOperationTool POSTWithUrlString:Walletaddress_bookTagUrl postProtoData:addressProtoData.data complete:^(id response) {
                 HttpResponse *respo = (HttpResponse *) response;
                 NSLog(@"respo == %@", respo);
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Update successful", nil) withType:ToastTypeSuccess showInView:weakself.view complete:nil];
                 }];
-                bitInfo.tag = [NSString stringWithFormat:@"%@", textField.text];
+                RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
+                [realm beginWriteTransaction];
+                bitInfo.tag = textField.text;
+                [realm commitWriteTransaction];
+                [[LMAddressBookManager sharedManager] updateAddressTag:textField.text address:bitInfo.address];
                 [GCDQueue executeInMainQueue:^{
                     [weakself.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
                 }];
@@ -206,7 +210,7 @@ static NSString *address = @"address";
             }];
 
             [[LMAddressBookManager sharedManager] deleteAddressBookWithAddress:bitInfo.address];
-            AddressBookInfo *info = weakself.dataArr[indexPath.section];
+            LMRamAddressBook *info = weakself.dataArr[indexPath.section];
 
             [weakself.dataArr removeObject:info];
             [GCDQueue executeInMainQueue:^{
@@ -267,7 +271,7 @@ static NSString *address = @"address";
 - (void)postAddressToServer:(NSString *)address {
 
     // Traverse the array
-    for (AddressBookInfo *bookInfo  in self.dataArr) {
+    for (LMRamAddressBook *bookInfo  in self.dataArr) {
         if ([bookInfo.address isEqualToString:address]) {
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat Address already exists", nil) withType:ToastTypeCommon showInView:self.view complete:nil];
@@ -291,7 +295,7 @@ static NSString *address = @"address";
         if (respo.code != successCode) {
             return;
         }
-        AddressBookInfo *info = [[AddressBookInfo alloc] init];
+        LMRamAddressBook *info = [[LMRamAddressBook alloc] init];
         info.address = address;
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Add Successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:nil];

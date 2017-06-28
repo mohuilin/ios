@@ -13,9 +13,7 @@
 void addressBookExternalChangeCallback(ABAddressBookRef addressBookRef, CFDictionaryRef info, void *context)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"addressBookExternalChangeCallback");
-        NSLog(@"Re-sync");
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddressBookDidChangeExternallyNotification" object:(__bridge id)context];
+        SendNotify(ConnnectUserAddressChangeNotification, (__bridge id)context)
     });
 }
 
