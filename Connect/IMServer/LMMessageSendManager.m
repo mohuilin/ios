@@ -8,7 +8,9 @@
 
 #import "LMMessageSendManager.h"
 #import "IMService.h"
-
+#import "MessageDBManager.h"
+#import "UserDBManager.h"
+#import "ConnectTool.h"
 
 /**
  "NOT_EXISTED": 1,

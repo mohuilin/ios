@@ -8,6 +8,8 @@
 */
 
 #import "Message.h"
+#import "ConnectTool.h"
+#import "NSData+Hash.h"
 
 #define SOCKET_HEAD_LEN 13
 

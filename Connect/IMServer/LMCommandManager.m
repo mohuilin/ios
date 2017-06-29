@@ -8,6 +8,18 @@
 
 #import "LMCommandManager.h"
 #import "LMMessageSendManager.h"
+#import "MessageDBManager.h"
+#import "LMMessageExtendManager.h"
+#import "UserDBManager.h"
+#import "GroupDBManager.h"
+#import "StringTool.h"
+#import "ConnectTool.h"
+#import "PeerMessageHandler.h"
+#import "GroupMessageHandler.h"
+#import "SystemMessageHandler.h"
+#import "NSData+Gzip.h"
+#import "YYImageCache.h"
+#import "LMHistoryCacheManager.h"
 
 @implementation SendCommandModel
 
