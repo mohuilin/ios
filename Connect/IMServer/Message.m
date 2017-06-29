@@ -8,9 +8,6 @@
 */
 
 #import "Message.h"
-#import "ConnectTool.h"
-#import "NSData+Hash.h"
-#import "GPBMessage+LMProtoDataValidation.h"
 
 #define SOCKET_HEAD_LEN 13
 
@@ -33,19 +30,19 @@ static inline unsigned int bswap_32(unsigned int v) {
 
 - (NSMutableData *)pack {
     DDLogInfo(@"pack data type :%d extension: %d", _typechar, _extension);
-    
+
     NSMutableData *dataM = [[NSMutableData alloc] init];
-    
+
     //ver
     unsigned char version = socketProtocolVersion;
     NSData *versionData = [NSData dataWithBytes:&version length:sizeof(version)];
     [dataM appendData:versionData];
-    
+
     //type
     NSData *typeData = [NSData dataWithBytes:&_typechar length:sizeof(_typechar)];
     [dataM appendData:typeData];
-    
-    
+
+
     NSData *data = (NSData *) self.body;
     if (![data isKindOfClass:[NSData class]]) {
         return [NSMutableData data];
@@ -58,36 +55,36 @@ static inline unsigned int bswap_32(unsigned int v) {
     int lenR = bswap_32(len);
     NSData *lenData = [NSData dataWithBytes:&lenR length:sizeof(lenR)];
     [dataM appendData:lenData];
-    
+
     //extension
     NSData *extensionData = [NSData dataWithBytes:&_extension length:sizeof(_extension)];
     [dataM appendData:extensionData];
-    
+
     //salt
     NSData *saltData = [[KeyHandle createRandom512bits] subdataWithRange:NSMakeRange(0, 4)];
     [dataM appendData:saltData];
-    
+
     // ，1 + 4 + 1 + 4
     NSMutableData *checkData = [NSMutableData dataWithData:[dataM subdataWithRange:NSMakeRange(1, 10)]];
     UInt8 j = 0xc0;
     NSData *data1 = [[NSData alloc] initWithBytes:&j length:sizeof(j)];
     [checkData appendData:data1];
-    
+
     UInt8 i = 0x2E;
     NSData *data2 = [[NSData alloc] initWithBytes:&i length:sizeof(i)];
     [checkData appendData:data2];
-    
+
     UInt8 n = 0xC7;
-    
+
     NSData *data3 = [[NSData alloc] initWithBytes:&n length:sizeof(n)];
     [checkData appendData:data3];
-    
+
     NSData *checkDataMd5 = [checkData md5Data];
     NSData *checkTwoBytes = [checkDataMd5 subdataWithRange:NSMakeRange(0, 2)];
-    
+
     //check bytes
     [dataM appendData:checkTwoBytes];
-    
+
     //data
     [dataM appendData:data];
     return dataM;
@@ -97,15 +94,15 @@ static inline unsigned int bswap_32(unsigned int v) {
     unsigned char type;
     unsigned char extension;
     int lenInt;
-    
+
     [[data subdataWithRange:NSMakeRange(0, 1)] getBytes:&type length:sizeof(type)];
     _typechar = type;
     [[data subdataWithRange:NSMakeRange(5, 1)] getBytes:&extension length:sizeof(extension)];
     _extension = extension;
-    
+
     [[data subdataWithRange:NSMakeRange(1, 4)] getBytes:&lenInt length:sizeof(lenInt)];
     lenInt = bswap_32(lenInt);
-    
+
     NSData *resultData = [data subdataWithRange:NSMakeRange(SOCKET_HEAD_LEN - 1, lenInt)];
     DDLogInfo(@"type:%d ,extension:%d", _typechar, _extension);
     switch (type) {
@@ -113,12 +110,12 @@ static inline unsigned int bswap_32(unsigned int v) {
             [self handlErrorWithExtension:extension];
             return YES;
             break;
-            
+
         case BM_COMMAND_TYPE:
             [self handlCommandWithExtension:extension resultData:resultData];
             return YES;
             break;
-            
+
         case BM_IM_TYPE:
             [self handlIMMessageWithExtension:extension resultData:resultData];
             return YES;
@@ -131,7 +128,7 @@ static inline unsigned int bswap_32(unsigned int v) {
             [self handCutOffByServer:extension resultData:resultData];
             return YES;
             break;
-            
+
         default:
             if (type == BM_HEARTBEAT_TYPE && extension == BM_HEARTBEAT_EXT) {
                 return YES;
@@ -237,7 +234,7 @@ static inline unsigned int bswap_32(unsigned int v) {
         case BM_RECOMMADN_NOTINTEREST_EXT:
         case BM_UPLOAD_CHAT_COOKIE_EXT:
         case BM_FRIEND_CHAT_COOKIE_EXT:
-        case BM_FROCEUODATA_CHAT_COOKIE_EXT:{
+        case BM_FROCEUODATA_CHAT_COOKIE_EXT: {
             IMTransferData *imTransfer = [IMTransferData parseFromData:resultData error:nil];
             if ([ConnectTool vertifyWithData:imTransfer.cipherData.data sign:imTransfer.sign]) {
                 NSData *decodeData = [ConnectTool decodeGcmDataWithEcdhKey:[ServerCenter shareCenter].extensionPass GcmData:imTransfer.cipherData];

@@ -7,11 +7,7 @@
 //
 
 #import "LMMessageSendManager.h"
-#import "MessageDBManager.h"
-#import "UserDBManager.h"
 #import "IMService.h"
-#import "ConnectTool.h"
-#import "LMMessage.h"
 
 
 /**
@@ -25,7 +21,7 @@
  "CHATINFO_EXPIRE": 8, //The other side is not more than a day on the line, ChatCookie expired, open a single random
  }
  */
-typedef NS_ENUM(NSInteger ,MessageRejectErrorType) {
+typedef NS_ENUM(NSInteger, MessageRejectErrorType) {
     MessageRejectErrorTypeUnknow = 0,
     MessageRejectErrorTypeNotExisted,
     MessageRejectErrorTypeNotFriend,
@@ -84,7 +80,7 @@ typedef NS_ENUM(NSInteger ,MessageRejectErrorType) {
                         sendMessageModel.callBack(sendMessageModel.sendMsg, [NSError errorWithDomain:@"over_time" code:OVER_TIME_CODE userInfo:nil]);
                     }
 
-                    
+
                     [weakSelf.sendingMessages removeObjectForKey:sendMessageModel.sendMsg.message_id];
                 }
             }
@@ -165,44 +161,39 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
     [GCDQueue executeInQueue:self.messageSendStatusQueue block:^{
         SendMessageModel *sendModel = [self.sendingMessages valueForKey:rejectMsg.msgId];
 
-        MessageRejectErrorType rejectErrorType = (NSInteger)rejectMsg.status;
+        MessageRejectErrorType rejectErrorType = (NSInteger) rejectMsg.status;
         switch (rejectErrorType) {
-            case MessageRejectErrorTypeMyChatCookieNotMatch:{
+            case MessageRejectErrorTypeMyChatCookieNotMatch: {
                 [[IMService instance] uploadCookieDuetoLocalChatCookieNotMatchServerChatCookieWithMessageCallModel:sendModel];
             }
                 break;
-            case MessageRejectErrorTypeChatinfoExpire:{
+            case MessageRejectErrorTypeChatinfoExpire: {
                 NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
                 [[SessionManager sharedManager] removeChatCookieWithChatSession:identifier];
                 [[SessionManager sharedManager] chatCookie:YES chatSession:identifier];
                 [[IMService instance] asyncSendMessageMessage:sendModel.sendMsg onQueue:nil completion:sendModel.callBack onQueue:nil];
             }
                 break;
-            case MessageRejectErrorTypeChatinfoNotMatch:{
+            case MessageRejectErrorTypeChatinfoNotMatch: {
                 ChatCookie *chatCookie = [ChatCookie parseFromData:rejectMsg.data_p error:nil];
                 NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
                 if ([ConnectTool vertifyWithData:chatCookie.data_p.data sign:chatCookie.sign publickey:identifier]) {
                     ChatCookieData *chatInfo = chatCookie.data_p;
                     [[SessionManager sharedManager] setChatCookie:chatInfo chatSession:identifier];
                     [[IMService instance] asyncSendMessageMessage:sendModel.sendMsg onQueue:nil completion:sendModel.callBack onQueue:nil];
-                } else{
+                } else {
                     if (sendModel.callBack) {
                         sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusFaild;
                         NSError *error = [NSError errorWithDomain:@"imserver" code:-1 userInfo:nil];
                         sendModel.callBack(sendModel.sendMsg, error);
+
                         //update message send status
-                        LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", identifier, rejectMsg.msgId]] firstObject];
-                        if (realmMessage) {
-                            RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                            [realm beginWriteTransaction];
-                            realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFaild;
-                            [realm commitWriteTransaction];
-                        }
+                        [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFaild withMessageId:rejectMsg.msgId messageOwer:identifier];
                     }
                 }
             }
                 break;
-            case MessageRejectErrorTypeNotInGroup:{
+            case MessageRejectErrorTypeNotInGroup: {
                 NSString *identifier = rejectMsg.receiverAddress;
                 if (!GJCFStringIsNull(identifier)) {
                     //updata message sendstatus
@@ -213,62 +204,45 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                     if (sendModel.callBack) {
                         sendModel.callBack(sendModel.sendMsg, nil);
                     }
-                    
+
                     //update message send status
-                    LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", identifier, rejectMsg.msgId]] firstObject];
-                    if (realmMessage) {
-                        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                        [realm beginWriteTransaction];
-                        realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFailByNotInGroup;
-                        [realm commitWriteTransaction];
-                    }
+                    [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNotInGroup withMessageId:rejectMsg.msgId messageOwer:identifier];
                 }
             }
                 break;
-            case MessageRejectErrorTypeNotFriend:{
+            case MessageRejectErrorTypeNotFriend: {
                 NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
                 if (!GJCFStringIsNull(identifier)) {
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNoRelationShip withMessageId:rejectMsg.msgId messageOwer:identifier];
-                    
+
                     sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusFailByNoRelationShip;
-                    
+
                     //create tip message
                     [[MessageDBManager sharedManager] createTipMessageWithMessageOwer:identifier isnoRelationShipType:YES content:nil];
                     if (sendModel.callBack) {
                         sendModel.callBack(sendModel.sendMsg, nil);
                     }
                     //update message send status
-                    LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", identifier, rejectMsg.msgId]] firstObject];
-                    if (realmMessage) {
-                        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                        [realm beginWriteTransaction];
-                        realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFailByNoRelationShip;
-                        [realm commitWriteTransaction];
-                    }
+                    [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNoRelationShip withMessageId:rejectMsg.msgId messageOwer:identifier];
                 }
             }
                 break;
-                
-            case MessageRejectErrorTypeBlackList:{
-                
+
+            case MessageRejectErrorTypeBlackList: {
+
                 NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
                 if (!GJCFStringIsNull(identifier)) {
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccessUnArrive withMessageId:rejectMsg.msgId messageOwer:identifier];
-                    
+
                     sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusSuccessUnArrive;
                     //create tip message
                     [[MessageDBManager sharedManager] createTipMessageWithMessageOwer:identifier isnoRelationShipType:NO content:LMLocalizedString(@"Link Message has been sent the other rejected", nil)];
                     if (sendModel.callBack) {
                         sendModel.callBack(sendModel.sendMsg, nil);
                     }
+
                     //update message send status
-                    LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", identifier, rejectMsg.msgId]] firstObject];
-                    if (realmMessage) {
-                        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                        [realm beginWriteTransaction];
-                        realmMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccessUnArrive;
-                        [realm commitWriteTransaction];
-                    }
+                    [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccessUnArrive withMessageId:rejectMsg.msgId messageOwer:identifier];
                 }
             }
                 break;
