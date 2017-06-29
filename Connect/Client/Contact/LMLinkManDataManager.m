@@ -271,54 +271,11 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
     self.friendNewItem = nil;
 }
-/**
- *  detail user array
- */
-- (void)detailGroupFriendFormat {
-    NSArray *contacts = [[UserDBManager sharedManager] getAllUsers];
-    [self.offenFriends removeAllObjects];
-    [self.normalFriends removeAllObjects];
-    [self.friendsArr removeAllObjects];
-    for (AccountInfo *contact in contacts) {
-        if (contact.isOffenContact) {
-            if (![self.offenFriends containsObject:contact]) {
-                [self.offenFriends objectAddObject:contact];
-            }
-        } else {
-            if (![self.normalFriends containsObject:contact]) {
-                [self.normalFriends objectAddObject:contact];
-            }
-        }
-        if (![self.friendsArr containsObject:contact]) {
-            [self.friendsArr objectAddObject:contact];
-        }
-    }
-    [self addDataToGroupArray];
-}
-/**
- *  get all user array
- */
-- (void)getAllLinkMan {
-    
-    [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
-        [GCDQueue executeInMainQueue:^{
-            [self.commonGroup removeAllObjects];
-            for (LMGroupInfo *group in groups) {
-                if (![self.commonGroup containsObject:group]) {
-                    [self.commonGroup objectAddObject:group];
-                }
-            }
-            [self detailGroupFriendFormat];
-        }];
-    }];
-}
 
 #pragma mark - notification method
 
 - (void)addNotification {
     RegisterNotify(ConnnectUserAddressChangeNotification, @selector(AddressBookChange:));
-    RegisterNotify(kFriendListChangeNotification, @selector(downAllContacts));
-    
     CFErrorRef *error = nil;
     ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(nil, error);
     if (!error) {
@@ -489,13 +446,6 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
             }
         }];
     }];
-}
-
-/**
- *  get all contacts
- */
-- (void)downAllContacts {
-    [self detailGroupFriendFormat];
 }
 
 - (void)formartFiendsGrouping {

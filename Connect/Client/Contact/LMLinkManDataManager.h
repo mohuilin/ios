@@ -51,11 +51,8 @@
  *
  */
 - (void)clearArrays;
-/**
- *  get user message
- *
- */
-- (void)getAllLinkMan;
+
+
 /**
  *  clear unread bridge
  *
