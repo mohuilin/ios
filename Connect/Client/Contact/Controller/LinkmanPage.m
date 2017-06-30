@@ -95,11 +95,9 @@
 - (void)friendPerssionSet:(UITableViewCell *)cell {
 
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-
-    AccountInfo *user = self.groupsFriend[indexPath.section][@"items"][indexPath.row];
-
-    user.tags = [[UserDBManager sharedManager] getUserTags:user.address];
-
+    CellGroup *group = [self.groupsFriend objectAtIndex:indexPath.section];
+    LMContactAccountInfo *contact = [group.items objectAtIndex:indexPath.row];
+    AccountInfo *user = contact.normalInfo;
     FriendSetPage *page = [[FriendSetPage alloc] initWithUser:user];
     page.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:page animated:YES];
@@ -296,8 +294,8 @@
     id model = [group.items objectAtIndex:indexPath.row];
     if ([model isKindOfClass:[LMGroupInfo class]]) {
         return NO;
-    } else if ([model isKindOfClass:[AccountInfo class]]){
-        AccountInfo *user = (AccountInfo *)model;
+    } else if ([model isKindOfClass:[LMContactAccountInfo class]]){
+        LMContactAccountInfo *user = (LMContactAccountInfo *)model;
         if ([user.pub_key isEqualToString:kSystemIdendifier]) {
             return NO;
         }
