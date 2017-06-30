@@ -80,8 +80,11 @@
         return;
     }
 
-    NSMutableArray *temArray = [weakSelf.talkModel.chatGroupInfo.groupMembers mutableCopy];
-    for (AccountInfo *contract in temArray) {
+    NSMutableArray *temArray = [NSMutableArray array];
+    for (LMRamMemberInfo *info in self.talkModel.chatGroupInfo.membersArray) {
+        [temArray addObject:info];
+    }
+    for (LMRamMemberInfo *contract in temArray) {
         if ([contract.address isEqualToString:weakSelf.groupMasterInfo.address]) {
             [temArray removeObject:contract];
             break;

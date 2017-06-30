@@ -229,8 +229,8 @@
         [self.navigationController pushViewController:page animated:YES];
     } else {
         id data = self.groupsFriend[indexPath.section][@"items"][indexPath.row];
-        if ([data isKindOfClass:[LMGroupInfo class]]) {
-            LMGroupInfo *group = (LMGroupInfo *) data;
+        if ([data isKindOfClass:[LMRamGroupInfo class]]) {
+            LMRamGroupInfo *group = (LMRamGroupInfo *) data;
             GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
             talk.talkType = GJGCChatFriendTalkTypeGroup;
             talk.chatIdendifier = group.groupIdentifer;
@@ -241,7 +241,7 @@
             // save session object
             [SessionManager sharedManager].chatSession = talk.chatIdendifier;
             [SessionManager sharedManager].chatObject = group;
-            talk.name = GJCFStringIsNull(group.groupName) ? [NSString stringWithFormat:LMLocalizedString(@"Link Group", nil), (unsigned long) talk.chatGroupInfo.groupMembers.count] : [NSString stringWithFormat:@"%@(%lu)", group.groupName, (unsigned long) talk.chatGroupInfo.groupMembers.count];
+            talk.name = GJCFStringIsNull(group.groupName) ? [NSString stringWithFormat:LMLocalizedString(@"Link Group", nil), (unsigned long) talk.chatGroupInfo.membersArray.count] : [NSString stringWithFormat:@"%@(%lu)", group.groupName, (unsigned long) talk.chatGroupInfo.membersArray.count];
             GJGCChatGroupViewController *groupChat = [[GJGCChatGroupViewController alloc] initWithTalkInfo:talk];
             groupChat.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:groupChat animated:YES];
@@ -290,7 +290,7 @@
         return NO;
     }
     id model = self.groupsFriend[indexPath.section][@"items"][indexPath.row];
-    if ([model isKindOfClass:[LMGroupInfo class]]) {
+    if ([model isKindOfClass:[LMRamGroupInfo class]]) {
         return NO;
     } else if ([model isKindOfClass:[AccountInfo class]]){
         AccountInfo *user = (AccountInfo *)model;

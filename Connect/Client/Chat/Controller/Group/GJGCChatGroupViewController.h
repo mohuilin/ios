@@ -7,7 +7,7 @@
 //
 
 #import "GJGCChatFriendViewController.h"
-
+#import "LMRamGroupInfo.h"
 @interface GJGCChatGroupViewController : GJGCChatFriendViewController
 
 @end

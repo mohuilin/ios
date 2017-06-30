@@ -7,8 +7,8 @@
 //
 
 #import "LinkmanFriendCell.h"
-#import "LMGroupInfo.h"
 #import "YYImageCache.h"
+#import "LMRamGroupInfo.h"
 
 @interface LinkmanFriendCell ()
 
@@ -35,8 +35,8 @@
 
 - (void)setData:(id)data{
     [super setData:data];
-    if ([data isKindOfClass:[LMGroupInfo class]]) {
-        LMGroupInfo *groupInfo = (LMGroupInfo *)data;
+    if ([data isKindOfClass:[LMRamGroupInfo class]]) {
+        LMRamGroupInfo *groupInfo = (LMRamGroupInfo *)data;
         _nameLabel.text = groupInfo.groupName;
         [self.avatarImageView setPlaceholderImageWithAvatarUrl:groupInfo.avatarUrl];
     } else if([data isKindOfClass:[AccountInfo class]]){

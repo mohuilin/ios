@@ -7,7 +7,6 @@
 //
 
 #import "LMBaseViewController.h"
-#import "LMGroupInfo.h"
 
 @interface LMGroupFriendsViewController : LMBaseViewController
 // user group

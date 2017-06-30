@@ -22,6 +22,7 @@
 #import "UIScrollView+EmptyDataSet.h"
 #import "GJGCChatGroupViewController.h"
 #import "GJGCChatSystemNotiViewController.h"
+#import "LMRamGroupInfo.h"
 
 #define cancelWidth  AUTO_WIDTH(150)
 
@@ -153,7 +154,7 @@
         [self.resultSearchDatas objectAddObject:searchGroup];
 
         NSMutableArray *groups = @[].mutableCopy;
-        for (LMGroupInfo *info in self.groups) {
+        for (LMRamGroupInfo *info in self.groups) {
             NSString *name = [info.groupName uppercaseString];
             if ([name containsString:conditionText]) {
                 
@@ -297,9 +298,9 @@
                 detailPage.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:detailPage animated:YES];
             }
-        }else if([data isKindOfClass:[LMGroupInfo class]])
+        }else if([data isKindOfClass:[LMRamGroupInfo class]])
         {
-            LMGroupInfo* group = (LMGroupInfo*)data;
+            LMRamGroupInfo* group = (LMRamGroupInfo*)data;
             GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
             talk.talkType = GJGCChatFriendTalkTypeGroup;
             talk.chatIdendifier = group.groupIdentifer;
@@ -308,7 +309,7 @@
             //save session
             [SessionManager sharedManager].chatSession = talk.chatIdendifier;
             [SessionManager sharedManager].chatObject = group;
-            talk.name = GJCFStringIsNull(group.groupName) ? [NSString stringWithFormat:LMLocalizedString(@"Link Group", nil), (unsigned long) talk.chatGroupInfo.groupMembers.count] : [NSString stringWithFormat:@"%@(%lu)", group.groupName, (unsigned long) talk.chatGroupInfo.groupMembers.count];
+            talk.name = GJCFStringIsNull(group.groupName) ? [NSString stringWithFormat:LMLocalizedString(@"Link Group", nil), (unsigned long) talk.chatGroupInfo.membersArray.count] : [NSString stringWithFormat:@"%@(%lu)", group.groupName, (unsigned long) talk.chatGroupInfo.membersArray.count];
             GJGCChatGroupViewController *groupChat = [[GJGCChatGroupViewController alloc] initWithTalkInfo:talk];
             groupChat.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:groupChat animated:YES];

@@ -7,8 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
-@class LMGroupInfo;
+#import "LMRamGroupInfo.h"
 
 @interface SetGlobalHandler : NSObject
 
@@ -233,6 +232,6 @@
  */
 + (void)syncPhoneContactWithHashContact:(NSMutableArray *)contacts complete:(void (^)(NSTimeInterval time))complete;
 
-+ (void)getGroupInfoWihtIdentifier:(NSString *)identifier complete:(void (^)(LMGroupInfo *groupInfo ,NSError *error))complete;
++ (void)getGroupInfoWihtIdentifier:(NSString *)identifier complete:(void (^)(LMRamGroupInfo *groupInfo ,NSError *error))complete;
 
 @end

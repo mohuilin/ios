@@ -193,10 +193,9 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                         //update message send status
                         LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", identifier, rejectMsg.msgId]] firstObject];
                         if (realmMessage) {
-                            RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                            [realm beginWriteTransaction];
-                            realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFaild;
-                            [realm commitWriteTransaction];
+                           [[MessageDBManager sharedManager]executeRealmWithBlock:^{
+                              realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFaild;
+                           }];
                         }
                     }
                 }
@@ -217,10 +216,9 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                     //update message send status
                     LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", identifier, rejectMsg.msgId]] firstObject];
                     if (realmMessage) {
-                        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                        [realm beginWriteTransaction];
-                        realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFailByNotInGroup;
-                        [realm commitWriteTransaction];
+                        [[MessageDBManager sharedManager]executeRealmWithBlock:^{
+                           realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFailByNotInGroup;
+                        }];
                     }
                 }
             }
@@ -240,10 +238,9 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                     //update message send status
                     LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", identifier, rejectMsg.msgId]] firstObject];
                     if (realmMessage) {
-                        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                        [realm beginWriteTransaction];
-                        realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFailByNoRelationShip;
-                        [realm commitWriteTransaction];
+                        [[MessageDBManager sharedManager]executeRealmWithBlock:^{
+                           realmMessage.sendstatus = GJGCChatFriendSendMessageStatusFailByNoRelationShip;
+                        }];
                     }
                 }
             }
@@ -264,10 +261,9 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                     //update message send status
                     LMMessage *realmMessage = [[LMMessage objectsWhere:[NSString stringWithFormat:@"messageOwer = '%@' and messageId = '%@'", identifier, rejectMsg.msgId]] firstObject];
                     if (realmMessage) {
-                        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                        [realm beginWriteTransaction];
-                        realmMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccessUnArrive;
-                        [realm commitWriteTransaction];
+                       [[MessageDBManager sharedManager] executeRealmWithBlock:^{
+                          realmMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccessUnArrive; 
+                       }];
                     }
                 }
             }

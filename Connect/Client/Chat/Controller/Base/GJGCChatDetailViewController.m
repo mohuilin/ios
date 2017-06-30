@@ -10,6 +10,8 @@
 #import "GJGCChatFriendBaseCell.h"
 #import "LMMessageExtendManager.h"
 #import "RecentChatDBManager.h"
+#import "Protofile.pbobjc.h"
+
 
 @interface GJGCChatDetailViewController () <
         GJGCRefreshHeaderViewDelegate,
@@ -131,7 +133,7 @@
     RegisterNotify(kAcceptNewFriendRequestNotification, @selector(friendAccept:))
     RegisterNotify(RereweetMessageNotification, @selector(retweetMessage:));
     RegisterNotify(TransactionStatusChangeNotification, @selector(transactionStatusChange:));
-    RegisterNotify(GroupAdminChangeNotification, @selector(groupAdmingChange));
+    RegisterNotify(GroupAdminChangeNotification, @selector(groupAdmingChange:));
     RegisterNotify(DeleteGroupReviewedMessageNotification, @selector(deleteReviewMessage:));
     RegisterNotify(ConnnectGroupDismissNotification, @selector(groupdissmiss:));
     RegisterNotify(UIApplicationDidChangeStatusBarFrameNotification, @selector(statusBarFrameChange:));
@@ -161,11 +163,14 @@
     [self.chatListTable reloadData];
 }
 
-- (void)groupAdmingChange {
-    AccountInfo *currentAdmin = [[GroupDBManager sharedManager] getAdminByGroupId:self.taklInfo.chatGroupInfo.groupIdentifer];
-    if (currentAdmin) {
-        self.taklInfo.chatGroupInfo.admin = currentAdmin;
-    }
+- (void)groupAdmingChange:(NSNotification *)note {
+    ChatMessageInfo *messageInfo = note.object;
+    LMRamMemberInfo *currentAdmin = [[GroupDBManager sharedManager] getAdminByGroupId:messageInfo.message.publicKey];
+//    if (currentAdmin) {
+//        [[GroupDBManager sharedManager] executeRealmWithBlock:^{
+//          self.taklInfo.chatGroupInfo.admin = currentAdmin;
+//        }];
+//    }
 }
 
 - (void)retweetMessage:(NSNotification *)note {
@@ -258,13 +263,13 @@
                         }
                             break;
                         case GJGCChatFriendTalkTypeGroup: {
-                            for (AccountInfo *groupMember in self.taklInfo.chatGroupInfo.groupMembers) {
+                            for (LMRamMemberInfo *groupMember in self.taklInfo.chatGroupInfo.membersArray) {
 
                                 if ([payAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
                                     payName = LMLocalizedString(@"Chat You", nil);
                                 } else {
                                     if ([groupMember.address isEqualToString:payAddress]) {
-                                        payName = groupMember.normalShowName;
+                                        payName = groupMember.username;
                                     }
                                 }
 
@@ -272,7 +277,7 @@
                                     reciverName = LMLocalizedString(@"Chat You", nil);
                                 } else {
                                     if ([groupMember.address isEqualToString:reciverAddress]) {
-                                        reciverName = groupMember.normalShowName;
+                                        reciverName = groupMember.username;
                                     }
                                 }
                             }

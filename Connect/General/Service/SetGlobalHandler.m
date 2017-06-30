@@ -14,6 +14,7 @@
 #import "IMService.h"
 #import "StringTool.h"
 #import "ConnectTool.h"
+#import "LMRamGroupInfo.h"
 
 @implementation SetGlobalHandler
 
@@ -687,28 +688,44 @@
         NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
         if (data) {
             //Save to the database
-            LMGroupInfo *group = [[LMGroupInfo alloc] init];
+            LMRamGroupInfo *group = [[LMRamGroupInfo alloc] init];
             GroupInfo *groupInfo = [GroupInfo parseFromData:data error:nil];
             group.groupEcdhKey = groupEcdh;
             group.isPublic = groupInfo.group.public_p;
             group.summary = groupInfo.group.summary;
             group.groupName = groupInfo.group.name;
             group.isGroupVerify = groupInfo.group.reviewed;
+            group.groupIdentifer = groupInfo.group.identifier;
+            group.avatarUrl = groupInfo.group.avatar;
             //To convert
             NSMutableArray* AccoutInfoArray = [NSMutableArray array];
+            LMRamMemberInfo *admin = nil;
             for (GroupMember* member in groupInfo.membersArray) {
-                AccountInfo* accountInfo = [[AccountInfo alloc] init];
+                LMRamMemberInfo* accountInfo = [[LMRamMemberInfo alloc] init];
                 accountInfo.username = member.username;
                 accountInfo.avatar = member.avatar;
                 accountInfo.address = member.address;
                 accountInfo.isGroupAdmin = (member.role != 0);
-                accountInfo.groupNickName = member.nick;
-                accountInfo.pub_key = member.pubKey;
-                [AccoutInfoArray objectAddObject:accountInfo];
+                accountInfo.groupNicksName = member.nick;
+                if (accountInfo.groupNicksName.length <= 0) {
+                    accountInfo.groupNicksName = member.username;
+                }
+                accountInfo.pubKey = member.pubKey;
+                accountInfo.identifier = group.groupIdentifer;
+                accountInfo.univerStr = [[NSString stringWithFormat:@"%@%@",accountInfo.address,accountInfo.identifier] sha1String];
+                if (!accountInfo.isGroupAdmin) {
+                    [AccoutInfoArray objectAddObject:accountInfo];
+                }else {
+                    admin = accountInfo;
+                    group.admin = accountInfo;
+                }
+                
             }
-            group.groupMembers = AccoutInfoArray;
-            group.groupIdentifer = groupInfo.group.identifier;
-            group.avatarUrl = groupInfo.group.avatar;
+            if (admin) {
+                [AccoutInfoArray insertObject:admin atIndex:0];
+            }
+            [group.membersArray addObjects:AccoutInfoArray];
+           
             [[GroupDBManager sharedManager] savegroup:group];
             
             DDLogInfo(@"%@",groupInfo);
@@ -741,7 +758,7 @@
         NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
         if (data) {
             //Save to the database
-            LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifer];
+            LMRamGroupInfo *group = [[LMRamGroupInfo alloc] init];
             if (GJCFStringIsNull(group.groupEcdhKey)) {
                 [self downGroupEcdhKeyWithGroupIdentifier:identifer complete:^(NSString *groupKey, NSError *error) {
                     GroupInfo *groupInfo = [GroupInfo parseFromData:data error:nil];
@@ -750,23 +767,36 @@
                     group.isPublic = groupInfo.group.public_p;
                     group.summary = groupInfo.group.summary;
                     group.groupName = groupInfo.group.name;
+                    group.isGroupVerify = groupInfo.group.reviewed;
+                    group.groupIdentifer = groupInfo.group.identifier;
                     NSMutableArray* AccoutInfoArray = [NSMutableArray array];
+                    LMRamMemberInfo *admin = nil;
                     for (GroupMember* member in groupInfo.membersArray) {
-                        AccountInfo* accountInfo = [[AccountInfo alloc] init];
+                        LMRamMemberInfo* accountInfo = [[LMRamMemberInfo alloc] init];
                         accountInfo.username = member.username;
                         accountInfo.avatar = member.avatar;
                         accountInfo.address = member.address;
                         accountInfo.isGroupAdmin = (member.role != 0);
-                        accountInfo.isGroupAdmin = (member.role != 0);
-                        accountInfo.groupNickName = member.nick;
-                        accountInfo.pub_key = member.pubKey;
-                        [AccoutInfoArray objectAddObject:accountInfo];
+                        accountInfo.groupNicksName = member.nick;
+                        if (accountInfo.groupNicksName.length <= 0) {
+                            accountInfo.groupNicksName = member.username;
+                        }
+                        accountInfo.pubKey = member.pubKey;
+                        accountInfo.identifier = groupInfo.group.identifier;
+                        accountInfo.univerStr = [[NSString stringWithFormat:@"%@%@",accountInfo.address,groupInfo.group.identifier] sha1String];
+                        if (!accountInfo.isGroupAdmin) {
+                            [AccoutInfoArray objectAddObject:accountInfo];
+                        }else {
+                            admin = accountInfo;
+                            group.admin = accountInfo;
+                        }
+                        
                     }
-                    group.groupMembers = AccoutInfoArray;
-                    group.groupIdentifer = groupInfo.group.identifier;
-                    group.isGroupVerify = groupInfo.group.reviewed;
-                    
-                    [[GroupDBManager sharedManager] updateGroup:group];
+                    if (admin) {
+                        [AccoutInfoArray insertObject:admin atIndex:0];
+                    }
+                    [group.membersArray addObjects:AccoutInfoArray];
+                    [[GroupDBManager sharedManager] savegroup:group];
                     
                     if (complete) {
                         complete(nil);
@@ -776,26 +806,38 @@
             } else{
                 GroupInfo *groupInfo = [GroupInfo parseFromData:data error:nil];
                // group.groupInfo = groupInfo;
-                
                 group.isPublic = groupInfo.group.public_p;
                 group.summary = groupInfo.group.summary;
                 group.groupName = groupInfo.group.name;
+                group.isGroupVerify = groupInfo.group.reviewed;
+                group.groupIdentifer = groupInfo.group.identifier;
                 NSMutableArray* AccoutInfoArray = [NSMutableArray array];
+                LMRamMemberInfo *admin = nil;
                 for (GroupMember* member in groupInfo.membersArray) {
-                    AccountInfo* accountInfo = [[AccountInfo alloc] init];
+                    LMRamMemberInfo* accountInfo = [[LMRamMemberInfo alloc] init];
                     accountInfo.username = member.username;
                     accountInfo.avatar = member.avatar;
                     accountInfo.address = member.address;
                     accountInfo.isGroupAdmin = (member.role != 0);
-                    accountInfo.groupNickName = member.nick;
-                    accountInfo.pub_key = member.pubKey;
-                    [AccoutInfoArray objectAddObject:accountInfo];
+                    accountInfo.groupNicksName = member.nick;
+                    if (accountInfo.groupNicksName.length <= 0) {
+                        accountInfo.groupNicksName = member.username;
+                    }
+                    accountInfo.pubKey = member.pubKey;
+                    accountInfo.identifier = group.groupIdentifer;
+                    accountInfo.univerStr = [[NSString stringWithFormat:@"%@%@",accountInfo.address,groupInfo.group.identifier] sha1String];
+                    if (!accountInfo.isGroupAdmin) {
+                        [AccoutInfoArray objectAddObject:accountInfo];
+                    }else {
+                        admin = accountInfo;
+                        group.admin = accountInfo;
+                    }
                 }
-                group.groupMembers = AccoutInfoArray;
-                group.groupIdentifer = groupInfo.group.identifier;
-                group.isGroupVerify = groupInfo.group.reviewed;
-                
-                [[GroupDBManager sharedManager] updateGroup:group];
+                    if (admin) {
+                        [AccoutInfoArray insertObject:admin atIndex:0];
+                    }
+                [group.membersArray addObjects:AccoutInfoArray];
+                [[GroupDBManager sharedManager] savegroup:group];
                 if (complete) {
                     complete(nil);
                 }
@@ -1360,11 +1402,11 @@
     }];
 }
 
-+ (void)getGroupInfoWihtIdentifier:(NSString *)identifier complete:(void (^)(LMGroupInfo *groupInfo ,NSError *error))complete{
++ (void)getGroupInfoWihtIdentifier:(NSString *)identifier complete:(void (^)(LMRamGroupInfo *groupInfo ,NSError *error))complete{
     if (GJCFStringIsNull(identifier)) {
         return;
     }
-    LMGroupInfo *lmGroup = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
+    LMRamGroupInfo *lmGroup = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
     if (lmGroup) {
         if (complete) {
             complete(lmGroup,nil);
@@ -1382,7 +1424,7 @@
                     NSData *data = [ConnectTool decodeHttpResponse:hResponse];
                     //Save to the database
                     GroupInfo *groupInfo = [GroupInfo parseFromData:data error:nil];
-                    LMGroupInfo *lmGroup = [LMGroupInfo new];
+                    LMRamGroupInfo *lmGroup = [LMRamGroupInfo new];
                     
                     lmGroup.groupName = groupInfo.group.name;
                     lmGroup.groupEcdhKey = groupKey;
@@ -1390,21 +1432,36 @@
                     lmGroup.groupIdentifer = groupInfo.group.identifier;
                     lmGroup.summary = groupInfo.group.summary;
                     lmGroup.isGroupVerify = groupInfo.group.reviewed;
+                    lmGroup.isGroupVerify = groupInfo.group.reviewed;
+                    lmGroup.avatarUrl = groupInfo.group.avatar;
                     //To convert
                     NSMutableArray* AccoutInfoArray = [NSMutableArray array];
+                    LMRamMemberInfo *admin = nil;
                     for (GroupMember* member in groupInfo.membersArray) {
-                        AccountInfo* accountInfo = [[AccountInfo alloc] init];
+                        LMRamMemberInfo* accountInfo = [[LMRamMemberInfo alloc] init];
                         accountInfo.username = member.username;
                         accountInfo.avatar = member.avatar;
                         accountInfo.address = member.address;
                         accountInfo.isGroupAdmin = (member.role != 0);
-                        accountInfo.groupNickName = member.nick;
-                        accountInfo.pub_key = member.pubKey;
-                        [AccoutInfoArray objectAddObject:accountInfo];
+                        accountInfo.groupNicksName = member.nick;
+                        if (accountInfo.groupNicksName.length <= 0) {
+                            accountInfo.groupNicksName = member.username;
+                        }
+                        accountInfo.pubKey = member.pubKey;
+                        accountInfo.identifier = lmGroup.groupIdentifer;
+                        accountInfo.univerStr = [[NSString stringWithFormat:@"%@%@",accountInfo.address,accountInfo.identifier] sha1String];
+                        if (!accountInfo.isGroupAdmin) {
+                            [AccoutInfoArray objectAddObject:accountInfo];
+                        }else {
+                            admin = accountInfo;
+                            lmGroup.admin = accountInfo;
+                        }
+                        
                     }
-                    lmGroup.groupMembers = AccoutInfoArray;
-                    lmGroup.isGroupVerify = groupInfo.group.reviewed;
-                    lmGroup.avatarUrl = groupInfo.group.avatar;
+                    if (admin) {
+                        [AccoutInfoArray insertObject:admin atIndex:0];
+                    }
+                    [lmGroup.membersArray addObjects:AccoutInfoArray];
                     [[GroupDBManager sharedManager] savegroup:lmGroup];
                     
                     if(complete)

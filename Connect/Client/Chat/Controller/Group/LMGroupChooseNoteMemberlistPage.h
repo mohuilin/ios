@@ -7,11 +7,11 @@
 //
 
 #import "BaseViewController.h"
-
+#import "LMRamMemberInfo.h"
 @interface LMGroupChooseNoteMemberlistPage : BaseViewController
 
 - (instancetype)initWithMembers:(NSArray *)members;
 
-@property(nonatomic, copy) void (^ChooseGroupMemberCallBack)(AccountInfo *member);
+@property(nonatomic, copy) void (^ChooseGroupMemberCallBack)(LMRamMemberInfo *member);
 
 @end

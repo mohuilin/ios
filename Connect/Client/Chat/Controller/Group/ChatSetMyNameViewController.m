@@ -13,14 +13,14 @@
 @interface ChatSetMyNameViewController ()
 
 @property(nonatomic, copy) NSString *updateNickName;
-@property(nonatomic, strong) AccountInfo *user;
+@property(nonatomic, strong) LMRamMemberInfo *user;
 @property(nonatomic, copy) NSString *groupID;
 
 @end
 
 @implementation ChatSetMyNameViewController
 
-- (instancetype)initWithUpdateUser:(AccountInfo *)user groupIdentifier:(NSString *)groupid {
+- (instancetype)initWithUpdateUser:(LMRamMemberInfo *)user groupIdentifier:(NSString *)groupid {
     if (self = [super init]) {
         self.user = user;
         self.groupID = groupid;
@@ -48,7 +48,7 @@
 
 - (void)rightButtonPressed:(UIButton *)sender {
 
-    if ([self.updateNickName isEqualToString:self.user.groupNickName]) {
+    if ([self.updateNickName isEqualToString:self.user.groupNicksName]) {
         return;
     }
     if (GJCFStringIsNull(self.groupID) || GJCFStringIsNull(self.updateNickName)) {
@@ -77,7 +77,7 @@
 - (void)setupCellData {
     CellItem *inputName = [[CellItem alloc] init];
     inputName.type = CellItemTypeRoundTextField;
-    inputName.title = self.user.groupShowName;
+    inputName.title = self.user.groupNicksName;
 
     CellGroup *group0 = [[CellGroup alloc] init];
     group0.footTitle = LMLocalizedString(@"Link Set group nicknames only be in this group", nil);

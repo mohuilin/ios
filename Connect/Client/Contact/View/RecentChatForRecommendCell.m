@@ -37,7 +37,6 @@
     } else {
         self.backgroundColor = [UIColor clearColor];
     }
-    __weak __typeof(&*self) weakSelf = self;
     self.displayLable.textColor = [UIColor blackColor];
     self.displayImageView.image = [UIImage imageNamed:@"default_user_avatar"];
     
@@ -50,7 +49,7 @@
             NSAttributedString *attr0 = [[NSAttributedString alloc] initWithString:name];
             [attributedString appendAttributedString:attr0];
             
-            NSString *total = [NSString stringWithFormat:LMLocalizedString(@"Chat members", nil), (int) model.chatGroupInfo.groupMembers.count];
+            NSString *total = [NSString stringWithFormat:LMLocalizedString(@"Chat members", nil), (int) model.chatGroupInfo.membersArray.count];
             // set font color
             NSDictionary *totalColor = @{NSForegroundColorAttributeName: [UIColor lightGrayColor]};
             NSAttributedString *attr1 = [[NSAttributedString alloc] initWithString:total attributes:totalColor];

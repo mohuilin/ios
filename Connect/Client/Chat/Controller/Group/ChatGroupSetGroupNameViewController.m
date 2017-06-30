@@ -8,7 +8,7 @@
 
 #import "ChatGroupSetGroupNameViewController.h"
 #import "NetWorkOperationTool.h"
-
+#import "Protofile.pbobjc.h"
 #import "GroupDBManager.h"
 #import "TextFieldRoundCell.h"
 #import "StringTool.h"

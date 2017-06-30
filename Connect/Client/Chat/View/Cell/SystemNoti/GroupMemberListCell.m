@@ -24,9 +24,9 @@
 
 - (void)setData:(id)data {
     [super setData:data];
-    AccountInfo *user = (AccountInfo *) data;
+    LMRamMemberInfo *user = (LMRamMemberInfo *) data;
     [self.avatarImageView setPlaceholderImageWithAvatarUrl:user.avatar];
-    self.nameLabel.text = user.groupShowName;
+    self.nameLabel.text = user.username;
 }
 
 @end

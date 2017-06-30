@@ -25,7 +25,7 @@
 
 
 @interface GroupMembersListViewController () <UITableViewDelegate, UITableViewDataSource, MGSwipeTableCellDelegate> {
-    AccountInfo *currentUser;
+    LMRamMemberInfo *currentUser;
 }
 
 @property(nonatomic, strong) NSMutableArray *groupMembers;
@@ -36,7 +36,7 @@
 @property(nonatomic, copy) NSString *groupid;
 @property(nonatomic, copy) NSString *groupEcdhKey;
 @property(nonatomic, strong) NSArray *addMembers;
-@property(nonatomic, strong) AccountInfo *adminAttron;
+@property(nonatomic, strong) LMRamMemberInfo *adminAttron;
 
 @end
 
@@ -46,7 +46,7 @@
     if (self = [super init]) {
         self.groupMembers = [NSMutableArray arrayWithArray:members];
         self.isGroupAdmin = isGroupAdmin;
-        currentUser = [[LKUserCenter shareCenter] currentLoginUser];
+        currentUser = [[LMRamMemberInfo alloc] initWithNormalInfo:[[LKUserCenter shareCenter] currentLoginUser]];
     }
     return self;
 }
@@ -56,7 +56,7 @@
         self.groupMembers = [NSMutableArray arrayWithArray:members];
         self.groupid = groupid;
         self.groupEcdhKey = groupEcdhKey;
-        currentUser = [[LKUserCenter shareCenter] currentLoginUser];
+        currentUser = [[LMRamMemberInfo alloc] initWithNormalInfo:[[LKUserCenter shareCenter] currentLoginUser]];
     }
     return self;
 }
@@ -99,7 +99,7 @@
 - (void)verifyWith:(NSArray *)contacts {
     NSMutableDictionary *userDict = [NSMutableDictionary dictionary];
     NSMutableArray *addresses = [NSMutableArray array];
-    for (AccountInfo *user in contacts) {
+    for (LMRamMemberInfo *user in contacts) {
         [addresses objectAddObject:user.address];
         [userDict setObject:user forKey:user.address];
     }
@@ -119,24 +119,24 @@
         if (data) {
             GroupInviteResponseList *tokenList = [GroupInviteResponseList parseFromData:data error:nil];
             for (GroupInviteResponse *tokenResponse in tokenList.listArray) {
-                AccountInfo *info = [userDict valueForKey:tokenResponse.address];
+                LMRamMemberInfo *info = [userDict valueForKey:tokenResponse.address];
                 if (GJCFStringIsNull(info.address)) {
                     continue;
                 }
-                if ([info.pub_key isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
+                if ([info.pubKey isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
                     continue;
                 }
 
                 NSString *msgId = [ConnectTool generateMessageId];
                 ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
                 chatMessage.messageId = msgId;
-                chatMessage.messageOwer = info.pub_key;
+                chatMessage.messageOwer = info.pubKey;
                 chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
                 MMMessage *message = [[MMMessage alloc] init];
                 message.type = GJGCChatInviteToGroup;
                 message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
                 message.message_id = msgId;
-                message.publicKey = info.pub_key;
+                message.publicKey = info.pubKey;
                 message.user_id = info.address;
                 message.ext1 = @{@"avatar": self.talkInfo.chatGroupInfo.avatarUrl ? self.talkInfo.chatGroupInfo.avatarUrl : @"",
                         @"groupname": self.talkInfo.chatGroupInfo.groupName,
@@ -150,7 +150,7 @@
                 chatMessage.message = message;
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:nil]];
+                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pubKey groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:nil]];
 
                 [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:^(MMMessage *message, NSError *error) {
 
@@ -208,9 +208,9 @@
     groupMessage.secretKey = self.groupEcdhKey;
     groupMessage.identifier = self.groupid;
 
-    for (AccountInfo *info in membsers) {
+    for (LMRamMemberInfo *info in membsers) {
 
-        if ([info.pub_key isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
+        if ([info.pubKey isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
             continue;
         }
 
@@ -219,7 +219,7 @@
             [welcomeTip appendString:@"、"];
         }
 
-        GcmData *groupInfoGcmData = [ConnectTool createGcmWithData:groupMessage.data publickey:info.pub_key needEmptySalt:YES];
+        GcmData *groupInfoGcmData = [ConnectTool createGcmWithData:groupMessage.data publickey:info.pubKey needEmptySalt:YES];
         NSString *messageID = [ConnectTool generateMessageId];
 
         MessageData *messageData = [[MessageData alloc] init];
@@ -317,7 +317,7 @@
     GroupMemberListCell *cell = [tableView dequeueReusableCellWithIdentifier:@"GroupMemberListCellID" forIndexPath:indexPath];
     cell.delegate = self;
 
-    AccountInfo *contact = group.items[indexPath.row];
+    LMRamMemberInfo *contact = group.items[indexPath.row];
 
     cell.data = contact;
     return cell;
@@ -328,19 +328,19 @@
 
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     CellGroup *group = self.groups[indexPath.section];
-    AccountInfo *contact = group.items[indexPath.row];
-    DDLogInfo(@"%@", [contact mj_JSONObject]);
+    LMRamMemberInfo *contact = group.items[indexPath.row];
     if (self.fromSource == FromSourceTypeGroupManager) {
         self.adminAttron = contact;
         [self detailManageWithAlert:contact];
     } else {
-        [self showUserDetailPageWithUser:contact];
+        AccountInfo *accountInfo = (AccountInfo *)contact.normalInfo;
+        [self showUserDetailPageWithUser:accountInfo];
     }
 }
 
 #pragma mark - group manage
 
-- (void)detailManageWithAlert:(AccountInfo *)contact {
+- (void)detailManageWithAlert:(LMRamMemberInfo *)contact {
     __weak typeof(self) weakSelf = self;
     NSString *disPlayName = [NSString stringWithFormat:LMLocalizedString(@"Link Selecting  new owner  release your ownership", nil), contact.username];
     UIAlertController *alertControl = [UIAlertController alertControllerWithTitle:nil message:disPlayName preferredStyle:UIAlertControllerStyleAlert];
@@ -393,8 +393,8 @@
             CellGroup *group = [[CellGroup alloc] init];
             group.headTitle = prex;
             items = [NSMutableArray array];
-            for (AccountInfo *contact in self.groupMembers) {
-                NSString *name = contact.groupShowName;
+            for (LMRamMemberInfo *contact in self.groupMembers) {
+                NSString *name = contact.username;
                 NSString *namePiny = [[name transformToPinyin] uppercaseString];
                 if (namePiny.length <= 0) {
                     continue;
@@ -420,9 +420,9 @@
     }
     if (!_indexs) {
         _indexs = [NSMutableArray array];
-        for (AccountInfo *contact in self.groupMembers) {
+        for (LMRamMemberInfo *contact in self.groupMembers) {
             NSString *prex = @"";
-            NSString *name = contact.groupShowName;
+            NSString *name = contact.username;
             if (name.length <= 0) {
                 continue;
             }
@@ -473,12 +473,12 @@
 
 - (BOOL)swipeTableCell:(MGSwipeTableCell *)cell canSwipe:(MGSwipeDirection)direction {
 
-    AccountInfo *admin = [self.groupMembers firstObject];
+    LMRamMemberInfo *admin = [self.groupMembers firstObject];
     if ([currentUser.address isEqualToString:admin.address]) {
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
 
         CellGroup *group = [self.groups objectAtIndexCheck:indexPath.section];
-        AccountInfo *willRemoveUser = group.items[indexPath.row];
+        LMRamMemberInfo *willRemoveUser = group.items[indexPath.row];
 
         if (willRemoveUser.isGroupAdmin) {
             return NO;
@@ -547,7 +547,7 @@
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
     __weak __typeof(&*self) weakSelf = self;
     CellGroup *group = [self.groups objectAtIndexCheck:indexPath.section];
-    AccountInfo *willRemoveUser = group.items[indexPath.row];
+    LMRamMemberInfo *willRemoveUser = group.items[indexPath.row];
     DelOrQuitGroupMember *adduser = [[DelOrQuitGroupMember alloc] init];
     adduser.identifier = self.groupid;
     adduser.address = willRemoveUser.address;
@@ -565,27 +565,26 @@
             }];
             return;
         }
-
-        [[GroupDBManager sharedManager] removeMemberWithAddress:willRemoveUser.address groupId:weakSelf.groupid];
-
+        
         NSArray *groupArray = [[GroupDBManager sharedManager] getgroupMemberByGroupIdentifier:weakSelf.groupid];
-        if (groupArray.count < 2) {
+        if (groupArray.count < 3) {
             [GCDQueue executeInMainQueue:^{
                 SendNotify(ConnnectQuitGroupNotification, weakSelf.groupid);
-                [self.navigationController popToRootViewControllerAnimated:YES];
                 [[GroupDBManager sharedManager] deletegroupWithGroupId:weakSelf.groupid];
+                [self.navigationController popToRootViewControllerAnimated:YES];
             }];
         } else {
             [GCDQueue executeInMainQueue:^{
                 SendNotify(ConnnectGroupInfoDidChangeNotification, weakSelf.groupid);
             }];
-
             [weakSelf createRemoveMessageWithUser:willRemoveUser];
+            [[GroupDBManager sharedManager] removeMemberWithAddress:willRemoveUser.address groupId:weakSelf.groupid];
         }
 
     }                                  fail:^(NSError *error) {
-        [MBProgressHUD hideHUDForView:weakSelf.view];
+        
         [GCDQueue executeInMainQueue:^{
+            [MBProgressHUD hideHUDForView:weakSelf.view];
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Remove Member Failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
         }];
 
@@ -594,7 +593,7 @@
 }
 
 
-- (void)createRemoveMessageWithUser:(AccountInfo *)user {
+- (void)createRemoveMessageWithUser:(LMRamMemberInfo *)user {
 
     [self.groupMembers removeObject:user];
     [self reloadView];

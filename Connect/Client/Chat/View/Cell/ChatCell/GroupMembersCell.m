@@ -8,7 +8,7 @@
 
 #import "GroupMembersCell.h"
 #import "MemberHeaderView.h"
-
+#import "LMRamMemberInfo.h"
 @interface GroupMembersCell () {
     CGFloat margin;
 }
@@ -71,9 +71,9 @@
 
     margin = (self.membersView.width - (50 * 4)) / 8;
 
-    AccountInfo *info = [members objectAtIndexCheck:0];
+    LMRamMemberInfo *info = [members objectAtIndexCheck:0];
 
-    MemberHeaderView *headerView0 = [[MemberHeaderView alloc] initWithAccountInfo:info tapBlock:^(AccountInfo *info) {
+    MemberHeaderView *headerView0 = [[MemberHeaderView alloc] initWithAccountInfo:info tapBlock:^(LMRamMemberInfo *info) {
         if (weakSelf.tapMemberHeaderBlock) {
             weakSelf.tapMemberHeaderBlock(info);
         }
@@ -83,9 +83,9 @@
 
     UIView *lastView = headerView0;
     for (int i = 1; i < max; i++) {
-        AccountInfo *info = [members objectAtIndexCheck:i];
+        LMRamMemberInfo *info = [members objectAtIndexCheck:i];
 
-        MemberHeaderView *headerView = [[MemberHeaderView alloc] initWithAccountInfo:info tapBlock:^(AccountInfo *info) {
+        MemberHeaderView *headerView = [[MemberHeaderView alloc] initWithAccountInfo:info tapBlock:^(LMRamMemberInfo *info) {
             if (weakSelf.tapMemberHeaderBlock) {
                 weakSelf.tapMemberHeaderBlock(info);
             }

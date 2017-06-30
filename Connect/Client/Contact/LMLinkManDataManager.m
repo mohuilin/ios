@@ -11,7 +11,6 @@
 #import "NewFriendItemModel.h"
 #import "NSString+Pinyin.h"
 #import "BadgeNumberManager.h"
-#import "LMGroupInfo.h"
 #import "GroupDBManager.h"
 #import "NetWorkOperationTool.h"
 #import "KTSContactsManager.h"
@@ -23,6 +22,8 @@
 #import "LMRamGroupInfo.h"
 #import "NSString+Pinyin.h"
 #import "LMFriendRequestInfo.h"
+#import "LMRamGroupInfo.h"
+#import "LMRamMemberInfo.h"
 
 
 @interface LMLinkManDataManager ()<NSMutableCopying>
@@ -66,7 +67,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
             [GCDQueue executeInMainQueue:^{
                 [self.commonGroup removeAllObjects];
-                for (LMGroupInfo *group in groups) {
+                for (LMRamGroupInfo *group in groups) {
                     if (![self.commonGroup containsObject:group]) {
                         [self.commonGroup objectAddObject:group];
                     }
@@ -303,7 +304,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
     [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
         [GCDQueue executeInMainQueue:^{
             [self.commonGroup removeAllObjects];
-            for (LMGroupInfo *group in groups) {
+            for (LMRamGroupInfo *group in groups) {
                 if (![self.commonGroup containsObject:group]) {
                     [self.commonGroup objectAddObject:group];
                 }
@@ -541,9 +542,8 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
             if (!error) {
                 [weakSelf.commonGroup removeAllObjects];
                 for (LMRamGroupInfo *realmGroup in results) {
-                    LMGroupInfo *group = (LMGroupInfo *)realmGroup.normalInfo;
-                    if (group) {
-                        [weakSelf.commonGroup addObject:group];
+                    if (realmGroup) {
+                        [weakSelf.commonGroup addObject:realmGroup];
                     }
                 }
                 [weakSelf addDataToGroupArray];

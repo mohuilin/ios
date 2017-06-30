@@ -7,7 +7,7 @@
 //
 
 #import "GroupDBManager.h"
-#import "LMRamGroupInfo.h"
+
 
 static GroupDBManager *manager = nil;
 
@@ -50,7 +50,7 @@ static GroupDBManager *manager = nil;
     }];
 }
 
-- (LMGroupInfo *)addMember:(NSArray *)newMembers ToGroupChat:(NSString *)groupId {
+- (LMRamGroupInfo *)addMember:(NSArray *)newMembers ToGroupChat:(NSString *)groupId {
 
     if (GJCFStringIsNull(groupId) || newMembers.count <= 0) {
         return nil;
@@ -58,8 +58,7 @@ static GroupDBManager *manager = nil;
     RLMResults<LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ", groupId]];
     LMRamGroupInfo *ramGroupInfo = [results lastObject];
     ramGroupInfo.groupIdentifer = groupId;
-    for (AccountInfo *info in newMembers) {
-        LMRamMemberInfo *ramInfo = [[LMRamMemberInfo alloc] initWithNormalInfo:info];
+    for (LMRamMemberInfo *ramInfo in newMembers) {
         ramInfo.identifier = groupId;
         if (ramInfo.isGroupAdmin) {
             ramGroupInfo.admin = ramInfo;
@@ -70,19 +69,17 @@ static GroupDBManager *manager = nil;
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         [realm addOrUpdateObject:ramGroupInfo];
     }];
-    LMGroupInfo *groupInfo = (LMGroupInfo *)[results lastObject].normalInfo;
-    return groupInfo;
+    return ramGroupInfo;
 
 }
 
-- (void)savegroup:(LMGroupInfo *)group {
+- (void)savegroup:(LMRamGroupInfo *)group {
 
     if (GJCFStringIsNull(group.groupIdentifer)) {
         return;
     }
-    LMRamGroupInfo *ramGroupInfo = [[LMRamGroupInfo alloc] initWithNormalInfo:group];
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-       [realm addOrUpdateObject:ramGroupInfo];
+       [realm addOrUpdateObject:group];
     }];
 
 }
@@ -127,26 +124,6 @@ static GroupDBManager *manager = nil;
         }];
     }
 }
-
-- (void)updateGroup:(LMGroupInfo *)group {
-    if (GJCFStringIsNull(group.groupIdentifer)) {
-        return;
-    }
-
-    RLMResults<LMRamMemberInfo *> *memberResult = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",group.groupIdentifer]];
-    for (LMRamMemberInfo * info in memberResult) {
-       [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-           [realm deleteObject:info];
-       }];
-    }
-    LMRamGroupInfo *ramGroupInfo = [[LMRamGroupInfo alloc] initWithNormalInfo:group];
-    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-       [realm addOrUpdateObject:ramGroupInfo];
-    }];
-    
-}
-
-
 - (void)updateGroupMembserUsername:(NSString *)userName address:(NSString *)address groupId:(NSString *)groupId {
     if (GJCFStringIsNull(groupId) || GJCFStringIsNull(address)) {
         return;
@@ -206,7 +183,16 @@ static GroupDBManager *manager = nil;
     }
 
 }
-
+- (BOOL)isGroupExist:(NSString *)groupId {
+    if (GJCFStringIsNull(groupId)) {
+        return NO;
+    }
+    RLMResults<LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ",groupId]];
+    if (results.count >0) {
+        return YES;
+    }
+    return NO;
+}
 - (void)updateGroupName:(NSString *)name groupId:(NSString *)groupId {
 
     if (GJCFStringIsNull(name) || GJCFStringIsNull(groupId)) {
@@ -233,7 +219,7 @@ static GroupDBManager *manager = nil;
 }
 
 
-- (LMGroupInfo *)getGroupByGroupIdentifier:(NSString *)groupid {
+- (LMRamGroupInfo *)getGroupByGroupIdentifier:(NSString *)groupid {
 
     if (GJCFStringIsNull(groupid)) {
         return nil;
@@ -242,8 +228,7 @@ static GroupDBManager *manager = nil;
     RLMResults<LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@'", groupid]];
     if (results.count > 0) {
         LMRamGroupInfo *ramGroupInfo = [results lastObject];
-        LMGroupInfo *groupInfo = (LMGroupInfo *)ramGroupInfo.normalInfo;
-        return groupInfo;
+        return ramGroupInfo;
     }
     return nil;
 }
@@ -310,8 +295,7 @@ static GroupDBManager *manager = nil;
         return nil;
     }
     for (LMRamGroupInfo *ramGroupInfo  in ramGroupResult) {
-        LMGroupInfo *groupInfo = (LMGroupInfo *)ramGroupInfo.normalInfo;
-        [groupsArray addObject:groupInfo];
+        [groupsArray addObject:ramGroupInfo];
     }
     return groupsArray;
 }
@@ -353,8 +337,7 @@ static GroupDBManager *manager = nil;
     }
     NSMutableArray *groupArray = [NSMutableArray array];
     for (LMRamGroupInfo *ramGroupInfo in results) {
-        LMGroupInfo *groupInfo = (LMGroupInfo *)ramGroupInfo.normalInfo;
-        [groupArray addObject:groupInfo];
+        [groupArray addObject:ramGroupInfo];
     }
     return groupArray.copy;
 
@@ -411,6 +394,15 @@ static GroupDBManager *manager = nil;
     [self executeRealmWithBlock:^{
         ramNewAccount.isGroupAdmin = YES;
     }];
+    LMRamGroupInfo *groupInfo = [[LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ",groupId]] lastObject];
+    [self executeRealmWithBlock:^{
+        groupInfo.admin = ramNewAccount;
+    }];
+    NSInteger ramAdminIndex = [groupInfo.membersArray indexOfObject:ramNewAccount];
+    [self executeRealmWithBlock:^{
+        [groupInfo.membersArray moveObjectAtIndex:ramAdminIndex toIndex:0];
+    }];
+    
 }
 
 - (void)removeFromCommonGroup:(NSString *)groupid {
@@ -447,27 +439,25 @@ static GroupDBManager *manager = nil;
     return ramGroupInfo.isCommonGroup;
 }
 
-- (AccountInfo *)getAdminByGroupId:(NSString *)groupId {
+- (LMRamMemberInfo *)getAdminByGroupId:(NSString *)groupId {
     if (GJCFStringIsNull(groupId)) {
         return nil;
     }
     RLMResults<LMRamMemberInfo *> *ramAccountResult = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND isGroupAdmin == 1 ",groupId]];
     LMRamMemberInfo *ramAccountInfo = [ramAccountResult lastObject];
     if (ramAccountInfo) {
-        AccountInfo *accountInfo = (AccountInfo *)ramAccountInfo.normalInfo;
-        return accountInfo;
+        return ramAccountInfo;
     }
     return nil;
 }
 
 
-- (AccountInfo *)getGroupMemberByGroupId:(NSString *)groupId memberAddress:(NSString *)address {
+- (LMRamMemberInfo *)getGroupMemberByGroupId:(NSString *)groupId memberAddress:(NSString *)address {
     if (GJCFStringIsNull(groupId) || GJCFStringIsNull(address)) {
         return nil;
     }
     LMRamMemberInfo *info = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND address ='%@' ", groupId, address]] lastObject];
-    AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
-    return accountInfo;
+    return info;
 
 }
 
@@ -500,7 +490,7 @@ static GroupDBManager *manager = nil;
 }
 
 - (BOOL)checkLoginUserIsGroupAdminWithIdentifier:(NSString *)identifier {
-    AccountInfo *admin = [self getAdminByGroupId:identifier];
+    LMRamMemberInfo *admin = [self getAdminByGroupId:identifier];
     return [admin.address isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address];
 }
 @end

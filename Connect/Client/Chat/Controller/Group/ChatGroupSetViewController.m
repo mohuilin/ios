@@ -22,6 +22,10 @@
 #import "InviteUserPage.h"
 #import "YYImageCache.h"
 #import "MessageDBManager.h"
+#import "LMRamGroupInfo.h"
+#import "LMRamMemberInfo.h"
+
+
 
 typedef NS_ENUM(NSUInteger, SourceType) {
     SourceTypeGroup = 5
@@ -33,7 +37,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 
 @property(nonatomic, copy) NSString *currentMyName;
 
-@property(nonatomic, weak) AccountInfo *currentUser;
+@property(nonatomic, weak) LMRamMemberInfo *currentUser;
 
 @property(nonatomic, weak) GJGCChatFriendTalkModel *talkModel;
 
@@ -41,9 +45,11 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 
 @property(assign, nonatomic) BOOL isGroupMaster;
 
-@property(weak, nonatomic) AccountInfo *groupMasterInfo;
+@property(weak, nonatomic) LMRamMemberInfo *groupMasterInfo;
 //Show arrow
 @property(assign, nonatomic) BOOL isHaveSow;
+@property(nonatomic, strong) RLMNotificationToken *groupToken;
+@property(nonatomic, strong) LMRamGroupInfo *groupInfo;
 
 @end
 
@@ -54,16 +60,17 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 - (instancetype)initWithTalkInfo:(GJGCChatFriendTalkModel *)talkInfo {
     if (self = [super init]) {
         self.talkModel = talkInfo;
-        self.members = talkInfo.chatGroupInfo.groupMembers;
+        NSMutableArray *temArray = [NSMutableArray array];
         AccountInfo *currentUser = [[LKUserCenter shareCenter] currentLoginUser];
         self.currentGroupName = talkInfo.chatGroupInfo.groupName;
-        for (AccountInfo *member in self.members) {
+        for (LMRamMemberInfo *member in talkInfo.chatGroupInfo.membersArray) {
             if ([currentUser.address isEqualToString:member.address]) {
-                self.currentMyName = member.groupShowName;
+                self.currentMyName = member.groupNicksName;
                 self.currentUser = member;
-                break;
             }
+            [temArray addObject:member];
         }
+        self.members = temArray;
     }
     return self;
 }
@@ -77,15 +84,34 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         self.isHaveSow = YES;
     }
     self.title = LMLocalizedString(@"Link Group", nil);
-    RegisterNotify(GroupAdminChangeNotification, @selector(groupAdmingChange))
     RegisterNotify(ConnnectGroupInfoDidChangeNotification, @selector(grouInfoChange:))
+    [self addNotification];
 }
-
-- (void)groupAdmingChange {
-    AccountInfo *currentAdmin = [[GroupDBManager sharedManager] getAdminByGroupId:self.talkModel.chatGroupInfo.groupIdentifer];
-    [self reloadDataWithNewAdmin:currentAdmin.address];
+- (void)addNotification {
+    self.groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.talkModel.chatGroupInfo.groupIdentifer];
+    __weak typeof(self.groupInfo)weakGroupInfo = self.groupInfo;
+    __weak typeof(self)weakSelf = self;
+   self.groupToken = [self.groupInfo addNotificationBlock:^(BOOL deleted, NSArray<RLMPropertyChange *> * _Nullable changes, NSError * _Nullable error) {
+       if (!error) {
+           for (RLMPropertyChange *property in changes) {
+               if ([property.name isEqualToString:@"admin"]) {
+                   [weakSelf addChnageGroupAdmin:weakGroupInfo];
+               }
+           }
+       }
+   }];
 }
-
+- (void)addChnageGroupAdmin:(LMRamGroupInfo *)groupInfo {
+    NSMutableArray *temArray = [NSMutableArray array];
+    for (LMRamMemberInfo *info in groupInfo.membersArray) {
+        [temArray addObject:info];
+    }
+    self.members = temArray.copy;
+    [GCDQueue executeInMainQueue:^{
+       [self reloadDataOnMainQueue];
+    }];
+  
+}
 - (void)syncGroupBaseInfo {
     GroupId *groupIdentifier = [GroupId new];
     groupIdentifier.identifier = self.talkModel.chatGroupInfo.groupIdentifer;
@@ -102,10 +128,12 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         if (data) {
             NSError *error = nil;
             GroupSettingInfo *groupSetInfo = [GroupSettingInfo parseFromData:data error:&error];
-            self.talkModel.chatGroupInfo.isPublic = groupSetInfo.public_p;
-            self.talkModel.chatGroupInfo.isGroupVerify = groupSetInfo.reviewed;
-            self.talkModel.chatGroupInfo.avatarUrl = groupSetInfo.avatar;
-            self.talkModel.chatGroupInfo.summary = groupSetInfo.summary;
+            [[GroupDBManager sharedManager] executeRealmWithBlock:^{
+                self.talkModel.chatGroupInfo.isPublic = groupSetInfo.public_p;
+                self.talkModel.chatGroupInfo.isGroupVerify = groupSetInfo.reviewed;
+                self.talkModel.chatGroupInfo.avatarUrl = groupSetInfo.avatar;
+                self.talkModel.chatGroupInfo.summary = groupSetInfo.summary;
+            }];
             if ([[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:self.talkModel.chatIdendifier] != groupSetInfo.mute) {
                 if (groupSetInfo.mute) {
                     [[RecentChatDBManager sharedManager] setMuteWithIdentifer:self.talkModel.chatIdendifier];
@@ -130,11 +158,15 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 - (void)grouInfoChange:(NSNotification *)note {
     NSString *groupIdentifer = (NSString *) note.object;
 
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
+    LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
     self.talkModel.chatGroupInfo = group;
-    self.members = group.groupMembers;
+    NSMutableArray *temArray = [NSMutableArray array];
+    for (LMRamMemberInfo *info in group.membersArray) {
+        [temArray addObject:info];
+    }
+    self.members = temArray.copy;
     NSMutableArray *avatars = [NSMutableArray array];
-    for (AccountInfo *membser in group.groupMembers) {
+    for (LMRamMemberInfo *membser in group.membersArray) {
         if (avatars.count == 9) {
             break;
         }
@@ -142,9 +174,9 @@ typedef NS_ENUM(NSUInteger, SourceType) {
     }
     self.currentGroupName = group.groupName;
     AccountInfo *currentUser = [[LKUserCenter shareCenter] currentLoginUser];
-    for (AccountInfo *info in group.groupMembers) {
+    for (LMRamMemberInfo *info in group.membersArray) {
         if ([currentUser.address isEqualToString:info.address]) {
-            self.currentMyName = info.groupShowName;
+            self.currentMyName = info.groupNicksName;
             self.currentUser = info;
             break;
         }
@@ -210,13 +242,16 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         CellItem *manageGroup = [CellItem itemWithIcon:@"message_groupchat_setting" title:displayName type:CellItemTypeImageValue1 operation:^{
             LMchatGroupManageViewController *manageGroup = [[LMchatGroupManageViewController alloc] init];
             manageGroup.switchChangeBlock = ^(BOOL isPublic) {
-                weakSelf.talkModel.chatGroupInfo.isPublic = isPublic;
+                [[GroupDBManager sharedManager] executeRealmWithBlock:^{
+                    weakSelf.talkModel.chatGroupInfo.isPublic = isPublic;
+                }];
             };
             manageGroup.titleName = displayName;
             manageGroup.talkModel = weakSelf.talkModel;
             manageGroup.groupMasterInfo = weakSelf.talkModel.chatGroupInfo.admin;
             manageGroup.groupAdminChangeCallBack = ^(NSString *address) {
-                [weakSelf reloadDataWithNewAdmin:address];
+                __weak typeof(self.groupInfo)weakGroupInfo = self.groupInfo;
+                [weakSelf addChnageGroupAdmin:weakGroupInfo];
             };
             [weakSelf.navigationController pushViewController:manageGroup animated:YES];
         }];
@@ -266,7 +301,9 @@ typedef NS_ENUM(NSUInteger, SourceType) {
             [SetGlobalHandler setCommonContactGroupWithIdentifer:weakSelf.talkModel.chatIdendifier complete:^(NSError *error) {
                 if (!error) {
                     [[GroupDBManager sharedManager] addGroupToCommonGroup:weakSelf.talkModel.chatIdendifier];
-                    weakSelf.talkModel.chatGroupInfo.isCommonGroup = isCommonGroup;
+                    [[GroupDBManager sharedManager] executeRealmWithBlock:^{
+                       weakSelf.talkModel.chatGroupInfo.isCommonGroup = isCommonGroup;
+                    }];
                 } else {
                     [GCDQueue executeInMainQueue:^{
                         [MBProgressHUD showToastwithText:LMLocalizedString(@"Update fail", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
@@ -279,7 +316,9 @@ typedef NS_ENUM(NSUInteger, SourceType) {
             [SetGlobalHandler removeCommonContactGroupWithIdentifer:weakSelf.talkModel.chatIdendifier complete:^(NSError *error) {
                 if (!error) {
                     [[GroupDBManager sharedManager] removeFromCommonGroup:weakSelf.talkModel.chatIdendifier];
-                    weakSelf.talkModel.chatGroupInfo.isCommonGroup = isCommonGroup;
+                    [[GroupDBManager sharedManager] executeRealmWithBlock:^{
+                      weakSelf.talkModel.chatGroupInfo.isCommonGroup = isCommonGroup;
+                    }];
                 } else {
                     [GCDQueue executeInMainQueue:^{
                         [MBProgressHUD showToastwithText:LMLocalizedString(@"Fail", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
@@ -392,8 +431,9 @@ typedef NS_ENUM(NSUInteger, SourceType) {
             [weakSelf showAccountListPage];
         };
 
-        memberCell.tapMemberHeaderBlock = ^(AccountInfo *tapInfo) {
-            [weakSelf showUserDetailPageWithUser:tapInfo];
+        memberCell.tapMemberHeaderBlock = ^(LMRamMemberInfo *tapInfo) {
+            AccountInfo *userInfo = (AccountInfo *)tapInfo.normalInfo;
+            [weakSelf showUserDetailPageWithUser:userInfo];
         };
         return cell;
     } else if (item.type == CellItemTypeNone) {
@@ -519,9 +559,12 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 - (void)inviteNewMembers:(NSArray *)membsers {
 
     __weak typeof(self) weakSelf = self;
-    LMGroupInfo *group = [[GroupDBManager sharedManager] addMember:membsers ToGroupChat:weakSelf.talkModel.chatIdendifier];
-    self.members = group.groupMembers.copy;
-
+    LMRamGroupInfo *group = [[GroupDBManager sharedManager] addMember:membsers ToGroupChat:weakSelf.talkModel.chatIdendifier];
+    NSMutableArray *temArray = [NSMutableArray array];
+    for (LMRamMemberInfo *info in group.membersArray) {
+        [temArray addObject:info];
+    }
+    self.members = temArray.copy;
     [self reloadDataOnMainQueue];
 
     NSMutableString *welcomeTip = [NSMutableString string];
@@ -621,28 +664,8 @@ typedef NS_ENUM(NSUInteger, SourceType) {
     self.currentUser = nil;
     self.talkModel = nil;
     RemoveNofify;
+    [self.groupToken stop];
+    self.groupToken = nil;
+    
 }
-
-#pragma mark - relod ui
-
-- (void)reloadDataWithNewAdmin:(NSString *)address {
-    AccountInfo *newAdmin = nil;
-    for (AccountInfo *member in self.talkModel.chatGroupInfo.groupMembers) {
-        if ([address isEqualToString:member.address]) {
-            newAdmin = member;
-            newAdmin.isGroupAdmin = YES;
-        } else {
-            member.isGroupAdmin = NO;
-        }
-    }
-    self.talkModel.chatGroupInfo.admin = newAdmin;
-    if (newAdmin) {
-        NSMutableArray *temMembers = self.talkModel.chatGroupInfo.groupMembers.mutableCopy;
-        [temMembers moveObject:newAdmin toIndex:0];
-        self.talkModel.chatGroupInfo.groupMembers = temMembers;
-        self.members = temMembers.copy;
-    }
-    [self reloadDataOnMainQueue];
-}
-
 @end

@@ -14,7 +14,7 @@
 #import "ConnectTool.h"
 #import "LMConversionManager.h"
 #import "LMRealmDBManager.h"
-
+#import "LMRamGroupInfo.h"
 
 static RecentChatDBManager *manager = nil;
 
@@ -173,7 +173,7 @@ static RecentChatDBManager *manager = nil;
     if (!realmModel) {
         RecentChatModel *model = [RecentChatModel new];
         model.identifier = identifier;
-        LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
+        LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
         if (group) {
             model.talkType = GJGCChatFriendTalkTypeGroup;
             model.chatGroupInfo = group;
@@ -432,7 +432,7 @@ static RecentChatDBManager *manager = nil;
         }];
     } else {
         if (groupChat) {
-            LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
+            LMRamGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
             if (GJCFStringIsNull(groupInfo.groupEcdhKey)) {
                 return nil;
             }
@@ -529,7 +529,7 @@ static RecentChatDBManager *manager = nil;
 
     } else {
         if (groupChat) {
-            LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
+            LMRamGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
             if (GJCFStringIsNull(ecdhKey)) {
                 ecdhKey = groupInfo.groupEcdhKey;
                 if (GJCFStringIsNull(ecdhKey)) {

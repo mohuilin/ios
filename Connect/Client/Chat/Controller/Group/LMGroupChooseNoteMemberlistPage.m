@@ -27,7 +27,7 @@
 - (instancetype)initWithMembers:(NSArray *)members {
     if (self = [super init]) {
         self.groupMembers = [NSMutableArray arrayWithArray:members];
-        for (AccountInfo *user in self.groupMembers) {
+        for (LMRamMemberInfo *user in self.groupMembers) {
             if ([user.address isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
                 [self.groupMembers removeObject:user];
                 break;
@@ -94,7 +94,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     CellGroup *group = self.groups[indexPath.section];
-    AccountInfo *contact = group.items[indexPath.row];
+    LMRamMemberInfo *contact = group.items[indexPath.row];
     if (self.ChooseGroupMemberCallBack) {
         self.ChooseGroupMemberCallBack(contact);
     }
@@ -135,8 +135,8 @@
             CellGroup *group = [[CellGroup alloc] init];
             group.headTitle = prex;
             items = [NSMutableArray array];
-            for (AccountInfo *contact in self.groupMembers) {
-                NSString *name = contact.groupShowName;
+            for (LMRamMemberInfo *contact in self.groupMembers) {
+                NSString *name = contact.username;
                 NSString *namePiny = [[name transformToPinyin] uppercaseString];
                 if (namePiny.length <= 0) {
                     continue;
@@ -162,9 +162,9 @@
     }
     if (!_indexs) {
         _indexs = [NSMutableArray array];
-        for (AccountInfo *contact in self.groupMembers) {
+        for (LMRamMemberInfo *contact in self.groupMembers) {
             NSString *prex = @"";
-            NSString *name = contact.groupShowName;
+            NSString *name = contact.username;
             if (name.length <= 0) {
                 continue;
             }

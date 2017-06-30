@@ -7,7 +7,7 @@
 //
 
 #import "BaseInfo.h"
-#import "LMGroupInfo.h"
+#import "LMRamGroupInfo.h"
 
 @interface RecentChatModel : BaseInfo
 
@@ -28,7 +28,7 @@
 
 @property(nonatomic, strong) AccountInfo *chatUser;
 
-@property(nonatomic, strong) LMGroupInfo *chatGroupInfo;
+@property(nonatomic, strong) LMRamGroupInfo *chatGroupInfo;
 
 @property(nonatomic, assign) GJGCChatFriendTalkType talkType;
 
