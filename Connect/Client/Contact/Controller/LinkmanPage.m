@@ -23,6 +23,7 @@
 #import "LMHandleScanResultManager.h"
 #import "LMLinkManDataManager.h"
 #import "RecentChatDBManager.h"
+#import "LMContactAccountInfo.h"
 
 @interface LinkmanPage () <MGSwipeTableCellDelegate, UINavigationControllerDelegate, LMLinkManDataManagerDelegate>
 
@@ -175,8 +176,8 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSArray *items = self.groupsFriend[section][@"items"];
-    return items.count;
+    CellGroup *group = [self.groupsFriend objectAtIndex:section];
+    return group.items.count;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -192,17 +193,17 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     ConnectTableHeaderView *hearderView = [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"ConnectTableHeaderViewID"];
-    hearderView.customTitle.text = [self.groupsFriend[section] valueForKey:@"title"];
-    NSString *titleIcon = [self.groupsFriend[section] valueForKey:@"titleicon"];
-    hearderView.customIcon = titleIcon;
+    CellGroup *group = [self.groupsFriend objectAtIndex:section];
+    hearderView.customTitle.text = group.headTitle;
+    hearderView.customIcon = group.headTitleImage;
     return hearderView;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
-    NSDictionary *groupDict = [self.groupsFriend objectAtIndex:indexPath.section];
-    NSArray *items = [groupDict valueForKey:@"items"];
+    CellGroup *group = [self.groupsFriend objectAtIndex:indexPath.section];
+    NSArray *items = group.items;
     id data = nil;
     if (items.count > 0) {
       data = [items objectAtIndex:indexPath.row];
@@ -227,7 +228,8 @@
         page.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:page animated:YES];
     } else {
-        id data = self.groupsFriend[indexPath.section][@"items"][indexPath.row];
+        CellGroup *group = [self.groupsFriend objectAtIndex:indexPath.section];
+        id data = [group.items objectAtIndex:indexPath.row];
         if ([data isKindOfClass:[LMGroupInfo class]]) {
             LMGroupInfo *group = (LMGroupInfo *) data;
             GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
@@ -244,16 +246,18 @@
             GJGCChatGroupViewController *groupChat = [[GJGCChatGroupViewController alloc] initWithTalkInfo:talk];
             groupChat.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:groupChat animated:YES];
-        } else if ([data isKindOfClass:[AccountInfo class]]) {
-            AccountInfo *user = (AccountInfo *) data;
-            if ([user.pub_key isEqualToString:kSystemIdendifier]) {
+        } else if ([data isKindOfClass:[LMContactAccountInfo class]]) {
+            LMContactAccountInfo *contact = (LMContactAccountInfo *) data;
+            
+            //connect term
+            if ([contact.pub_key isEqualToString:kSystemIdendifier]) {
                 GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
-                talk.chatIdendifier = user.pub_key;
+                talk.chatIdendifier = contact.pub_key;
                 talk.snapChatOutDataTime = 0;
                 talk.talkType = GJGCChatFriendTalkTypePostSystem;
-                talk.name = user.username;
-                talk.headUrl = user.avatar;
-                talk.chatUser = user;
+                talk.name = contact.username;
+                talk.headUrl = contact.avatar;
+                talk.chatUser = contact.normalInfo;
                 // save session object
                 [SessionManager sharedManager].chatSession = talk.chatIdendifier;
                 [SessionManager sharedManager].chatObject = talk.chatUser;
@@ -262,7 +266,7 @@
                 privateChat.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:privateChat animated:YES];
             } else {
-                UserDetailPage *detailPage = [[UserDetailPage alloc] initWithUser:user];
+                UserDetailPage *detailPage = [[UserDetailPage alloc] initWithUser:contact.normalInfo];
                 detailPage.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:detailPage animated:YES];
             }
@@ -288,7 +292,8 @@
     if (indexPath.section == 0) {
         return NO;
     }
-    id model = self.groupsFriend[indexPath.section][@"items"][indexPath.row];
+    CellGroup *group = [self.groupsFriend objectAtIndex:indexPath.section];
+    id model = [group.items objectAtIndex:indexPath.row];
     if ([model isKindOfClass:[LMGroupInfo class]]) {
         return NO;
     } else if ([model isKindOfClass:[AccountInfo class]]){
