@@ -259,7 +259,6 @@
                 // save session object
                 [SessionManager sharedManager].chatSession = talk.chatIdendifier;
                 [SessionManager sharedManager].chatObject = talk.chatUser;
-
                 GJGCChatSystemNotiViewController *privateChat = [[GJGCChatSystemNotiViewController alloc] initWithTalkInfo:talk];
                 privateChat.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:privateChat animated:YES];
@@ -305,11 +304,8 @@
 
 - (NSArray *)swipeTableCell:(MGSwipeTableCell *)cell swipeButtonsForDirection:(MGSwipeDirection)direction
               swipeSettings:(MGSwipeSettings *)swipeSettings expansionSettings:(MGSwipeExpansionSettings *)expansionSettings {
-
     swipeSettings.transition = MGSwipeTransitionStatic;
-
     if (direction == MGSwipeDirectionRightToLeft) {
-
         CGFloat padding = AUTO_WIDTH(50);
         __weak __typeof(&*self) weakSelf = self;
         MGSwipeButton *setButton = [MGSwipeButton buttonWithTitle:@"" icon:[UIImage imageNamed:@"contract_setting"] backgroundColor:[UIColor whiteColor] padding:padding callback:^BOOL(MGSwipeTableCell *sender) {
@@ -317,12 +313,9 @@
             [weakSelf friendPerssionSet:cell];
             return YES;
         }];
-
         return @[setButton];
     }
-
     return nil;
-
 }
 
 - (void)swipeTableCell:(MGSwipeTableCell *)cell didChangeSwipeState:(MGSwipeState)state gestureIsActive:(BOOL)gestureIsActive {
@@ -331,25 +324,5 @@
     } else {
         self.tableView.scrollEnabled = NO;
     }
-    NSString *str;
-    switch (state) {
-        case
-            MGSwipeStateNone:
-            str = @"None";
-            break;
-        case MGSwipeStateSwippingLeftToRight:
-            str = @"SwippingLeftToRight";
-            break;
-        case MGSwipeStateSwippingRightToLeft:
-            str = @"SwippingRightToLeft";
-            break;
-        case MGSwipeStateExpandingLeftToRight:
-            str = @"ExpandingLeftToRight";
-            break;
-        case MGSwipeStateExpandingRightToLeft:
-            str = @"ExpandingRightToLeft";
-            break;
-    }
-    DDLogInfo(@"Swipe state: %@ ::: Gesture: %@", str, gestureIsActive ? @"Active" : @"Ended");
 }
 @end

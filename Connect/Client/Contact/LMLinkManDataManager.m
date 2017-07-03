@@ -25,7 +25,7 @@
 #import "LMFriendRequestInfo.h"
 
 
-@interface LMLinkManDataManager ()<NSMutableCopying>
+@interface LMLinkManDataManager ()
 
 // user list
 @property(nonatomic, strong) NSMutableArray *friendsArr;
@@ -159,101 +159,230 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 - (NSMutableArray *)getListIndexs {
     return self.indexs;
 }
-- (NSMutableArray *)getListGroupsFriend:(AccountInfo *)shareContact {
-    
-    if (self.groupsFriend.count <= 1) {
-        return nil;
-    }
-    //get prex
-    NSString *prex = [self getPrex:shareContact];
-    NSMutableArray *temGroupArray = [NSMutableArray array];
-    for (NSInteger index = 1; index < self.groupsFriend.count;index++) {
-        NSMutableDictionary * dic = [self.groupsFriend[index] mutableCopy];
-        NSMutableArray *temArray = [dic[@"items"] mutableCopy];
-        NSString *temTitle = dic[@"title"];
-        NSMutableArray *temCommonArray = [NSMutableArray array];
-        id data = temArray[0];
-        if ([data isKindOfClass:[AccountInfo class]]) {
-            if (![prex isEqualToString:@"C"]) { // is not egual with connect
-                if ([temArray containsObject:shareContact]) {  //delete shareContact
-                    if (![self judgeDic:dic addArray:temCommonArray withArray:temArray withUser:shareContact]) {
-                        continue;
-                    };
-                } else {  // delete Connect
-                    if ([temTitle isEqualToString:@"C"]) {
-                        if (![self judgeDic:dic addArray:temCommonArray withArray:temArray withUser:nil]) {
-                            continue;
-                        };
-                    }
-                }
-            }else {    // is equal connect
-                if ([self.offenFriends containsObject:shareContact]) {  // shareConnect exiset in offenArray
-                    if (![self judgeDic:dic addArray:temCommonArray withArray:temArray withUser:shareContact]) {
-                        continue;
-                    };
-                }else {    // connect and shareConnect is common group
-                    if ([temArray containsObject:shareContact]) {
-                        if (![self judgeSpecialDic:dic addArray:temCommonArray withArray:temArray withUser:shareContact]) {
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
-         [temGroupArray addObject:dic];
-     }
-    return temGroupArray;
 
-}
-- (BOOL)judgeSpecialDic:(NSMutableDictionary *)dic addArray:(NSMutableArray *)temCommonArray withArray:(NSMutableArray *)temArray withUser:(AccountInfo *)user {
-    if (temArray.count > 2) {
-        for (AccountInfo *info in temArray) {
-            if (![info.address isEqualToString:user.address] && ![info.pub_key isEqualToString:kSystemIdendifier]) {
-                [temCommonArray addObject:[info mutableCopy]];
-            }
-            dic[@"items"] = temCommonArray;
+
+- (void)getInviteGroupMemberWithSelectedUser:(NSArray *)selectedUsers complete:(void (^)(NSMutableArray *groupArray,NSMutableArray *indexs))complete{
+    NSMutableArray *groupArray = [NSMutableArray array];
+    
+    // 使用 NSPredicate 查询
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"pub_key != %@",kSystemIdendifier];
+    RLMResults *results = [self.contactResults objectsWithPredicate:pred];
+    
+    //formart group
+    NSMutableSet *set = [NSMutableSet set];
+    NSMutableDictionary *groupDict = [NSMutableDictionary dictionary];
+    NSMutableArray *temItems = nil;
+    for (LMContactAccountInfo *contact in results) {
+        AccountInfo *userInfo = contact.normalInfo;
+        if ([selectedUsers containsObject:userInfo]) {
+            userInfo.isThisGroupMember = YES;
         }
-        return YES;
-    }else {
-        return NO;
-    }
-}
-- (BOOL)judgeDic:(NSMutableDictionary *)dic addArray:(NSMutableArray *)temCommonArray withArray:(NSMutableArray *)temArray withUser:(AccountInfo *)user {
-    if (temArray.count > 1) {
-        for (AccountInfo *info in temArray) {
-            if (user) {
-                if (![info.address isEqualToString:user.address]) {
-                    [temCommonArray addObject:[info mutableCopy]];
-                }
-            }else {
-                if (![info.pub_key isEqualToString:kSystemIdendifier]) {
-                    [temCommonArray addObject:[info mutableCopy]];
-                }
-            }
-            dic[@"items"] = temCommonArray;
+        NSString *prex = @"";
+        NSString *name = userInfo.remarks.length ? userInfo.remarks:userInfo.username;
+        if (name.length) {
+            prex = [[name transformToPinyin] substringToIndex:1];
         }
-        return YES;
-    }else {
-        return NO;
+        // to leave
+        if ([prex preIsInAtoZ]) {
+            prex = [prex uppercaseString];
+        } else {
+            prex = @"#";
+        }
+        [set addObject:prex];
+        // keep items
+        temItems = [groupDict valueForKey:prex];
+        if (!temItems) {
+            temItems = [NSMutableArray array];
+        }
+        [temItems objectAddObject:userInfo];
+        [groupDict setObject:temItems forKey:prex];
+    }
+    
+    NSMutableArray *indexs = [NSMutableArray array];
+    
+    //index
+    for (NSObject *obj in set) {
+        if (![indexs containsObject:obj]) {
+            [indexs objectAddObject:obj];
+        }
+    }
+    NSMutableArray *deleteIndexs = [NSMutableArray array];
+    for (NSString *pre in indexs) {
+        if (![set containsObject:pre]) {
+            [deleteIndexs addObject:pre];
+        }
+    }
+    [indexs removeObjectsInArray:deleteIndexs];
+    
+    [indexs sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
+        NSString *str1 = obj1;
+        NSString *str2 = obj2;
+        return [str1 compare:str2];
+    }];
+    
+    for (NSString *prex in indexs) {
+        NSMutableArray *items = [groupDict valueForKey:prex];
+        CellGroup *group = [[CellGroup alloc] init];
+        group.headTitle = prex;
+        group.items = items;
+        [groupArray objectAddObject:group];
+    }
+    if (complete) {
+        complete(groupArray,indexs);
     }
 }
-- (NSString *)getPrex:(AccountInfo *)contact {
-    if (!contact) {
-        return nil;
+
+- (void)getRecommandUserGroupArrayChatUser:(AccountInfo *)chatUser complete:(void (^)(NSMutableArray *groupArray,NSMutableArray *indexs))complete{
+    NSMutableArray *groupArray = [NSMutableArray array];
+    
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"address != %@ and pub_key != %@",
+                         chatUser.address,kSystemIdendifier];
+    if (!chatUser) { //group chat
+        pred = [NSPredicate predicateWithFormat:@"pub_key != %@",kSystemIdendifier];
     }
-    NSString *prex = @"";
-    NSString *name = contact.normalShowName;
-    if (name.length) {
-        prex = [[name transformToPinyin] substringToIndex:1];
+    RLMResults *results = [self.contactResults objectsWithPredicate:pred];
+    
+    //formart group
+    NSMutableSet *set = [NSMutableSet set];
+    NSMutableDictionary *groupDict = [NSMutableDictionary dictionary];
+    NSMutableArray *temItems = nil;
+    for (LMContactAccountInfo *contact in results) {
+        NSString *prex = @"";
+        NSString *name = contact.remarks.length ? contact.remarks:contact.username;
+        if (name.length) {
+            prex = [[name transformToPinyin] substringToIndex:1];
+        }
+        // to leave
+        if ([prex preIsInAtoZ]) {
+            prex = [prex uppercaseString];
+        } else {
+            prex = @"#";
+        }
+        [set addObject:prex];
+        // keep items
+        temItems = [groupDict valueForKey:prex];
+        if (!temItems) {
+            temItems = [NSMutableArray array];
+        }
+        [temItems objectAddObject:contact];
+        [groupDict setObject:temItems forKey:prex];
     }
-    // to leave
-    if ([prex preIsInAtoZ]) {
-        prex = [prex uppercaseString];
-    } else {
-        prex = @"#";
+    
+    NSMutableArray *indexs = [NSMutableArray array];
+    
+    //index
+    for (NSObject *obj in set) {
+        if (![indexs containsObject:obj]) {
+            [indexs objectAddObject:obj];
+        }
     }
-    return prex;
+    NSMutableArray *deleteIndexs = [NSMutableArray array];
+    for (NSString *pre in indexs) {
+        if (![set containsObject:pre]) {
+            [deleteIndexs addObject:pre];
+        }
+    }
+    [indexs removeObjectsInArray:deleteIndexs];
+    
+    [indexs sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
+        NSString *str1 = obj1;
+        NSString *str2 = obj2;
+        return [str1 compare:str2];
+    }];
+
+    for (NSString *prex in indexs) {
+        NSMutableArray *items = [groupDict valueForKey:prex];
+        CellGroup *group = [[CellGroup alloc] init];
+        group.headTitle = prex;
+        group.items = items;
+        [groupArray objectAddObject:group];
+    }
+    
+    if (complete) {
+        complete(groupArray,indexs);
+    }
 }
+
+
+- (void)getRecommandGroupArrayWithRecommonUser:(AccountInfo *)recmmondUser complete:(void (^)(NSMutableArray *groupArray,NSMutableArray *indexs))complete{
+    if (!recmmondUser) {
+        return;
+    }
+    NSMutableArray *groupArray = [NSMutableArray array];
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"address != %@ and pub_key != %@",
+                         recmmondUser.address,kSystemIdendifier];
+    RLMResults *results = [self.contactResults objectsWithPredicate:pred];
+    //formart group
+    NSMutableSet *set = [NSMutableSet set];
+    NSMutableDictionary *groupDict = [NSMutableDictionary dictionary];
+    NSMutableArray *temItems = nil;
+    for (LMContactAccountInfo *contact in results) {
+        NSString *prex = @"";
+        NSString *name = contact.remarks.length ? contact.remarks:contact.username;
+        if (name.length) {
+            prex = [[name transformToPinyin] substringToIndex:1];
+        }
+        // to leave
+        if ([prex preIsInAtoZ]) {
+            prex = [prex uppercaseString];
+        } else {
+            prex = @"#";
+        }
+        [set addObject:prex];
+        // keep items
+        temItems = [groupDict valueForKey:prex];
+        if (!temItems) {
+            temItems = [NSMutableArray array];
+        }
+        [temItems objectAddObject:contact];
+        [groupDict setObject:temItems forKey:prex];
+    }
+    
+    NSMutableArray *indexs = [NSMutableArray array];
+    
+    //index
+    for (NSObject *obj in set) {
+        if (![indexs containsObject:obj]) {
+            [indexs objectAddObject:obj];
+        }
+    }
+    NSMutableArray *deleteIndexs = [NSMutableArray array];
+    for (NSString *pre in indexs) {
+        if (![set containsObject:pre]) {
+            [deleteIndexs addObject:pre];
+        }
+    }
+    [indexs removeObjectsInArray:deleteIndexs];
+    
+    [indexs sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
+        NSString *str1 = obj1;
+        NSString *str2 = obj2;
+        return [str1 compare:str2];
+    }];
+    
+    
+    // common group
+    if (self.commonGroup.count > 0) {
+        CellGroup *group = [[CellGroup alloc] init];
+        group.headTitle = LMLocalizedString(@"Link Group Common", nil);;
+        group.items = self.commonGroup;
+        group.headTitleImage = @"contract_group_chat";
+        [groupArray objectAddObject:group];
+    }
+    
+    for (NSString *prex in indexs) {
+        NSMutableArray *items = [groupDict valueForKey:prex];
+        CellGroup *group = [[CellGroup alloc] init];
+        group.headTitle = prex;
+        group.items = items;
+        [groupArray objectAddObject:group];
+    }
+    
+    if (complete) {
+        complete(groupArray,indexs);
+    }
+}
+
 - (void)clearArrays {
 
     [self.friendsArr removeAllObjects];

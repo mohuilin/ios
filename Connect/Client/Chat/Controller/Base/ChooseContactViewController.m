@@ -53,28 +53,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setUpUI];
-    
-    [MBProgressHUD showLoadingMessageToView:self.view];
-    [[UserDBManager sharedManager] getAllUsersNoConnectWithComplete:^(NSArray *contacts) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:self.view];
-        }];
-        
-        self.contacts = contacts;
-        //set data
-        for (AccountInfo *selectedInfo in self.selectedUsers) {
-            for (AccountInfo *info in self.contacts) {
-                if ([selectedInfo.address isEqualToString:info.address]) {
-                    info.isThisGroupMember = YES;
-                    break;
-                }
-            }
-        }
-        [GCDQueue executeInMainQueue:^{
-            [self.tableView reloadData];
-        }];
+    [[LMLinkManDataManager sharedManager] getInviteGroupMemberWithSelectedUser:self.selectedUsers complete:^(NSMutableArray *groupArray, NSMutableArray *indexs) {
+        self.groups = groupArray;
+        self.indexs = indexs;
+        [self.tableView reloadData];
     }];
-    
 }
 - (void)setUpUI {
     
@@ -99,32 +82,8 @@
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
-- (NSMutableArray *)groups {
-    if (self.contacts.count <= 0) {
-        return nil;
-    }
-    if (!_groups) {
-        _groups = [NSMutableArray array];
-        [_groups addObjectsFromArray: [MMGlobal getGroupsArray:self.indexs withContactArray:self.contacts.mutableCopy]];
-    }
-    return _groups;
-}
 
-- (NSMutableArray *)indexs {
-    if (self.contacts.count <= 0) {
-        return nil;
-    }
-    if (!_indexs) {
-        _indexs = [NSMutableArray array];
-        [_indexs addObjectsFromArray:[MMGlobal getIndexsWith:self.contacts.mutableCopy]];
-        if (_indexs.count <= 0) {
-            _indexs = nil;
-        }
-    }
-    return _indexs;
-}
 #pragma mark - Table view data source
-
 
 - (NSArray<NSString *> *)sectionIndexTitlesForTableView:(UITableView *)tableView {
     return self.indexs;

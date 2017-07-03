@@ -59,11 +59,12 @@
  *
  */
 - (void)clearUnreadCountWithType:(int)type;
-/**
- *  get share contact ,The outside world needs the method to share in use
- *
- */
-- (NSMutableArray *)getListGroupsFriend:(AccountInfo *)shareContact;
+
+- (void)getRecommandGroupArrayWithRecommonUser:(AccountInfo *)recmmondUser complete:(void (^)(NSMutableArray *groupArray,NSMutableArray *indexs))complete;
+
+- (void)getRecommandUserGroupArrayChatUser:(AccountInfo *)chatUser complete:(void (^)(NSMutableArray *groupArray,NSMutableArray *indexs))complete;
+
+- (void)getInviteGroupMemberWithSelectedUser:(NSArray *)selectedUsers complete:(void (^)(NSMutableArray *groupArray,NSMutableArray *indexs))complete;
 
 
 @end
