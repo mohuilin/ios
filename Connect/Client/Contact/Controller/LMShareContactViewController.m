@@ -28,6 +28,7 @@
 #import "RegexKit.h"
 #import "LMRamGroupInfo.h"
 #import "LMContactAccountInfo.h"
+#import "LMRamGroupInfo.h"
 
 @interface LMShareContactViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -91,6 +92,10 @@
     [super viewDidLoad];
     self.title = LMLocalizedString(@"Link Share", nil);
     [self.view addSubview:self.tableView];
+    //dudge is retweet
+    if (self.retweetModel) {
+      self.contact = [[UserDBManager sharedManager] getUserByPublickey:self.retweetModel.retweetMessage.publicKey];
+    }
     [[LMLinkManDataManager sharedManager] getRecommandGroupArrayWithRecommonUser:self.contact complete:^(NSMutableArray *groupArray, NSMutableArray *indexs) {
          self.groupsFriendArray = groupArray;
          self.indexsArray = indexs;
