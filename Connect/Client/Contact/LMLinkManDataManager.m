@@ -313,13 +313,10 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         }];
     }];
 }
-
 #pragma mark - notification method
 
 - (void)addNotification {
     RegisterNotify(ConnnectUserAddressChangeNotification, @selector(AddressBookChange:));
-    RegisterNotify(kFriendListChangeNotification, @selector(downAllContacts));
-    
     CFErrorRef *error = nil;
     ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(nil, error);
     if (!error) {
@@ -492,13 +489,6 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
     }];
 }
 
-/**
- *  get all contacts
- */
-- (void)downAllContacts {
-    [self detailGroupFriendFormat];
-}
-
 - (void)formartFiendsGrouping {
     
     if (!self.contactResults ||
@@ -511,29 +501,17 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         self.contactResultsToken = [self.contactResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
             if (!error) {
                 ///reload data
-                NSMutableArray *contacts = [NSMutableArray array];
-                for (LMContactAccountInfo *contact in results) {
-                    AccountInfo *info = (AccountInfo *)contact.normalInfo;
-                    if (info) {
-                        [contacts addObject:info];
-                    }
-                }
                 [weakSelf.offenFriends removeAllObjects];
                 [weakSelf.normalFriends removeAllObjects];
                 [weakSelf.friendsArr removeAllObjects];
-                for (AccountInfo *contact in contacts) {
+                
+                for (LMContactAccountInfo *contact in results) {
                     if (contact.isOffenContact) {
-                        if (![weakSelf.offenFriends containsObject:contact]) {
-                            [weakSelf.offenFriends objectAddObject:contact];
-                        }
+                        [weakSelf.offenFriends addObject:contact];
                     } else {
-                        if (![weakSelf.normalFriends containsObject:contact]) {
-                            [weakSelf.normalFriends objectAddObject:contact];
-                        }
+                        [weakSelf.normalFriends addObject:contact];
                     }
-                    if (![weakSelf.friendsArr containsObject:contact]) {
-                        [weakSelf.friendsArr objectAddObject:contact];
-                    }
+                    [weakSelf.friendsArr objectAddObject:contact];
                 }
                 [weakSelf addDataToGroupArray];
             }
@@ -570,13 +548,16 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
 - (void)addDataToGroupArray {
 
-    //indexs
+    //clear group
+    [self.groupsFriend removeAllObjects];
+    
+    //formart group
     NSMutableSet *set = [NSMutableSet set];
     NSMutableDictionary *groupDict = [NSMutableDictionary dictionary];
     NSMutableArray *temItems = nil;
-    for (AccountInfo *info in self.normalFriends) {
+    for (LMContactAccountInfo *contact in self.normalFriends) {
         NSString *prex = @"";
-        NSString *name = info.normalShowName;
+        NSString *name = contact.remarks.length ? contact.remarks:contact.username;
         if (name.length) {
             prex = [[name transformToPinyin] substringToIndex:1];
         }
@@ -592,9 +573,11 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         if (!temItems) {
             temItems = [NSMutableArray array];
         }
-        [temItems objectAddObject:info];
+        [temItems objectAddObject:contact];
         [groupDict setObject:temItems forKey:prex];
     }
+    
+    //index
     for (NSObject *obj in set) {
         if (![self.indexs containsObject:obj]) {
             [self.indexs objectAddObject:obj];
@@ -607,51 +590,46 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         }
     }
     [self.indexs removeObjectsInArray:deleteIndexs];
-    // array sort
+    
     [self.indexs sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
         NSString *str1 = obj1;
         NSString *str2 = obj2;
         return [str1 compare:str2];
     }];
 
-    [self.groupsFriend removeAllObjects];
     // new friends
-    NSMutableDictionary *newGroup = [NSMutableDictionary dictionary];
     NSMutableArray *newItems = [NSMutableArray array];
     self.friendNewItem.addMeUser = nil;
     [newItems objectAddObject:self.friendNewItem];
-    newGroup[@"items"] = newItems;
-    [self.groupsFriend objectAddObject:newGroup];
+    CellGroup *newFriendGroup = [[CellGroup alloc] init];
+    newFriendGroup.items = newItems;
+    [self.groupsFriend objectAddObject:newFriendGroup];
     
     // common
     if (self.offenFriends.count > 0) {
-        NSMutableDictionary *offenFriendGroup = [NSMutableDictionary dictionary];
-        offenFriendGroup[@"title"] = LMLocalizedString(@"Link Favorite Friend", nil);
-        offenFriendGroup[@"titleicon"] = @"table_header_favorite";
-        offenFriendGroup[@"items"] = self.offenFriends;
-        [self.groupsFriend objectAddObject:offenFriendGroup];
+        CellGroup *group = [[CellGroup alloc] init];
+        group.headTitle = LMLocalizedString(@"Link Favorite Friend", nil);
+        group.items = self.offenFriends;
+        group.headTitleImage = @"table_header_favorite";
+        [self.groupsFriend objectAddObject:group];
     }
     // common group
     if (self.commonGroup.count > 0) {
-        NSMutableDictionary *commonGroup = [NSMutableDictionary dictionary];
-        commonGroup[@"title"] = LMLocalizedString(@"Link Group Common", nil);
-        commonGroup[@"titleicon"] = @"contract_group_chat";
-        commonGroup[@"items"] = self.commonGroup;
-        [self.groupsFriend objectAddObject:commonGroup];
+        CellGroup *group = [[CellGroup alloc] init];
+        group.headTitle = LMLocalizedString(@"Link Group Common", nil);;
+        group.items = self.commonGroup;
+        group.headTitleImage = @"contract_group_chat";
+        [self.groupsFriend objectAddObject:group];
     }
 
-    NSMutableDictionary *group = nil;
-    NSMutableArray *items = nil;
-
     for (NSString *prex in self.indexs) {
-        group = [NSMutableDictionary dictionary];
-        items = [groupDict valueForKey:prex];
-        group[@"title"] = prex;
-        group[@"items"] = items;
+        NSMutableArray *items = [groupDict valueForKey:prex];
+        CellGroup *group = [[CellGroup alloc] init];
+        group.headTitle = prex;
+        group.items = items;
         [self.groupsFriend objectAddObject:group];
     }
     [self reloadBadgeValue];
-    
 }
 
 - (void)dealloc {

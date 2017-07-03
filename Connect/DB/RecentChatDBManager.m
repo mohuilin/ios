@@ -123,7 +123,7 @@ static RecentChatDBManager *manager = nil;
         for (LMRecentChat *realmModel in results) {
             count += realmModel.unReadCount;
         }
-        complete(0);
+        complete(count);
     }
 }
 

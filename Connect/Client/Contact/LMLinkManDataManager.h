@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CellGroup.h"
 
 @protocol LMLinkManDataManagerDelegate <NSObject>
 
@@ -51,11 +52,8 @@
  *
  */
 - (void)clearArrays;
-/**
- *  get user message
- *
- */
-- (void)getAllLinkMan;
+
+
 /**
  *  clear unread bridge
  *

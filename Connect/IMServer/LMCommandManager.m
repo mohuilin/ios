@@ -7,6 +7,7 @@
 //
 
 #import "LMCommandManager.h"
+#import "LMMessageSendManager.h"
 #import "MessageDBManager.h"
 #import "LMMessageExtendManager.h"
 #import "UserDBManager.h"
@@ -64,7 +65,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 int long long sendDuration = currentTime - sendComModel.sendTime;
                 if (sendDuration >= SOCKET_TIME_OUT) {
                     if (sendComModel.callBack) {
-                        DDLogError(@"Command send overtime: extension:%d",sendComModel.sendMsg.extension);
+                        DDLogError(@"Command send overtime: extension:%d", sendComModel.sendMsg.extension);
                         sendComModel.callBack([NSError errorWithDomain:@"over_time" code:OVER_TIME_CODE userInfo:nil], nil);
                     }
                     [weakSelf.sendingCommands removeObjectForKey:sendComModel.sendMsg.msgIdentifer];
@@ -83,10 +84,10 @@ CREATE_SHARED_MANAGER(LMCommandManager)
         sendComModel.sendMsg = commandMsg;
         sendComModel.sendTime = (long long int) [[NSDate date] timeIntervalSince1970];
         sendComModel.callBack = callBack;
-        
+
         //save to send queue
         [self.sendingCommands setValue:sendComModel forKey:commandMsg.msgIdentifer];
-        
+
         //open reflash
         if (!self.reflashSendStatusSourceActive) {
             dispatch_resume(self.reflashSendStatusSource);
@@ -178,7 +179,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
             case BM_FRIEND_CHAT_COOKIE_EXT:
                 [self chatUserCookie:command];
                 break;
-            case BM_FROCEUODATA_CHAT_COOKIE_EXT:{
+            case BM_FROCEUODATA_CHAT_COOKIE_EXT: {
                 [self loginOnNewPhoneUploadChatCookie:command];
             }
                 break;
@@ -476,7 +477,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
 }
 
 - (void)handldOfflineCmdData:(NSData *)data cmdType:(int)cmdType {
-    
+
     NSError *error = nil;
     Command *command = [Command parseFromData:data error:&error];
     if (error) {
@@ -523,11 +524,10 @@ CREATE_SHARED_MANAGER(LMCommandManager)
 
         [[UserDBManager sharedManager] saveNewFriend:newFriend];
     } else {
-        
+
         switch (command.errNo) {
             case 3:
-            case 1:
-            {
+            case 1: {
                 if (sendComModel.callBack) {
                     sendComModel.callBack([NSError errorWithDomain:@"" code:command.errNo userInfo:nil], nil);
                 }
@@ -543,7 +543,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
 }
 
 - (void)loginOnNewPhoneUploadChatCookie:(Command *)command {
-    DDLogInfo(@"command %@",command);
+    DDLogInfo(@"command %@", command);
     [[IMService instance] uploadCookieDuetoLocalChatCookieNotMatchServerChatCookieWithMessageCallModel:nil];
 }
 
@@ -846,8 +846,8 @@ CREATE_SHARED_MANAGER(LMCommandManager)
     }
 }
 
-- (void)deviceTokenBind:(Command *)command{
-    
+- (void)deviceTokenBind:(Command *)command {
+
 }
 
 
@@ -920,14 +920,14 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 user.remarks = friend.remark;
                 [users objectAddObject:user];
             }
-            
+
             AccountInfo *connect = [[AccountInfo alloc] init];
             connect.address = @"Connect";
             connect.pub_key = kSystemIdendifier;
             connect.username = @"Connect";
             connect.avatar = @"connect_logo";
             [users addObject:connect];
-            
+
             if (users.count) {
                 [[UserDBManager sharedManager] batchSaveUsers:users];
             }
@@ -1060,7 +1060,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
 
     SendCommandModel *sendComModel = [self.sendingCommands valueForKey:command.msgId];
     Message *oriMsg = sendComModel.sendMsg;
-    
+
     AccountInfo *deleteUser = [[UserDBManager sharedManager] getUserByAddress:oriMsg.sendOriginInfo];
 
     //delete user
@@ -1092,7 +1092,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
 }
 
 - (void)handldSyncBadgeNumber:(Command *)command {
-    
+
 }
 
 - (void)handldSessionBackCall:(Command *)command {
@@ -1218,9 +1218,9 @@ CREATE_SHARED_MANAGER(LMCommandManager)
         }
             break;
         case 3: //you garbed this luckypackage
-            {
-                message = LMLocalizedString(@"Chat system luckypackage have been frozen", nil);
-            }
+        {
+            message = LMLocalizedString(@"Chat system luckypackage have been frozen", nil);
+        }
             break;
         default:
             break;
@@ -1252,7 +1252,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
 }
 
 - (void)uploadCookieAck:(Command *)command {
-    DDLogInfo(@"command %@",command);
+    DDLogInfo(@"command %@", command);
     SendCommandModel *sendComModel = [self.sendingCommands valueForKey:command.msgId];
     UploadChatCookieModel *uploadChatCookie = sendComModel.sendMsg.sendOriginInfo;
     SendMessageModel *sendModel = uploadChatCookie.sendMessageModel;
@@ -1339,7 +1339,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
             }
         }
             break;
-            
+
         case 4: //OVER TIME
         {
             NSError *error = [NSError errorWithDomain:command.msg code:command.errNo userInfo:nil];
@@ -1348,15 +1348,15 @@ CREATE_SHARED_MANAGER(LMCommandManager)
             }
         }
             break;
-        default:{
+        default: {
             ReceiveAcceptFriendRequest *syncRalation = [ReceiveAcceptFriendRequest parseFromData:command.detail error:nil];
             [[UserDBManager sharedManager] updateNewFriendStatusAddress:syncRalation.address withStatus:RequestFriendStatusAdded];
-            
+
             if (sendComModel.callBack) {
                 sendComModel.callBack(nil, oriMsg.sendOriginInfo);
                 [[IMService instance] getFriendsWithVersion:[[MMAppSetting sharedSetting] getContactVersion] comlete:^(NSError *error, id data) {
                     if (!error && [data isKindOfClass:[AccountInfo class]]) {
-                        AccountInfo *addUser = (AccountInfo *)data;
+                        AccountInfo *addUser = (AccountInfo *) data;
                         addUser.message = [[UserDBManager sharedManager] getRequestTipsByUserPublickey:addUser.pub_key];
                         [GCDQueue executeInMainQueue:^{
                             SendNotify(kAcceptNewFriendRequestNotification, addUser);

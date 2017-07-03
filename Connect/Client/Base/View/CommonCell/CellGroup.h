@@ -10,6 +10,8 @@
 
 @interface CellGroup : NSObject
 
+@property (nonatomic ,copy) NSString *headTitleImage;
+
 @property (nonatomic ,copy) NSString *headTitle;
 
 @property (nonatomic ,copy) NSString *footTitle;

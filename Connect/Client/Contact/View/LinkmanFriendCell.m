@@ -9,6 +9,8 @@
 #import "LinkmanFriendCell.h"
 #import "YYImageCache.h"
 #import "LMRamGroupInfo.h"
+#import "LMContactAccountInfo.h"
+
 
 @interface LinkmanFriendCell ()
 
@@ -39,17 +41,17 @@
         LMRamGroupInfo *groupInfo = (LMRamGroupInfo *)data;
         _nameLabel.text = groupInfo.groupName;
         [self.avatarImageView setPlaceholderImageWithAvatarUrl:groupInfo.avatarUrl];
-    } else if([data isKindOfClass:[AccountInfo class]]){
-        AccountInfo *user = (AccountInfo *)data;
-        if (user.remarks && user.remarks.length) {
-            _nameLabel.text = user.remarks;
+    } else if([data isKindOfClass:[LMContactAccountInfo class]]){
+        LMContactAccountInfo *contact = (LMContactAccountInfo *)data;
+        if (!GJCFStringIsNull(contact.remarks)) {
+            _nameLabel.text = contact.remarks;
         } else{
-            _nameLabel.text = user.username;
+            _nameLabel.text = contact.username;
         }
-        if (![user.pub_key isEqualToString:kSystemIdendifier]) {
-            [self.avatarImageView setPlaceholderImageWithAvatarUrl:user.avatar];
+        if (![contact.pub_key isEqualToString:kSystemIdendifier]) {
+            [self.avatarImageView setPlaceholderImageWithAvatarUrl:contact.avatar];
         } else{
-            self.avatarImageView.image = [UIImage imageNamed:user.avatar];
+            self.avatarImageView.image = [UIImage imageNamed:contact.avatar];
         }
     }
 }
