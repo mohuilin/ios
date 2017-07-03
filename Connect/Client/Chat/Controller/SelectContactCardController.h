@@ -12,6 +12,6 @@
 @interface SelectContactCardController : BaseTableViewController
 
 
-- (instancetype)initWihtTalkName:(NSString *)name complete:(void (^)(AccountInfo *user))complete cancel:(void (^)())cancel;
+- (instancetype)initWihtTalkUser:(AccountInfo *)talkUser complete:(void (^)(AccountInfo *user))complete cancel:(void (^)())cancel;
 
 @end

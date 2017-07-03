@@ -27,6 +27,7 @@
 #import "LMLinkManDataManager.h"
 #import "RegexKit.h"
 #import "LMRamGroupInfo.h"
+#import "LMContactAccountInfo.h"
 
 @interface LMShareContactViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -90,13 +91,12 @@
     [super viewDidLoad];
     self.title = LMLocalizedString(@"Link Share", nil);
     [self.view addSubview:self.tableView];
-    [GCDQueue executeInGlobalQueue:^{
-        self.groupsFriendArray = [[LMLinkManDataManager sharedManager] getListGroupsFriend:self.contact];
-        self.indexsArray = [MMGlobal getIndexArray:self.groupsFriendArray];
-        [GCDQueue executeInMainQueue:^{
-            [self.tableView reloadData];
-        }];
+    [[LMLinkManDataManager sharedManager] getRecommandGroupArrayWithRecommonUser:self.contact complete:^(NSMutableArray *groupArray, NSMutableArray *indexs) {
+         self.groupsFriendArray = groupArray;
+         self.indexsArray = indexs;
     }];
+    [self.tableView reloadData];
+    
 }
 #pragma mark - Table view data source
 
@@ -105,14 +105,12 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSArray *items = self.groupsFriendArray[section][@"items"];
-    return items.count;
+    CellGroup *group = [self.groupsFriendArray objectAtIndex:section];
+    return group.items.count;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    
     return self.groupsFriendArray.count;
-
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -121,15 +119,17 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     ConnectTableHeaderView *hearderView = [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"ConnectTableHeaderViewID"];
-    hearderView.customTitle.text = [self.groupsFriendArray[section] valueForKey:@"title"];
-    NSString *titleIcon = [self.groupsFriendArray[section] valueForKey:@"titleicon"];
-    hearderView.customIcon = titleIcon;
+    
+    CellGroup *group = [self.groupsFriendArray objectAtIndex:section];
+    hearderView.customTitle.text = group.headTitle;
+    hearderView.customIcon = group.headTitleImage;
     return hearderView;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    id data = self.groupsFriendArray[indexPath.section][@"items"][indexPath.row];
+    CellGroup *group = [self.groupsFriendArray objectAtIndex:indexPath.section];
+    id data = [group.items objectAtIndex:indexPath.row];
     LinkmanFriendCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LinkmanFriendCellID" forIndexPath:indexPath];
     cell.data = data;
     return cell;
@@ -138,19 +138,19 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    id data = self.groupsFriendArray[indexPath.section][@"items"][indexPath.row];
-
+    
+    CellGroup *group = [self.groupsFriendArray objectAtIndex:indexPath.section];
+    id data = [group.items objectAtIndex:indexPath.row];
     __weak __typeof(&*self) weakSelf = self;
     NSString *displayName = nil;
     if ([data isKindOfClass:[LMRamGroupInfo class]]) {
         LMRamGroupInfo *groupInfo = (LMRamGroupInfo *) data;
         displayName = groupInfo.groupName;
     } else {
-        AccountInfo *user = (AccountInfo *) data;
-        displayName = user.username;
+        LMContactAccountInfo *contact = (LMContactAccountInfo *)data;
+        data = contact.normalInfo;
+        displayName = contact.username;
     }
-
-
     NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Chat Share contact to", nil), self.contact.username, displayName];
     if (self.retweetModel) {
         if (self.retweetModel.retweetMessage.type == GJGCChatFriendContentTypeVideo) {
@@ -161,8 +161,6 @@
             title = [NSString stringWithFormat:LMLocalizedString(@"Link Send to", nil), displayName];
         }
     }
-
-
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:LMLocalizedString(@"Common Cancel", nil) style:UIAlertActionStyleCancel handler:nil];
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:LMLocalizedString(@"Common OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *_Nonnull action) {
@@ -174,8 +172,6 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 - (void)sendShareCardMessageWithChat:(id)data {
-
-
     if (self.retweetModel) {
         self.retweetModel.toFriendModel = data;
         __weak __typeof(&*self) weakSelf = self;
@@ -297,12 +293,6 @@
             }                                     onQueue:nil];
         }
     }
-}
-
-#pragma mark - 其他方法
-
-- (BOOL)preIsInAtoZ:(NSString *)str {
-    return [@"QWERTYUIOPLKJHGFDSAZXCVBNM" containsString:str] || [[@"QWERTYUIOPLKJHGFDSAZXCVBNM" lowercaseString] containsString:str];
 }
 
 - (void)dealloc {

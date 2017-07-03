@@ -2010,8 +2010,8 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
         case GJGCChatInputMenuPanelActionTypeContact: {
             self.isShowingOhterView = YES;
             __weak __typeof(&*self) weakSelf = self;
-            SelectContactCardController *contactPage = [[SelectContactCardController alloc] initWihtTalkName:self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup ? nil : self.taklInfo.chatIdendifier complete:^(AccountInfo *user) {
-
+            
+            SelectContactCardController *contactPage = [[SelectContactCardController alloc] initWihtTalkUser:self.taklInfo.chatUser complete:^(AccountInfo *user) {
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:[NSString stringWithFormat:LMLocalizedString(@"Chat Send contact card to the current chat", nil), user.username] preferredStyle:UIAlertControllerStyleAlert];
                 UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:LMLocalizedString(@"Common Cancel", nil) style:UIAlertActionStyleCancel handler:nil];
                 UIAlertAction *okAction = [UIAlertAction actionWithTitle:LMLocalizedString(@"Link Send", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *_Nonnull action) {
@@ -2019,14 +2019,10 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                 }];
                 [alertController addAction:cancelAction];
                 [alertController addAction:okAction];
-
                 [weakSelf presentViewController:alertController animated:YES completion:nil];
-
-            }                                                                                         cancel:^{
-
+            } cancel:^{
             }];
             [self presentViewController:[[UINavigationController alloc] initWithRootViewController:contactPage] animated:YES completion:nil];
-
         }
             break;
         default:
