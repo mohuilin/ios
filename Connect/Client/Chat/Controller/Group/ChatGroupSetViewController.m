@@ -622,10 +622,16 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 }
 
 - (void)showAccountListPage {
+    //Transformation model
+    NSMutableArray *temArray = [NSMutableArray array];
+    for (LMRamMemberInfo *memberInfo in self.members) {
+        AccountInfo *accountInfo = (AccountInfo *)memberInfo.normalInfo;
+        [temArray addObject:accountInfo];
+    }
     ChooseContactViewController *page = [[ChooseContactViewController alloc] initWithChooseComplete:^(NSArray *selectContactArray) {
         DDLogInfo(@"%@", selectContactArray);
         [self addNewGroupMembers:selectContactArray];
-    }                                                                          defaultSelectedUsers:self.members];
+    }                                                                          defaultSelectedUsers:temArray];
 
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:page] animated:YES completion:nil];
 }

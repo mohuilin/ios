@@ -177,6 +177,8 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         AccountInfo *userInfo = contact.normalInfo;
         if ([selectedUsers containsObject:userInfo]) {
             userInfo.isThisGroupMember = YES;
+        }else {
+            userInfo.isThisGroupMember = NO;
         }
         NSString *prex = @"";
         NSString *name = userInfo.remarks.length ? userInfo.remarks:userInfo.username;
