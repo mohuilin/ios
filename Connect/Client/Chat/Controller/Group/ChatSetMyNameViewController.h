@@ -8,10 +8,10 @@
 
 #import "BaseSetViewController.h"
 #import "AccountInfo.h"
-
+#import "LMRamMemberInfo.h"
 
 @interface ChatSetMyNameViewController : BaseSetViewController
 
-- (instancetype)initWithUpdateUser:(AccountInfo *)user groupIdentifier:(NSString *)groupid;
+- (instancetype)initWithUpdateUser:(LMRamMemberInfo *)user groupIdentifier:(NSString *)groupid;
 
 @end

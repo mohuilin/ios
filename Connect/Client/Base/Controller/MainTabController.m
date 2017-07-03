@@ -232,7 +232,7 @@
 
 #pragma mark - Conversation page navigation
 
-- (void)createGroupWithGroupInfo:(LMGroupInfo *)groupInfo content:(NSString *)tipMessage{
+- (void)createGroupWithGroupInfo:(LMRamGroupInfo *)groupInfo content:(NSString *)tipMessage{
     
     NSString *localMsgId = [ConnectTool generateMessageId];
     ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
@@ -250,18 +250,20 @@
     chatMessage.message = message;
     [[MessageDBManager sharedManager] saveMessage:chatMessage];
     // Put the current user in the first place
-    if (groupInfo.groupMembers.count > 0) {
-        AccountInfo * info = [groupInfo.groupMembers firstObject];
-        if (![info.address isEqualToString:[LKUserCenter shareCenter].currentLoginUser.address]) {
-            [groupInfo.groupMembers moveObject:[LKUserCenter shareCenter].currentLoginUser toIndex:0];
-        }
-    }
+//    if (groupInfo.membersArray.count > 0) {
+//        LMRamMemberInfo * info = [groupInfo.membersArray firstObject];
+//        if (![info.address isEqualToString:[LKUserCenter shareCenter].currentLoginUser.address]) {
+//            LMRamMemberInfo *memberAccount = [[LMRamMemberInfo alloc] initWithNormalInfo:[LKUserCenter shareCenter].currentLoginUser];
+//            NSInteger index = [groupInfo.membersArray indexOfObject:memberAccount];
+//            [groupInfo.membersArray moveObjectAtIndex:index toIndex:0];
+//        }
+//    }
     GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
     talk.talkType = GJGCChatFriendTalkTypeGroup;
     talk.chatIdendifier = groupInfo.groupIdentifer;
     talk.group_ecdhKey = groupInfo.groupEcdhKey;
     talk.chatGroupInfo = groupInfo;
-    talk.name = [NSString stringWithFormat:@"%@(%lu)", groupInfo.groupName, (unsigned long) talk.chatGroupInfo.groupMembers.count];
+    talk.name = [NSString stringWithFormat:@"%@(%lu)", groupInfo.groupName, (unsigned long) talk.chatGroupInfo.membersArray.count];
     [SessionManager sharedManager].chatSession = talk.chatIdendifier;
     [SessionManager sharedManager].chatObject = groupInfo;
     

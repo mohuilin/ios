@@ -7,20 +7,20 @@
 //
 
 #import "BaseDB.h"
-#import "LMGroupInfo.h"
+#import "LMRamGroupInfo.h"
+
 
 @interface GroupDBManager : BaseDB
 
 + (GroupDBManager *)sharedManager;
 
 + (void)tearDown;
-
 /**
- * update group info
- * @param group
+ * update group name
+ * @param name
+ * @param groupId
  */
-- (void)updateGroup:(LMGroupInfo *)group;
-
+- (BOOL)isGroupExist:(NSString *)groupId;
 /**
  * update group name
  * @param name
@@ -74,14 +74,14 @@
  * save group info
  * @param group
  */
-- (void)savegroup:(LMGroupInfo *)group;
+- (void)savegroup:(LMRamGroupInfo *)group;
 
 /**
  * get group info
  * @param groupid
  * @return
  */
-- (LMGroupInfo *)getGroupByGroupIdentifier:(NSString *)groupid;
+- (LMRamGroupInfo *)getGroupByGroupIdentifier:(NSString *)groupid;
 
 /**
  * get all group info
@@ -101,7 +101,7 @@
  * @param groupId
  * @return
  */
-- (AccountInfo *)getAdminByGroupId:(NSString *)groupId;
+- (LMRamMemberInfo *)getAdminByGroupId:(NSString *)groupId;
 
 
 /**
@@ -160,7 +160,7 @@
  * @param groupId
  * @return
  */
-- (LMGroupInfo *)addMember:(NSArray *)newMembers ToGroupChat:(NSString *)groupId;
+- (LMRamGroupInfo *)addMember:(NSArray *)newMembers ToGroupChat:(NSString *)groupId;
 
 /**
  * remove member form group
@@ -234,7 +234,7 @@
  * @param address
  * @return
  */
-- (AccountInfo *)getGroupMemberByGroupId:(NSString *)groupId memberAddress:(NSString *)address;
+- (LMRamMemberInfo *)getGroupMemberByGroupId:(NSString *)groupId memberAddress:(NSString *)address;
 
 /**
  * check user is in group

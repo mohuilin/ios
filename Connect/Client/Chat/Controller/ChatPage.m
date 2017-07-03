@@ -81,7 +81,7 @@
                 talk.talkType = GJGCChatFriendTalkTypeGroup;
                 talk.chatIdendifier = recentModel.identifier;
                 talk.chatGroupInfo = recentModel.chatGroupInfo;
-                talk.name = GJCFStringIsNull(recentModel.name) ? [NSString stringWithFormat:LMLocalizedString(@"Group (%lu)", nil), (unsigned long) recentModel.chatGroupInfo.groupMembers.count] : [NSString stringWithFormat:@"%@(%lu)", recentModel.name, (unsigned long) recentModel.chatGroupInfo.groupMembers.count];
+                talk.name = GJCFStringIsNull(recentModel.name) ? [NSString stringWithFormat:LMLocalizedString(@"Group (%lu)", nil), (unsigned long) recentModel.chatGroupInfo.membersArray.count] : [NSString stringWithFormat:@"%@(%lu)", recentModel.name, (unsigned long) recentModel.chatGroupInfo.membersArray.count];
                 showPage = [[GJGCChatGroupViewController alloc] initWithTalkInfo:talk];
             }
                 break;
@@ -355,7 +355,7 @@
     talk.chatGroupInfo = recentModel.chatGroupInfo;
     talk.mute = recentModel.notifyStatus;
     talk.top = recentModel.isTopChat;
-    talk.name = GJCFStringIsNull(recentModel.name) ? [NSString stringWithFormat:LMLocalizedString(@"Group (%lu)", nil), (unsigned long) recentModel.chatGroupInfo.groupMembers.count] : [NSString stringWithFormat:@"%@(%lu)", recentModel.name, (unsigned long) recentModel.chatGroupInfo.groupMembers.count];
+    talk.name = GJCFStringIsNull(recentModel.name) ? [NSString stringWithFormat:LMLocalizedString(@"Group (%lu)", nil), (unsigned long) recentModel.chatGroupInfo.membersArray.count] : [NSString stringWithFormat:@"%@(%lu)", recentModel.name, (unsigned long) recentModel.chatGroupInfo.membersArray.count];
     [SessionManager sharedManager].chatSession = talk.chatIdendifier;
     [SessionManager sharedManager].chatObject = recentModel.chatGroupInfo;
 

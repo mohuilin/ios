@@ -27,6 +27,7 @@
 #import "LMLinkManDataManager.h"
 #import "RegexKit.h"
 #import "LMContactAccountInfo.h"
+#import "LMRamGroupInfo.h"
 
 @interface LMShareContactViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -142,8 +143,8 @@
     id data = [group.items objectAtIndex:indexPath.row];
     __weak __typeof(&*self) weakSelf = self;
     NSString *displayName = nil;
-    if ([data isKindOfClass:[LMGroupInfo class]]) {
-        LMGroupInfo *groupInfo = (LMGroupInfo *) data;
+    if ([data isKindOfClass:[LMRamGroupInfo class]]) {
+        LMRamGroupInfo *groupInfo = (LMRamGroupInfo *) data;
         displayName = groupInfo.groupName;
     } else {
         LMContactAccountInfo *contact = (LMContactAccountInfo *)data;
@@ -206,7 +207,7 @@
             message.user_id = info.address;
             message.sendstatus = GJGCChatFriendSendMessageStatusSending;
         } else {
-            LMGroupInfo *info = (LMGroupInfo *) data;
+            LMRamGroupInfo *info = (LMRamGroupInfo *) data;
             message.user_name = info.groupName;
             message.type = GJGCChatFriendContentTypeNameCard;
             message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
@@ -235,7 +236,7 @@
             AccountInfo *info = (AccountInfo *) data;
             messageInfo.messageOwer = info.pub_key;
         } else {
-            LMGroupInfo *info = (LMGroupInfo *) data;
+            LMRamGroupInfo *info = (LMRamGroupInfo *) data;
             messageInfo.messageOwer = info.groupIdentifer;
         }
 
@@ -245,8 +246,8 @@
         messageInfo.readTime = 0;
         [[MessageDBManager sharedManager] saveMessage:messageInfo];
 
-        if ([data isKindOfClass:[LMGroupInfo class]]) {
-            LMGroupInfo *info = (LMGroupInfo *) data;
+        if ([data isKindOfClass:[LMRamGroupInfo class]]) {
+            LMRamGroupInfo *info = (LMRamGroupInfo *) data;
             // creat new session
             [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.groupIdentifer groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content] ecdhKey:info.groupEcdhKey talkName:nil];
         } else {
@@ -256,8 +257,8 @@
         }
         // send message
         __weak __typeof(&*self) weakSelf = self;
-        if ([data isKindOfClass:[LMGroupInfo class]]) {
-            LMGroupInfo *info = (LMGroupInfo *) data;
+        if ([data isKindOfClass:[LMRamGroupInfo class]]) {
+            LMRamGroupInfo *info = (LMRamGroupInfo *) data;
             [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:info.groupEcdhKey onQueue:nil completion:^(MMMessage *message, NSError *error) {
                 if (error) {
                     [GCDQueue executeInMainQueue:^{

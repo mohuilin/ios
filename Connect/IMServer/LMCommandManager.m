@@ -20,6 +20,8 @@
 #import "NSData+Gzip.h"
 #import "YYImageCache.h"
 #import "LMHistoryCacheManager.h"
+#import "LMMessageSendManager.h"
+#import "LMRamGroupInfo.h"
 
 @implementation SendCommandModel
 
@@ -560,7 +562,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
  *  @param groupChange
  */
 - (void)handleGroupInfoDetailChange:(GroupChange *)groupChange messageId:(NSString *)msgId {
-    [SetGlobalHandler getGroupInfoWihtIdentifier:groupChange.identifier complete:^(LMGroupInfo *lmGroup, NSError *error) {
+    [SetGlobalHandler getGroupInfoWihtIdentifier:groupChange.identifier complete:^(LMRamGroupInfo *lmGroup, NSError *error) {
         if (lmGroup) {
             switch (groupChange.changeType) {
                 case 0: {
@@ -587,7 +589,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 case 1: {
                     NSError *error = nil;
                     UsersInfo *usersInfo = [UsersInfo parseFromData:groupChange.detail error:&error];
-                    if (lmGroup.groupMembers.count < 9) {
+                    if (lmGroup.membersArray.count < 9) {
                         [[YYImageCache sharedCache] removeImageForKey:lmGroup.avatarUrl];
                     }
 
@@ -680,7 +682,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                     NSError *error = nil;
                     QuitGroupUserAddress *quitAddresses = [QuitGroupUserAddress parseFromData:groupChange.detail error:&error];
 
-                    if (lmGroup.groupMembers.count - quitAddresses.addressesArray.count < 9) {
+                    if (lmGroup.membersArray.count - quitAddresses.addressesArray.count < 9) {
                         [[YYImageCache sharedCache] removeImageForKey:lmGroup.avatarUrl];
                     }
 
@@ -691,17 +693,17 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                         NSMutableArray *willDeleteMember = [NSMutableArray array];
                         NSMutableArray *avatars = [NSMutableArray array];
                         for (NSString *quitAddress in quitAddresses.addressesArray) {
-                            for (AccountInfo *member in lmGroup.groupMembers) {
+                            for (LMRamMemberInfo *member in lmGroup.membersArray) {
                                 if ([member.address isEqualToString:quitAddress]) {
-                                    [willDeleteMember objectAddObject:member];
+                                    NSInteger index = [lmGroup.membersArray indexOfObject:member];
+                                    NSNumber *indexNumber = [NSNumber numberWithInteger:index];
+                                    [willDeleteMember addObject:indexNumber];
                                     [[GroupDBManager sharedManager] removeMemberWithAddress:member.address groupId:groupChange.identifier];
                                 } else {
                                     [avatars objectAddObject:member.avatar];
                                 }
                             }
                         }
-                        [lmGroup.groupMembers.mutableCopy removeObjectsInArray:willDeleteMember];
-
                         NSArray *groupArray = [[GroupDBManager sharedManager] getgroupMemberByGroupIdentifier:groupChange.identifier];
                         if (groupArray.count <= 1) {
                             [[GroupDBManager sharedManager] deletegroupWithGroupId:groupChange.identifier];
@@ -717,10 +719,11 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                         if (!lmGroup) {
                             return;
                         }
-                        for (AccountInfo *member in lmGroup.groupMembers) {
+                        for (LMRamMemberInfo *member in lmGroup.membersArray) {
                             if ([member.address isEqualToString:changeNick.address]) {
-                                member.groupNickName = changeNick.nick;
-
+                                [[GroupDBManager sharedManager] executeRealmWithBlock:^{
+                                   member.groupNicksName = changeNick.nick;
+                                }];
                                 [[GroupDBManager sharedManager] updateGroupMembserNick:changeNick.nick address:changeNick.address groupId:lmGroup.groupIdentifer];
                                 break;
                             }
@@ -736,7 +739,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                         if (!lmGroup) {
                             return;
                         }
-                        for (AccountInfo *member in lmGroup.groupMembers) {
+                        for (LMRamMemberInfo *member in lmGroup.membersArray) {
                             if ([member.address isEqualToString:attorn.address]) {
 
                                 ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
@@ -757,15 +760,19 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
                                 [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:1 lastContent:message.content ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
-                                member.isGroupAdmin = YES;
-
+                                [[GroupDBManager sharedManager] executeRealmWithBlock:^{
+                                    member.isGroupAdmin = YES;
+                                }];
                                 [[GroupDBManager sharedManager] setGroupNewAdmin:member.address groupId:lmGroup.groupIdentifer];
 
                                 if ([[SessionManager sharedManager].chatSession isEqualToString:attorn.identifier]) {
                                     SendNotify(GroupAdminChangeNotification, chatMessage);
                                 }
                             } else {
-                                member.isGroupAdmin = NO;
+                                [[GroupDBManager sharedManager] executeRealmWithBlock:^{
+                                    member.isGroupAdmin = NO;
+                                }];
+
                             }
                         }
                     }
@@ -774,22 +781,23 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 default:
                     break;
             }
-
-            if (lmGroup.groupMembers.count != groupChange.count) {
-                [SetGlobalHandler downGroupInfoWithGroupIdentifer:groupChange.identifier complete:^(NSError *error) {
-                    if (!error) {
-                        if (groupChange.changeType != 4) {
-                            [GCDQueue executeInMainQueue:^{
-                                SendNotify(ConnnectGroupInfoDidChangeNotification, groupChange.identifier);
-                            }];
+            if ([[GroupDBManager sharedManager] isGroupExist:groupChange.identifier]) {
+                if (lmGroup.membersArray.count != groupChange.count) {
+                    [SetGlobalHandler downGroupInfoWithGroupIdentifer:groupChange.identifier complete:^(NSError *error) {
+                        if (!error) {
+                            if (groupChange.changeType != 4) {
+                                [GCDQueue executeInMainQueue:^{
+                                    SendNotify(ConnnectGroupInfoDidChangeNotification, groupChange.identifier);
+                                }];
+                            }
                         }
-                    }
-                }];
-            } else {
-                if (groupChange.changeType != 4) {
-                    [GCDQueue executeInMainQueue:^{
-                        SendNotify(ConnnectGroupInfoDidChangeNotification, groupChange.identifier);
                     }];
+                } else {
+                    if (groupChange.changeType != 4) {
+                        [GCDQueue executeInMainQueue:^{
+                            SendNotify(ConnnectGroupInfoDidChangeNotification, groupChange.identifier);
+                        }];
+                    }
                 }
             }
         }
@@ -956,7 +964,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 if (GJCFStringIsNull(groupKey)) {
                     continue;
                 }
-                LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
+                LMRamGroupInfo *lmGroup = [[LMRamGroupInfo alloc] init];
                 lmGroup.groupName = groupInfo.group.name;
                 lmGroup.groupIdentifer = groupInfo.group.identifier;
                 lmGroup.groupEcdhKey = groupKey;
@@ -967,18 +975,31 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 lmGroup.avatarUrl = groupInfo.group.avatar;
 
                 NSMutableArray *AccoutInfoArray = [NSMutableArray array];
+                LMRamMemberInfo *admin = nil;
                 for (GroupMember *member in groupInfo.membersArray) {
-                    AccountInfo *accountInfo = [[AccountInfo alloc] init];
+                    LMRamMemberInfo *accountInfo = [[LMRamMemberInfo alloc] init];
                     accountInfo.username = member.username;
                     accountInfo.avatar = member.avatar;
                     accountInfo.address = member.address;
                     accountInfo.isGroupAdmin = (member.role != 0);
-                    accountInfo.groupNickName = member.nick;
-                    accountInfo.pub_key = member.pubKey;
-                    [AccoutInfoArray objectAddObject:accountInfo];
+                    accountInfo.groupNicksName = member.nick;
+                    if (accountInfo.groupNicksName.length <= 0) {
+                        accountInfo.groupNicksName = member.username;
+                    }
+                    accountInfo.pubKey = member.pubKey;
+                    accountInfo.identifier = lmGroup.groupIdentifer;
+                    accountInfo.univerStr = [[NSString stringWithFormat:@"%@%@",accountInfo.address,lmGroup.groupIdentifer] sha1String];
+                    if (!accountInfo.isGroupAdmin) {
+                        [AccoutInfoArray objectAddObject:accountInfo];
+                    }else {
+                        admin = accountInfo;
+                        lmGroup.admin = accountInfo;
+                    }
                 }
-                lmGroup.groupMembers = AccoutInfoArray;
-
+                if (admin) {
+                    [AccoutInfoArray insertObject:admin atIndex:0];
+                }
+                [lmGroup.membersArray addObjects:AccoutInfoArray];;
                 [[GroupDBManager sharedManager] savegroup:lmGroup];
             }
             if ([[[MMAppSetting sharedSetting] getContactVersion] isEqualToString:@""]) {

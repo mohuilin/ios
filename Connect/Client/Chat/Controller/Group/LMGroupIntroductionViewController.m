@@ -9,7 +9,7 @@
 #import "LMGroupIntroductionViewController.h"
 #import "NetWorkOperationTool.h"
 #import "GroupDBManager.h"
-
+#import "LMRamGroupInfo.h"
 @interface LMGroupIntroductionViewController () <UITextViewDelegate>
 
 @property(weak, nonatomic) IBOutlet UITextView *summaryTextView;
@@ -25,7 +25,7 @@
     }
     self.view.backgroundColor = [UIColor whiteColor];
     [self setNavigationRight:LMLocalizedString(@"Set Save", nil) titleColor:LMBasicGreen];
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.talkModel.chatIdendifier];
+    LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.talkModel.chatIdendifier];
     self.summaryTextView.text = [[GroupDBManager sharedManager] getGroupSummaryWithGroupID:group.groupIdentifer];
     if (self.summaryTextView.text == nil || [self.summaryTextView.text isEqualToString:@""]) {
         self.summaryTextView.text = self.talkModel.chatGroupInfo.groupName;

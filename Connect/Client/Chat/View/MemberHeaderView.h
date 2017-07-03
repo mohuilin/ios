@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "LMRamMemberInfo.h"
 
-#import "AccountInfo.h"
 
-typedef void(^TapMemberHeaderViewBlock)(AccountInfo *info);
+typedef void(^TapMemberHeaderViewBlock)(LMRamMemberInfo *info);
 
 @interface MemberHeaderView : UIControl
 
@@ -18,7 +18,7 @@ typedef void(^TapMemberHeaderViewBlock)(AccountInfo *info);
 
 - (instancetype)initWithImage:(NSString *)avatar name:(NSString *)name tapBlock:(TapMemberHeaderViewBlock)tapBlock;
 
-- (instancetype)initWithAccountInfo:(AccountInfo *)info tapBlock:(TapMemberHeaderViewBlock)tapBlock;
+- (instancetype)initWithAccountInfo:(LMRamMemberInfo *)info tapBlock:(TapMemberHeaderViewBlock)tapBlock;
 
 @property(nonatomic, copy) TapMemberHeaderViewBlock tapBlock;
 

@@ -18,7 +18,8 @@
 #import "MessageDBManager.h"
 #import "StringTool.h"
 #import "AppDelegate.h"
-
+#import "LMRamGroupInfo.h"
+#import "LMRamMemberInfo.h"
 @interface ChatFriendSetViewController ()
 
 @property(nonatomic, strong) NSMutableArray *members;
@@ -163,8 +164,9 @@
             [weakSelf showAccountListPage];
         };
 
-        memberCell.tapMemberHeaderBlock = ^(AccountInfo *tapInfo) {
-            [weakSelf showUserDetailPageWithUser:tapInfo];
+        memberCell.tapMemberHeaderBlock = ^(LMRamMemberInfo *tapInfo) {
+            AccountInfo *accountInfo = (AccountInfo *)tapInfo.normalInfo;
+            [weakSelf showUserDetailPageWithUser:accountInfo];
         };
 
 
@@ -304,7 +306,7 @@
     NSString *groupName = groupInfo.group.name;
     //  [content appendString:LMLocalizedString(@"Link Join Group", nil)];
 
-    LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
+    LMRamGroupInfo *lmGroup = [[LMRamGroupInfo alloc] init];
     lmGroup.groupName = groupInfo.group.name;
     lmGroup.groupIdentifer = groupInfo.group.identifier;
     lmGroup.groupEcdhKey = self.groupEcdhKey;
@@ -314,26 +316,31 @@
     lmGroup.summary = groupInfo.group.summary;
 
     NSMutableArray *AccoutInfoArray = [NSMutableArray array];
-    AccountInfo *admin = nil;
+    LMRamMemberInfo *admin = nil;
     for (GroupMember *member in groupInfo.membersArray) {
-        AccountInfo *accountInfo = [[AccountInfo alloc] init];
+        LMRamMemberInfo *accountInfo = [[LMRamMemberInfo alloc] init];
         accountInfo.username = member.username;
         accountInfo.avatar = member.avatar;
         accountInfo.address = member.address;
-        accountInfo.groupNickName = member.nick;
-        accountInfo.pub_key = member.pubKey;
-        accountInfo.isGroupAdmin = member.role == 1;
+        accountInfo.groupNicksName = member.nick;
+        if (accountInfo.groupNicksName.length <= 0) {
+            accountInfo.groupNicksName = member.username;
+        }
+        accountInfo.pubKey = member.pubKey;
+        accountInfo.isGroupAdmin = (member.role != 0);
+        accountInfo.identifier = groupInfo.group.identifier;
+        accountInfo.univerStr = [[NSString stringWithFormat:@"%@%@",accountInfo.address,accountInfo.identifier] sha1String];
         if (!accountInfo.isGroupAdmin) {
             [AccoutInfoArray objectAddObject:accountInfo];
         } else {
             admin = accountInfo;
+            lmGroup.admin = accountInfo;
         }
     }
     if (admin) {
         [AccoutInfoArray insertObject:admin atIndex:0];
     }
-    lmGroup.groupMembers = AccoutInfoArray;
-
+    [lmGroup.membersArray addObjects:AccoutInfoArray];
     [[GroupDBManager sharedManager] savegroup:lmGroup];
 
     [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupInfo.group.identifier groupChat:YES lastContentShowType:1 lastContent:content ecdhKey:self.groupEcdhKey talkName:groupName];

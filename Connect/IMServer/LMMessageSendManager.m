@@ -209,6 +209,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
 
                     //update message send status
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNotInGroup withMessageId:rejectMsg.msgId messageOwer:identifier];
+
                 }
             }
                 break;
@@ -224,7 +225,6 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                     if (sendModel.callBack) {
                         sendModel.callBack(sendModel.sendMsg, nil);
                     }
-                    //update message send status
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNoRelationShip withMessageId:rejectMsg.msgId messageOwer:identifier];
                 }
             }

@@ -88,8 +88,8 @@
     [GCDQueue executeInGlobalQueue:^{
         NSArray *groups = [[GroupDBManager sharedManager] getAllgroups];
         int updateCount = 0;
-        for (LMGroupInfo *group in groups) {
-            for (AccountInfo *member in group.groupMembers) {
+        for (LMRamGroupInfo *group in groups) {
+            for (LMRamMemberInfo *member in group.membersArray) {
                 if ([member.address isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
                     // update data
                     [[GroupDBManager sharedManager] updateGroupMembserUsername:self.updataName address:member.address groupId:group.groupIdentifer];

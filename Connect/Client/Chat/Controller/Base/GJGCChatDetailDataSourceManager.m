@@ -926,7 +926,6 @@
         }
     }
 
-    
     //update conversion
     [[LMConversionManager sharedManager] sendMessage:message type:self.taklInfo.talkType];
     
@@ -1488,13 +1487,13 @@
             }
                 break;
             case GJGCChatFriendTalkTypeGroup: {
-                for (AccountInfo *groupMember in self.taklInfo.chatGroupInfo.groupMembers) {
+                for (LMRamMemberInfo *groupMember in self.taklInfo.chatGroupInfo.membersArray) {
                     //send is self
                     if ([senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
                         senderName = LMLocalizedString(@"Chat You", nil);
                     } else {
                         if ([groupMember.address isEqualToString:senderAddress]) {
-                            senderName = groupMember.normalShowName;
+                            senderName = groupMember.username;
                         }
                     }
                     //recive is self
@@ -1502,7 +1501,7 @@
                         garbName = LMLocalizedString(@"Chat You", nil);
                     } else {
                         if ([groupMember.address isEqualToString:reciverAddress]) {
-                            garbName = groupMember.normalShowName;
+                            garbName = groupMember.username;
                         }
                     }
                 }

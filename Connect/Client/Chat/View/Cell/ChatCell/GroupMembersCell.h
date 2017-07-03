@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "LMRamMemberInfo.h"
 #import "BaseCell.h"
 
-typedef void(^TapMemberHeaderBlock)(AccountInfo *tapUser);
+typedef void(^TapMemberHeaderBlock)(LMRamMemberInfo *tapUser);
 
 typedef void(^TapAddMemberBlock)();
 

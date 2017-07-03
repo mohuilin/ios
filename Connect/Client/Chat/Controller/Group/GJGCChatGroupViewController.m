@@ -32,8 +32,8 @@
 
 - (void)deleteGroupMember:(NSNotification *)note {
     NSString *groupName = note.object;
-    for (AccountInfo *groupMember in self.noteGroupMembers) {
-        if ([groupName isEqualToString:groupMember.groupShowName]) {
+    for (LMRamMemberInfo *groupMember in self.noteGroupMembers) {
+        if ([groupName isEqualToString:groupMember.username]) {
             [self.noteGroupMembers removeObject:groupMember];
             break;
         }
@@ -45,7 +45,7 @@
     if (!user) {
         return;
     }
-    for (AccountInfo *member in self.taklInfo.chatGroupInfo.groupMembers) {
+    for (LMRamMemberInfo *member in self.taklInfo.chatGroupInfo.membersArray) {
         if ([member.address isEqualToString:user.address]) {
             if ([member.username isEqualToString:user.username] && [member.avatar isEqualToString:user.avatar]) {
                 break;
@@ -54,7 +54,7 @@
             member.avatar = user.avatar;
             [[GroupDBManager sharedManager] updateGroupMembserAvatarUrl:member.avatar address:member.address groupId:self.taklInfo.chatIdendifier];
             [[GroupDBManager sharedManager] updateGroupMembserUsername:member.username address:member.address groupId:self.taklInfo.chatIdendifier];
-            self.taklInfo.chatGroupInfo.groupMembers = self.taklInfo.chatGroupInfo.groupMembers.copy;
+            self.taklInfo.chatGroupInfo.membersArray = self.taklInfo.chatGroupInfo.membersArray;
             break;
         }
     }
@@ -64,9 +64,9 @@
 
     NSString *groupIdentifer = (NSString *) note.object;
 
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
+    LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
     self.taklInfo.chatGroupInfo = group;
-    self.taklInfo.name = [NSString stringWithFormat:@"%@(%lu)", group.groupName, group.groupMembers.count];
+    self.taklInfo.name = [NSString stringWithFormat:@"%@(%lu)", group.groupName, group.membersArray.count];
     self.dataSourceManager.title = self.taklInfo.name;
     [GCDQueue executeInMainQueue:^{
         self.titleView.title = self.taklInfo.name;
@@ -94,11 +94,15 @@
 - (void)inputTextChangeWithText:(NSString *)text {
     __weak typeof(self) weakSelf = self;
     if ([text isEqualToString:@"@"]) {
-        LMGroupChooseNoteMemberlistPage *page = [[LMGroupChooseNoteMemberlistPage alloc] initWithMembers:self.taklInfo.chatGroupInfo.groupMembers];
+        NSMutableArray *temArray = [NSMutableArray array];
+        for (LMRamMemberInfo *info in self.taklInfo.chatGroupInfo.membersArray) {
+            [temArray addObject:info];
+        }
+        LMGroupChooseNoteMemberlistPage *page = [[LMGroupChooseNoteMemberlistPage alloc] initWithMembers:temArray];
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:page];
-        page.ChooseGroupMemberCallBack = ^(AccountInfo *membser) {
+        page.ChooseGroupMemberCallBack = ^(LMRamMemberInfo *membser) {
             if (membser) {
-                [weakSelf.inputPanel appendFocusOnOther:[NSString stringWithFormat:@"@%@ ", membser.groupShowName]];
+                [weakSelf.inputPanel appendFocusOnOther:[NSString stringWithFormat:@"@%@ ", membser.username]];
                 if (![weakSelf.noteGroupMembers containsObject:membser]) {
                     [weakSelf.noteGroupMembers objectAddObject:membser];
                 }

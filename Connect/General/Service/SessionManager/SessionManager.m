@@ -7,7 +7,7 @@
 //
 
 #import "SessionManager.h"
-#import "LMGroupInfo.h"
+#import "LMRamGroupInfo.h"
 #import "RecentChatModel.h"
 #import "NSMutableArray+MoveObject.h"
 
@@ -98,8 +98,8 @@ static SessionManager *manager = nil;
     if ([chatObject isKindOfClass:[AccountInfo class]]) {
         AccountInfo *model = (AccountInfo *)chatObject;
         self.chatSession = model.pub_key;
-    } else if([chatObject isKindOfClass:[LMGroupInfo class]]){
-        LMGroupInfo *model = (LMGroupInfo *)chatObject;
+    } else if([chatObject isKindOfClass:[LMRamGroupInfo class]]){
+        LMRamGroupInfo *model = (LMRamGroupInfo *)chatObject;
         self.chatSession = model.groupIdentifer;
     }
 }

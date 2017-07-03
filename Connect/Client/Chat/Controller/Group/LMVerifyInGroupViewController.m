@@ -18,7 +18,7 @@
 #import "GJGCChatFriendTalkModel.h"
 #import "GJGCChatGroupViewController.h"
 #import "LMVerifyTableHeadView.h"
-
+#import "LMRamGroupInfo.h"
 
 typedef NS_ENUM(NSUInteger, CellType) {
     CellTypeOther = 0,
@@ -78,12 +78,12 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
 }
 
 - (UIView *)creatTableView {
-    LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.model.groupIdentifier];
+    LMRamGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.model.groupIdentifier];
     LMVerifyTableHeadView *headView = [[[NSBundle mainBundle] loadNibNamed:@"LMVerifyTableHeadView" owner:nil options:nil] lastObject];
     headView.frame = CGRectMake(0, 0, DEVICE_SIZE.width, 185);
     [headView.groupHeaderImageView setImageWithAvatarUrl:groupInfo.avatarUrl];
     headView.groupNameLable.text = groupInfo.groupName;
-    headView.groupMemberLable.text = [NSString stringWithFormat:LMLocalizedString(@"Link Members", nil), groupInfo.groupMembers.count, 200];
+    headView.groupMemberLable.text = [NSString stringWithFormat:LMLocalizedString(@"Link Members", nil), groupInfo.membersArray.count, 200];
     headView.groupSummaryLable.text = groupInfo.summary;
     return headView;
 }
@@ -411,7 +411,7 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
     }
     nav.viewControllers = controllers;
 
-    LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.model.groupIdentifier];
+    LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.model.groupIdentifier];
     GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
     talk.talkType = GJGCChatFriendTalkTypeGroup;
     talk.chatIdendifier = group.groupIdentifer;
@@ -420,7 +420,7 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
 
     [SessionManager sharedManager].chatSession = talk.chatIdendifier;
     [SessionManager sharedManager].chatObject = group;
-    talk.name = GJCFStringIsNull(group.groupName) ? [NSString stringWithFormat:LMLocalizedString(@"Group chat(%lu)", nil), (unsigned long) talk.chatGroupInfo.groupMembers.count] : [NSString stringWithFormat:@"%@(%lu)", group.groupName, (unsigned long) talk.chatGroupInfo.groupMembers.count];
+    talk.name = GJCFStringIsNull(group.groupName) ? [NSString stringWithFormat:LMLocalizedString(@"Group chat(%lu)", nil), (unsigned long) talk.chatGroupInfo.membersArray.count] : [NSString stringWithFormat:@"%@(%lu)", group.groupName, (unsigned long) talk.chatGroupInfo.membersArray.count];
     GJGCChatGroupViewController *groupChat = [[GJGCChatGroupViewController alloc] initWithTalkInfo:talk];
     groupChat.hidesBottomBarWhenPushed = YES;
     [nav pushViewController:groupChat animated:YES];

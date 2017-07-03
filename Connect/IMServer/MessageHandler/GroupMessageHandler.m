@@ -18,6 +18,9 @@
 #import "LMMessageValidationTool.h"
 #import "LMConversionManager.h"
 #import "LMMessageExtendManager.h"
+#import "LMRamMemberInfo.h"
+#import "LMRamGroupInfo.h"
+
 
 @interface GroupMessageHandler ()
 
@@ -59,7 +62,7 @@
     NSMutableArray *messageExtendArray = [NSMutableArray array];
     for (MessagePost *msg in messages) {
         NSString *identifer = msg.msgData.receiverAddress;
-        LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifer];
+        LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifer];
         if (GJCFStringIsNull(group.groupEcdhKey)) {
             NSMutableArray *messages = [self.unHandleMessagees valueForKey:identifer];
             if (messages) {
@@ -317,29 +320,44 @@
 
 - (void)savaToDBWith:(GroupInfo *)group createGroupInfo:(CreateGroupMessage *)createGroupinfo {
 
-    LMGroupInfo *lmGroup = [[LMGroupInfo alloc] init];
+    LMRamGroupInfo *lmGroup = [[LMRamGroupInfo alloc] init];
     lmGroup.groupIdentifer = createGroupinfo.identifier;
     lmGroup.groupEcdhKey = createGroupinfo.secretKey;
     lmGroup.groupName = group.group.name;
-    NSMutableArray *AccoutInfoArray = [NSMutableArray array];
-    for (GroupMember *member in group.membersArray) {
-        AccountInfo *accountInfo = [[AccountInfo alloc] init];
-        accountInfo.username = member.username;
-        accountInfo.avatar = member.avatar;
-        accountInfo.address = member.address;
-        accountInfo.isGroupAdmin = (member.role != 0);
-        accountInfo.groupNickName = member.nick;
-        accountInfo.pub_key = member.pubKey;
-        [AccoutInfoArray objectAddObject:accountInfo];
-    }
-    lmGroup.groupMembers = AccoutInfoArray;
     lmGroup.avatarUrl = group.group.avatar;
     lmGroup.isPublic = group.group.public_p;
     lmGroup.isGroupVerify = group.group.reviewed;
     lmGroup.summary = group.group.summary;
     lmGroup.isGroupVerify = group.group.reviewed;
     lmGroup.avatarUrl = group.group.avatar;
-
+    NSMutableArray *AccoutInfoArray = [NSMutableArray array];
+    LMRamMemberInfo * admin = nil;
+    for (GroupMember *member in group.membersArray) {
+        LMRamMemberInfo *accountInfo = [[LMRamMemberInfo alloc] init];
+        accountInfo.username = member.username;
+        accountInfo.avatar = member.avatar;
+        accountInfo.address = member.address;
+        accountInfo.isGroupAdmin = (member.role != 0);
+        accountInfo.groupNicksName = member.nick;
+        if (accountInfo.groupNicksName.length <= 0) {
+            accountInfo.groupNicksName = member.username;
+        }
+        accountInfo.pubKey = member.pubKey;
+        accountInfo.identifier = lmGroup.groupIdentifer;
+        accountInfo.univerStr = [[NSString stringWithFormat:@"%@%@",accountInfo.address,accountInfo.identifier] sha1String];
+        if (!accountInfo.isGroupAdmin) {
+            [AccoutInfoArray objectAddObject:accountInfo];
+        }else {
+            lmGroup.admin = accountInfo;
+            admin = accountInfo;
+        }
+        
+    }
+    if (admin) {
+         [AccoutInfoArray insertObject:admin atIndex:0];
+    }
+    [lmGroup.membersArray addObjects:AccoutInfoArray];
+    
     [[GroupDBManager sharedManager] savegroup:lmGroup];
     
     //remove downloading
@@ -351,7 +369,7 @@
     [self.unHandleMessagees removeObjectForKey:createGroupinfo.identifier];
 }
 
-- (void)handMessage:(NSArray *)unHandleMessage groupInfo:(LMGroupInfo *)lmGroup{
+- (void)handMessage:(NSArray *)unHandleMessage groupInfo:(LMRamGroupInfo *)lmGroup{
     
     NSMutableDictionary *owerMessagesDict = [NSMutableDictionary dictionary];
     NSMutableArray *messageExtendArray = [NSMutableArray array];

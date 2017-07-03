@@ -179,7 +179,6 @@
 		192351611E8123370022D844 /* UnSpentInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351601E8123370022D844 /* UnSpentInfo.m */; };
 		1923516C1E81237E0022D844 /* ServerInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351671E81237E0022D844 /* ServerInfo.m */; };
 		192351781E8123C60022D844 /* AddressBookInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1923516F1E8123C60022D844 /* AddressBookInfo.m */; };
-		192351791E8123C60022D844 /* LMGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351711E8123C60022D844 /* LMGroupInfo.m */; };
 		1923517A1E8123C60022D844 /* LMOtherModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351731E8123C60022D844 /* LMOtherModel.m */; };
 		1923517B1E8123C60022D844 /* NewFriendItemModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351751E8123C60022D844 /* NewFriendItemModel.m */; };
 		1923517C1E8123C60022D844 /* PhoneContactInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351771E8123C60022D844 /* PhoneContactInfo.m */; };
@@ -1383,8 +1382,6 @@
 		192351671E81237E0022D844 /* ServerInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerInfo.m; sourceTree = "<group>"; };
 		1923516E1E8123C60022D844 /* AddressBookInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddressBookInfo.h; sourceTree = "<group>"; };
 		1923516F1E8123C60022D844 /* AddressBookInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddressBookInfo.m; sourceTree = "<group>"; };
-		192351701E8123C60022D844 /* LMGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMGroupInfo.h; sourceTree = "<group>"; };
-		192351711E8123C60022D844 /* LMGroupInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMGroupInfo.m; sourceTree = "<group>"; };
 		192351721E8123C60022D844 /* LMOtherModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMOtherModel.h; sourceTree = "<group>"; };
 		192351731E8123C60022D844 /* LMOtherModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMOtherModel.m; sourceTree = "<group>"; };
 		192351741E8123C60022D844 /* NewFriendItemModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewFriendItemModel.h; sourceTree = "<group>"; };
@@ -14651,8 +14648,6 @@
 				1923518D1E81247E0022D844 /* ShareMessageModel.m */,
 				1923516E1E8123C60022D844 /* AddressBookInfo.h */,
 				1923516F1E8123C60022D844 /* AddressBookInfo.m */,
-				192351701E8123C60022D844 /* LMGroupInfo.h */,
-				192351711E8123C60022D844 /* LMGroupInfo.m */,
 				192351721E8123C60022D844 /* LMOtherModel.h */,
 				192351731E8123C60022D844 /* LMOtherModel.m */,
 				192351741E8123C60022D844 /* NewFriendItemModel.h */,
@@ -32819,7 +32814,6 @@
 				19234F731E81164E0022D844 /* LMAddMoreViewController.m in Sources */,
 				19234F4D1E8113D60022D844 /* SelectLoginUserViewController.m in Sources */,
 				19234F9D1E8117560022D844 /* RecentChatForRecommendCell.m in Sources */,
-				192351791E8123C60022D844 /* LMGroupInfo.m in Sources */,
 				D92232C31E822BF900D67110 /* amrFileCodec.mm in Sources */,
 				D92232601E822BF800D67110 /* LMCustomBtn.m in Sources */,
 				D95C046B1E810902006C5C8A /* GroupMemberListCell.m in Sources */,

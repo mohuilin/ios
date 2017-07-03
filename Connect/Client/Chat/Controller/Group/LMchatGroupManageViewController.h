@@ -8,7 +8,7 @@
 
 #import "BaseSetViewController.h"
 #import "GJGCChatFriendTalkModel.h"
-
+#import "LMRamMemberInfo.h"
 typedef void(^changeSwitchBlock)(BOOL verifiy);
 
 @interface LMchatGroupManageViewController : BaseSetViewController
@@ -16,7 +16,7 @@ typedef void(^changeSwitchBlock)(BOOL verifiy);
 @property(copy, nonatomic) NSString *titleName;
 @property(nonatomic, weak) GJGCChatFriendTalkModel *talkModel;
 @property(strong, nonatomic) changeSwitchBlock switchChangeBlock;
-@property(weak, nonatomic) AccountInfo *groupMasterInfo;
+@property(weak, nonatomic) LMRamMemberInfo *groupMasterInfo;
 
 @property(nonatomic, copy) void (^groupAdminChangeCallBack)(NSString *address);
 

@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "LMRamGroupInfo.h"
+#import "LMRamMemberInfo.h"
 
 @interface MainTabController : UITabBarController
 
@@ -14,7 +16,7 @@
 
 - (void)chatWithFriend:(AccountInfo *)user withObject:(NSDictionary *)obj;
 
-- (void)createGroupWithGroupInfo:(LMGroupInfo *)groupInfo content:(NSString *)content;
+- (void)createGroupWithGroupInfo:(LMRamGroupInfo *)groupInfo content:(NSString *)tipMessage;
 
 - (void)changeLanguageResetController;
 

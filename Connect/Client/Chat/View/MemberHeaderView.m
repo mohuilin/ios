@@ -7,6 +7,7 @@
 //
 
 #import "MemberHeaderView.h"
+#import "LMRamMemberInfo.h"
 
 @interface MemberHeaderView ()
 
@@ -16,7 +17,7 @@
 @property(nonatomic, copy) NSString *avatarUrl;
 @property(nonatomic, copy) NSString *name;
 
-@property(nonatomic, strong) AccountInfo *info;
+@property(nonatomic, strong) LMRamMemberInfo *info;
 
 @end
 
@@ -77,11 +78,11 @@
     return self;
 }
 
-- (instancetype)initWithAccountInfo:(AccountInfo *)info tapBlock:(TapMemberHeaderViewBlock)tapBlock {
+- (instancetype)initWithAccountInfo:(LMRamMemberInfo *)info tapBlock:(TapMemberHeaderViewBlock)tapBlock {
     if (self = [super init]) {
         self.info = info;
         self.avatarUrl = info.avatar;
-        self.name = info.groupShowName;
+        self.name = info.username;
         self.tapBlock = tapBlock;
         [self setup];
     }

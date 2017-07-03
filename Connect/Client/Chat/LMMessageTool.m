@@ -10,7 +10,7 @@
 #import "ConnectTool.h"
 #import "GJGCChatFriendCellStyle.h"
 #import "GJGCChatContentEmojiParser.h"
-#import "LMGroupInfo.h"
+#import "LMRamGroupInfo.h"
 #import "GJGCChatSystemNotiCellStyle.h"
 #import "LMOtherModel.h"
 #import "LMMessageExtendManager.h"
@@ -69,11 +69,11 @@
 + (NSData *)formateVideoLoacalPath:(GJGCChatFriendContentModel *)messageContent {
     
     AccountInfo *user = nil;
-    LMGroupInfo *group = nil;
+    LMRamGroupInfo *group = nil;
     if ([[SessionManager sharedManager].chatObject isKindOfClass:[AccountInfo class]]) {
         user = (AccountInfo *)[SessionManager sharedManager].chatObject;
-    } else if ([[SessionManager sharedManager].chatObject isKindOfClass:[LMGroupInfo class]]){
-        group = (LMGroupInfo *)[SessionManager sharedManager].chatObject;
+    } else if ([[SessionManager sharedManager].chatObject isKindOfClass:[LMRamGroupInfo class]]){
+        group = (LMRamGroupInfo *)[SessionManager sharedManager].chatObject;
     }
 
     //amr
@@ -109,11 +109,11 @@
 + (MMMessage *)packSendMessageWithChatContent:(GJGCChatFriendContentModel *)messageContent snapTime:(int)snapTime{
     
     AccountInfo *user = nil;
-    LMGroupInfo *group = nil;
+    LMRamGroupInfo *group = nil;
     if ([[SessionManager sharedManager].chatObject isKindOfClass:[AccountInfo class]]) {
         user = (AccountInfo *)[SessionManager sharedManager].chatObject;
-    } else if ([[SessionManager sharedManager].chatObject isKindOfClass:[LMGroupInfo class]]){
-        group = (LMGroupInfo *)[SessionManager sharedManager].chatObject;
+    } else if ([[SessionManager sharedManager].chatObject isKindOfClass:[LMRamGroupInfo class]]){
+        group = (LMRamGroupInfo *)[SessionManager sharedManager].chatObject;
     }
     if (!group && !user) {
         return nil;
@@ -233,11 +233,11 @@
 
 + (GJGCChatFriendContentType)formateChatFriendContent:(GJGCChatFriendContentModel *)chatContentModel withMsgModel:(MMMessage *)message{
     AccountInfo *user = nil;
-    LMGroupInfo *group = nil;
+    LMRamGroupInfo *group = nil;
     if ([[SessionManager sharedManager].chatObject isKindOfClass:[AccountInfo class]]) {
         user = (AccountInfo *)[SessionManager sharedManager].chatObject;
-    } else if ([[SessionManager sharedManager].chatObject isKindOfClass:[LMGroupInfo class]]){
-        group = (LMGroupInfo *)[SessionManager sharedManager].chatObject;
+    } else if ([[SessionManager sharedManager].chatObject isKindOfClass:[LMRamGroupInfo class]]){
+        group = (LMRamGroupInfo *)[SessionManager sharedManager].chatObject;
     }
     GJGCChatFriendContentType type = GJGCChatFriendContentTypeNotFound;
     if (!group && !user) {
@@ -686,13 +686,13 @@
                                     }
                                         break;
                                     case GJGCChatFriendTalkTypeGroup: {
-                                        for (AccountInfo *groupMember in group.groupMembers) {
+                                        for (LMRamMemberInfo *groupMember in group.membersArray) {
                                             //sender is self
                                             if ([senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
                                                 senderName = LMLocalizedString(@"Chat You", nil);
                                             } else {
                                                 if ([groupMember.address isEqualToString:senderAddress]) {
-                                                    senderName = groupMember.normalShowName;
+                                                    senderName = groupMember.username;
                                                 }
                                             }
                                             //reciver is self
@@ -700,7 +700,7 @@
                                                 garbName = LMLocalizedString(@"Chat You", nil);
                                             } else {
                                                 if ([groupMember.address isEqualToString:reciverAddress]) {
-                                                    garbName = groupMember.normalShowName;
+                                                    garbName = groupMember.username;
                                                 }
                                             }
                                         }
@@ -745,13 +745,13 @@
                                 }
                                     break;
                                 case GJGCChatFriendTalkTypeGroup: {
-                                    for (AccountInfo *groupMember in group.groupMembers) {
+                                    for (LMRamMemberInfo *groupMember in group.membersArray) {
 
                                         if ([payAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
                                             payName = LMLocalizedString(@"Chat You", nil);
                                         } else {
                                             if ([groupMember.address isEqualToString:payAddress]) {
-                                                payName = groupMember.normalShowName;
+                                                payName = groupMember.username;
                                             }
                                         }
 
@@ -759,7 +759,7 @@
                                             reciverName = LMLocalizedString(@"Chat You", nil);
                                         } else {
                                             if ([groupMember.address isEqualToString:reciverAddress]) {
-                                                reciverName = groupMember.normalShowName;
+                                                reciverName = groupMember.username;
                                             }
                                         }
                                     }

@@ -13,14 +13,14 @@
 @property(nonatomic, assign) NSInteger ID;
 
 /**
- * init with normarl model eg:Accountinfo LMgroupinfo
+ * init with normarl model eg:Accountinfo
  * @param info
  * @return
  */
 - (LMBaseModel *)initWithNormalInfo:(id)info;
 
 /**
- * get normarl info eg:Accountinfo LMgroupinfo
+ * get normarl info eg:Accountinfo 
  * @return
  */
 - (id)normalInfo;

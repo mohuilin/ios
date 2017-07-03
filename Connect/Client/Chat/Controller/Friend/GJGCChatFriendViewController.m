@@ -829,11 +829,11 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
     } else {
         AccountInfo *info = nil;
         if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-            for (AccountInfo *groupUser in self.taklInfo.chatGroupInfo.groupMembers) {
+            for (LMRamMemberInfo *groupUser in self.taklInfo.chatGroupInfo.membersArray) {
                 if ([groupUser.address isEqualToString:chatContentModel.senderAddress]) {
                     info = [[UserDBManager sharedManager] getUserByAddress:groupUser.address];
                     if (!info) {
-                        info = groupUser;
+                        info = (AccountInfo *)groupUser.normalInfo;
                         info.stranger = YES;
                     }
                     break;
@@ -1046,7 +1046,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                 user = [[LKUserCenter shareCenter] currentLoginUser];
             } else {
                 if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-                    user = [[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:address];
+                    user = (AccountInfo *)[[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:address].normalInfo;
                 } else {
                     user = [[UserDBManager sharedManager] getUserByAddress:bagInfo.redpackage.sendAddress];
                 }
@@ -1075,7 +1075,12 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
                         } else {
                             LMChatRedLuckyDetailController *page = [[LMChatRedLuckyDetailController alloc] initWithUserInfo:accoutInfo redLuckyInfo:bagInfo];
-                            page.groupMembers = self.taklInfo.chatGroupInfo.groupMembers;
+                            NSMutableArray *memberInfoArray = [NSMutableArray array];
+                            for (LMRamMemberInfo *info in self.taklInfo.chatGroupInfo.membersArray) {
+                                AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
+                                [memberInfoArray addObject:accountInfo];
+                            }
+                            page.groupMembers = memberInfoArray;
                             [self presentViewController:[[UINavigationController alloc] initWithRootViewController:page] animated:YES completion:nil];
                         }
                     }
@@ -1112,7 +1117,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
             user = [[LKUserCenter shareCenter] currentLoginUser];
         } else {
             if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-                user = [[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:address];
+                user = (AccountInfo *)[[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:address].normalInfo;
             } else {
                 user = [[UserDBManager sharedManager] getUserByAddress:bagInfo.redpackage.sendAddress];
             }
@@ -1141,7 +1146,12 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
                     } else {
                         LMChatRedLuckyDetailController *page = [[LMChatRedLuckyDetailController alloc] initWithUserInfo:accoutInfo redLuckyInfo:bagInfo];
-                        page.groupMembers = self.taklInfo.chatGroupInfo.groupMembers;
+                        NSMutableArray *memberInfoArray = [NSMutableArray array];
+                        for (LMRamMemberInfo *info in self.taklInfo.chatGroupInfo.membersArray) {
+                            AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
+                            [memberInfoArray addObject:accountInfo];
+                        }
+                        page.groupMembers = memberInfoArray;
                         [self presentViewController:[[UINavigationController alloc] initWithRootViewController:page] animated:YES completion:nil];
                     }
                 }
@@ -1194,9 +1204,9 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                         LMGroupZChouReciptViewController *reciptVc = [[LMGroupZChouReciptViewController alloc] initWithCrowdfundingInfo:crowdInfo];
                         [self.navigationController pushViewController:reciptVc animated:YES];
                     } else {
-                        for (AccountInfo *member in self.taklInfo.chatGroupInfo.groupMembers) {
+                        for (LMRamMemberInfo *member in self.taklInfo.chatGroupInfo.membersArray) {
                             if ([member.address isEqualToString:crowdInfo.sender.address]) {
-                                crowdInfo.sender.username = member.groupShowName;
+                                crowdInfo.sender.username = member.username;
                                 break;
                             }
                         }
@@ -2397,7 +2407,12 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 - (void)transfer {
     if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
         LMGroupFriendsViewController *page = [[LMGroupFriendsViewController alloc] init];
-        page.groupFriends = [NSMutableArray arrayWithArray:self.taklInfo.chatGroupInfo.groupMembers];
+        NSMutableArray *memberInfoArray = [NSMutableArray array];
+        for (LMRamMemberInfo *info in self.taklInfo.chatGroupInfo.membersArray) {
+            AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
+            [memberInfoArray addObject:accountInfo];
+        }
+        page.groupFriends = memberInfoArray;
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:page];
         [self presentViewController:nav animated:YES completion:nil];
 
@@ -2439,7 +2454,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
     __weak __typeof(&*self) weakSelf = self;
     if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
         LMGroupChatReciptViewController *groupRecipVc = [[LMGroupChatReciptViewController alloc] initWithIdentifier:self.taklInfo.chatIdendifier];
-        groupRecipVc.groupMemberCount = self.taklInfo.chatGroupInfo.groupMembers.count;
+        groupRecipVc.groupMemberCount = self.taklInfo.chatGroupInfo.membersArray.count;
         groupRecipVc.didGetNumberAndMoney = ^(int totalNum, NSDecimalNumber *money, NSString *hashId, NSString *note) {
             [weakSelf sendFriendRceiptMessageWithAmount:money transactionID:hashId totalMember:totalNum isCrowdfundRceipt:YES note:note];
         };

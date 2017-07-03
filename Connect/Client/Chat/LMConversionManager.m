@@ -132,28 +132,33 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 
                 //update
                 LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
-                RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                [realm beginWriteTransaction];
-                realmModel.unReadCount = recentModel.unReadCount;
-                realmModel.createTime = time;
-                realmModel.stranger = recentModel.stranger;
-                realmModel.content = recentModel.content;
-                if (snapChatTime >= 0 &&
-                    snapChatTime != recentModel.snapChatDeleteTime) {
-                    recentModel.snapChatDeleteTime = (int)snapChatTime;
-                    realmModel.chatSetting.snapChatDeleteTime = recentModel.snapChatDeleteTime;
-                }
-                [realm commitWriteTransaction];
+                [[RecentChatDBManager sharedManager] executeRealmWithBlock:^{
+                    realmModel.unReadCount = recentModel.unReadCount;
+                    realmModel.createTime = time;
+                    realmModel.stranger = recentModel.stranger;
+                    realmModel.content = recentModel.content;
+                    if (snapChatTime >= 0 &&
+                        snapChatTime != recentModel.snapChatDeleteTime) {
+                        recentModel.snapChatDeleteTime = (int)snapChatTime;
+                        realmModel.chatSetting.snapChatDeleteTime = recentModel.snapChatDeleteTime;
+                    }
+ 
+                }];
             }
         }
             break;
             
         case GJGCChatFriendTalkTypeGroup:
         {
+           
             recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:lastMessage.messageOwer];
             if (!recentModel) {
                 
-                LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:lastMessage.messageOwer];
+                LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:lastMessage.messageOwer];
+                NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+                for (LMRamMemberInfo *info in group.membersArray) {
+                    dic[info.address] = info;
+                }
                 recentModel = [[RecentChatModel alloc] init];
                 recentModel.headUrl = group.avatarUrl;
                 recentModel.name = group.groupName;
@@ -161,7 +166,10 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 recentModel.identifier = lastMessage.messageOwer;
                 recentModel.unReadCount = messageCount;
                 NSString *sendName = nil;
-                AccountInfo *senderUser = [group.addressMemberDict valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
+                LMRamMemberInfo *senderUser = nil;
+                if ([dic allValues].count > 0) {
+                   senderUser = [dic valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
+                }
                 if (senderUser) {
                     sendName = senderUser.username;
                 } else{
@@ -174,9 +182,16 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 [[RecentChatDBManager sharedManager] save:recentModel];
             } else{
                 NSString *sendName = nil;
-                AccountInfo *senderUser = [recentModel.chatGroupInfo.addressMemberDict valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
+                NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+                for (LMRamMemberInfo *info in recentModel.chatGroupInfo.membersArray) {
+                    dic[info.address] = info;
+                }
+                LMRamMemberInfo *senderUser = nil;
+                if ([dic allValues].count > 0) {
+                   senderUser = [dic valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
+                }
                 if (senderUser) {
-                    sendName = senderUser.groupShowName;
+                    sendName = senderUser.username;
                 } else{
                     sendName = [lastMessage.message.senderInfoExt valueForKey:@"username"];
                 }
@@ -191,12 +206,11 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 
                 //update
                 LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
-                RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                [realm beginWriteTransaction];
-                realmModel.unReadCount = recentModel.unReadCount;
-                realmModel.createTime = time;
-                realmModel.content = recentModel.content;
-                [realm commitWriteTransaction];
+                [[RecentChatDBManager sharedManager] executeRealmWithBlock:^{
+                    realmModel.unReadCount = recentModel.unReadCount;
+                    realmModel.createTime = time;
+                    realmModel.content = recentModel.content;
+                }];
             }
         }
             break;
@@ -218,12 +232,11 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 
                 //update
                 LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
-                RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-                [realm beginWriteTransaction];
-                realmModel.unReadCount = recentModel.unReadCount;
-                realmModel.createTime = time;
-                realmModel.content = recentModel.content;
-                [realm commitWriteTransaction];
+                [[RecentChatDBManager sharedManager] executeRealmWithBlock:^{
+                    realmModel.unReadCount = recentModel.unReadCount;
+                    realmModel.createTime = time;
+                    realmModel.content = recentModel.content;
+                }];
             } else{
                 recentModel = [[RecentChatModel alloc] init];
                 recentModel.talkType = GJGCChatFriendTalkTypePostSystem;
@@ -246,7 +259,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
 - (void)getNewMessagesWithLastMessage:(ChatMessageInfo *)lastMessage newMessageCount:(int)messageCount  groupNoteMyself:(BOOL)groupNoteMyself{
     RecentChatModel *recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:lastMessage.messageOwer];
     if (!recentModel) {
-        LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:lastMessage.messageOwer];
+        LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:lastMessage.messageOwer];
         recentModel = [[RecentChatModel alloc] init];
         recentModel.headUrl = group.avatarUrl;
         recentModel.name = group.groupName;
@@ -256,7 +269,14 @@ CREATE_SHARED_MANAGER(LMConversionManager)
         recentModel.unReadCount = messageCount;
         recentModel.groupNoteMyself = groupNoteMyself;
         NSString *sendName = nil;
-        AccountInfo *senderUser = [group.addressMemberDict valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
+        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+        for (LMRamMemberInfo *info in group.membersArray) {
+            dic[info.address] = info;
+        }
+        LMRamMemberInfo *senderUser = nil;
+        if ([dic allValues].count > 0) {
+           senderUser = [dic valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
+        }
         if (senderUser) {
             sendName = senderUser.username;
         } else{
@@ -276,9 +296,16 @@ CREATE_SHARED_MANAGER(LMConversionManager)
             }
         }
         NSString *sendName = nil;
-        AccountInfo *senderUser = [recentModel.chatGroupInfo.addressMemberDict valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
+        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+        LMRamMemberInfo *senderUser = nil;
+        for (LMRamMemberInfo *info in recentModel.chatGroupInfo.membersArray) {
+            dic[info.address] = info;
+        }
+        if ([dic allValues].count > 0) {
+          senderUser = [dic valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
+        }
         if (senderUser) {
-            sendName = senderUser.groupShowName;
+            sendName = senderUser.username;
         } else{
             sendName = [lastMessage.message.senderInfoExt valueForKey:@"username"];
         }
@@ -293,13 +320,12 @@ CREATE_SHARED_MANAGER(LMConversionManager)
         
         //update
         LMRecentChat *realmModel = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'",recentModel.identifier]] firstObject];
-        RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
-        [realm beginWriteTransaction];
-        realmModel.unReadCount = recentModel.unReadCount;
-        realmModel.createTime = time;
-        realmModel.groupNoteMyself = recentModel.groupNoteMyself;
-        realmModel.content = recentModel.content;
-        [realm commitWriteTransaction];
+        [[RecentChatDBManager sharedManager]executeRealmWithBlock:^{
+            realmModel.unReadCount = recentModel.unReadCount;
+            realmModel.createTime = time;
+            realmModel.groupNoteMyself = recentModel.groupNoteMyself;
+            realmModel.content = recentModel.content;
+        }];
     }
     
     [self reloadRecentChatWithRecentChatModel:recentModel needReloadBadge:messageCount > 0];
@@ -620,8 +646,8 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     }
     NSInteger index = [[SessionManager sharedManager].allRecentChats indexOfObject:recentChat];
     if (recentChat.talkType == GJGCChatFriendTalkTypeGroup) {
-        if (recentChat.chatGroupInfo.groupMembers.count == 0) {
-            LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:recentChat.identifier];
+        if (recentChat.chatGroupInfo.membersArray.count == 0) {
+            LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:recentChat.identifier];
             recentChat.chatGroupInfo = group;
             recentChat.name = group.groupName;
         }
@@ -657,7 +683,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     }
     RecentChatModel *findModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:groupIdentifer];
     if (findModel) {
-        LMGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
+        LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
         findModel.name = group.groupName;
         findModel.chatGroupInfo = group;
         [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
@@ -671,17 +697,17 @@ CREATE_SHARED_MANAGER(LMConversionManager)
         return;
     }
     RecentChatModel *model = [[SessionManager sharedManager] getRecentChatWithIdentifier:groupid];
+    [ChatMessageFileManager deleteRecentChatAllMessageFilesByAddress:groupid];
+    [[RecentChatDBManager sharedManager] deleteByIdentifier:groupid];
+    [[MessageDBManager sharedManager] deleteAllMessageByMessageOwer:groupid];
+    [[SessionManager sharedManager] removeRecentChatWithIdentifier:model.identifier];
     if (model) {
-        [ChatMessageFileManager deleteRecentChatAllMessageFilesByAddress:groupid];
-        [[RecentChatDBManager sharedManager] deleteByIdentifier:groupid];
-        [[MessageDBManager sharedManager] deleteAllMessageByMessageOwer:groupid];
-        [[SessionManager sharedManager] removeRecentChatWithIdentifier:model.identifier];
-        
         if (model.talkType == GJGCChatFriendTalkTypeGroup) {
             [[GroupDBManager sharedManager] deletegroupWithGroupId:model.identifier];
         }
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
     }
+    [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
+
 }
 
 
@@ -719,7 +745,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 }
                 changeFlag = YES;
             } else if(!model.chatGroupInfo){
-                LMGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:model.identifier];
+                LMRamGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:model.identifier];
                 model.chatGroupInfo = groupInfo;
                 if (!model.name) {
                     model.name = groupInfo.groupName;

@@ -67,7 +67,7 @@
     return _chatUser;
 }
 
-- (LMGroupInfo *)chatGroupInfo{
+- (LMRamGroupInfo *)chatGroupInfo{
     if (self.talkType == GJGCChatFriendTalkTypeGroup) {
         _chatGroupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.identifier];
     }

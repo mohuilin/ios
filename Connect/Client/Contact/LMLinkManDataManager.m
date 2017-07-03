@@ -11,7 +11,6 @@
 #import "NewFriendItemModel.h"
 #import "NSString+Pinyin.h"
 #import "BadgeNumberManager.h"
-#import "LMGroupInfo.h"
 #import "GroupDBManager.h"
 #import "NetWorkOperationTool.h"
 #import "KTSContactsManager.h"
@@ -23,6 +22,8 @@
 #import "LMRamGroupInfo.h"
 #import "NSString+Pinyin.h"
 #import "LMFriendRequestInfo.h"
+#import "LMRamGroupInfo.h"
+#import "LMRamMemberInfo.h"
 
 
 @interface LMLinkManDataManager ()
@@ -66,7 +67,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
             [GCDQueue executeInMainQueue:^{
                 [self.commonGroup removeAllObjects];
-                for (LMGroupInfo *group in groups) {
+                for (LMRamGroupInfo *group in groups) {
                     if (![self.commonGroup containsObject:group]) {
                         [self.commonGroup objectAddObject:group];
                     }
@@ -400,7 +401,47 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
     self.friendNewItem = nil;
 }
-
+/**
+ *  detail user array
+ */
+- (void)detailGroupFriendFormat {
+    NSArray *contacts = [[UserDBManager sharedManager] getAllUsers];
+    [self.offenFriends removeAllObjects];
+    [self.normalFriends removeAllObjects];
+    [self.friendsArr removeAllObjects];
+    for (AccountInfo *contact in contacts) {
+        if (contact.isOffenContact) {
+            if (![self.offenFriends containsObject:contact]) {
+                [self.offenFriends objectAddObject:contact];
+            }
+        } else {
+            if (![self.normalFriends containsObject:contact]) {
+                [self.normalFriends objectAddObject:contact];
+            }
+        }
+        if (![self.friendsArr containsObject:contact]) {
+            [self.friendsArr objectAddObject:contact];
+        }
+    }
+    [self addDataToGroupArray];
+}
+/**
+ *  get all user array
+ */
+- (void)getAllLinkMan {
+    
+    [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
+        [GCDQueue executeInMainQueue:^{
+            [self.commonGroup removeAllObjects];
+            for (LMRamGroupInfo *group in groups) {
+                if (![self.commonGroup containsObject:group]) {
+                    [self.commonGroup objectAddObject:group];
+                }
+            }
+            [self detailGroupFriendFormat];
+        }];
+    }];
+}
 #pragma mark - notification method
 
 - (void)addNotification {
@@ -608,9 +649,8 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
             if (!error) {
                 [weakSelf.commonGroup removeAllObjects];
                 for (LMRamGroupInfo *realmGroup in results) {
-                    LMGroupInfo *group = (LMGroupInfo *)realmGroup.normalInfo;
-                    if (group) {
-                        [weakSelf.commonGroup addObject:group];
+                    if (realmGroup) {
+                        [weakSelf.commonGroup addObject:realmGroup];
                     }
                 }
                 [weakSelf addDataToGroupArray];

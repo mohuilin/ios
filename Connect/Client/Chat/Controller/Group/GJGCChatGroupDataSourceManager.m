@@ -90,10 +90,17 @@
         }
         if (![[senderInfoExt valueForKey:@"address"] isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //发送者不是自己
             chatContentModel.isFromSelf = NO;
-            AccountInfo *member = [self.taklInfo.chatGroupInfo.addressMemberDict valueForKey:[senderInfoExt valueForKey:@"address"]];
+            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+            for (LMRamMemberInfo *info in self.taklInfo.chatGroupInfo.membersArray) {
+                dic[info.address] = info;
+            }
+            LMRamMemberInfo *member = nil;
+            if ([dic allValues].count > 0) {
+               member = [dic valueForKey:[senderInfoExt valueForKey:@"address"]];
+            }
             if (member) {
                 chatContentModel.headUrl = member.avatar;
-                chatContentModel.senderName = member.groupShowName;
+                chatContentModel.senderName = member.username;
                 chatContentModel.senderAddress = member.address;
             } else {
                 chatContentModel.headUrl = [senderInfoExt valueForKey:@"avatar"];

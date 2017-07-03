@@ -27,9 +27,8 @@
 @property NSString *avatarUrl;
 // groupSummary
 @property NSString *summary;
-
+// admin 
 @property LMRamMemberInfo *admin;
-
 @property RLMArray<LMRamMemberInfo *> <LMRamMemberInfo> *membersArray;
 
 @end

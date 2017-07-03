@@ -10,7 +10,7 @@
 #import "ReconmandChatListPage.h"
 #import "GJCFFileUploadManager.h"
 #import "MessageDBManager.h"
-#import "LMGroupInfo.h"
+#import "LMRamGroupInfo.h"
 #import "RecentChatDBManager.h"
 #import "IMService.h"
 #import "LMConversionManager.h"
@@ -66,9 +66,9 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
     }
     GJGCChatFriendTalkType chatType = GJGCChatFriendTalkTypePrivate;
     NSString *ecdhKey = nil;
-    if ([retweetModel.toFriendModel isKindOfClass:[LMGroupInfo class]]) {
+    if ([retweetModel.toFriendModel isKindOfClass:[LMRamGroupInfo class]]) {
         chatType = GJGCChatFriendTalkTypeGroup;
-        LMGroupInfo *group = (LMGroupInfo *)retweetModel.toFriendModel;
+        LMRamGroupInfo *group = (LMRamGroupInfo *)retweetModel.toFriendModel;
         ecdhKey = group.groupEcdhKey;
     } else if ([retweetModel.toFriendModel isKindOfClass:[AccountInfo class]]){
         AccountInfo *user = (AccountInfo *)retweetModel.toFriendModel;
@@ -215,8 +215,8 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
     RecentChatModel *recent = nil;
     MMMessage *message = [[MMMessage alloc] init];
     message.type = retweetMessage.type;
-    if ([toFriend isKindOfClass:[LMGroupInfo class]]) {
-        LMGroupInfo *group = (LMGroupInfo *)toFriend;
+    if ([toFriend isKindOfClass:[LMRamGroupInfo class]]) {
+        LMRamGroupInfo *group = (LMRamGroupInfo *)toFriend;
         message.user_name = group.groupName;
         message.publicKey = group.groupIdentifer;
         message.user_id = group.groupIdentifer;
@@ -367,7 +367,7 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
         } onQueue:nil];
         
     } else if (chatType == GJGCChatFriendTalkTypeGroup){
-        LMGroupInfo *group = (LMGroupInfo *)toFriend;
+        LMRamGroupInfo *group = (LMRamGroupInfo *)toFriend;
         [[IMService instance] asyncSendGroupMessage:sendMessage withGroupEckhKey:group.groupEcdhKey onQueue:nil completion:^(MMMessage *messageInfo, NSError *error) {
             
             self.RetweetComplete(error,1.1);
