@@ -224,10 +224,27 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(groupid)) {
         return nil;
     }
-
     RLMResults<LMRamGroupInfo *> *results = [LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@'", groupid]];
     if (results.count > 0) {
         LMRamGroupInfo *ramGroupInfo = [results lastObject];
+        LMRamMemberInfo *admin = [ramGroupInfo.membersArray firstObject];
+        if (!admin.isGroupAdmin) {
+            //move
+            for (LMRamMemberInfo *member in ramGroupInfo.membersArray) {
+                if (member.isGroupAdmin) {
+                    admin = member;
+                    break;
+                }
+            }
+            if (admin) {
+                NSInteger index = [ramGroupInfo.membersArray indexOfObject:admin];
+                if (index != NSNotFound) {
+                    [self executeRealmWithBlock:^{
+                        [ramGroupInfo.membersArray moveObjectAtIndex:index toIndex:0];
+                    }];
+                }
+            }
+        }
         return ramGroupInfo;
     }
     return nil;
@@ -383,26 +400,23 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(groupId) || address.length <= 0) {
         return;
     }
-
-    RLMResults <LMRamMemberInfo *> *ramAccoutResults = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND isGroupAdmin == 1",groupId]];
-    LMRamMemberInfo *ramAccoutnInfo = [ramAccoutResults firstObject];
-    [self executeRealmWithBlock:^{
-       ramAccoutnInfo.isGroupAdmin = NO;
-    }];
-    //add new admin
-    LMRamMemberInfo *ramNewAccount = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' AND address = '%@' ",groupId,address]] lastObject];
-    [self executeRealmWithBlock:^{
-        ramNewAccount.isGroupAdmin = YES;
-    }];
     LMRamGroupInfo *groupInfo = [[LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ",groupId]] lastObject];
     [self executeRealmWithBlock:^{
-        groupInfo.admin = ramNewAccount;
+        LMRamMemberInfo *admin = nil;
+        for (LMRamMemberInfo *member in groupInfo.membersArray) {
+            if ([member.address isEqualToString:address]) {
+                admin = member;
+                admin.isGroupAdmin = YES;
+            } else {
+                member.isGroupAdmin = NO;
+            }
+        }
+        if (admin) {
+            NSInteger adminIndex = [groupInfo.membersArray indexOfObject:admin];
+            [groupInfo.membersArray moveObjectAtIndex:adminIndex toIndex:0];
+            groupInfo.admin = admin;
+        }
     }];
-    NSInteger ramAdminIndex = [groupInfo.membersArray indexOfObject:ramNewAccount];
-    [self executeRealmWithBlock:^{
-        [groupInfo.membersArray moveObjectAtIndex:ramAdminIndex toIndex:0];
-    }];
-    
 }
 
 - (void)removeFromCommonGroup:(NSString *)groupid {

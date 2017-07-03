@@ -84,11 +84,13 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         self.isHaveSow = YES;
     }
     self.title = LMLocalizedString(@"Link Group", nil);
+    
+    
+    self.groupInfo = self.talkModel.chatGroupInfo;
     RegisterNotify(ConnnectGroupInfoDidChangeNotification, @selector(grouInfoChange:))
     [self addNotification];
 }
 - (void)addNotification {
-    self.groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:self.talkModel.chatGroupInfo.groupIdentifer];
     __weak typeof(self.groupInfo)weakGroupInfo = self.groupInfo;
     __weak typeof(self)weakSelf = self;
    self.groupToken = [self.groupInfo addNotificationBlock:^(BOOL deleted, NSArray<RLMPropertyChange *> * _Nullable changes, NSError * _Nullable error) {
