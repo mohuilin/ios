@@ -493,9 +493,6 @@
     UpdateGroupMemberInfo *upDataUserNick = [[UpdateGroupMemberInfo alloc] init];
     upDataUserNick.nick = myName;
     upDataUserNick.identifier = groupid;
-    //update nickname
-    [[GroupDBManager sharedManager] updateGroupMembserNick:myName address:[LKUserCenter shareCenter].currentLoginUser.address groupId:groupid];
-    
     [NetWorkOperationTool POSTWithUrlString:GroupMemberUpdateUrl postProtoData:upDataUserNick.data complete:^(id response) {
         
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -507,7 +504,8 @@
             }
             return;
         }
-        
+        //update nickname
+        [[GroupDBManager sharedManager] updateGroupMembserNick:myName address:[LKUserCenter shareCenter].currentLoginUser.address groupId:groupid];
         if (complete) {
             complete(nil);
         }

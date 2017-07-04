@@ -721,9 +721,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                         }
                         for (LMRamMemberInfo *member in lmGroup.membersArray) {
                             if ([member.address isEqualToString:changeNick.address]) {
-                                [[GroupDBManager sharedManager] executeRealmWithBlock:^{
-                                   member.groupNicksName = changeNick.nick;
-                                }];
                                 [[GroupDBManager sharedManager] updateGroupMembserNick:changeNick.nick address:changeNick.address groupId:lmGroup.groupIdentifer];
                                 break;
                             }
