@@ -32,6 +32,7 @@ selector:_selector name:_name object:nil];
 #define OVER_TIME_CODE -110
 
 #define MAX_PASS_LEN (4)
+#define MAX_GROUP_MEMBER_COUNT (500)
 
 // Start screen time
 #define LANUCH_DURATION (1.5)
