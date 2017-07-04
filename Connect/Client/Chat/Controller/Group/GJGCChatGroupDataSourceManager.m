@@ -60,7 +60,6 @@
     [self.orginMessageListArray objectAddObject:aMessage];
 
     /* 格式化消息 */
-
     GJGCChatFriendContentModel *chatContentModel = [[GJGCChatFriendContentModel alloc] init];
     chatContentModel.contentType = aMessage.type;
     chatContentModel.autoMsgid = chatMessage.ID;
@@ -85,19 +84,11 @@
         if ([senderInfoExt isKindOfClass:[NSString class]]) {
             senderInfoExt = [senderInfoExt mj_JSONObject];
             NSAssert(senderInfoExt != nil, @"senderInfoExt should not be nil");
-        } else {
-            DDLogError(@"senderInfoExt %@", senderInfoExt);
         }
-        if (![[senderInfoExt valueForKey:@"address"] isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //发送者不是自己
+        NSString *senderAddress = [senderInfoExt valueForKey:@"address"];
+        if (![senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //发送者不是自己
             chatContentModel.isFromSelf = NO;
-            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-            for (LMRamMemberInfo *info in self.taklInfo.chatGroupInfo.membersArray) {
-                dic[info.address] = info;
-            }
-            LMRamMemberInfo *member = nil;
-            if ([dic allValues].count > 0) {
-               member = [dic valueForKey:[senderInfoExt valueForKey:@"address"]];
-            }
+            LMRamMemberInfo *member = [[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:senderAddress];
             if (member) {
                 chatContentModel.headUrl = member.avatar;
                 chatContentModel.senderName = member.username;
@@ -116,7 +107,6 @@
     chatContentModel.readState = GJGCChatFriendMessageReadStateReaded;
     /* 格式内容字段 */
     GJGCChatFriendContentType contentType = [self formateChatFriendContent:chatContentModel withMsgModel:aMessage];
-
     if (contentType != GJGCChatFriendContentTypeNotFound) {
         // 界面消息去重
         if (![self contentModelByMsgId:aMessage.message_id]) {
@@ -124,7 +114,6 @@
         }
 
     }
-
     return chatContentModel;
 }
 

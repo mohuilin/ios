@@ -449,52 +449,45 @@
 #pragma mark - 加载历史消息
 
 - (void)trigglePullHistoryMsgForEarly {
-
-    __weak __typeof(&*self) weakSelf = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-
-        if (weakSelf.chatListArray && [weakSelf.chatListArray count] > 0) {
-            /* Remove the time model to find the top message content */
-            GJGCChatFriendContentModel *lastMsgContent;
-            for (int i = 0; i < weakSelf.totalCount; i++) {
-                GJGCChatFriendContentModel *item = (GJGCChatFriendContentModel *) [weakSelf contentModelAtIndex:i];
-                if (!item.isTimeSubModel) {
-                    lastMsgContent = item;
-                    break;
-                }
-
+    if (self.chatListArray && [self.chatListArray count] > 0) {
+        /* Remove the time model to find the top message content */
+        GJGCChatFriendContentModel *lastMsgContent;
+        for (int i = 0; i < self.totalCount; i++) {
+            GJGCChatFriendContentModel *item = (GJGCChatFriendContentModel *) [self contentModelAtIndex:i];
+            if (!item.isTimeSubModel) {
+                lastMsgContent = item;
+                break;
             }
-            /* Last message sending time */
-            long long lastMsgSendTime;
-            if (lastMsgContent) {
-                lastMsgSendTime = lastMsgContent.sendTime;
-            } else {
-                lastMsgSendTime = 0;
-            }
-            lastMsgSendTime = lastMsgSendTime;
-            //time * 1000
-            NSArray *localHistroyMsgArray = [[MessageDBManager sharedManager] getMessagesWithMessageOwer:weakSelf.taklInfo.chatIdendifier Limit:20 beforeTime:lastMsgSendTime messageAutoID:lastMsgContent.autoMsgid];
-            if (localHistroyMsgArray.count < 20) {
-                weakSelf.isFinishLoadAllHistoryMsg = YES;
-            } else {
-                weakSelf.isFinishLoadAllHistoryMsg = NO;
-            }
-
-            if (localHistroyMsgArray && localHistroyMsgArray.count > 0) {
-                [weakSelf pushAddMoreMsg:localHistroyMsgArray];
-            } else {
-                [GCDQueue executeInMainQueue:^{
-                    /* Hover on the first message after the first load */
-                    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(dataSourceManagerRequireFinishRefresh:)]) {
-                        [weakSelf.delegate dataSourceManagerRequireFinishRefresh:weakSelf];
-                    }
-
-                    weakSelf.isLoadingMore = NO;
-                }];
-            }
+            
         }
-    });
-
+        /* Last message sending time */
+        long long lastMsgSendTime;
+        if (lastMsgContent) {
+            lastMsgSendTime = lastMsgContent.sendTime;
+        } else {
+            lastMsgSendTime = 0;
+        }
+        lastMsgSendTime = lastMsgSendTime;
+        //time * 1000
+        NSArray *localHistroyMsgArray = [[MessageDBManager sharedManager] getMessagesWithMessageOwer:self.taklInfo.chatIdendifier Limit:20 beforeTime:lastMsgSendTime messageAutoID:lastMsgContent.autoMsgid];
+        if (localHistroyMsgArray.count < 20) {
+            self.isFinishLoadAllHistoryMsg = YES;
+        } else {
+            self.isFinishLoadAllHistoryMsg = NO;
+        }
+        
+        if (localHistroyMsgArray && localHistroyMsgArray.count > 0) {
+            [self pushAddMoreMsg:localHistroyMsgArray];
+        } else {
+            [GCDQueue executeInMainQueue:^{
+                /* Hover on the first message after the first load */
+                if (self.delegate && [self.delegate respondsToSelector:@selector(dataSourceManagerRequireFinishRefresh:)]) {
+                    [self.delegate dataSourceManagerRequireFinishRefresh:self];
+                }
+                self.isLoadingMore = NO;
+            }];
+        }
+    }
 }
 
 - (void)pushAddMoreMsg:(NSArray *)array {

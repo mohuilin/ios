@@ -26,4 +26,9 @@
     return _group_ecdhKey;
 }
 
+- (LMRamGroupInfo *)chatGroupInfo{
+    LMRamGroupInfo *group = [[LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@'",self.chatIdendifier]] lastObject];
+    return group;
+}
+
 @end
