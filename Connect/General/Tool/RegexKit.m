@@ -39,11 +39,14 @@
 }
 
 + (BOOL)vilidatePassword:(NSString *)password{
-    NSString *regex = @"^(?!^(\\d+|[a-zA-Z]+|[~!\\*@#$%^&?\\/\\.,;:()-]+)$)^[\\w~!\\*@#$%\\^&?\\/\\.,;:()-]{8,32}$";
+    //^(?!^(\d+|[a-zA-Z]+|[`~!@#\$%\^&*\(\)\-_=\+\\\|\[\]\{\}:;\“\‘,.<>\/\?]+)$)^[\w`~!@#\$%\^&*\(\)\-_=\+\\\|\[\]\{\}:;\"\',.<>\/\?]{8,32}$
+    NSString *regex = @"^(?!^(\\d+|[a-zA-Z]+|[`~!@#\\$%\\^&*\\(\\)\\-_=\\+\\\\|\\[\\]\\{\\}:;\\“\\‘,.<>\\/\\?]+)$)^[\\w`~!@#\\$%\\^&*\\(\\)\\-_=\\+\\\\|\\[\\]\\{\\}:;\"\\',.<>\\/\\?]{8,32}$";
     NSPredicate* pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
     if ([pred evaluateWithObject:password]) {
+        DDLogInfo(@"%@ 通过",password);
         return YES;
     }else{
+        DDLogInfo(@"%@ 失败",password);
         return NO;
     }
 }
