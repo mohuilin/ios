@@ -95,6 +95,15 @@
     // creat recommond man
     [self getArrayFromNetWork];
 }
+- (void)dealloc {
+    RemoveNofify;
+    [self.tableView removeFromSuperview];
+    self.tableView = nil;
+    self.recommandFriendArray = nil;
+    self.allArray = nil;
+    self.friendRequests = nil;
+    self.titleArr = nil;
+}
 #pragma mark - method
 - (void)friendRequestNotification {
 
@@ -252,17 +261,6 @@
         self.recommandFriendArray = tmpArray;
     }
 }
-
-- (void)dealloc {
-    RemoveNofify;
-    [self.tableView removeFromSuperview];
-    self.tableView = nil;
-    self.recommandFriendArray = nil;
-    self.allArray = nil;
-    self.friendRequests = nil;
-    self.titleArr = nil;
-}
-
 - (void)uploadContactAndGetNewPhoneFriends {
     __weak __typeof(&*self) weakSelf = self;
     [[KTSContactsManager sharedManager] importContacts:^(NSArray *contacts, BOOL reject) {
@@ -441,7 +439,7 @@
     self.tableView.allowsMultipleSelectionDuringEditing = NO;
 }
 
-#pragma mark - tableview - 头部
+#pragma mark - tableview - head
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     NSArray *array = (NSArray *) self.allArray[section];
@@ -502,7 +500,7 @@
     }
 }
 
-#pragma mark - 更多按钮的点击事件
+#pragma mark - more click action
 
 - (void)moreButtonClick {
     LMAddMoreViewController *addMoreVc = [[LMAddMoreViewController alloc] init];
@@ -597,11 +595,10 @@
     [[IMService instance] setRecommandUserNoInterestAdress:oldAddress comlete:^(NSError *error, id data) {
         if (error == nil) {
             [GCDQueue executeInMainQueue:^{
-                [[LMRecommandFriendManager sharedManager] updateRecommandFriendStatus:3 withAddress:oldAddress];
-                [self creatAllArray];
                 [MBProgressHUD hideHUDForView:self.view];
             }];
-            
+            [[LMRecommandFriendManager sharedManager] updateRecommandFriendStatus:3 withAddress:oldAddress];
+            [self creatAllArray];
         } else {
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Operation failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
