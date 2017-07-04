@@ -56,12 +56,6 @@ extern NSString *const ConnnectUserAddressChangeNotification;
 
 extern NSString *const ConnnectGroupInfoDidChangeNotification;
 
-// Global Notification Settings \ Remove common groups
-
-extern NSString *const ConnnectAddCommonGroupNotification;
-
-extern NSString *const ConnnectRemoveCommonGroupNotification;
-
 // Global notifications delete members
 
 extern NSString *const ConnnectGroupInfoDidDeleteMember;

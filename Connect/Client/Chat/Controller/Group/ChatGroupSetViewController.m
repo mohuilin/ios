@@ -298,7 +298,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         if (isCommonGroup) {
             [SetGlobalHandler setCommonContactGroupWithIdentifer:weakSelf.talkModel.chatIdendifier complete:^(NSError *error) {
                 if (!error) {
-                    [[GroupDBManager sharedManager] addGroupToCommonGroup:weakSelf.talkModel.chatIdendifier];
+                    [[GroupDBManager sharedManager] updateGroupStatus:YES groupId:weakSelf.talkModel.chatIdendifier];
                     [[GroupDBManager sharedManager] executeRealmWithBlock:^{
                        weakSelf.talkModel.chatGroupInfo.isCommonGroup = isCommonGroup;
                     }];
@@ -313,7 +313,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         } else {
             [SetGlobalHandler removeCommonContactGroupWithIdentifer:weakSelf.talkModel.chatIdendifier complete:^(NSError *error) {
                 if (!error) {
-                    [[GroupDBManager sharedManager] removeFromCommonGroup:weakSelf.talkModel.chatIdendifier];
+                    [[GroupDBManager sharedManager] updateGroupStatus:NO groupId:weakSelf.talkModel.chatIdendifier];
                     [[GroupDBManager sharedManager] executeRealmWithBlock:^{
                       weakSelf.talkModel.chatGroupInfo.isCommonGroup = isCommonGroup;
                     }];

@@ -102,8 +102,6 @@
  * @return
  */
 - (LMRamMemberInfo *)getAdminByGroupId:(NSString *)groupId;
-
-
 /**
  * delete group info
  * @param groupId
@@ -114,7 +112,6 @@
  * delete all group info
  */
 - (void)removeAllGroup;
-
 /**
  * updata some group member name
  * @param userName
@@ -174,9 +171,17 @@
  * @param complete
  */
 - (void)getAllgroupsWithComplete:(void (^)(NSArray *groups))complete;
-
+/**
+ * realmCommonGroupList
+ * @param nil
+ * @param nil
+ */
 - (RLMResults *)realmCommonGroupList;
-
+/**
+ * get all commonGroup
+ * @param nil
+ * @param nil
+ */
 - (void)getCommonGroupListWithComplete:(void (^)(NSArray *commonGroups))complete;
 
 /**
@@ -184,18 +189,11 @@
  * @return
  */
 - (NSArray *)commonGroupList;
-
 /**
- * add some group to common group
+ * updata group common status
  * @param groupid
  */
-- (void)addGroupToCommonGroup:(NSString *)groupid;
-
-/**
- * remove group from common group
- * @param groupid
- */
-- (void)removeFromCommonGroup:(NSString *)groupid;
+- (void)updateGroupStatus:(BOOL)flag groupId:(NSString *)groupId;
 
 /**
  * check group is common group
