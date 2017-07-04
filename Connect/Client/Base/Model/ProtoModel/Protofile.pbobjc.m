@@ -4313,6 +4313,7 @@ typedef struct GroupReviewed__storage_ {
 @dynamic count;
 @dynamic hash_p;
 @dynamic public_p;
+@dynamic joined;
 
 typedef struct GroupInfoBase__storage_ {
   uint32_t _has_storage_[1];
@@ -4383,6 +4384,15 @@ typedef struct GroupInfoBase__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeBool,
       },
+      {
+        .name = "joined",
+        .dataTypeSpecific.className = NULL,
+        .number = GroupInfoBase_FieldNumber_Joined,
+        .hasIndex = 7,
+        .offset = 8,  // Stored in _has_storage_ to save space.
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeBool,
+      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[GroupInfoBase class]
@@ -4412,6 +4422,7 @@ typedef struct GroupInfoBase__storage_ {
 @dynamic public_p;
 @dynamic username;
 @dynamic identifier;
+@dynamic joined;
 
 typedef struct GroupInfoBaseShare__storage_ {
   uint32_t _has_storage_[1];
@@ -4501,6 +4512,15 @@ typedef struct GroupInfoBaseShare__storage_ {
         .offset = (uint32_t)offsetof(GroupInfoBaseShare__storage_, identifier),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "joined",
+        .dataTypeSpecific.className = NULL,
+        .number = GroupInfoBaseShare_FieldNumber_Joined,
+        .hasIndex = 9,
+        .offset = 10,  // Stored in _has_storage_ to save space.
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeBool,
       },
     };
     GPBDescriptor *localDescriptor =

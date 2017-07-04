@@ -1301,6 +1301,7 @@ typedef GPB_ENUM(GroupInfoBase_FieldNumber) {
   GroupInfoBase_FieldNumber_Count = 4,
   GroupInfoBase_FieldNumber_Hash_p = 5,
   GroupInfoBase_FieldNumber_Public_p = 6,
+  GroupInfoBase_FieldNumber_Joined = 7,
 };
 
 @interface GroupInfoBase : GPBMessage
@@ -1317,6 +1318,8 @@ typedef GPB_ENUM(GroupInfoBase_FieldNumber) {
 
 @property(nonatomic, readwrite) BOOL public_p;
 
+@property(nonatomic, readwrite) BOOL joined;
+
 @end
 
 #pragma mark - GroupInfoBaseShare
@@ -1330,6 +1333,7 @@ typedef GPB_ENUM(GroupInfoBaseShare_FieldNumber) {
   GroupInfoBaseShare_FieldNumber_Public_p = 6,
   GroupInfoBaseShare_FieldNumber_Username = 7,
   GroupInfoBaseShare_FieldNumber_Identifier = 8,
+  GroupInfoBaseShare_FieldNumber_Joined = 9,
 };
 
 @interface GroupInfoBaseShare : GPBMessage
@@ -1349,6 +1353,8 @@ typedef GPB_ENUM(GroupInfoBaseShare_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *username;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *identifier;
+
+@property(nonatomic, readwrite) BOOL joined;
 
 @end
 
