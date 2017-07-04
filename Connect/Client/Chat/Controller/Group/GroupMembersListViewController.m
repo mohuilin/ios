@@ -78,11 +78,17 @@
 #pragma mark - invite new group member
 
 - (void)doRight:(id)sender {
+    //model exchange
+    NSMutableArray *temArray = [NSMutableArray array];
+    for (LMRamMemberInfo *memberInfo in self.groupMembers) {
+        AccountInfo *accountInfo = (AccountInfo *)memberInfo.normalInfo;
+        [temArray addObject:accountInfo];
+    }
+    
     ChooseContactViewController *page = [[ChooseContactViewController alloc] initWithChooseComplete:^(NSArray *selectContactArray) {
         DDLogInfo(@"%@", selectContactArray);
         [self addNewGroupMembers:selectContactArray];
-    }                                                                          defaultSelectedUsers:self.groupMembers];
-
+    }                                                                          defaultSelectedUsers:temArray];
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:page] animated:YES completion:nil];
 
 
