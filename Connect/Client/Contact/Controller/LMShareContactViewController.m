@@ -99,8 +99,11 @@
     [[LMLinkManDataManager sharedManager] getRecommandGroupArrayWithRecommonUser:self.contact complete:^(NSMutableArray *groupArray, NSMutableArray *indexs) {
          self.groupsFriendArray = groupArray;
          self.indexsArray = indexs;
+        [GCDQueue executeInMainQueue:^{
+           [self.tableView reloadData];
+        }];
     }];
-    [self.tableView reloadData];
+    
     
 }
 #pragma mark - Table view data source

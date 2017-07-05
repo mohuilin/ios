@@ -56,7 +56,9 @@
     [[LMLinkManDataManager sharedManager] getInviteGroupMemberWithSelectedUser:self.selectedUsers complete:^(NSMutableArray *groupArray, NSMutableArray *indexs) {
         self.groups = groupArray;
         self.indexs = indexs;
-        [self.tableView reloadData];
+        [GCDQueue executeInMainQueue:^{
+           [self.tableView reloadData];
+        }];
     }];
 }
 - (void)setUpUI {
