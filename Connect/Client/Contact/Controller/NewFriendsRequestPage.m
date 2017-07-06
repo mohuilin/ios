@@ -80,7 +80,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = LMLocalizedString(@"Link New friend", nil);
-    [self creatFriendRequestsAction];
     [self configTableView];
     [self bridgeNumberAction];
     [self friendRequestNotification];
@@ -115,7 +114,7 @@
        if (!error) {
            NSMutableArray *temArray = [NSMutableArray array];
            for (LMFriendRequestInfo* info in results) {
-               AccountInfo *accountInfo = ( AccountInfo *)info.normalInfo;
+               AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
                [temArray addObject:accountInfo];
            }
            weakSelf.friendRequests = temArray;
@@ -146,23 +145,6 @@
         }];
     }];
 }
-- (void)creatFriendRequestsAction {
-    if (!self.friendRequests) {
-        self.friendRequests = [NSMutableArray array];
-    }
-    self.friendRequests = [[UserDBManager sharedManager] getAllNewFirendRequest].mutableCopy;
-    __weak __typeof(&*self) weakSelf = self;
-    for (AccountInfo *user in _friendRequests) {
-        NSString *address = user.address;
-        int source = user.source;
-        if (user.status == RequestFriendStatusAccept) {
-            user.customOperation = ^() {
-                [weakSelf acceptRequest:address source:source];
-            };
-        }
-    }
-}
-
 - (void)getArrayFromNetWork {
     __weak typeof(self) weakSelf = self;
     self.isLoading = YES;

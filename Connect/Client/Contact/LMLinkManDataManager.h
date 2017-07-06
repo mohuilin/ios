@@ -16,6 +16,7 @@
 @end
 
 @interface LMLinkManDataManager : NSObject
+
 @property(weak, nonatomic) id <LMLinkManDataManagerDelegate> delegate;
 
 // set up

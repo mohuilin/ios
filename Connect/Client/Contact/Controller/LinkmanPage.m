@@ -25,6 +25,7 @@
 #import "RecentChatDBManager.h"
 #import "LMContactAccountInfo.h"
 
+
 @interface LinkmanPage () <MGSwipeTableCellDelegate, UINavigationControllerDelegate, LMLinkManDataManagerDelegate>
 
 //tableView headerView
