@@ -245,8 +245,10 @@
                          *  save and upload
                          */
                         [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                            [SetGlobalHandler setpayPass:password compete:^(BOOL result) {
+                            [SetGlobalHandler setpayPass:password withNumerType:PassWordTypeCommon compete:^(BOOL result,NSString *encryPassWord) {
                                 if (result) {
+                                    // upload encry seed
+                                    [self uploadEncrySeed:encryPassWord];
                                     [GCDQueue executeInMainQueue:^{
                                         KQXPasswordInputController *psw = [KQXPasswordInputController passwordInputViewWithStyle:KQXPasswordInputStyleWithoutMoney];
                                         __weak __typeof(&*psw)weakPsw = psw;
@@ -281,7 +283,14 @@
         }];
     }
 }
-
+/**
+ *  encryPassWord
+ *  upload server (array)
+ */
+- (void)uploadEncrySeed:(NSString *)encryPassWord {
+   
+    
+}
 
 - (void)openFingerPayComplete:(void (^)(BOOL result))complete{
     [[WJTouchID touchID] startWJTouchIDWithMessage:LMLocalizedString(@"Wallet Allow fingerprint to pay", nil) fallbackTitle:LMLocalizedString(@"Common OK", nil) delegate:self];

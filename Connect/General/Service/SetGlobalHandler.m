@@ -1177,21 +1177,26 @@
 }
 
 
-+ (void)setpayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete{
++ (void)setpayPass:(NSString *)payPass withNumerType:(PassWordType)passWordType compete:(void(^)(BOOL result, NSString *encryPassWord))complete{
     if (payPass == nil) {
         payPass = @"";
     }
     PayPin *paySet = [[PayPin alloc] init];
+    GcmData *gcmData = nil;
     if (!GJCFStringIsNull(payPass)) {
-        GcmData *gcmData = [ConnectTool createGcmWithData:payPass
-                                                publickey:[[LKUserCenter shareCenter] currentLoginUser].pub_key needEmptySalt:NO];
+        if([LKUserCenter shareCenter].currentLoginUser.isOldUser){
+            gcmData = [ConnectTool createGcmWithData:payPass
+                                                    publickey:[[LKUserCenter shareCenter] currentLoginUser].pub_key needEmptySalt:NO];
+        }else {
+            gcmData = [ConnectTool createGcmWithData:payPass withInterationType:passWordType];
+        }
         paySet.payPin = [StringTool hexStringFromData:gcmData.data];
     }
     [NetWorkOperationTool POSTWithUrlString:PinSetingUrl postProtoData:paySet.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO);
+                complete(NO,nil);
             }
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
@@ -1201,12 +1206,12 @@
             }
             [[MMAppSetting sharedSetting]  setPayPass:payPass];
             if (complete) {
-                complete(YES);
+                complete(YES,paySet.payPin);
             }
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO);
+            complete(NO,nil);
         }
     }];
 }
@@ -1225,7 +1230,7 @@
             if (data) {
                 PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
                 if ([version.version isEqualToString:@"0"]) {
-                    [self setpayPass:[[MMAppSetting sharedSetting] getPayPass] compete:^(BOOL result) {
+                    [self setpayPass:[[MMAppSetting sharedSetting] getPayPass] withNumerType:PassWordTypeCommon  compete:^(BOOL result,NSString *encryPassWord) {
                         if (result) {
                             if (complete) {
                                 complete([[MMAppSetting sharedSetting] getPayPass],nil);

@@ -54,6 +54,8 @@
 + (GcmData *)createGcmWithData:(id)data
                      publickey:(NSString *)publickey
                  needEmptySalt:(BOOL)needEmptySalt;
++ (GcmData *)createGcmWithData:(id)data withInterationType:(PassWordType)passWordType;
+
 + (GcmData *)createGcmDataWithEcdhkey:(NSData *)ecdhKey
                                  data:(NSData *)data
                                   aad:(NSData *)aad;

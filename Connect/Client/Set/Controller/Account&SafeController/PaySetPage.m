@@ -276,9 +276,12 @@
                             if ([firstPass isEqualToString:password]) {
                                 // save and upload
                                 [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                                    [SetGlobalHandler setpayPass:password compete:^(BOOL result) {
+                                    [SetGlobalHandler setpayPass:password withNumerType:PassWordTypeCommon compete:^(BOOL result,NSString *encryPassWord) {
                                         if (result) {
                                             [weakSelf reload];
+                                            // Re-encrypt the seed
+                                            [weakSelf encryptSeed:encryPassWord];
+                                            // tips
                                             [GCDQueue executeInMainQueue:^{
                                                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
                                                     if (weakSelf.poptoRoot) {
@@ -318,12 +321,18 @@
     [alertController addAction:okAction];
 
     alertController.automaticallyAdjustsScrollViewInsets = NO;
-
-
     [self presentViewController:alertController animated:YES completion:nil];
 
 }
+- (void)encryptSeed:(NSString *)encryPassWord {
+  // The seeds of each currency
+    NSString *currencySeed = nil;
+    
+    
+    
+    
 
+}
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
