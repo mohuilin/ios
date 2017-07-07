@@ -86,8 +86,13 @@
         [SetGlobalHandler privacySetAllowSearchAddress:[[MMAppSetting sharedSetting] isAllowAddress] AllowSearchPhone:[[MMAppSetting sharedSetting] isAllowPhone] needVerify:[[MMAppSetting sharedSetting] isAllowVerfiy] syncPhonebook:[[MMAppSetting sharedSetting] isAutoSysBook] findMe:[userInfo boolValue]];
 
     };
-
-    group1.items = @[searchByPhoto, searchByAddress, recommendFindMe].copy;
+    CellItem *hideAddressBalance = [CellItem itemWithTitle:@"hide balance" type:CellItemTypeSwitch operation:nil];
+    hideAddressBalance.switchIsOn = [[MMAppSetting sharedSetting] isHideBalance];
+    hideAddressBalance.operationWithInfo = ^(id userInfo) {
+       // upload
+    
+    };
+    group1.items = @[searchByPhoto, searchByAddress, recommendFindMe,hideAddressBalance].copy;
     [self.groups objectAddObject:group1];
 
 

@@ -98,6 +98,7 @@ static MMAppSetting *manager = nil;
         [userSet setObject:@(YES) forKey:@"voicenoti"];
         [userSet setObject:@(YES) forKey:@"vibratenoti"];
         [userSet setObject:@(NO) forKey:@"setAllowRecomand"];
+        [userSet setObject:@(NO) forKey:@"setHideBalance"];
         [userSet setObject:@"" forKey:@"im.conect.contactversionkey"];
       
         NSMutableString *currencySymbol = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencySymbol];
@@ -264,6 +265,16 @@ static MMAppSetting *manager = nil;
 }
 - (BOOL)isAllowRecomand{
     return [[self getValue:@"setAllowRecomand"] boolValue];
+}
+#pragma mark - Is hide balance
+- (void)displayHideBalance{
+    [self setValue:@(YES) forKey:@"setHideBalance"];
+}
+- (void)HideBalance{
+    [self removeObjectForKey:@"setHideBalance"];
+}
+- (BOOL)isHideBalance{
+    return [[self getValue:@"setHideBalance"] boolValue];
 }
 #pragma mark - Whether or not the method of obtaining the old group was executed
 - (void)setGroupExecuted
