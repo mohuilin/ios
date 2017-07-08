@@ -403,7 +403,7 @@
                  needEmptySalt:(BOOL)needEmptySalt{
     return [self createGcmWithData:data privkey:nil publickey:publickey aad:nil needEmptySalt:needEmptySalt];
 }
-+ (GcmData *)createGcmWithData:(id)data withInterationType:(PassWordType)passWordType {
++ (GcmData *)createGcmWithData:(id)data withInterationType:(PassWordType)passWordType needEmptySalt:(BOOL)needEmptySalt{
     NSUInteger number = 17;
     switch (passWordType) {
         case PassWordTypeCommon:{

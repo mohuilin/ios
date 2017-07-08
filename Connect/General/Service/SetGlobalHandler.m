@@ -1188,7 +1188,7 @@
             gcmData = [ConnectTool createGcmWithData:payPass
                                                     publickey:[[LKUserCenter shareCenter] currentLoginUser].pub_key needEmptySalt:NO];
         }else {
-            gcmData = [ConnectTool createGcmWithData:payPass withInterationType:passWordType];
+            gcmData = [ConnectTool createGcmWithData:payPass withInterationType:passWordType needEmptySalt:NO];
         }
         paySet.payPin = [StringTool hexStringFromData:gcmData.data];
     }
