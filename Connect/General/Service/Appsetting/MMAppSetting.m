@@ -754,7 +754,14 @@ char* printEnv(void)
     
     return currency;
 }
+#pragma mark wallet
+- (void)setWallet:(NSString *)walletId{
+    [self setValue:walletId forKey:@"walletId"];
 
+}
+- (NSString *)walletId{
+    return [self getValue:@"walletId"];
+}
 
 #pragma mark - notification
 - (void)openVoiceNoti{

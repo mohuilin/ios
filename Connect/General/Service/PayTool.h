@@ -33,14 +33,6 @@
  */
 - (void)getRateComplete:(void (^)(NSDecimalNumber *rate,NSError *error))complete;
 
-/**
- *  pay vertification
- */
-- (void)payVerfifyWithMoney:(NSString *)money controller:(UIViewController *)controller withComplete:(void (^)(BOOL result,NSString *errorMsg))complete;
-
-- (void)payVerfifyWithMoney:(NSString *)money controller:(UIViewController *)controller withComplete:(void (^)(BOOL result,NSString *errorMsg))complete resultCallBack:(void (^)(BOOL result))resultCallBack;
-
-
 - (void)payVerfifyFingerWithComplete:(void (^)(BOOL result,NSString *errorMsg))complete;
 
 

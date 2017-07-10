@@ -11,6 +11,7 @@
 #import "SetUserInfoPage.h"
 #import "LMDisplayProgressView.h"
 #import "StringTool.h"
+#import "LMIMHelper.h"
 
 #define DisplayTime (5.0*60)
 #define FaliCount 3
@@ -129,9 +130,14 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [self.navigationController.navigationBar lt_reset];
+    
+    if (self.seedSourceType == SeedSouceTypeWallet) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"top_background"] forBarMetrics:UIBarMetricsDefault];
+    }else {
+        [self.navigationController.navigationBar lt_reset];
+    }
+    
 }
-
 /**
  *  power
  */
@@ -163,8 +169,10 @@
 #pragma mark - action
 
 - (void)doLeft:(id)sender {
-    [self stopLink];
-    [self.navigationController popViewControllerAnimated:YES];
+    if (self.seedSourceType != SeedSouceTypeWallet) {
+        [self stopLink];
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (void)setup {
@@ -362,15 +370,28 @@
         self.displayLable.text = LMLocalizedString(@"Login Generated Successful", nil);
     });
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        SetUserInfoPage *page = nil;
-        NSData *data = [NSData dataWithContentsOfFile:self.recoderPath];
-        // Should be checked first
-        if (self.token && self.mobile) {
-            page = [[SetUserInfoPage alloc] initWithStr:[StringTool stringWithData:data] mobile:self.mobile token:self.token];
-            [self.navigationController pushViewController:page animated:YES];
-        } else {
-            page = [[SetUserInfoPage alloc] initWithStr:[StringTool stringWithData:data]];
-            [self.navigationController pushViewController:page animated:YES];
+        if (self.seedSourceType == SeedSouceTypeWallet) {
+            NSData *data = [NSData dataWithContentsOfFile:self.recoderPath];
+            NSString *dataStr = [StringTool stringWithData:data];
+            NSData *randomData = [LMIMHelper createRandom512bits];
+            NSString *commonRandomStr = [StringTool hexStringFromData:randomData];
+            // or
+            NSString *randomSeed = [StringTool pinxCreator:commonRandomStr withPinv:dataStr];
+            if (self.SeedBlock) {
+                self.SeedBlock(randomSeed);
+            }
+            [self.navigationController popViewControllerAnimated:YES];
+        }else {
+            SetUserInfoPage *page = nil;
+            NSData *data = [NSData dataWithContentsOfFile:self.recoderPath];
+            // Should be checked first
+            if (self.token && self.mobile) {
+                page = [[SetUserInfoPage alloc] initWithStr:[StringTool stringWithData:data] mobile:self.mobile token:self.token];
+                [self.navigationController pushViewController:page animated:YES];
+            } else {
+                page = [[SetUserInfoPage alloc] initWithStr:[StringTool stringWithData:data]];
+                [self.navigationController pushViewController:page animated:YES];
+            }
         }
     });
 }

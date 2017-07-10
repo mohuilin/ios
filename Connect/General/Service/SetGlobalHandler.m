@@ -15,6 +15,9 @@
 #import "StringTool.h"
 #import "ConnectTool.h"
 #import "LMRamGroupInfo.h"
+#import "LMBTCWalletHelper.h"
+#import "LMRandomSeedController.h"
+
 
 @implementation SetGlobalHandler
 
@@ -566,6 +569,7 @@
         }
         
     }];
+
 
 }
 
@@ -1177,45 +1181,140 @@
 }
 
 
-+ (void)setpayPass:(NSString *)payPass withNumerType:(PassWordType)passWordType compete:(void(^)(BOOL result, NSString *encryPassWord))complete{
++ (void)setpayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete{
     if (payPass == nil) {
         payPass = @"";
     }
-    PayPin *paySet = [[PayPin alloc] init];
-    GcmData *gcmData = nil;
-    if (!GJCFStringIsNull(payPass)) {
-        if([LKUserCenter shareCenter].currentLoginUser.isOldUser){
-            gcmData = [ConnectTool createGcmWithData:payPass
-                                                    publickey:[[LKUserCenter shareCenter] currentLoginUser].pub_key needEmptySalt:NO];
-        }else {
-            gcmData = [ConnectTool createGcmWithData:payPass withInterationType:passWordType needEmptySalt:NO];
+    if([LKUserCenter shareCenter].currentLoginUser.isOldUser){
+        PayPin *paySet = [[PayPin alloc] init];
+        GcmData *gcmData = nil;
+        if (!GJCFStringIsNull(payPass)) {
+                gcmData = [ConnectTool createGcmWithData:payPass
+                                                        publickey:[[LKUserCenter shareCenter] currentLoginUser].pub_key needEmptySalt:NO];
+                paySet.payPin = [StringTool hexStringFromData:gcmData.data];
         }
-        paySet.payPin = [StringTool hexStringFromData:gcmData.data];
+        [NetWorkOperationTool POSTWithUrlString:PinSetingUrl postProtoData:paySet.data complete:^(id response) {
+            HttpResponse *hResponse = (HttpResponse *)response;
+            if (hResponse.code != successCode) {
+                if (complete) {
+                    complete(NO);
+                }
+            } else{
+                NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
+                    [[MMAppSetting sharedSetting] setpaypassVersion:version.version];
+                }
+                [[MMAppSetting sharedSetting]  setPayPass:payPass];
+                if (complete) {
+                    complete(YES);
+                }
+            }
+        } fail:^(NSError *error) {
+            if (complete) {
+                complete(NO);
+            }
+        }];
+    }else { //
+        if (!GJCFStringIsNull([LKUserCenter shareCenter].currentLoginUser.baseSeed)) {
+           NSString *encryPtionSeed = [LMBTCWalletHelper encodeWalletSeed:[LKUserCenter shareCenter].currentLoginUser.baseSeed userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
+            
+            [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:nil complete:^(id response) {
+                HttpResponse *hResponse = (HttpResponse *)response;
+                if (hResponse.code != successCode) {
+                    if (complete) {
+                        complete(NO);
+                    }
+                } else{
+                    NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+                    if (data) {
+                        NSString *versionStr = @"0";
+                        [[MMAppSetting sharedSetting] setpaypassVersion:versionStr];
+                    }
+                    [[MMAppSetting sharedSetting]  setPayPass:payPass];
+                    if (complete) {
+                        complete(YES);
+                    }
+                }
+            } fail:^(NSError *error) {
+                if (complete) {
+                    complete(NO);
+                }
+            }];
+        }
     }
-    [NetWorkOperationTool POSTWithUrlString:PinSetingUrl postProtoData:paySet.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(NO,nil);
-            }
-        } else{
-            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-            if (data) {
-                PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
-                [[MMAppSetting sharedSetting] setpaypassVersion:version.version];
-            }
-            [[MMAppSetting sharedSetting]  setPayPass:payPass];
-            if (complete) {
-                complete(YES,paySet.payPin);
-            }
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(NO,nil);
-        }
-    }];
 }
-
+/**
+ * Payment resetPayPass
+   *
+   * @param nopass whether a password is required
+   * @param payPass to pay the password
+   * @ Param fee
+ */
++ (void)resetPayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete{
+    if (payPass == nil) {
+        payPass = @"";
+    }
+    if([LKUserCenter shareCenter].currentLoginUser.isOldUser){
+        PayPin *paySet = [[PayPin alloc] init];
+        GcmData *gcmData = nil;
+        if (!GJCFStringIsNull(payPass)) {
+            gcmData = [ConnectTool createGcmWithData:payPass
+                                           publickey:[[LKUserCenter shareCenter] currentLoginUser].pub_key needEmptySalt:NO];
+            paySet.payPin = [StringTool hexStringFromData:gcmData.data];
+        }
+        [NetWorkOperationTool POSTWithUrlString:PinSetingUrl postProtoData:paySet.data complete:^(id response) {
+            HttpResponse *hResponse = (HttpResponse *)response;
+            if (hResponse.code != successCode) {
+                if (complete) {
+                    complete(NO);
+                }
+            } else{
+                NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
+                    [[MMAppSetting sharedSetting] setpaypassVersion:version.version];
+                }
+                [[MMAppSetting sharedSetting]  setPayPass:payPass];
+                if (complete) {
+                    complete(YES);
+                }
+            }
+        } fail:^(NSError *error) {
+            if (complete) {
+                complete(NO);
+            }
+        }];
+    }else { //
+        if (!GJCFStringIsNull([LKUserCenter shareCenter].currentLoginUser.baseSeed)) {
+            
+            NSString *encryPtionSeed = [LMBTCWalletHelper encodeWalletSeed:[LKUserCenter shareCenter].currentLoginUser.baseSeed userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
+            
+            [NetWorkOperationTool POSTWithUrlString:UpdateBaseSeedUrl postProtoData:nil complete:^(id response) {
+                HttpResponse *hResponse = (HttpResponse *)response;
+                if (hResponse.code != successCode) {
+                    if (complete) {
+                        complete(NO);
+                    }
+                } else{
+                    NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+                    if (data) {
+                        PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
+                        [[MMAppSetting sharedSetting] setpaypassVersion:version.version];
+                    }
+                    [[MMAppSetting sharedSetting]  setPayPass:payPass];
+                    if (complete) {
+                        complete(YES);
+                    }
+                }
+            } fail:^(NSError *error) {
+                if (complete) {
+                    complete(NO);
+                }
+            }];
+        }
+    }
+}
 + (void)syncPaypinversionWithComplete:(void(^)(NSString *password,NSError *error))complete{
     PayPinVersion *sendVersion = [[PayPinVersion alloc] init];
     sendVersion.version = [[MMAppSetting sharedSetting] getpaypassVersion];
@@ -1230,7 +1329,7 @@
             if (data) {
                 PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
                 if ([version.version isEqualToString:@"0"]) {
-                    [self setpayPass:[[MMAppSetting sharedSetting] getPayPass] withNumerType:PassWordTypeCommon  compete:^(BOOL result,NSString *encryPassWord) {
+                    [self setpayPass:[[MMAppSetting sharedSetting] getPayPass] compete:^(BOOL result) {
                         if (result) {
                             if (complete) {
                                 complete([[MMAppSetting sharedSetting] getPayPass],nil);
@@ -1481,5 +1580,89 @@
         }];
     }
 }
-
+/**
+ * creat new wallet
+ *
+ * @param contacts
+ * @param complete
+ */
++ (void)creatNewWalletWithController:(UIViewController *)controllerVc complete:(void (^)(BOOL isFinish))complete{
+    
+    // Synchronize wallet data and create wallet
+    if(GJCFStringIsNull([[MMAppSetting sharedSetting] walletId])) {
+        [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
+            HttpResponse *hResponse = (HttpResponse *)response;
+            if (hResponse.code != successCode) {
+                
+            } else{
+                [SetGlobalHandler creatNewWallet:controllerVc complete:complete];
+                
+                
+                
+                
+                
+                
+            }
+        } fail:^(NSError *error) {
+            
+        }];
+    }
+}
++ (void)creatNewWallet:(UIViewController *)controllerVc complete:(void (^)(BOOL isFinish))complete{
+    LMRandomSeedController *seedVc = [[LMRandomSeedController alloc] init];
+    seedVc.seedSourceType = SeedSouceTypeWallet;
+    seedVc.SeedBlock = ^(NSString *randomSeed) {
+        if (!GJCFStringIsNull(randomSeed)) {
+            [LKUserCenter shareCenter].currentLoginUser.baseSeed = randomSeed;
+            NSString __block *firstPass = nil;
+            [GCDQueue executeInMainQueue:^{
+                KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
+                __weak __typeof(&*passView) weakPassView = passView;
+                passView.fillCompleteBlock = ^(NSString *password) {
+                    if (password.length != 4) {
+                        return;
+                    }
+                    if (GJCFStringIsNull(firstPass)) {
+                        firstPass = password;
+                        [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm PIN", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                    } else {
+                        [weakPassView dismissWithClosed:YES];
+                        if ([firstPass isEqualToString:password]) {
+                            // save and upload
+                            [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
+                                [SetGlobalHandler setpayPass:password compete:^(BOOL result) {
+                                    if (result) {
+                                        // tips
+                                        if (complete) {
+                                            complete(YES);
+                                        }
+                                    }else {
+                                        if (complete) {
+                                            complete(NO);
+                                        }
+                                    }
+                                }];
+                            }];
+                        } else {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:controllerVc.view complete:^{
+                                    if (complete) {
+                                        complete(NO);
+                                    }
+                                }];
+                            }];
+                        }
+                    }
+                };
+                [controllerVc presentViewController:passView animated:NO completion:nil];
+            }];
+            
+        }else {
+            if (complete) {
+                complete(NO);
+            }
+        }
+    };
+    [controllerVc.navigationController pushViewController:seedVc animated:YES];
+}
 @end

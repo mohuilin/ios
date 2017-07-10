@@ -15,6 +15,11 @@
 #import "WalletItemCell.h"
 #import "ScanAddPage.h"
 #import "LMHandleScanResultManager.h"
+#import "SetGlobalHandler.h"
+#import "NetWorkOperationTool.h"
+
+
+
 
 
 @interface WalletItem : NSObject
@@ -57,12 +62,15 @@
     [self setupSubView];
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
+    [self creatNewWallet];
+    
+    
 }
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self queryBlance];
 }
+
 #pragma lazy
 - (AccountInfo *)loginUser {
     if (!_loginUser) {
@@ -109,7 +117,17 @@
     HistoryVc.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:HistoryVc animated:YES];
 }
-
+#pragma mark action
+- (void)creatNewWallet{
+    //Synchronize wallet data and create wallet
+  [SetGlobalHandler creatNewWalletWithController:self complete:^(BOOL isFinish) {
+      if (isFinish) {
+          [GCDQueue executeInMainQueue:^{
+           [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
+          }];
+      }
+  }];
+}
 - (void)currencyChange {
     [super currencyChange];
     __weak __typeof(&*self) weakSelf = self;

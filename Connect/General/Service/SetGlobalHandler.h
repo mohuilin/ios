@@ -8,13 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "LMRamGroupInfo.h"
-typedef NS_ENUM(NSUInteger,PassWordType) {
-    PassWordTypeCommon = 0,
-    PassWordTypeMiddle = 1,
-    PassWordTypeHeight = 2
-    
-};
-
 
 @interface SetGlobalHandler : NSObject
 
@@ -224,7 +217,23 @@ typedef NS_ENUM(NSUInteger,PassWordType) {
    * @ Param fee
  */
 + (void)setPaySetNoPass:(BOOL)nopass payPass:(NSString *)payPass fee:(long long)fee compete:(void(^)(BOOL result))complete;
-+ (void)setpayPass:(NSString *)payPass withNumerType:(PassWordType)passWordType compete:(void(^)(BOOL result, NSString *encryPassWord))complete;
+/**
+   * Payment payPass
+   *
+   * @param nopass whether a password is required
+   * @param payPass to pay the password
+   * @ Param fee
+ */
++ (void)setpayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete;
+/**
+   * Payment resetPayPass
+   *
+   * @param nopass whether a password is required
+   * @param payPass to pay the password
+   * @ Param fee
+ */
++ (void)resetPayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete;
+
 + (void)syncPaypinversionWithComplete:(void(^)(NSString *password,NSError *error))complete;
 + (void)getPaySetComplete:(void (^)(NSError *erro))complete;
 
@@ -232,13 +241,27 @@ typedef NS_ENUM(NSUInteger,PassWordType) {
 #pragma mark - user
 
 /**
-   * Synchronous address book
-   *
-   * @param contacts
-   * @param complete
+  * Synchronous address book
+  *
+  * @param contacts
+  * @param complete
  */
 + (void)syncPhoneContactWithHashContact:(NSMutableArray *)contacts complete:(void (^)(NSTimeInterval time))complete;
 
 + (void)getGroupInfoWihtIdentifier:(NSString *)identifier complete:(void (^)(LMRamGroupInfo *groupInfo ,NSError *error))complete;
+/**
+ * creat new wallet
+ *
+ * @param contacts
+ * @param complete
+ */
++ (void)creatNewWalletWithController:(UIViewController *)controllerVc complete:(void (^)(BOOL isFinish))complete;
+/**
+ * creat new wallet
+ *
+ * @param contacts
+ * @param complete
+ */
++ (void)creatNewWallet;
 
 @end
