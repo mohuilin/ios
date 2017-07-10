@@ -32,7 +32,7 @@
 + (NSString *)createRawTranscationWithTvsArray:(NSArray *)tvsArray outputs:(NSDictionary *)outputs;
 
 
-+ (NSString *)creatPrivkeyBySeed:(NSString *)seed index:(int)index;
++ (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index;
 
 + (NSString *)encodeWalletSeed:(NSString *)seed userAddress:(NSString *)address password:(NSString *)password;
 

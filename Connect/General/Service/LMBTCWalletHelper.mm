@@ -139,7 +139,7 @@ extern "C" {
 }
 
 
-+ (NSString *)creatPrivkeyBySeed:(NSString *)seed index:(int)index {
++ (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index {
     char myRand[129] = {0};
     char *randomC = (char *) [seed UTF8String];
     sprintf(myRand, "%s", randomC);
