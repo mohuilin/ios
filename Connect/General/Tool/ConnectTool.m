@@ -403,30 +403,6 @@
                  needEmptySalt:(BOOL)needEmptySalt{
     return [self createGcmWithData:data privkey:nil publickey:publickey aad:nil needEmptySalt:needEmptySalt];
 }
-+ (GcmData *)createGcmWithData:(id)data withInterationType:(PassWordType)passWordType needEmptySalt:(BOOL)needEmptySalt{
-    NSUInteger number = 17;
-    switch (passWordType) {
-        case PassWordTypeCommon:{
-            number = 17;
-        }
-            break;
-        case PassWordTypeMiddle:{
-            number = 20;
-        }
-            break;
-        case PassWordTypeHeight:{
-            number = 25;
-        }
-            break;
-            
-        default:{
-            number = 17;
-        }
-            break;
-    }
-    return nil;
-}
-
 + (GcmData *)createHalfRandomPeerIMGcmWithData:(NSString *)data chatPubkey:(NSString *)chatPubkey{
     NSString * privkey = [SessionManager sharedManager].loginUserChatCookie.chatPrivkey;
     NSData *ecdhKey = [KeyHandle getECDHkeyWithPrivkey:privkey publicKey:chatPubkey];
