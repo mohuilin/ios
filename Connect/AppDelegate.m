@@ -47,7 +47,8 @@
     self.window.rootViewController = nil;
     if (userInfo) {
         self.currentUser = userInfo;
-        NSString *olddbPath = [MMGlobal getDBFile:self.currentUser.pub_key.sha256String];
+        NSString *olddbPath = [[NSHomeDirectory() stringByAppendingPathComponent:RootPath]
+                               stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
         if (GJCFFileIsExist(olddbPath)) {
             self.window.rootViewController = [[LMDBUpdataController alloc] initWithUpdateComplete:^(BOOL complete) {
                 if (complete) {
@@ -58,7 +59,6 @@
             self.window.rootViewController = self.mainTabController;
         }
     } else {
-        
         PhoneLoginPage* phoneVc = [[PhoneLoginPage alloc]init];
         self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:phoneVc];
     }
@@ -304,7 +304,10 @@
                                                                         imageCount:3
                                                                    showPageControl:YES
                                                                        finishBlock:^{
-                                                                           if ([[MMAppSetting sharedSetting] haveLoginAddress]) {
+                                                                           NSString *olddbPath = [[NSHomeDirectory() stringByAppendingPathComponent:RootPath]
+                                                                                                  stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
+                                                                           if (GJCFFileIsExist(olddbPath) &&
+                                                                               [[MMAppSetting sharedSetting] haveLoginAddress]) {
                                                                                self.window.rootViewController = [[LMDBUpdataController alloc] initWithUpdateComplete:^(BOOL complete) {
                                                                                    if (complete) {
                                                                                        [weakSelf gestureLockVertifyWith:shortcutItem];
@@ -316,7 +319,9 @@
                                                                        }];
             newFeatureVC.showSkip = YES;
             newFeatureVC.skipBlock = ^(void) {
-                if ([[MMAppSetting sharedSetting] haveLoginAddress]) {
+                NSString *olddbPath = [[NSHomeDirectory() stringByAppendingPathComponent:RootPath]
+                                       stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
+                if (GJCFFileIsExist(olddbPath) && [[MMAppSetting sharedSetting] haveLoginAddress]) {
                     self.window.rootViewController = [[LMDBUpdataController alloc] initWithUpdateComplete:^(BOOL complete) {
                         if (complete) {
                             [weakSelf gestureLockVertifyWith:shortcutItem];
@@ -329,10 +334,11 @@
             newFeatureVC.pointCurrentColor = [UIColor blackColor];
             self.window.rootViewController = newFeatureVC;
         } else {
-            if ([[MMAppSetting sharedSetting] haveLoginAddress]) {
+            NSString *olddbPath = [[NSHomeDirectory() stringByAppendingPathComponent:RootPath]
+                                   stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
+            if (GJCFFileIsExist(olddbPath) && [[MMAppSetting sharedSetting] haveLoginAddress]) {
                 self.window.rootViewController = [[LMDBUpdataController alloc] initWithUpdateComplete:^(BOOL complete) {
                     if (complete) {
-
                         [self gestureLockVertifyWith:shortcutItem];
                     }
                 }];

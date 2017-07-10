@@ -82,12 +82,8 @@
 
     NSMutableArray *temArray = [NSMutableArray array];
     for (LMRamMemberInfo *info in self.talkModel.chatGroupInfo.membersArray) {
-        [temArray addObject:info];
-    }
-    for (LMRamMemberInfo *contract in temArray) {
-        if ([contract.address isEqualToString:weakSelf.groupMasterInfo.address]) {
-            [temArray removeObject:contract];
-            break;
+        if (![info.address isEqualToString:self.talkModel.chatGroupInfo.admin.address]) {
+            [temArray addObject:info];
         }
     }
     GroupMembersListViewController *page1 = [[GroupMembersListViewController alloc] initWithMemberInfos:temArray groupIdentifer:weakSelf.talkModel.chatIdendifier groupEchhKey:weakSelf.talkModel.group_ecdhKey];

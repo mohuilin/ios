@@ -234,30 +234,23 @@
 
 - (void)createGroupWithGroupInfo:(LMRamGroupInfo *)groupInfo content:(NSString *)tipMessage{
     
-    NSString *localMsgId = [ConnectTool generateMessageId];
-    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-    chatMessage.messageId = localMsgId;
-    chatMessage.messageOwer = groupInfo.groupIdentifer;
-    chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-    chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-    MMMessage *message = [[MMMessage alloc] init];
-    message.type = GJGCChatFriendContentTypeStatusTip;
-    message.content = tipMessage;
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = localMsgId;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    chatMessage.message = message;
-    [[MessageDBManager sharedManager] saveMessage:chatMessage];
-    // Put the current user in the first place
-//    if (groupInfo.membersArray.count > 0) {
-//        LMRamMemberInfo * info = [groupInfo.membersArray firstObject];
-//        if (![info.address isEqualToString:[LKUserCenter shareCenter].currentLoginUser.address]) {
-//            LMRamMemberInfo *memberAccount = [[LMRamMemberInfo alloc] initWithNormalInfo:[LKUserCenter shareCenter].currentLoginUser];
-//            NSInteger index = [groupInfo.membersArray indexOfObject:memberAccount];
-//            [groupInfo.membersArray moveObjectAtIndex:index toIndex:0];
-//        }
-//    }
+    if (tipMessage) {
+        NSString *localMsgId = [ConnectTool generateMessageId];
+        ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
+        chatMessage.messageId = localMsgId;
+        chatMessage.messageOwer = groupInfo.groupIdentifer;
+        chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
+        chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+        chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
+        MMMessage *message = [[MMMessage alloc] init];
+        message.type = GJGCChatFriendContentTypeStatusTip;
+        message.content = tipMessage;
+        message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
+        message.message_id = localMsgId;
+        message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+        chatMessage.message = message;
+        [[MessageDBManager sharedManager] saveMessage:chatMessage];
+    }
     GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];
     talk.talkType = GJGCChatFriendTalkTypeGroup;
     talk.chatIdendifier = groupInfo.groupIdentifer;

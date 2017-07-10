@@ -10,6 +10,8 @@
 #import "NetWorkOperationTool.h"
 #import "UIImage+Color.h"
 #import "StringTool.h"
+#import "AppDelegate.h"
+#import "GroupDBManager.h"
 
 typedef NS_ENUM(NSInteger, GetGroupInfoType) {
     GetGroupInfoTypeQrcode = 0,
@@ -205,14 +207,15 @@ typedef NS_ENUM(NSInteger, GetGroupInfoType) {
             GroupInfoBaseShare *groupBaseInfo = [GroupInfoBaseShare parseFromData:data error:&error];
             [GCDQueue executeInMainQueue:^{
                 [weakSelf dispalyAllView];
+                
                 [weakSelf.groupAvatarImageView setImageWithAvatarUrl:groupBaseInfo.avatar];
                 weakSelf.groupNameLabel.text = groupBaseInfo.name;
-                weakSelf.countLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Chat Member Max", nil), groupBaseInfo.count, 200];
+                weakSelf.countLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Chat Member Max", nil), groupBaseInfo.count, MAX_GROUP_MEMBER_COUNT];
                 weakSelf.sumaryLabel.text = groupBaseInfo.summary;
-
+                
                 weakSelf.groupApply.identifier = groupBaseInfo.identifier;
                 weakSelf.groupApply.hash_p = groupBaseInfo.hash_p;
-
+                
                 if (!groupBaseInfo.public_p) {
                     weakSelf.applyToJoinGroupBtn.hidden = YES;
                     weakSelf.groupStatueTipLabel.hidden = NO;
@@ -220,6 +223,10 @@ typedef NS_ENUM(NSInteger, GetGroupInfoType) {
                 } else {
                     weakSelf.applyToJoinGroupBtn.hidden = NO;
                     weakSelf.groupStatueTipLabel.hidden = YES;
+                }
+                
+                if (groupBaseInfo.joined) {
+                    [self enterGroupChatWithGroupIdentifier:groupBaseInfo.identifier];
                 }
             }];
         }
@@ -254,7 +261,7 @@ typedef NS_ENUM(NSInteger, GetGroupInfoType) {
                 [weakSelf dispalyAllView];
                 [weakSelf.groupAvatarImageView setImageWithAvatarUrl:groupBaseInfo.avatar];
                 weakSelf.groupNameLabel.text = groupBaseInfo.name;
-                weakSelf.countLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Chat Member Max", nil), groupBaseInfo.count, 200];
+                weakSelf.countLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Chat Member Max", nil), groupBaseInfo.count, MAX_GROUP_MEMBER_COUNT];
                 weakSelf.sumaryLabel.text = groupBaseInfo.summary;
                 weakSelf.groupApply.hash_p = groupBaseInfo.hash_p;
                 if (!groupBaseInfo.public_p) {
@@ -264,6 +271,9 @@ typedef NS_ENUM(NSInteger, GetGroupInfoType) {
                 } else {
                     weakSelf.applyToJoinGroupBtn.hidden = NO;
                     weakSelf.groupStatueTipLabel.hidden = YES;
+                }
+                if (groupBaseInfo.joined) {
+                    [self enterGroupChatWithGroupIdentifier:self.identifier];
                 }
             }];
         }
@@ -300,8 +310,12 @@ typedef NS_ENUM(NSInteger, GetGroupInfoType) {
             GroupInfoBase *groupBaseInfo = [GroupInfoBase parseFromData:data error:&error];
             [weakSelf.groupAvatarImageView setImageWithAvatarUrl:groupBaseInfo.avatar];
             weakSelf.groupNameLabel.text = groupBaseInfo.name;
-            weakSelf.countLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Chat Member Max", nil), groupBaseInfo.count, 200];
+            weakSelf.countLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Chat Member Max", nil), groupBaseInfo.count, MAX_GROUP_MEMBER_COUNT];
             weakSelf.sumaryLabel.text = groupBaseInfo.summary;
+            
+            if (groupBaseInfo.joined) {
+                [self enterGroupChatWithGroupIdentifier:self.groupApply.identifier];
+            }
         }
     }                                  fail:^(NSError *error) {
         [weakSelf hideAllView];
@@ -311,6 +325,25 @@ typedef NS_ENUM(NSInteger, GetGroupInfoType) {
             }];
         }];
     }];
+}
+
+
+- (void)enterGroupChatWithGroupIdentifier:(NSString *)identifier{
+    // inteface jump
+    [self.navigationController popToRootViewControllerAnimated:NO];
+    AppDelegate *appDelegate = (AppDelegate *) [UIApplication sharedApplication].delegate;
+    LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
+    if (group) {
+        [[appDelegate shareMainTabController] createGroupWithGroupInfo:group content:nil];
+    } else { //sync
+        [SetGlobalHandler getGroupInfoWihtIdentifier:identifier complete:^(LMRamGroupInfo *groupInfo, NSError *error) {
+            if (!error) {
+                [GCDQueue executeInMainQueue:^{
+                    [[appDelegate shareMainTabController] createGroupWithGroupInfo:groupInfo content:nil];
+                }];
+            }
+        }];
+    }
 }
 
 - (void)hideAllView {

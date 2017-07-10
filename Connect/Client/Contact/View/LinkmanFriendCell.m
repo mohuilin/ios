@@ -53,6 +53,18 @@
         } else{
             self.avatarImageView.image = [UIImage imageNamed:contact.avatar];
         }
+    } else if([data isKindOfClass:[AccountInfo class]]){
+        AccountInfo *contact = (AccountInfo *)data;
+        if (!GJCFStringIsNull(contact.remarks)) {
+            _nameLabel.text = contact.remarks;
+        } else{
+            _nameLabel.text = contact.username;
+        }
+        if (![contact.pub_key isEqualToString:kSystemIdendifier]) {
+            [self.avatarImageView setPlaceholderImageWithAvatarUrl:contact.avatar];
+        } else{
+            self.avatarImageView.image = [UIImage imageNamed:contact.avatar];
+        }
     }
 }
 @end

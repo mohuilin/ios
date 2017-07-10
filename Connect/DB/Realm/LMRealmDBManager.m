@@ -22,11 +22,13 @@ static FMDatabaseQueue *queue;
 
 
 + (void)dataMigrationWithComplete:(void (^)(CGFloat progress))complete {
-    NSString *olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key.sha256String];
+    NSString *olddbPath = olddbPath = [[NSHomeDirectory() stringByAppendingPathComponent:RootPath]
+                                       stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].pub_key.sha256String];
     if (GJCFFileIsExist(olddbPath)) {
 
     } else {
-        olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
+        olddbPath = [[NSHomeDirectory() stringByAppendingPathComponent:RootPath]
+                     stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
         if (GJCFFileIsExist(olddbPath)) {
             // judge old user
             [LKUserCenter shareCenter].currentLoginUser.isOldUser = YES;
@@ -71,6 +73,7 @@ static FMDatabaseQueue *queue;
                     complete(1);
                 }
             }
+            GJCFFileDeleteFile(olddbPath);
         }
     }
 }
