@@ -48,11 +48,6 @@ NSString *const ConnnectUserAddressChangeNotification = @"AddressBookDidChangeEx
 
 NSString *const ConnnectGroupInfoDidChangeNotification = @"ConnnectGroupInfoDidChangeNotification";
 
-// Global Notification Settings \ Remove common groups
-
-NSString *const ConnnectAddCommonGroupNotification = @"ConnnectAddCommonGroupNotification";
-
-NSString *const ConnnectRemoveCommonGroupNotification = @"ConnnectRemoveCommonGroupNotification";
 // Global notifications delete members
 
 NSString *const ConnnectGroupInfoDidDeleteMember = @"ConnnectGroupInfoDidDeleteMember";

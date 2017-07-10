@@ -37,8 +37,6 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 
 @property(nonatomic, copy) NSString *currentMyName;
 
-@property(nonatomic, weak) LMRamMemberInfo *currentUser;
-
 @property(nonatomic, weak) GJGCChatFriendTalkModel *talkModel;
 
 @property(nonatomic, strong) NSArray *members;
@@ -66,7 +64,6 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         for (LMRamMemberInfo *member in talkInfo.chatGroupInfo.membersArray) {
             if ([currentUser.address isEqualToString:member.address]) {
                 self.currentMyName = member.groupNicksName;
-                self.currentUser = member;
             }
             [temArray addObject:member];
         }
@@ -179,7 +176,6 @@ typedef NS_ENUM(NSUInteger, SourceType) {
     for (LMRamMemberInfo *info in group.membersArray) {
         if ([currentUser.address isEqualToString:info.address]) {
             self.currentMyName = info.groupNicksName;
-            self.currentUser = info;
             break;
         }
     }
@@ -225,8 +221,8 @@ typedef NS_ENUM(NSUInteger, SourceType) {
     groupName.tag = SourceTypeGroup;
 
     CellItem *myName = [CellItem itemWithIcon:@"message_groupchat_myname" title:LMLocalizedString(@"Link My Alias in Group", nil) type:CellItemTypeImageValue1 operation:^{
-
-        ChatSetMyNameViewController *myName = [[ChatSetMyNameViewController alloc] initWithUpdateUser:weakSelf.currentUser groupIdentifier:weakSelf.talkModel.chatIdendifier];
+        LMRamMemberInfo *currentUser = [[GroupDBManager sharedManager] getGroupMemberByGroupId:weakSelf.talkModel.chatIdendifier memberAddress:[LKUserCenter shareCenter].currentLoginUser.address];
+        ChatSetMyNameViewController *myName = [[ChatSetMyNameViewController alloc] initWithUpdateUser:currentUser groupIdentifier:weakSelf.talkModel.chatIdendifier];
         [weakSelf.navigationController pushViewController:myName animated:YES];
     }];
     myName.subTitle = self.currentMyName;
@@ -300,7 +296,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         if (isCommonGroup) {
             [SetGlobalHandler setCommonContactGroupWithIdentifer:weakSelf.talkModel.chatIdendifier complete:^(NSError *error) {
                 if (!error) {
-                    [[GroupDBManager sharedManager] addGroupToCommonGroup:weakSelf.talkModel.chatIdendifier];
+                    [[GroupDBManager sharedManager] updateGroupStatus:YES groupId:weakSelf.talkModel.chatIdendifier];
                     [[GroupDBManager sharedManager] executeRealmWithBlock:^{
                        weakSelf.talkModel.chatGroupInfo.isCommonGroup = isCommonGroup;
                     }];
@@ -315,7 +311,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         } else {
             [SetGlobalHandler removeCommonContactGroupWithIdentifer:weakSelf.talkModel.chatIdendifier complete:^(NSError *error) {
                 if (!error) {
-                    [[GroupDBManager sharedManager] removeFromCommonGroup:weakSelf.talkModel.chatIdendifier];
+                    [[GroupDBManager sharedManager] updateGroupStatus:NO groupId:weakSelf.talkModel.chatIdendifier];
                     [[GroupDBManager sharedManager] executeRealmWithBlock:^{
                       weakSelf.talkModel.chatGroupInfo.isCommonGroup = isCommonGroup;
                     }];
@@ -667,7 +663,6 @@ typedef NS_ENUM(NSUInteger, SourceType) {
 }
 
 - (void)dealloc {
-    self.currentUser = nil;
     self.talkModel = nil;
     RemoveNofify;
     [self.groupToken stop];

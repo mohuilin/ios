@@ -392,12 +392,7 @@
     <GenerateTokenResponse>
         <attr name='expired' type='int'></attr>
     </GenerateTokenResponse>
-    
-    <VersionResponse>
-        <attr name='version' type='string'>.+</attr>
-        <attr name='upgradeUrl' type='string'>.+</attr>
-    </VersionResponse>
-    
+        
     <PaymentSetting>
         <attr name='fee' type='int'></attr>
     </PaymentSetting>

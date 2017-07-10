@@ -8,6 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "LMRamGroupInfo.h"
+typedef NS_ENUM(NSUInteger,PassWordType) {
+    PassWordTypeCommon = 0,
+    PassWordTypeMiddle = 1,
+    PassWordTypeHeight = 2
+    
+};
+
 
 @interface SetGlobalHandler : NSObject
 
@@ -217,7 +224,7 @@
    * @ Param fee
  */
 + (void)setPaySetNoPass:(BOOL)nopass payPass:(NSString *)payPass fee:(long long)fee compete:(void(^)(BOOL result))complete;
-+ (void)setpayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete;
++ (void)setpayPass:(NSString *)payPass withNumerType:(PassWordType)passWordType compete:(void(^)(BOOL result, NSString *encryPassWord))complete;
 + (void)syncPaypinversionWithComplete:(void(^)(NSString *password,NSError *error))complete;
 + (void)getPaySetComplete:(void (^)(NSError *erro))complete;
 

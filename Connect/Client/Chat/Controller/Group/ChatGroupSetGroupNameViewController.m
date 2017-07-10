@@ -71,8 +71,6 @@
     updataGroup.name = self.updataGroupName;
     updataGroup.identifier = self.groupid;
     self.updataGroupName = [StringTool filterStr:self.updataGroupName];
-    [[GroupDBManager sharedManager] updateGroupName:self.updataGroupName groupId:self.groupid];
-
     __weak __typeof(&*self) weakSelf = self;
     [MBProgressHUD showMessage:LMLocalizedString(@"Common Loading", nil) toView:self.view];
 

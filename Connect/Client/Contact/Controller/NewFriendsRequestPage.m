@@ -80,7 +80,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = LMLocalizedString(@"Link New friend", nil);
-    [self creatFriendRequestsAction];
     [self configTableView];
     [self bridgeNumberAction];
     [self friendRequestNotification];
@@ -95,6 +94,15 @@
     // creat recommond man
     [self getArrayFromNetWork];
 }
+- (void)dealloc {
+    RemoveNofify;
+    [self.tableView removeFromSuperview];
+    self.tableView = nil;
+    self.recommandFriendArray = nil;
+    self.allArray = nil;
+    self.friendRequests = nil;
+    self.titleArr = nil;
+}
 #pragma mark - method
 - (void)friendRequestNotification {
 
@@ -106,7 +114,7 @@
        if (!error) {
            NSMutableArray *temArray = [NSMutableArray array];
            for (LMFriendRequestInfo* info in results) {
-               AccountInfo *accountInfo = ( AccountInfo *)info.normalInfo;
+               AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
                [temArray addObject:accountInfo];
            }
            weakSelf.friendRequests = temArray;
@@ -137,23 +145,6 @@
         }];
     }];
 }
-- (void)creatFriendRequestsAction {
-    if (!self.friendRequests) {
-        self.friendRequests = [NSMutableArray array];
-    }
-    self.friendRequests = [[UserDBManager sharedManager] getAllNewFirendRequest].mutableCopy;
-    __weak __typeof(&*self) weakSelf = self;
-    for (AccountInfo *user in _friendRequests) {
-        NSString *address = user.address;
-        int source = user.source;
-        if (user.status == RequestFriendStatusAccept) {
-            user.customOperation = ^() {
-                [weakSelf acceptRequest:address source:source];
-            };
-        }
-    }
-}
-
 - (void)getArrayFromNetWork {
     __weak typeof(self) weakSelf = self;
     self.isLoading = YES;
@@ -252,17 +243,6 @@
         self.recommandFriendArray = tmpArray;
     }
 }
-
-- (void)dealloc {
-    RemoveNofify;
-    [self.tableView removeFromSuperview];
-    self.tableView = nil;
-    self.recommandFriendArray = nil;
-    self.allArray = nil;
-    self.friendRequests = nil;
-    self.titleArr = nil;
-}
-
 - (void)uploadContactAndGetNewPhoneFriends {
     __weak __typeof(&*self) weakSelf = self;
     [[KTSContactsManager sharedManager] importContacts:^(NSArray *contacts, BOOL reject) {
@@ -441,7 +421,7 @@
     self.tableView.allowsMultipleSelectionDuringEditing = NO;
 }
 
-#pragma mark - tableview - 头部
+#pragma mark - tableview - head
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     NSArray *array = (NSArray *) self.allArray[section];
@@ -502,7 +482,7 @@
     }
 }
 
-#pragma mark - 更多按钮的点击事件
+#pragma mark - more click action
 
 - (void)moreButtonClick {
     LMAddMoreViewController *addMoreVc = [[LMAddMoreViewController alloc] init];
@@ -597,11 +577,10 @@
     [[IMService instance] setRecommandUserNoInterestAdress:oldAddress comlete:^(NSError *error, id data) {
         if (error == nil) {
             [GCDQueue executeInMainQueue:^{
-                [[LMRecommandFriendManager sharedManager] updateRecommandFriendStatus:3 withAddress:oldAddress];
-                [self creatAllArray];
                 [MBProgressHUD hideHUDForView:self.view];
             }];
-            
+            [[LMRecommandFriendManager sharedManager] updateRecommandFriendStatus:3 withAddress:oldAddress];
+            [self creatAllArray];
         } else {
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Operation failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];

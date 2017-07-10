@@ -45,6 +45,7 @@
 // point members
 @property(assign, nonatomic) NSUInteger redCount;
 
+
 @property (nonatomic ,strong) RLMResults *contactResults;
 @property (nonatomic ,strong) RLMResults *commonGroupResults;
 @property (nonatomic ,strong) RLMResults *allNewFriendRequest;
@@ -626,7 +627,10 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         !self.commonGroupResults||!self.allNewFriendRequest) {
         self.contactResults = [[UserDBManager sharedManager] getRealmUsers];
         self.commonGroupResults = [[GroupDBManager sharedManager] realmCommonGroupList];
-        self.allNewFriendRequest = [[UserDBManager sharedManager] getAllNewFriendResults];
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+          self.allNewFriendRequest = [[UserDBManager sharedManager] getAllNewFriendResults];
+        });
         __weak __typeof(&*self)weakSelf = self;
         //register notification
         self.contactResultsToken = [self.contactResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
@@ -661,15 +665,27 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         self.allNewFriendRequestTolen = [self.allNewFriendRequest addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
             if (!error) {
                 
-                DDLogInfo(@"%@",results);
                 LMFriendRequestInfo *friendRequestInfo = [results lastObject];
                 if (friendRequestInfo) {
                     AccountInfo *newFriend = (AccountInfo *)friendRequestInfo.normalInfo;
                     if (!newFriend) {
                         return;
                     }
-                    weakSelf.friendNewItem.addMeUser = newFriend;
-                    [weakSelf reloadBadgeValue];
+                    //badge
+                    [[BadgeNumberManager shareManager] getBadgeNumberCountWithMin:ALTYPE_CategoryTwo_NewFriend max:ALTYPE_CategoryTwo_PhoneContact Completion:^(NSUInteger count) {
+                        [GCDQueue executeInMainQueue:^{
+                            if (count > 0) {
+                                weakSelf.friendNewItem.addMeUser = newFriend;
+                                weakSelf.redCount = count;
+                                weakSelf.friendNewItem.FriendBadge = [NSString stringWithFormat:@"%d", (int) count];
+                                if ([weakSelf.delegate respondsToSelector:@selector(listChange: withTabBarCount:)]) {
+                                    [weakSelf.delegate listChange:weakSelf.groupsFriend withTabBarCount:weakSelf.redCount];
+                                }
+                            }else {
+                                weakSelf.redCount = 0;
+                            }
+                        }];
+                    }];
                 }
             }
         }];

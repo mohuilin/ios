@@ -46,7 +46,9 @@
     [[LMLinkManDataManager sharedManager] getRecommandUserGroupArrayChatUser:self.talkUser complete:^(NSMutableArray *groupArray, NSMutableArray *indexs) {
         self.groupsFriend = groupArray;
         self.indexs = indexs;
-        [self.tableView reloadData];
+        [GCDQueue executeInMainQueue:^{
+          [self.tableView reloadData];
+        }];
     }];
 }
 

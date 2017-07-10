@@ -70,5 +70,6 @@ typedef void(^AccountOperationWithUserInfo)(id userInfo);
 @property (nonatomic ,assign) BOOL isUnRegisterAddress;
 @property (nonatomic ,assign) int recommandStatus; //2:sent 1:unsend
 @property (nonatomic ,assign) BOOL recommend;
+@property (nonatomic, assign) BOOL isOldUser;
 
 @end

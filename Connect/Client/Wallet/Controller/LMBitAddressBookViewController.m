@@ -177,9 +177,6 @@ static NSString *address = @"address";
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Update successful", nil) withType:ToastTypeSuccess showInView:weakself.view complete:nil];
                 }];
-                [[LMAddressBookManager sharedManager] executeRealmWithBlock:^{
-                   bitInfo.tag = textField.text;
-                }];
                 [[LMAddressBookManager sharedManager] updateAddressTag:textField.text address:bitInfo.address];
                 [GCDQueue executeInMainQueue:^{
                     [weakself.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];

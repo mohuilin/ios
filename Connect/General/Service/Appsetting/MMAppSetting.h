@@ -170,6 +170,10 @@
 - (void)setAllowRecomand;
 - (void)setDelyRecomand;
 - (BOOL)isAllowRecomand;
+#pragma mark - Is hide balance
+- (void)displayHideBalance;
+- (void)HideBalance;
+- (BOOL)isHideBalance;
 #pragma mark - Whether or not the method of obtaining the old group was executed
 - (void)setGroupExecuted;
 - (BOOL)isGroupExecuted;

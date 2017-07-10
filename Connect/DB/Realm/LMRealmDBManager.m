@@ -30,6 +30,8 @@ static FMDatabaseQueue *queue;
         olddbPath = [[NSHomeDirectory() stringByAppendingPathComponent:RootPath]
                      stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
         if (GJCFFileIsExist(olddbPath)) {
+            // judge old user
+            [LKUserCenter shareCenter].currentLoginUser.isOldUser = YES;
             //data migration
             if ([self saveMessagesToRealm]) {
                 if (complete) {
