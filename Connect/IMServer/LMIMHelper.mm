@@ -26,8 +26,30 @@ extern "C"{
 #include <boost/algorithm/string.hpp>
 #include <boost/assign/list_of.hpp>
 #include "json_spirit_reader_template.h"
+#include <CommonCrypto/CommonCrypto.h>
 
 @implementation LMIMHelper
+
+
++ (NSString *)hexStringFromData:(NSData *)data{
+    
+    unsigned char result[CC_SHA256_DIGEST_LENGTH];
+    
+    CC_SHA256(data.bytes, (int32_t)data.length, result);
+    
+    NSData *newData = [[NSData alloc] initWithBytes:result length:CC_SHA256_DIGEST_LENGTH];
+    
+    unsigned char Nresult[CC_SHA256_DIGEST_LENGTH];
+    
+    CC_SHA256(newData.bytes, (int32_t)newData.length, Nresult);
+    
+    NSMutableString *ret = [NSMutableString stringWithCapacity:CC_SHA256_DIGEST_LENGTH*2];
+    for (int i = 0; i<CC_SHA256_DIGEST_LENGTH; i++) {
+        [ret appendFormat:@"%02x",Nresult[i]];
+    }
+    return ret;
+    
+}
 
 // Create a new private key
 + (NSString *)creatNewPrivkey {
@@ -120,14 +142,14 @@ extern "C"{
     return [NSData dataWithBytes:randNum length:512 / 8];
 }
 
-+ (BOOL)CheckPrivKey:(NSString *)privkey {
++ (BOOL)checkPrivkey:(NSString *)privkey {
     char *cPrivkey = (char *) [privkey UTF8String];
     int result = CheckPrivKey_im(cPrivkey);
     return result == 0 ? YES : NO;
 }
 
 
-+ (BOOL)CheckAddress:(NSString *)address {
++ (BOOL)checkAddress:(NSString *)address {
 
     // Adapt the btc.com sweep results
     address = [address stringByReplacingOccurrencesOfString:@"bitcoin:" withString:@""];
@@ -186,7 +208,7 @@ extern "C"{
 
 #pragma mark -AES
 
-+ (NSDictionary *)xtalkEncodeAES_gcm_im:(NSString *)password data:(NSString *)dataStr aad:(NSString *)aad iv:(NSString *)iv {
++ (NSDictionary *)xtalkEncodeAES_GCM:(NSString *)password data:(NSString *)dataStr aad:(NSString *)aad iv:(NSString *)iv {
 
     unsigned char *encryptedData;
 
@@ -253,7 +275,7 @@ extern "C"{
 }
 
 
-+ (NSDictionary *)xtalkEncodeAES_imWithPassword:(NSData *)password originData:(NSData *)data aad:(NSData *)aad {
++ (NSDictionary *)xtalkEncodeAES_GCMWithPassword:(NSData *)password originData:(NSData *)data aad:(NSData *)aad {
 
     if (!data || data.length <= 0 || !password || password.length <= 0 || !aad || aad.length <= 0) {
         return nil;
@@ -306,7 +328,7 @@ extern "C"{
 }
 
 
-+ (NSDictionary *)xtalkEncodeAES_gcm_im:(NSString *)password withNSdata:(NSData *)data aad:(NSString *)aad iv:(NSString *)iv {
++ (NSDictionary *)xtalkEncodeAES_GCM:(NSString *)password withNSdata:(NSData *)data aad:(NSString *)aad iv:(NSString *)iv {
 
     if (!data) {
         return nil;

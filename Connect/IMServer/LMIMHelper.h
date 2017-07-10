@@ -11,6 +11,12 @@
 @interface LMIMHelper : NSObject
 
 /**
+ * hexString From Data
+ *
+ */
++ (NSString *)hexStringFromData:(NSData *)data;
+
+/**
  * Create a new private key
  *
  */
