@@ -173,6 +173,7 @@ static RecentChatDBManager *manager = nil;
     if (!realmModel) {
         RecentChatModel *model = [RecentChatModel new];
         model.identifier = identifier;
+        model.isTopChat = YES;
         LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifier];
         if (group) {
             model.talkType = GJGCChatFriendTalkTypeGroup;

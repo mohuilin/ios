@@ -16,7 +16,6 @@ typedef void(^changeSwitchBlock)(BOOL verifiy);
 @property(copy, nonatomic) NSString *titleName;
 @property(nonatomic, weak) GJGCChatFriendTalkModel *talkModel;
 @property(strong, nonatomic) changeSwitchBlock switchChangeBlock;
-@property(weak, nonatomic) LMRamMemberInfo *groupMasterInfo;
 
 @property(nonatomic, copy) void (^groupAdminChangeCallBack)(NSString *address);
 

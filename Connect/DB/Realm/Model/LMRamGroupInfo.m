@@ -13,4 +13,5 @@
 + (NSString *)primaryKey {
     return @"groupIdentifer";
 }
+
 @end

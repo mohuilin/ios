@@ -79,7 +79,9 @@ static GroupDBManager *manager = nil;
         return;
     }
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-       [realm addOrUpdateObject:group];
+        //set avatar
+        group.avatarUrl = [NSString stringWithFormat:@"%@/avatar/%@/group/%@.jpg",baseServer,APIVersion,group.groupIdentifer];
+        [realm addOrUpdateObject:group];
     }];
 
 }

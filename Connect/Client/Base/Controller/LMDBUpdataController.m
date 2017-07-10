@@ -57,24 +57,20 @@
     }
 }
 - (void)viewDidLoad {
-    NSString *olddbPath = [MMGlobal getDBFile:[[LKUserCenter shareCenter] currentLoginUser].pub_key.sha256String];
-    if (GJCFFileIsExist(olddbPath)) {
-        self.isDisplay = YES;
-        self.displayLable.text = LMLocalizedString(@"Chat Updating Database", nil);
-        self.tipLable.text = LMLocalizedString(@"Chat Update Database", nil);
-        self.displayLable.hidden = NO;
-        self.displayImage.hidden = NO;
-        self.tipLable.hidden = NO;
-        [LMRealmDBManager dataMigrationWithComplete:^(CGFloat progress) {
-            DDLogInfo(@"dataMigrationWithComplete progress %f",progress);
-        }];
-        [GCDQueue executeInMainQueue:^{
-            self.complete(YES);
-        } afterDelaySecs:(DisplayTime + 1)];
-    } else{
-        self.complete(YES);
-    }
+    [super viewDidLoad];
     
+    self.isDisplay = YES;
+    self.displayLable.text = LMLocalizedString(@"Chat Updating Database", nil);
+    self.tipLable.text = LMLocalizedString(@"Chat Update Database", nil);
+    self.displayLable.hidden = NO;
+    self.displayImage.hidden = NO;
+    self.tipLable.hidden = NO;
+    [LMRealmDBManager dataMigrationWithComplete:^(CGFloat progress) {
+        DDLogInfo(@"dataMigrationWithComplete progress %f",progress);
+    }];
+    [GCDQueue executeInMainQueue:^{
+        self.complete(YES);
+    } afterDelaySecs:(DisplayTime + 1)];
 }
 #pragma mark - response
 //start timer

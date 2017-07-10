@@ -250,10 +250,8 @@ typedef NS_ENUM(NSUInteger, SourceType) {
             };
             manageGroup.titleName = displayName;
             manageGroup.talkModel = weakSelf.talkModel;
-            manageGroup.groupMasterInfo = weakSelf.talkModel.chatGroupInfo.admin;
             manageGroup.groupAdminChangeCallBack = ^(NSString *address) {
-                __weak typeof(self.groupInfo)weakGroupInfo = self.groupInfo;
-                [weakSelf addChnageGroupAdmin:weakGroupInfo];
+                [weakSelf addChnageGroupAdmin:weakSelf.groupInfo];
             };
             [weakSelf.navigationController pushViewController:manageGroup animated:YES];
         }];
