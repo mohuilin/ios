@@ -72,6 +72,6 @@ typedef void(^AccountOperationWithUserInfo)(id userInfo);
 @property (nonatomic ,assign) BOOL recommend;
 @property (nonatomic, assign) BOOL isOldUser;
 @property (nonatomic, copy) NSString *baseSeed;
-@property (nonatomic, copy) NSString *walletId;
+
 
 @end

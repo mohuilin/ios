@@ -382,6 +382,48 @@
   
    Interface description
   
+   PATH: /wallet/" APIVersion "/base
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define EncryptionBaseSeedUrl baseServer "/wallet/" APIVersion "/base"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/" APIVersion "/update
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define UpdateBaseSeedUrl baseServer "/wallet/" APIVersion "/update"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/" APIVersion "/sync
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define SyncWalletDataUrl baseServer "/wallet/" APIVersion "/sync"
+/**
+ Payment settings
+  
+   Interface description
+  
    PATH: /blockchain/" APIVersion "/unspent/%@/info
    METHOD: POST
    Data Format: Protobuf
