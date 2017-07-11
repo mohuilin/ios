@@ -181,10 +181,6 @@
 #pragma mark - currency
 - (void)setcurrency:(NSString *)currency;
 - (NSString *)getcurrency;
-#pragma mark wallet
-- (void)setWallet:(NSString *)walletId;
-- (NSString *)walletId;
-
 #pragma mark - money blance
 - (void)saveBalance:(long long int)balance;
 - (long long int)getBalance;

@@ -17,7 +17,7 @@
 #import "LMRamGroupInfo.h"
 #import "LMBTCWalletHelper.h"
 #import "LMRandomSeedController.h"
-
+#import "LMSeedModel.h"
 
 @implementation SetGlobalHandler
 
@@ -1589,7 +1589,8 @@
 + (void)creatNewWalletWithController:(UIViewController *)controllerVc complete:(void (^)(BOOL isFinish))complete{
     
     // Synchronize wallet data and create wallet
-    if(GJCFStringIsNull([[MMAppSetting sharedSetting] walletId])) {
+    LMSeedModel *seedModel = [LMSeedModel new];
+    if(GJCFStringIsNull(seedModel.walletId)) {
         [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
             if (hResponse.code != successCode) {

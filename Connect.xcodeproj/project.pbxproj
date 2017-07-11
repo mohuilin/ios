@@ -859,9 +859,9 @@
 		D9B084ED1E810E5A0067EC4A /* TextFieldRoundCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B084E11E810E5A0067EC4A /* TextFieldRoundCell.m */; };
 		D9B4365B1E8E5272006C816C /* LMSetLanguagePage.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B4365A1E8E5272006C816C /* LMSetLanguagePage.m */; };
 		D9B4365D1E8E5366006C816C /* LanguageConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9B4365C1E8E5366006C816C /* LanguageConfig.plist */; };
+		D9B6D5581EF22C3200D35CDC /* LMBTCWalletHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = D9B6D5571EF22C3200D35CDC /* LMBTCWalletHelper.mm */; };
 		D9B7422F1EFB9D330072DC72 /* LMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B7422E1EFB9D330072DC72 /* LMTag.m */; };
 		D9B906D81EFCE7AE006BAE49 /* LMFriendRequestInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */; };
-		D9B6D5581EF22C3200D35CDC /* LMBTCWalletHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = D9B6D5571EF22C3200D35CDC /* LMBTCWalletHelper.mm */; };
 		D9C73AEB1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C73AEA1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m */; };
 		D9C9CC271E8111B90048DE92 /* MMLaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C9CC251E8111B90048DE92 /* MMLaunchViewController.m */; };
 		D9C9CC281E8111B90048DE92 /* MMLaunchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9C9CC261E8111B90048DE92 /* MMLaunchViewController.xib */; };
@@ -874,6 +874,9 @@
 		F116E9601EA06AA500DCAED4 /* LMMessageExtendManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */; };
 		F11CF9A51EFA6CA400750437 /* LMContactAccountInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */; };
 		F11CF9A81EFA724400750437 /* LMRamAddressBook.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A71EFA724400750437 /* LMRamAddressBook.m */; };
+		F127E12A1F146AD8003E448F /* LMSeedModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E1291F146AD8003E448F /* LMSeedModel.m */; };
+		F127E12D1F146E30003E448F /* LMCurrencyModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E12C1F146E30003E448F /* LMCurrencyModel.m */; };
+		F127E1301F14702A003E448F /* LMCurrencyAddressModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E12F1F14702A003E448F /* LMCurrencyAddressModel.m */; };
 		F156BB621EC4681B00512743 /* LMlockGestureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F156BB611EC4681B00512743 /* LMlockGestureViewController.m */; };
 		F16FD7B81EC3205B002F9395 /* allocators.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16FADB31EC3203E002F9395 /* allocators.cpp */; };
 		F16FD7B91EC3205B002F9395 /* base58.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F16FADB51EC3203E002F9395 /* base58.cpp */; };
@@ -2624,12 +2627,12 @@
 		D9B436591E8E5272006C816C /* LMSetLanguagePage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSetLanguagePage.h; sourceTree = "<group>"; };
 		D9B4365A1E8E5272006C816C /* LMSetLanguagePage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMSetLanguagePage.m; sourceTree = "<group>"; };
 		D9B4365C1E8E5366006C816C /* LanguageConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = LanguageConfig.plist; sourceTree = "<group>"; };
+		D9B6D5561EF22C3200D35CDC /* LMBTCWalletHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBTCWalletHelper.h; sourceTree = "<group>"; };
+		D9B6D5571EF22C3200D35CDC /* LMBTCWalletHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LMBTCWalletHelper.mm; sourceTree = "<group>"; };
 		D9B7422D1EFB9D330072DC72 /* LMTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTag.h; sourceTree = "<group>"; };
 		D9B7422E1EFB9D330072DC72 /* LMTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTag.m; sourceTree = "<group>"; };
 		D9B906D61EFCE7AE006BAE49 /* LMFriendRequestInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRequestInfo.h; sourceTree = "<group>"; };
 		D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRequestInfo.m; sourceTree = "<group>"; };
-		D9B6D5561EF22C3200D35CDC /* LMBTCWalletHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBTCWalletHelper.h; sourceTree = "<group>"; };
-		D9B6D5571EF22C3200D35CDC /* LMBTCWalletHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LMBTCWalletHelper.mm; sourceTree = "<group>"; };
 		D9C73AE91E8CD5E7002BF3B7 /* NSDictionary+NilSafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NilSafe.h"; sourceTree = "<group>"; };
 		D9C73AEA1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NilSafe.m"; sourceTree = "<group>"; };
 		D9C9CC241E8111B90048DE92 /* MMLaunchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMLaunchViewController.h; sourceTree = "<group>"; };
@@ -2651,6 +2654,12 @@
 		F11CF9A41EFA6CA400750437 /* LMContactAccountInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMContactAccountInfo.m; sourceTree = "<group>"; };
 		F11CF9A61EFA724400750437 /* LMRamAddressBook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamAddressBook.h; sourceTree = "<group>"; };
 		F11CF9A71EFA724400750437 /* LMRamAddressBook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamAddressBook.m; sourceTree = "<group>"; };
+		F127E1281F146AD8003E448F /* LMSeedModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSeedModel.h; sourceTree = "<group>"; };
+		F127E1291F146AD8003E448F /* LMSeedModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMSeedModel.m; sourceTree = "<group>"; };
+		F127E12B1F146E30003E448F /* LMCurrencyModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyModel.h; sourceTree = "<group>"; };
+		F127E12C1F146E30003E448F /* LMCurrencyModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyModel.m; sourceTree = "<group>"; };
+		F127E12E1F14702A003E448F /* LMCurrencyAddressModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyAddressModel.h; sourceTree = "<group>"; };
+		F127E12F1F14702A003E448F /* LMCurrencyAddressModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyAddressModel.m; sourceTree = "<group>"; };
 		F156BB601EC4681B00512743 /* LMlockGestureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMlockGestureViewController.h; sourceTree = "<group>"; };
 		F156BB611EC4681B00512743 /* LMlockGestureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMlockGestureViewController.m; sourceTree = "<group>"; };
 		F16FADB31EC3203E002F9395 /* allocators.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = allocators.cpp; sourceTree = "<group>"; };
@@ -15299,6 +15308,12 @@
 				F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */,
 				D9B906D61EFCE7AE006BAE49 /* LMFriendRequestInfo.h */,
 				D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */,
+				F127E1281F146AD8003E448F /* LMSeedModel.h */,
+				F127E1291F146AD8003E448F /* LMSeedModel.m */,
+				F127E12B1F146E30003E448F /* LMCurrencyModel.h */,
+				F127E12C1F146E30003E448F /* LMCurrencyModel.m */,
+				F127E12E1F14702A003E448F /* LMCurrencyAddressModel.h */,
+				F127E12F1F14702A003E448F /* LMCurrencyAddressModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -32818,6 +32833,7 @@
 				D95C044D1E810902006C5C8A /* GJGCChatFriendContentModel.m in Sources */,
 				19234F731E81164E0022D844 /* LMAddMoreViewController.m in Sources */,
 				19234F4D1E8113D60022D844 /* SelectLoginUserViewController.m in Sources */,
+				F127E12D1F146E30003E448F /* LMCurrencyModel.m in Sources */,
 				19234F9D1E8117560022D844 /* RecentChatForRecommendCell.m in Sources */,
 				D92232C31E822BF900D67110 /* amrFileCodec.mm in Sources */,
 				D92232601E822BF800D67110 /* LMCustomBtn.m in Sources */,
@@ -33070,6 +33086,7 @@
 				D95C035E1E8108D8006C5C8A /* GJGCChatFriendDataSourceManager.m in Sources */,
 				F172A66F1EB8843C006E186C /* MMMessage.m in Sources */,
 				D92232F61E822BF900D67110 /* UIView+GJCFViewFrameUitil.m in Sources */,
+				F127E1301F14702A003E448F /* LMCurrencyAddressModel.m in Sources */,
 				D92232F71E822BF900D67110 /* GJCUAsyncImageView.m in Sources */,
 				19234FEA1E811BDA0022D844 /* TopImageBottomTitleButton.m in Sources */,
 				F16FD7DB1EC3205B002F9395 /* rpcrawtransaction.cpp in Sources */,
@@ -33158,6 +33175,7 @@
 				D9B084CC1E810DDC0067EC4A /* MyInfoPage.m in Sources */,
 				D9222FC41E822A3100D67110 /* NSString+YYAdd.m in Sources */,
 				D961041D1EF7D5DF001A0998 /* LMRealmDBManager.m in Sources */,
+				F127E12A1F146AD8003E448F /* LMSeedModel.m in Sources */,
 				D95C04741E810902006C5C8A /* GJGCChatInputExpandMenuPanel.m in Sources */,
 				192350171E811D3E0022D844 /* BottomLineTextField.m in Sources */,
 				19234F801E8117020022D844 /* FriendTransactionHisPage.m in Sources */,
