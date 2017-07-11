@@ -122,9 +122,6 @@
 - (void)setPayPass:(NSString *)pass;
 - (void)removePayPass;
 - (NSString *)getPayPass;
-- (void)setpaypassVersion:(NSString *)version;
-- (NSString *)getpaypassVersion;
-
 
 #pragma mark - Whether the user tags are synchronized
 - (void)haveSyncUserTags;

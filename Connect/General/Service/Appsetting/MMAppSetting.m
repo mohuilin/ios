@@ -656,17 +656,6 @@ char* printEnv(void)
 - (NSString *)getPayPass{
     return [self getValue:@"password"];
 }
-- (void)setpaypassVersion:(NSString *)version{
-    [self setValue:version forKey:@"paypassVersion"];
-}
-- (NSString *)getpaypassVersion{
-    NSString *version = [self getValue:@"paypassVersion"];
-    if (GJCFStringIsNull([self getValue:@"paypassVersion"])) {
-        version = @"0";
-    }
-    return version;
-}
-
 
 #pragma mark -Whether the user tags are synchronized
 - (void)haveSyncUserTags; {

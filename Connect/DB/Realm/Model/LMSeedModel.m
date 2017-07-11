@@ -10,7 +10,7 @@
 
 @implementation LMSeedModel
 +(NSString *)primaryKey{
-  return @"walletId";
+  return @"encryptSeed";
 }
 
 @end

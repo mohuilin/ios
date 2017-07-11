@@ -22,6 +22,7 @@
 @property(nonatomic, strong) PassInputFieldView *fristPassView;
 @property(nonatomic, strong) PassInputFieldView *payPassView;
 @property(nonatomic, copy) void (^completeBlock)(InputPayPassView *passView, NSError *error, BOOL result);
+@property(nonatomic, copy) void (^payCompleteBlock)(InputPayPassView *passView, NSError *error, NSString *baseSeed);
 @property(nonatomic, copy) void (^forgetPassBlock)();
 @property(nonatomic, copy) void (^closeBlock)();
 
@@ -151,7 +152,24 @@
     [window addSubview:passView];
     return passView;
 }
++ (InputPayPassView *)inputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete{
+    InputPayPassView *passView = [[InputPayPassView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    if ([[MMAppSetting sharedSetting] getPayPass]) {
+        passView.style = InputPayPassViewVerfyPass;
+        __weak __typeof(&*passView) weakSelf = passView;
+        passView.requestCallBack = ^(NSError *error) {
+            [weakSelf showResultStatusWithError:error];
+        };
+    } else {
+        passView.style = InputPayPassViewSetPass;
+    }
+    passView.payCompleteBlock = complete;
+    passView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    [window addSubview:passView];
+    return passView;
 
+}
 
 - (void)awakeFromNib {
     [super awakeFromNib];

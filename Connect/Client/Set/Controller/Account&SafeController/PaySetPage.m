@@ -261,19 +261,27 @@
 
             if (decodeDict) {
                 NSString __block *firstPass = nil;
+                NSString __block *secondPass = nil;
                 [GCDQueue executeInMainQueue:^{
                     KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
                     __weak __typeof(&*passView) weakPassView = passView;
+                    [weakPassView setTitleString:LMLocalizedString(@"请输入原密码哈哈", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                     passView.fillCompleteBlock = ^(NSString *password) {
-                        if (password.length != 4) {
-                            return;
-                        }
                         if (GJCFStringIsNull(firstPass)) {
                             firstPass = password;
-                            [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm PIN", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                        } else {
+                            [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                            if (![self decodeEncryPtion:password]) {
+                               [weakPassView setTitleString:LMLocalizedString(@"原密码输入错误哈哈,请重新输入", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                                firstPass = nil;
+                            }
+                            return;
+                        }else if (GJCFStringIsNull(secondPass)){
+                            secondPass = password;
+                            [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm Payment password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                            return;
+                        }else  {
                             [weakPassView dismissWithClosed:YES];
-                            if ([firstPass isEqualToString:password]) {
+                            if ([secondPass isEqualToString:password]) {
                                 // save and upload
                                 [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
                                     [SetGlobalHandler resetPayPass:password compete:^(BOOL result) {
@@ -322,7 +330,17 @@
     [self presentViewController:alertController animated:YES completion:nil];
 
 }
-
+- (BOOL)decodeEncryPtion:(NSString *)passWord {
+    // old user
+    if ([LKUserCenter shareCenter].currentLoginUser.category == 1) {
+        
+        
+    }else if ([LKUserCenter shareCenter].currentLoginUser.category == 2) { // new user
+    
+        
+    }
+    return YES;
+}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
 

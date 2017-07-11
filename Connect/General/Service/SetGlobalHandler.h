@@ -249,19 +249,5 @@
 + (void)syncPhoneContactWithHashContact:(NSMutableArray *)contacts complete:(void (^)(NSTimeInterval time))complete;
 
 + (void)getGroupInfoWihtIdentifier:(NSString *)identifier complete:(void (^)(LMRamGroupInfo *groupInfo ,NSError *error))complete;
-/**
- * creat new wallet
- *
- * @param contacts
- * @param complete
- */
-+ (void)creatNewWalletWithController:(UIViewController *)controllerVc complete:(void (^)(BOOL isFinish))complete;
-/**
- * creat new wallet
- *
- * @param contacts
- * @param complete
- */
-+ (void)creatNewWallet;
 
 @end
