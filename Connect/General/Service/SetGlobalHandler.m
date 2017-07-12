@@ -1187,83 +1187,52 @@
     if (payPass == nil) {
         payPass = @"";
     }
-    if([LKUserCenter shareCenter].currentLoginUser.category == 1){
-        PayPin *paySet = [[PayPin alloc] init];
-        GcmData *gcmData = nil;
-        if (!GJCFStringIsNull(payPass)) {
-                gcmData = [ConnectTool createGcmWithData:payPass
-                                                        publickey:[[LKUserCenter shareCenter] currentLoginUser].pub_key needEmptySalt:NO];
-                paySet.payPin = [StringTool hexStringFromData:gcmData.data];
-        }
-        [NetWorkOperationTool POSTWithUrlString:PinSetingUrl postProtoData:paySet.data complete:^(id response) {
-            HttpResponse *hResponse = (HttpResponse *)response;
-            if (hResponse.code != successCode) {
-                if (complete) {
-                    complete(NO);
-                }
-            } else{
-                NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-                if (data) {
-                    PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
-                    LMSeedModel *seelModel = [[LMSeedModel allObjects] lastObject];
-                    [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                        seelModel.version = [version.version intValue];
-                    }];
-                }
-                [[MMAppSetting sharedSetting]  setPayPass:payPass];
-                if (complete) {
-                    complete(YES);
-                }
-            }
-        } fail:^(NSError *error) {
+    NSString *needStr = nil;
+    if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeOldUser) {
+        needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
+    }else if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeNewUser){
+        needStr = [LKUserCenter shareCenter].currentLoginUser.baseSeed;
+    }
+    NSString *payLoad = [LMBTCWalletHelper encodeWalletSeed:needStr userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
+    NSData *saltData = [LMIMHelper createRandom512bits];
+    NSString *saltString = [[NSString alloc] initWithData:saltData encoding:NSUTF8StringEncoding];
+    int n = 17;
+    NSString *checkSum = nil;
+    
+    [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:nil complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
             if (complete) {
                 complete(NO);
             }
-        }];
-    }else { //
-        if (!GJCFStringIsNull([LKUserCenter shareCenter].currentLoginUser.baseSeed)) {
-           NSString *encryPtionSeed = [LMBTCWalletHelper encodeWalletSeed:[LKUserCenter shareCenter].currentLoginUser.baseSeed userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
-            NSData *saltData = [LMIMHelper createRandom512bits];
-            NSString *saltString = [[NSString alloc] initWithData:saltData encoding:NSUTF8StringEncoding];
-            int n = 17;
-            NSString *payLoad = nil;
-            NSString *checkSum = nil;
-            
-            [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:nil complete:^(id response) {
-                HttpResponse *hResponse = (HttpResponse *)response;
-                if (hResponse.code != successCode) {
-                    if (complete) {
-                        complete(NO);
-                    }
-                } else{
-                    NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-                    if (data) {
-                        // save data to db
-                        LMSeedModel *saveSeedModel = [LMSeedModel new];
-                        saveSeedModel.encryptSeed = @"";
-                        saveSeedModel.salt = @"";
-                        saveSeedModel.n = 17;
-                        saveSeedModel.status = 0;
-                        saveSeedModel.version = 0;
-                        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                            [realm addOrUpdateObject:saveSeedModel];
-                        }];
-                    }
-                    [[MMAppSetting sharedSetting]  setPayPass:payPass];
-                    if (complete) {
-                        complete(YES);
-                    }
-                }
-            } fail:^(NSError *error) {
-                if (complete) {
-                    complete(NO);
-                }
-            }];
+        } else{
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                // save data to db
+                LMSeedModel *saveSeedModel = [LMSeedModel new];
+                saveSeedModel.encryptSeed = @"";
+                saveSeedModel.salt = @"";
+                saveSeedModel.n = 17;
+                saveSeedModel.status = 0;
+                saveSeedModel.version = 0;
+                [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                    [realm addOrUpdateObject:saveSeedModel];
+                }];
+            }
+            [[MMAppSetting sharedSetting]  setPayPass:payPass];
+            if (complete) {
+                complete(YES);
+            }
         }
-    }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(NO);
+        }
+    }];
+    
 }
 /**
- * Payment resetPayPass
+   * Payment resetPayPass
    *
    * @param nopass whether a password is required
    * @param payPass to pay the password
@@ -1273,15 +1242,19 @@
     if (payPass == nil) {
         payPass = @"";
     }
-    if([LKUserCenter shareCenter].currentLoginUser.category == 1){
-        PayPin *paySet = [[PayPin alloc] init];
-        GcmData *gcmData = nil;
-        if (!GJCFStringIsNull(payPass)) {
-            gcmData = [ConnectTool createGcmWithData:payPass
-                                           publickey:[[LKUserCenter shareCenter] currentLoginUser].pub_key needEmptySalt:NO];
-            paySet.payPin = [StringTool hexStringFromData:gcmData.data];
+    if ([LKUserCenter shareCenter].currentLoginUser.categorys >= 1) {
+        NSString *needStr = nil;
+        if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeOldUser) {
+            needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
+        }else if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeNewUser){
+            needStr = [LKUserCenter shareCenter].currentLoginUser.baseSeed;
         }
-        [NetWorkOperationTool POSTWithUrlString:PinSetingUrl postProtoData:paySet.data complete:^(id response) {
+        NSString *payLoad = [LMBTCWalletHelper encodeWalletSeed:needStr userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
+        NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
+        int n = 17;
+        NSString *checkSum = nil;
+        
+        [NetWorkOperationTool POSTWithUrlString:UpdateBaseSeedUrl postProtoData:nil complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
             if (hResponse.code != successCode) {
                 if (complete) {
@@ -1291,10 +1264,17 @@
                 NSData *data = [ConnectTool decodeHttpResponse:hResponse];
                 if (data) {
                     PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
-                    LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
-                    [[LMRealmManager sharedManager]executeRealmWithBlock:^{
-                        seedModel.version = [version.version intValue];
+                    LMSeedModel *saveSeedModel = [LMSeedModel new];
+                    saveSeedModel.encryptSeed = payLoad;
+                    saveSeedModel.salt = salt;
+                    saveSeedModel.n = 17;
+                    saveSeedModel.status = 0;
+                    saveSeedModel.version = [version.version intValue];;
+                    [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                        [realm addOrUpdateObject:saveSeedModel];
                     }];
+                    
+                    
                 }
                 [[MMAppSetting sharedSetting]  setPayPass:payPass];
                 if (complete) {
@@ -1306,45 +1286,7 @@
                 complete(NO);
             }
         }];
-    }else { //
-        if (!GJCFStringIsNull([LKUserCenter shareCenter].currentLoginUser.baseSeed)) {
-            
-            NSString *encryPtionSeed = [LMBTCWalletHelper encodeWalletSeed:[LKUserCenter shareCenter].currentLoginUser.baseSeed userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
-            
-            [NetWorkOperationTool POSTWithUrlString:UpdateBaseSeedUrl postProtoData:nil complete:^(id response) {
-                HttpResponse *hResponse = (HttpResponse *)response;
-                if (hResponse.code != successCode) {
-                    if (complete) {
-                        complete(NO);
-                    }
-                } else{
-                    NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-                    if (data) {
-                        PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
-                        LMSeedModel *saveSeedModel = [LMSeedModel new];
-                        saveSeedModel.encryptSeed = @"";
-                        saveSeedModel.salt = @"";
-                        saveSeedModel.n = 17;
-                        saveSeedModel.status = 0;
-                        saveSeedModel.version = [version.version intValue];;
-                        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                            [realm addOrUpdateObject:saveSeedModel];
-                        }];
-                        
-                        
-                    }
-                    [[MMAppSetting sharedSetting]  setPayPass:payPass];
-                    if (complete) {
-                        complete(YES);
-                    }
-                }
-            } fail:^(NSError *error) {
-                if (complete) {
-                    complete(NO);
-                }
-            }];
-        }
-    }
+     }
 }
 + (void)syncPaypinversionWithComplete:(void(^)(NSString *password,NSError *error))complete{
     PayPinVersion *sendVersion = [[PayPinVersion alloc] init];

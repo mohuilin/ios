@@ -14,6 +14,9 @@
 #import "LMCurrencyManager.h"
 #import "LMRealmManager.h"
 #import "StringTool.h"
+#import "LMCurrencyModel.h"
+#import "LMIMHelper.h"
+#import "LMBTCWalletHelper.h"
 
 typedef NS_ENUM(NSUInteger,CurrencyType) {
     CurrencyTypePrikey   = 1,
@@ -28,10 +31,11 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
  * @param complete
  */
 + (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(NSString *)currency complete:(void (^)(BOOL isFinish))complete{
-    
+    // creat new page
+    [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
     // Synchronize wallet data and create wallet
     LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
-    if(seedModel == nil) {
+    if(!seedModel) {
         [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
             if (hResponse.code != successCode) {
@@ -47,8 +51,8 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                 [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                     [realm addOrUpdateObject:saveSeedModel];
                 }];
-                [LKUserCenter shareCenter].currentLoginUser.category = 1;
-                switch ([LKUserCenter shareCenter].currentLoginUser.category) {
+                [LKUserCenter shareCenter].currentLoginUser.categorys = 1;
+                switch ([LKUserCenter shareCenter].currentLoginUser.categorys) {
                     case CurrencyTypePrikey:
                     {
                         // creat old page
@@ -101,7 +105,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
  *
  * create old wallet
  */
-+ (void)creatOldWallet:(UIViewController *)controllerVc complete:(void (^)(BOOL isFinish))complete{
++ (void)creatOldWallet:(UIViewController *)controllerVc  complete:(void (^)(BOOL isFinish))complete{
     NSString __block *firstPass = nil;
     [GCDQueue executeInMainQueue:^{
         KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
@@ -118,17 +122,22 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                 if ([firstPass isEqualToString:password]) {
                     [SetGlobalHandler setpayPass:password compete:^(BOOL result) {
                         if (result) {
-                            if (result) {
-                                if (complete) {
-                                    complete(YES);
+                            NSString *salt = [[NSString alloc] initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
+                            int category = 1;
+                            NSString *masterAddress = [KeyHandle getAddressByPrivKey:[LKUserCenter shareCenter].currentLoginUser.prikey];
+                            [LMCurrencyManager createCurrency:@"bitcoin" salt:salt category:category masterAddess:masterAddress complete:^(BOOL result) {
+                                if (result) {
+                                    // tips
+                                    if (complete) {
+                                        complete(YES);
+                                    }
+                                }else{
+                                    // tips
+                                    if (complete) {
+                                        complete(NO);
+                                    }
                                 }
-                            }else{
-                                // tips
-                                if (complete) {
-                                    complete(NO);
-                                }
-                            }
-                            
+                            }];
                         }else {
                             if (complete) {
                                 complete(NO);
@@ -175,10 +184,11 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                         if ([firstPass isEqualToString:password]) {
                             [SetGlobalHandler setpayPass:password compete:^(BOOL result) {
                                 if (result) {
-                                    
-                                    NSString *salt = @"";
-                                    int category = 0;
+                                    NSString *salt = [[NSString alloc] initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
+                                    int category = 2;
+                                    LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
                                     NSString *masterAddress = nil;
+                                    
                                     [LMCurrencyManager createCurrency:currency salt:salt category:category masterAddess:masterAddress complete:^(BOOL result) {
                                         if (result) {
                                             // tips

@@ -119,7 +119,7 @@
 #pragma mark action
 - (void)creatNewWallet{
     //Synchronize wallet data and create wallet
-  [LMWalletCreatManager creatNewWalletWithController:self currency:@"btc" complete:^(BOOL isFinish) {
+  [LMWalletCreatManager creatNewWalletWithController:self currency:@"bitcoin" complete:^(BOOL isFinish) {
       if (isFinish) {
           [GCDQueue executeInMainQueue:^{
            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
@@ -197,8 +197,8 @@
         case 0: {
             LMReceiptViewController *bigReVc = [[LMReceiptViewController alloc] init];
             bigReVc.hidesBottomBarWhenPushed = YES;
+            bigReVc.currency = @"bitcnin";
             [self.navigationController pushViewController:bigReVc animated:YES];
-            LMLocalizedString(@"Wallet Transfer", nil);
         }
             break;
         case 1: {

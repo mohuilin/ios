@@ -9,7 +9,8 @@
 #import "PaySetPage.h"
 #import "SetTransferFeePage.h"
 #import "WJTouchID.h"
-
+#import "LMSeedModel.h"
+#import "LMWalletCreatManager.h"
 
 @interface PaySetPage () <WJTouchIDDelegate>
 
@@ -106,11 +107,23 @@
     if ([[MMAppSetting sharedSetting] getPayPass].length == MAX_PASS_LEN) {
         tip = LMLocalizedString(@"Wallet Reset password", nil);
     }
-    CellItem *payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
-        [weakSelf resetPayPass];
-    }];
-
-
+    LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
+    CellItem *payPass = nil;
+    if (!seedModel) {
+        tip = LMLocalizedString(@"开启钱包哈哈", nil);
+        payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
+            [LMWalletCreatManager creatNewWalletWithController:self currency:@"bitcoin" complete:^(BOOL isFinish) {
+                if (isFinish) {
+                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:nil];
+                }
+                [weakSelf reload];
+            }];
+        }];
+    }else {
+        payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
+            [weakSelf resetPayPass];
+        }];
+    }
     CellItem *fingerPay = [CellItem itemWithTitle:LMLocalizedString(@"Set Pay with Fingerprint", nil) type:CellItemTypeSwitch operation:nil];
     fingerPay.switchIsOn = [[MMAppSetting sharedSetting] needFingerPay];
     fingerPay.operationWithInfo = ^(id userInfo) {
@@ -238,104 +251,62 @@
 - (void)resetPayPass {
 
     __weak __typeof(&*self) weakSelf = self;
-    AccountInfo *loginUser = [[LKUserCenter shareCenter] currentLoginUser];
-
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:LMLocalizedString(@"Set Enter Login Password", nil) message:nil preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.secureTextEntry = YES;
-        weakSelf.passTextField = textField;
-    }];
-
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:LMLocalizedString(@"Common Cancel", nil) style:UIAlertActionStyleCancel handler:nil];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:LMLocalizedString(@"Common OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *_Nonnull action) {
-
-        [GCDQueue executeInGlobalQueue:^{
-
-            if (self.passTextField.text.length <= 0) {
+    NSString __block *firstPass = nil;
+    NSString __block *secondPass = nil;
+    [GCDQueue executeInMainQueue:^{
+        KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
+        __weak __typeof(&*passView) weakPassView = passView;
+        [weakPassView setTitleString:LMLocalizedString(@"请输入原密码哈哈", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+        passView.fillCompleteBlock = ^(NSString *password) {
+            if (GJCFStringIsNull(firstPass)) {
+                firstPass = password;
+                [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                if (![self decodeEncryPtion:password]) {
+                    [weakPassView setTitleString:LMLocalizedString(@"原密码输入错误哈哈,请重新输入", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                    firstPass = nil;
+                }
                 return;
-            }
-            self.navigationController.view.userInteractionEnabled = NO;
-
-            NSDictionary *decodeDict = [KeyHandle decodePrikeyGetDict:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
-            weakSelf.navigationController.view.userInteractionEnabled = YES;
-
-            if (decodeDict) {
-                NSString __block *firstPass = nil;
-                NSString __block *secondPass = nil;
-                [GCDQueue executeInMainQueue:^{
-                    KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
-                    __weak __typeof(&*passView) weakPassView = passView;
-                    [weakPassView setTitleString:LMLocalizedString(@"请输入原密码哈哈", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                    passView.fillCompleteBlock = ^(NSString *password) {
-                        if (GJCFStringIsNull(firstPass)) {
-                            firstPass = password;
-                            [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                            if (![self decodeEncryPtion:password]) {
-                               [weakPassView setTitleString:LMLocalizedString(@"原密码输入错误哈哈,请重新输入", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                                firstPass = nil;
-                            }
-                            return;
-                        }else if (GJCFStringIsNull(secondPass)){
-                            secondPass = password;
-                            [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm Payment password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                            return;
-                        }else  {
-                            [weakPassView dismissWithClosed:YES];
-                            if ([secondPass isEqualToString:password]) {
-                                // save and upload
-                                [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                                    [SetGlobalHandler resetPayPass:password compete:^(BOOL result) {
-                                        if (result) {
-                                            [weakSelf reload];
-                                            // tips
+            }else if (GJCFStringIsNull(secondPass)){
+                secondPass = password;
+                [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm Payment password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                return;
+            }else  {
+                [weakPassView dismissWithClosed:YES];
+                if ([secondPass isEqualToString:password]) {
+                    // save and upload
+                    [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
+                        [SetGlobalHandler resetPayPass:password compete:^(BOOL result) {
+                            if (result) {
+                                [weakSelf reload];
+                                // tips
+                                [GCDQueue executeInMainQueue:^{
+                                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
+                                        if (weakSelf.poptoRoot) {
                                             [GCDQueue executeInMainQueue:^{
-                                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
-                                                    if (weakSelf.poptoRoot) {
-                                                        [GCDQueue executeInMainQueue:^{
-                                                            [weakSelf.navigationController popToRootViewControllerAnimated:YES];
-                                                        }             afterDelaySecs:1.f];
-                                                    }
-                                                }];
-                                            }];
+                                                [weakSelf.navigationController popToRootViewControllerAnimated:YES];
+                                            }             afterDelaySecs:1.f];
                                         }
                                     }];
                                 }];
-                            } else {
-                                [GCDQueue executeInMainQueue:^{
-                                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                                }];
                             }
-                        }
-                    };
-
-                    [weakSelf presentViewController:passView animated:NO completion:nil];
-
-                }];
-            } else {
-                [GCDQueue executeInMainQueue:^{
+                        }];
+                    }];
+                } else {
                     [GCDQueue executeInMainQueue:^{
                         [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
                     }];
-                    [weakSelf setupCellData];
-                    [weakSelf.tableView reloadData];
-                }];
+                }
             }
-        }];
-
+        };
+        [weakSelf presentViewController:passView animated:NO completion:nil];
     }];
-    [alertController addAction:cancelAction];
-    [alertController addAction:okAction];
-
-    alertController.automaticallyAdjustsScrollViewInsets = NO;
-    [self presentViewController:alertController animated:YES completion:nil];
-
 }
 - (BOOL)decodeEncryPtion:(NSString *)passWord {
     // old user
-    if ([LKUserCenter shareCenter].currentLoginUser.category == 1) {
+    if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeOldUser) {
         
         
-    }else if ([LKUserCenter shareCenter].currentLoginUser.category == 2) { // new user
+    }else if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeNewUser) { // new user
     
         
     }

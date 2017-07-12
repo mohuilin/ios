@@ -8,6 +8,9 @@
 
 #import "LMCurrencyManager.h"
 #import "NetWorkOperationTool.h"
+#import "LMCurrencyModel.h"
+#import "LMRealmManager.h"
+
 @implementation LMCurrencyManager
 /**
  *  creat currency
@@ -15,7 +18,32 @@
  */
 + (void)createCurrency:(NSString *)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
     
+    
+    
+    
     [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:nil complete:^(id response) {
+        
+        
+        // save db
+        LMCurrencyModel *currencyModel = [LMCurrencyModel new];
+        currencyModel.currency = currency;
+        currencyModel.category = category;
+        currencyModel.salt = salt;
+        currencyModel.masterAddress = masterAddess;
+        currencyModel.status = 0;
+        currencyModel.blance = 0;
+        NSMutableArray *addressList = [NSMutableArray array];
+        [addressList addObject:masterAddess];
+        [currencyModel.addressListArray addObjects:addressList];
+        
+        if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeOldUser) {
+            currencyModel.payload = nil;
+        }else if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeNewUser){
+            currencyModel.payload = nil;
+        }
+        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm addOrUpdateObject:currencyModel];
+        }];
         
         if (complete) {
             complete(YES);
