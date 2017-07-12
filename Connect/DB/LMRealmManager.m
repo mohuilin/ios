@@ -9,19 +9,7 @@
 #import "LMRealmManager.h"
 
 @implementation LMRealmManager
-static LMRealmManager *manager = nil;
-CREATE_SHARED_MANAGER(LMRealmManager)
-+ (void)tearDown {
-    manager = nil;
-}
 
-+ (id)allocWithZone:(NSZone *)zone {
-    @synchronized (self) {
-        if (manager == nil) {
-            manager = [super allocWithZone:zone];
-            return manager;
-        }
-    }
-    return nil;
-}
+CREATE_SHARED_MANAGER(LMRealmManager)
+
 @end

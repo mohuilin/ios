@@ -27,6 +27,11 @@
 
 CF_EXTERN_C_BEGIN
 
+@class Coin;
+@class CoinInfo;
+@class Coins;
+@class Wallet;
+
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - WalletRoot
@@ -83,6 +88,166 @@ typedef GPB_ENUM(RequestUserInfo_FieldNumber) {
 @interface RequestUserInfo : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *uid;
+
+@end
+
+#pragma mark - Address
+
+typedef GPB_ENUM(Address_FieldNumber) {
+  Address_FieldNumber_Address = 1,
+};
+
+@interface Address : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+
+@end
+
+#pragma mark - Balance
+
+typedef GPB_ENUM(Balance_FieldNumber) {
+  Balance_FieldNumber_Amount = 1,
+  Balance_FieldNumber_Pending = 2,
+};
+
+@interface Balance : GPBMessage
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@property(nonatomic, readwrite) int64_t pending;
+
+@end
+
+#pragma mark - Wallet
+
+typedef GPB_ENUM(Wallet_FieldNumber) {
+  Wallet_FieldNumber_Pbkdf2Iterations = 1,
+  Wallet_FieldNumber_Version = 2,
+  Wallet_FieldNumber_Uuid = 3,
+  Wallet_FieldNumber_PayLoad = 4,
+  Wallet_FieldNumber_Salt = 5,
+};
+
+@interface Wallet : GPBMessage
+
+@property(nonatomic, readwrite) int32_t pbkdf2Iterations;
+
+@property(nonatomic, readwrite) int32_t version;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *uuid;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *payLoad;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *salt;
+
+@end
+
+#pragma mark - Coin
+
+typedef GPB_ENUM(Coin_FieldNumber) {
+  Coin_FieldNumber_Status = 1,
+  Coin_FieldNumber_Currency = 2,
+  Coin_FieldNumber_Category = 3,
+  Coin_FieldNumber_Salt = 4,
+  Coin_FieldNumber_Balance = 5,
+  Coin_FieldNumber_WId = 6,
+  Coin_FieldNumber_Payload = 7,
+};
+
+@interface Coin : GPBMessage
+
+@property(nonatomic, readwrite) int32_t status;
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite) int32_t category;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *salt;
+
+@property(nonatomic, readwrite) int64_t balance;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
+
+@end
+
+#pragma mark - Coins
+
+typedef GPB_ENUM(Coins_FieldNumber) {
+  Coins_FieldNumber_CoinsArray = 1,
+};
+
+@interface Coins : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<Coin*> *coinsArray;
+/** The number of items in @c coinsArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger coinsArray_Count;
+
+@end
+
+#pragma mark - CoinsDetail
+
+typedef GPB_ENUM(CoinsDetail_FieldNumber) {
+  CoinsDetail_FieldNumber_Coin = 1,
+  CoinsDetail_FieldNumber_CoinInfosArray = 2,
+};
+
+@interface CoinsDetail : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) Coin *coin;
+/** Test to see if @c coin has been set. */
+@property(nonatomic, readwrite) BOOL hasCoin;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<CoinInfo*> *coinInfosArray;
+/** The number of items in @c coinInfosArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger coinInfosArray_Count;
+
+@end
+
+#pragma mark - CoinInfo
+
+typedef GPB_ENUM(CoinInfo_FieldNumber) {
+  CoinInfo_FieldNumber_Index = 1,
+  CoinInfo_FieldNumber_Status = 2,
+  CoinInfo_FieldNumber_Address = 3,
+  CoinInfo_FieldNumber_Label = 4,
+  CoinInfo_FieldNumber_Balance = 5,
+};
+
+@interface CoinInfo : GPBMessage
+
+@property(nonatomic, readwrite) int32_t index;
+
+@property(nonatomic, readwrite) int32_t status;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *label;
+
+@property(nonatomic, readwrite) int64_t balance;
+
+@end
+
+#pragma mark - RespSyncWallet
+
+typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
+  RespSyncWallet_FieldNumber_Wallet = 1,
+  RespSyncWallet_FieldNumber_Status = 2,
+  RespSyncWallet_FieldNumber_Coins = 3,
+};
+
+@interface RespSyncWallet : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) Wallet *wallet;
+/** Test to see if @c wallet has been set. */
+@property(nonatomic, readwrite) BOOL hasWallet;
+
+@property(nonatomic, readwrite) int32_t status;
+
+@property(nonatomic, readwrite, strong, null_resettable) Coins *coins;
+/** Test to see if @c coins has been set. */
+@property(nonatomic, readwrite) BOOL hasCoins;
 
 @end
 

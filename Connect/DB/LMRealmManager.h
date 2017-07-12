@@ -11,5 +11,5 @@
 @interface LMRealmManager : BaseDB
 
 + (instancetype)sharedManager;
-+ (void)tearDown;
+
 @end

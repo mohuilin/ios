@@ -432,7 +432,7 @@
    Protobuf file: IMRequest
  
  */
-#define SyncWalletDataUrl baseServer "/wallet/" APIVersion "/sync"
+#define SyncWalletDataUrl @"http://192.168.40.110:18083/wallet/v2/sync"
 /**
  Payment settings
   

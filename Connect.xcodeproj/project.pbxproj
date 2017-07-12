@@ -215,6 +215,7 @@
 		192352A61E81275B0022D844 /* RedPacketHistoryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 192352541E81275B0022D844 /* RedPacketHistoryCell.xib */; };
 		2C65A2F77344813C490750ED /* libPods-Connect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D7FC9FA4528B022EBC0831 /* libPods-Connect.a */; };
 		71C3EDF9126EE9B5FCB64F2F /* libPods-ConnectUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */; };
+		D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */; };
 		D912F5511CEB8DA6008E04D0 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D912F54F1CEB8DA6008E04D0 /* Localizable.strings */; };
 		D91DBB701E08F4F20096E6DC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D91DBB6F1E08F4F20096E6DC /* libc++.tbd */; };
 		D9217ED31CE03D9100953F51 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D9217ED21CE03D9100953F51 /* main.m */; };
@@ -1458,6 +1459,8 @@
 		8DFC756E4F3D5D6D353F8A2E /* Pods-ConnectUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConnectUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ConnectUITests/Pods-ConnectUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		AAB2668721BBB77729DB36E5 /* Pods-Connect.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Connect.release.xcconfig"; path = "Pods/Target Support Files/Pods-Connect/Pods-Connect.release.xcconfig"; sourceTree = "<group>"; };
 		BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ConnectUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D90E0F851F164701007D0C4F /* Wallet.pbobjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wallet.pbobjc.h; sourceTree = "<group>"; };
+		D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wallet.pbobjc.m; sourceTree = "<group>"; };
 		D912F5501CEB8DA6008E04D0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D912F5521CEB8DB6008E04D0 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		D912F5531CEB8DB6008E04D0 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
@@ -12839,6 +12842,8 @@
 		192351521E81226C0022D844 /* ProtoModel */ = {
 			isa = PBXGroup;
 			children = (
+				D90E0F851F164701007D0C4F /* Wallet.pbobjc.h */,
+				D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */,
 				192351531E81226C0022D844 /* GPBMessage+LMProtoDataValidation.h */,
 				192351541E81226C0022D844 /* GPBMessage+LMProtoDataValidation.m */,
 				192351551E81226C0022D844 /* Protofile.pbobjc.h */,
@@ -33126,6 +33131,7 @@
 				F16FD7B91EC3205B002F9395 /* base58.cpp in Sources */,
 				D97FDCBC1E86664800B161C8 /* YYTextUtilities.m in Sources */,
 				D95C044F1E810902006C5C8A /* GJGCChatFriendImageMessageCell.m in Sources */,
+				D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */,
 				D95C035E1E8108D8006C5C8A /* GJGCChatFriendDataSourceManager.m in Sources */,
 				F172A66F1EB8843C006E186C /* MMMessage.m in Sources */,
 				D92232F61E822BF900D67110 /* UIView+GJCFViewFrameUitil.m in Sources */,

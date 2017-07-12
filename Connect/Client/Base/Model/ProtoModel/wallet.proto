@@ -1,5 +1,6 @@
 syntax = "proto3";
 package wallet;
+
 // 新的钱包
 message RequestWalletInfo {
 string check_sum = 1;
@@ -12,4 +13,55 @@ int32 version = 6;
 
 message RequestUserInfo {
 string uid = 1;
+}
+
+
+message Address {
+string address = 1;
+}
+message Balance {
+int64 amount = 1;
+int64 pending = 2;
+}
+
+
+message Wallet {
+int32 pbkdf2_iterations = 1;
+int32 version = 2;
+string uuid = 3;
+string pay_load = 4;
+string salt = 5;
+}
+
+message Coin {
+int32 status = 1;
+int32 currency = 2;
+int32 category = 3;
+string salt = 4;
+int64 balance = 5;
+string w_id = 6;
+string payload = 7;
+}
+
+message Coins {
+repeated Coin Coins = 1;
+}
+
+message CoinsDetail {
+Coin coin = 1;
+repeated CoinInfo coinInfos = 2;
+}
+
+message CoinInfo {
+int32 index = 1;
+int32 status = 2;
+string address = 3;
+string label = 4;
+int64 balance = 5;
+}
+
+message RespSyncWallet {
+Wallet wallet = 1;
+int32 status = 2;
+Coins Coins = 3;
 }
