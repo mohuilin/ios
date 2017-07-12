@@ -35,55 +35,56 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
     [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
     // Synchronize wallet data and create wallet
     LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
-    if(!seedModel) {
-        [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
             if (hResponse.code != successCode) {
                 
             } else{
-                // save data to db
-                LMSeedModel *saveSeedModel = [LMSeedModel new];
-                saveSeedModel.encryptSeed = @"";
-                saveSeedModel.salt = @"";
-                saveSeedModel.n = 17;
-                saveSeedModel.status = 0;
-                saveSeedModel.version = 0;
-                [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                    [realm addOrUpdateObject:saveSeedModel];
-                }];
-                // array count
-                if (/* DISABLES CODE */ (YES)) {
-                    
-                }else {
-                    [LMWalletInfoManager sharedManager].categorys = 1;
-                    switch ([LMWalletInfoManager sharedManager].categorys) {
-                        case CurrencyTypePrikey:
-                        {
-                            // creat old page
-                            [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
+                NSString *version = [[MMAppSetting sharedSetting] getContactVersion];
+                if ([version intValue]!= 1 || [version intValue] == 0) {
+                    // save data to db
+                    LMSeedModel *saveSeedModel = [LMSeedModel new];
+                    saveSeedModel.encryptSeed = @"";
+                    saveSeedModel.salt = @"";
+                    saveSeedModel.n = 17;
+                    saveSeedModel.status = 0;
+                    saveSeedModel.version = 0;
+                    [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                        [realm addOrUpdateObject:saveSeedModel];
+                    }];
+                    // array count
+                    if (/* DISABLES CODE */ (YES)) {
+                        
+                    }else {
+                        [LMWalletInfoManager sharedManager].categorys = 1;
+                        switch ([LMWalletInfoManager sharedManager].categorys) {
+                            case CurrencyTypePrikey:
+                            {
+                                // creat old page
+                                [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
+                            }
+                                break;
+                            case CurrencyTypeBaseSeed:
+                            {
+                                // creat new page
+                                [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
+                            }
+                                break;
+                            case CurrencyTypeImport:
+                            {
+                                [LMWalletCreatManager creatImportWallet:nil complete:complete];
+                            }
+                                break;
+                                
+                            default:
+                                break;
                         }
-                            break;
-                        case CurrencyTypeBaseSeed:
-                        {
-                            // creat new page
-                            [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
-                        }
-                            break;
-                        case CurrencyTypeImport:
-                        {
-                            [LMWalletCreatManager creatImportWallet:nil complete:complete];
-                        }
-                            break;
-                            
-                        default:
-                            break;
                     }
                 }
             }
         } fail:^(NSError *error) {
             
         }];
-    }
 }
 /**
  * creat import wallet
