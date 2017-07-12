@@ -11,6 +11,7 @@
 #import "MessageDBManager.h"
 #import "UserDBManager.h"
 #import "ConnectTool.h"
+#import "LMIMHelper.h"
 
 /**
  "NOT_EXISTED": 1,
@@ -126,7 +127,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
         if (sendStatus == GJGCChatFriendSendMessageStatusSuccessUnArrive ||
                 sendStatus == GJGCChatFriendSendMessageStatusFailByNotInGroup) {
             //blocked
-        } else if (sendStatus == GJGCChatFriendSendMessageStatusFailByNoRelationShip && ![[UserDBManager sharedManager] isFriendByAddress:[KeyHandle getAddressByPubkey:messageOwer]]) {
+        } else if (sendStatus == GJGCChatFriendSendMessageStatusFailByNoRelationShip && ![[UserDBManager sharedManager] isFriendByAddress:[LMIMHelper getAddressByPubkey:messageOwer]]) {
             //no relationship
         } else {
             //update status

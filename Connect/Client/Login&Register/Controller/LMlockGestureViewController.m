@@ -9,6 +9,7 @@
 #import "LMlockGestureViewController.h"
 #import "GestureLockView.h"
 #import "GestureThumbView.h"
+#import "LMIMHelper.h"
 
 #define MAX_TRYTIME  (int)4
 #define MAX_SPACE_TIME (int)30
@@ -111,7 +112,7 @@
         [GCDQueue executeInGlobalQueue:^{
             
             weakSelf.navigationController.view.userInteractionEnabled = NO;
-            NSDictionary *decodeDict = [KeyHandle decodePrikeyGetDict:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
+            NSDictionary *decodeDict = [LMIMHelper decodeEncryptPrikey:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
             weakSelf.navigationController.view.userInteractionEnabled = YES;
             
             if (decodeDict) {

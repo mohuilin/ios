@@ -15,6 +15,7 @@
 #import "LMConversionManager.h"
 #import "LMRealmDBManager.h"
 #import "LMRamGroupInfo.h"
+#import "LMIMHelper.h"
 
 static RecentChatDBManager *manager = nil;
 
@@ -370,7 +371,7 @@ static RecentChatDBManager *manager = nil;
     } else {
         AccountInfo *contact = [[UserDBManager sharedManager] getUserByPublickey:identifier];
         if (!contact) {
-            contact = [[UserDBManager sharedManager] getFriendRequestBy:[KeyHandle getAddressByPubkey:identifier]];
+            contact = [[UserDBManager sharedManager] getFriendRequestBy:[LMIMHelper getAddressByPubkey:identifier]];
             if (!contact && contact.status == 1) {
                 return;
             }
@@ -453,7 +454,7 @@ static RecentChatDBManager *manager = nil;
             AccountInfo *contact = [[UserDBManager sharedManager] getUserByPublickey:identifier];
             if (!contact) {
 
-                contact = [[UserDBManager sharedManager] getFriendRequestBy:[KeyHandle getAddressByPubkey:identifier]];
+                contact = [[UserDBManager sharedManager] getFriendRequestBy:[LMIMHelper getAddressByPubkey:identifier]];
                 if (!contact && contact.status == 1) {
 
                     return nil;
@@ -553,7 +554,7 @@ static RecentChatDBManager *manager = nil;
             AccountInfo *contact = [[UserDBManager sharedManager] getUserByPublickey:identifier];
             if (!contact) {
 
-                contact = [[UserDBManager sharedManager] getFriendRequestBy:[KeyHandle getAddressByPubkey:identifier]];
+                contact = [[UserDBManager sharedManager] getFriendRequestBy:[LMIMHelper getAddressByPubkey:identifier]];
                 if (!contact && contact.status == 1) {
 
                     return;

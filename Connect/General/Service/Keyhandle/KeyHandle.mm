@@ -168,7 +168,6 @@ extern "C"{
     return [NSString stringWithFormat:@"%s",outstr];
 }
 
-
 +(NSString *)getEncodePrikey:(NSString *)privkey withBitAddress :(NSString *) bitAddress password:(NSString *)password{
     char usrID_BtcAddress[256];
     char privKey_HexString[65];
@@ -1174,6 +1173,34 @@ int xtalkDecodeAES_gcm(unsigned char *ciphertext, int ciphertext_len, unsigned c
 }
 
 
+//decode hex
++ (NSString *)decodeHex:(NSString *)hexStr
+{
+    char *inparam = (char*)[hexStr UTF8String];
+    char *oriParam;
+    decodeRawTransaction(inparam, &oriParam);
+    
+    //    NSLog(@"%s",oriParam);
+    NSString *resultParamStr = [NSString stringWithFormat:@"%s",oriParam];
+    free(oriParam);
+    
+    return resultParamStr;
+}
+
+int decodeRawTransaction(char *in_param, char **decodetx_ret)
+{
+    Value r;
+    char *ret_str;
+    string param=string("decoderawtransaction ")+in_param;
+    r = CallRPC(param);
+    string ret=write_string(Value(r), false);
+    ret_str=(char *)malloc(ret.size()+1);
+    sprintf(ret_str,"%s",ret.c_str());
+    *decodetx_ret=ret_str;
+    return 0;
+}
+
+
 + (NSString *)signRawTranscationWithTvsArray:(NSArray *)tvsArray privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation{
 
 #if !ONTEST
@@ -1197,8 +1224,7 @@ int xtalkDecodeAES_gcm(unsigned char *ciphertext, int ciphertext_len, unsigned c
     }
 
     NSString *tvsJson = [self ObjectTojsonString:tvsArray];
-
-
+    
     const char *rawtrans_str = [rawTranscation UTF8String];
     char *signedtrans_ret;
     char inparam[1024 * 100];
@@ -2141,19 +2167,6 @@ int GetPrivKeyFromSeedEx(char *SeedStr, char *PrivKey, int type1, int type2, int
     btcSecret.SetKey(privkeyNew3.key);
     sprintf(PrivKey,"%s",btcSecret.ToString().c_str());
 
-    return 0;
-}
-
-int decodeRawTransaction(char *in_param, char **decodetx_ret)
-{
-    Value r;
-    char *ret_str;
-    string param=string("decoderawtransaction ")+in_param;
-    r = CallRPC(param);
-    string ret=write_string(Value(r), false);
-    ret_str=(char *)malloc(ret.size()+1);
-    sprintf(ret_str,"%s",ret.c_str());
-    *decodetx_ret=ret_str;
     return 0;
 }
 

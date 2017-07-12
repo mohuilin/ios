@@ -63,8 +63,6 @@
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
     [self creatNewWallet];
-    
-    
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];

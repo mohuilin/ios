@@ -9,7 +9,7 @@
 #import "PaySetPage.h"
 #import "SetTransferFeePage.h"
 #import "WJTouchID.h"
-
+#import "LMIMHelper.h"
 
 @interface PaySetPage () <WJTouchIDDelegate>
 
@@ -207,7 +207,7 @@
         [GCDQueue executeInGlobalQueue:^{
 
             weakSelf.navigationController.view.userInteractionEnabled = NO;
-            NSDictionary *decodeDict = [KeyHandle decodePrikeyGetDict:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
+            NSDictionary *decodeDict = [LMIMHelper decodeEncryptPrikey:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
             weakSelf.navigationController.view.userInteractionEnabled = YES;
 
             if (decodeDict) {
@@ -256,7 +256,7 @@
             }
             self.navigationController.view.userInteractionEnabled = NO;
 
-            NSDictionary *decodeDict = [KeyHandle decodePrikeyGetDict:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
+            NSDictionary *decodeDict = [LMIMHelper decodeEncryptPrikey:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
             weakSelf.navigationController.view.userInteractionEnabled = YES;
 
             if (decodeDict) {

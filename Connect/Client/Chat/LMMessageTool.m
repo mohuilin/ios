@@ -20,6 +20,7 @@
 #import "CameraTool.h"
 #import <Photos/Photos.h>
 #import "LMMessage.h"
+#import "LMIMHelper.h"
 
 @implementation LMMessageTool
 
@@ -51,7 +52,7 @@
         //message encrypt
         NSString *aad = [[NSString stringWithFormat:@"%d", arc4random() % 100 + 1000] sha1String];
         NSString *iv = [[NSString stringWithFormat:@"%d", arc4random() % 100 + 1000] sha1String];
-        NSDictionary *encodeDict = [KeyHandle xtalkEncodeAES_GCM:[[LKUserCenter shareCenter] getLocalGCDEcodePass] data:[message mj_JSONString] aad:aad iv:iv];
+        NSDictionary *encodeDict = [LMIMHelper xtalkEncodeAES_GCM:[[LKUserCenter shareCenter] getLocalGCDEcodePass] data:[message mj_JSONString] aad:aad iv:iv];
         NSString *ciphertext = encodeDict[@"encryptedDatastring"];
         NSString *tag = encodeDict[@"tagstring"];
         NSMutableDictionary *content = [NSMutableDictionary dictionary];
@@ -360,7 +361,7 @@
                 BOOL isNoted = [[temD valueForKey:@"newaccept"] boolValue];
                 NSString *groupId = [temD valueForKey:@"identifier"];
                 NSString *applyUserPubkey = [temD valueForKey:@"pubKey"];
-                BOOL userIsInGroup = [[GroupDBManager sharedManager] userWithAddress:[KeyHandle getAddressByPubkey:applyUserPubkey] isinGroup:groupId];
+                BOOL userIsInGroup = [[GroupDBManager sharedManager] userWithAddress:[LMIMHelper getAddressByPubkey:applyUserPubkey] isinGroup:groupId];
                 if (userIsInGroup) {
                     chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateCellStatusWithHandle:YES refused:NO isNoted:isNoted];
                 } else{

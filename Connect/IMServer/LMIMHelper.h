@@ -131,4 +131,6 @@
  */
 + (NSData *)xtalkDecodeAES_GCMDataWithPassword:(NSData *)password data:(NSData *)data aad:(NSData *)aad iv:(NSData *)iv tag:(NSData *)tag;
 
++ (NSString *)getHash256:(NSString *)string;
+
 @end

@@ -31,12 +31,12 @@
  */
 + (NSString *)createRawTranscationWithTvsArray:(NSArray *)tvsArray outputs:(NSDictionary *)outputs;
 
++ (NSString *)getAddressByPrivKey:(NSString *)prvkey;
 
 + (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index;
 
-+ (NSString *)encodeWalletSeed:(NSString *)seed userAddress:(NSString *)address password:(NSString *)password;
++(NSString *)encodeValue:(NSString *)value password:(NSString *)password n:(int)n;
 
-+ (NSDictionary *)decodeEncryptSeed:(NSString *)encryptSeed password:(NSString *)password;
-
++(NSString *)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password;
 
 @end

@@ -159,4 +159,5 @@
 + (NSData *)getAes256KeyByECDHKeyAndSalt:(NSData *)password salt:(NSData *)salt;
 
 + (NSData *)xtalkDecodeAES_GCMDataWithPassword:(NSData *)password data:(NSData *)data aad:(NSData *)aad iv:(NSData *)iv tag:(NSData *)tag;
+
 @end

@@ -15,6 +15,7 @@
 #import "LMBitAddressViewController.h"
 #import "NSURL+Param.h"
 #import "HandleUrlManager.h"
+#import "LMIMHelper.h"
 
 #define scanViewWH (DEVICE_SIZE.width - 100)
 
@@ -159,7 +160,7 @@ typedef NS_ENUM(NSInteger, ScanMoneyType) {
 - (void)GetUserInfo {
     __weak typeof(self) weakSelf = self;
     self.resultContent = [self.resultContent stringByReplacingOccurrencesOfString:@"bitcoin:" withString:@""];
-    if (![KeyHandle checkAddress:self.resultContent]) {
+    if (![LMIMHelper checkAddress:self.resultContent]) {
         [MBProgressHUD hideHUDForView:self.view];
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Result is not a bitcoin address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{
@@ -183,7 +184,7 @@ typedef NS_ENUM(NSInteger, ScanMoneyType) {
 
 - (void)GetMoneyUserInfo {
     __weak typeof(self) weakSelf = self;
-    if (![KeyHandle checkAddress:self.resultContent]) {
+    if (![LMIMHelper checkAddress:self.resultContent]) {
         [MBProgressHUD hideHUDForView:self.view];
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Result is not a bitcoin address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{

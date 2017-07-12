@@ -819,6 +819,8 @@
 		D98FD7E21D264E470048E29E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E11D264E470048E29E /* CoreGraphics.framework */; };
 		D98FD7E41D264E550048E29E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E31D264E550048E29E /* Security.framework */; };
 		D98FD7E61D264E710048E29E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E51D264E710048E29E /* libz.tbd */; };
+		D993B6481F1478C1006E95A9 /* LMBTCTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */; };
+		D993B64B1F1480EB006E95A9 /* LMTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D993B64A1F1480EB006E95A9 /* LMTransferManager.m */; };
 		D9ACCD061EDFC6BC009A5869 /* NSObject+Swing.m in Sources */ = {isa = PBXBuildFile; fileRef = D9ACCD051EDFC6BC009A5869 /* NSObject+Swing.m */; };
 		D9ACCD0A1EDFC98C009A5869 /* XMLReader.m in Sources */ = {isa = PBXBuildFile; fileRef = D9ACCD091EDFC98C009A5869 /* XMLReader.m */; };
 		D9ACCD0C1EDFCA83009A5869 /* pbrule.xml in Resources */ = {isa = PBXBuildFile; fileRef = D9ACCD0B1EDFCA83009A5869 /* pbrule.xml */; };
@@ -2553,6 +2555,10 @@
 		D98FD7E11D264E470048E29E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		D98FD7E31D264E550048E29E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		D98FD7E51D264E710048E29E /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		D993B6461F1478C1006E95A9 /* LMBTCTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBTCTransferManager.h; sourceTree = "<group>"; };
+		D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBTCTransferManager.m; sourceTree = "<group>"; };
+		D993B6491F1480EB006E95A9 /* LMTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransferManager.h; sourceTree = "<group>"; };
+		D993B64A1F1480EB006E95A9 /* LMTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransferManager.m; sourceTree = "<group>"; };
 		D9ACCD041EDFC6BC009A5869 /* NSObject+Swing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Swing.h"; sourceTree = "<group>"; };
 		D9ACCD051EDFC6BC009A5869 /* NSObject+Swing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Swing.m"; sourceTree = "<group>"; };
 		D9ACCD081EDFC98C009A5869 /* XMLReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLReader.h; sourceTree = "<group>"; };
@@ -13833,6 +13839,7 @@
 		D922311A1E822BF800D67110 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				D993B6451F147826006E95A9 /* WalletManager */,
 				D922311D1E822BF800D67110 /* Appsetting */,
 				D92231221E822BF800D67110 /* DownloadManager */,
 				D922312A1E822BF800D67110 /* FileUploadManager */,
@@ -15425,6 +15432,17 @@
 				D97FDCA21E86664800B161C8 /* YYTextWeakProxy.m */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		D993B6451F147826006E95A9 /* WalletManager */ = {
+			isa = PBXGroup;
+			children = (
+				D993B6491F1480EB006E95A9 /* LMTransferManager.h */,
+				D993B64A1F1480EB006E95A9 /* LMTransferManager.m */,
+				D993B6461F1478C1006E95A9 /* LMBTCTransferManager.h */,
+				D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */,
+			);
+			name = WalletManager;
 			sourceTree = "<group>";
 		};
 		D9ACCD071EDFC98C009A5869 /* XMLReader */ = {
@@ -33299,6 +33317,7 @@
 				D92233061E822BF900D67110 /* LMUnspentCheckTool.m in Sources */,
 				D92232A81E822BF800D67110 /* GJCFAudioFileUitil.m in Sources */,
 				D9222FC31E822A3100D67110 /* NSObject+YYAddForKVO.m in Sources */,
+				D993B64B1F1480EB006E95A9 /* LMTransferManager.m in Sources */,
 				D92232B21E822BF800D67110 /* KeyHandle.mm in Sources */,
 				19234F491E8113D60022D844 /* LocalAccountLoginPage.m in Sources */,
 				1923514C1E8121CB0022D844 /* WXInputView.m in Sources */,
@@ -33457,6 +33476,7 @@
 				F16FD7CB1EC3205B002F9395 /* sha2.c in Sources */,
 				D97FDCBF1E86664800B161C8 /* YYTextView.m in Sources */,
 				1923517C1E8123C60022D844 /* PhoneContactInfo.m in Sources */,
+				D993B6481F1478C1006E95A9 /* LMBTCTransferManager.m in Sources */,
 				F10F2C701EFCC0D20017C32C /* LMFriendRecommandInfo.m in Sources */,
 				D9222FDE1E822A3100D67110 /* UIButton+YYWebImage.m in Sources */,
 				F16FD7BF1EC3205B002F9395 /* bignum.c in Sources */,

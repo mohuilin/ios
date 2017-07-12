@@ -8,7 +8,7 @@
 
 #import "LKUserCenter.h"
 #import "AppDelegate.h"
-#import "KeyHandle.h"
+#import "LMIMHelper.h"
 #import "NSString+Hash.h"
 #import "IMService.h"
 #import "NetWorkOperationTool.h"
@@ -28,6 +28,7 @@
 #import "LMConversionManager.h"
 #import "LMLinkManDataManager.h"
 #import "LMRealmDBManager.h"
+#import "LMIMHelper.h"
 
 @interface LKUserCenter ()
 
@@ -92,7 +93,7 @@ static LKUserCenter *center = nil;
 }
 
 - (NSString *)getLocalGCDEcodePass{
-    return [[KeyHandle getPassByPrikey:[self currentLoginUser].prikey] sha256String];
+    return [[LMIMHelper getHash256:[self currentLoginUser].prikey] sha256String];
 }
 
 
@@ -101,7 +102,7 @@ static LKUserCenter *center = nil;
                     withComplete:(LKUserCenterLoginCompleteBlock)complete{
     
     self.loginUser = loginUser;
-    NSDictionary *decodeDict = [KeyHandle decodePrikeyGetDict:loginUser.encryption_pri withPassword:password];
+    NSDictionary *decodeDict = [LMIMHelper decodeEncryptPrikey:loginUser.encryption_pri withPassword:password];
     // Cache head
     NSError *error = nil;
     NSString *privkey = nil;
@@ -117,8 +118,8 @@ static LKUserCenter *center = nil;
             privkey = loginUser.prikey;
             if (GJCFStringIsNull(loginUser.address)) { // May be swept of the user information
                 //
-                loginUser.address = [KeyHandle getAddressByPrivKey:privkey];
-                loginUser.pub_key = [KeyHandle createPubkeyByPrikey:privkey];
+                loginUser.address = [LMIMHelper getAddressByPrivKey:privkey];
+                loginUser.pub_key = [LMIMHelper getPubkeyByPrikey:privkey];
                 loginUser.isSelected = NO;
                 // Download avatar
                 SearchUser *usrAddInfo = [[SearchUser alloc] init];
@@ -290,7 +291,7 @@ static LKUserCenter *center = nil;
     NSString *prikey = [MMAppSetting sharedSetting].privkey;
     if (prikey) {
         NSArray *users = [[MMAppSetting sharedSetting]  getKeyChainUsers];
-        NSString *address = [KeyHandle getAddressByPrivKey:prikey];
+        NSString *address = [LMIMHelper getAddressByPrivKey:prikey];
         for (AccountInfo *user in users) {
             if ([user.address isEqualToString:address]) {
                 self.loginUser = user;
