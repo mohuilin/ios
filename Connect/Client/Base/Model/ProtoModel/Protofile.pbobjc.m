@@ -13354,6 +13354,115 @@ typedef struct ChatCookieHistory__storage_ {
 
 @end
 
+#pragma mark - Luckypackage
+
+@implementation Luckypackage
+
+@dynamic total;
+@dynamic fee;
+@dynamic amount;
+@dynamic type;
+@dynamic currency;
+@dynamic category;
+@dynamic fromAddressesArray, fromAddressesArray_Count;
+
+typedef struct Luckypackage__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t total;
+  int32_t fee;
+  int32_t amount;
+  int32_t type;
+  int32_t category;
+  NSString *currency;
+  NSMutableArray *fromAddressesArray;
+} Luckypackage__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "total",
+        .dataTypeSpecific.className = NULL,
+        .number = Luckypackage_FieldNumber_Total,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(Luckypackage__storage_, total),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "fee",
+        .dataTypeSpecific.className = NULL,
+        .number = Luckypackage_FieldNumber_Fee,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(Luckypackage__storage_, fee),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = Luckypackage_FieldNumber_Amount,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(Luckypackage__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "type",
+        .dataTypeSpecific.className = NULL,
+        .number = Luckypackage_FieldNumber_Type,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(Luckypackage__storage_, type),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = Luckypackage_FieldNumber_Currency,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(Luckypackage__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "category",
+        .dataTypeSpecific.className = NULL,
+        .number = Luckypackage_FieldNumber_Category,
+        .hasIndex = 5,
+        .offset = (uint32_t)offsetof(Luckypackage__storage_, category),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "fromAddressesArray",
+        .dataTypeSpecific.className = NULL,
+        .number = Luckypackage_FieldNumber_FromAddressesArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(Luckypackage__storage_, fromAddressesArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[Luckypackage class]
+                                     rootClass:[ProtofileRoot class]
+                                          file:ProtofileRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(Luckypackage__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
 
 #pragma clang diagnostic pop
 

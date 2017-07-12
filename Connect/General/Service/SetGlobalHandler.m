@@ -1194,7 +1194,9 @@
         needStr = [LMWalletInfoManager sharedManager].baseSeed;
     }
     NSString *payLoad = [LMBTCWalletHelper encodeValue:needStr password:payPass n:17];
-    NSString *checkSum = nil;
+    NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
+    int n = 17;
+    NSString *checkSum = [[NSString stringWithFormat:@"%d%@%@",n,payLoad,salt] sha256String];
     
     [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:nil complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -1207,9 +1209,9 @@
             if (data) {
                 // save data to db
                 LMSeedModel *saveSeedModel = [LMSeedModel new];
-                saveSeedModel.encryptSeed = @"";
-                saveSeedModel.salt = @"";
-                saveSeedModel.n = 17;
+                saveSeedModel.encryptSeed = payLoad;
+                saveSeedModel.salt = salt;
+                saveSeedModel.n = n;
                 saveSeedModel.status = 0;
                 saveSeedModel.version = 0;
                 [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {

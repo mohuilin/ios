@@ -14,7 +14,7 @@ typedef NS_ENUM(NSInteger,CategoryType) {
 };
 @interface LMWalletInfoManager : NSObject
 + (instancetype)sharedManager;
-+ (void)tearDown;
+
 /**
  *  Attributes
  *

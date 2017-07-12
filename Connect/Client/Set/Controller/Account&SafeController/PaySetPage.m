@@ -305,11 +305,20 @@
 - (BOOL)decodeEncryPtion:(NSString *)passWord {
     // old user
     if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-        
+       NSString *priKey = [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord];
+        if ([priKey isEqualToString:[LKUserCenter shareCenter].currentLoginUser.prikey]) {
+            return YES;
+        }else {
+            return NO;
+        }
         
     }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser) { // new user
-    
-        
+        NSString *baseSeed = [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord];
+        if ([baseSeed isEqualToString:[LMWalletInfoManager sharedManager].baseSeed]) {
+            return YES;
+        }else {
+            return NO;
+        }
     }
     return YES;
 }

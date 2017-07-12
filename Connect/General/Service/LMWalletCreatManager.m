@@ -34,7 +34,6 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
     // creat new page
     [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
     // Synchronize wallet data and create wallet
-    LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
     [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
             if (hResponse.code != successCode) {
@@ -130,7 +129,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                         if (result) {
                             NSString *salt = [[NSString alloc] initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
                             int category = 1;
-                            NSString *masterAddress = [KeyHandle getAddressByPrivKey:[LKUserCenter shareCenter].currentLoginUser.prikey];
+                            NSString *masterAddress = [LMBTCWalletHelper getAddressByPrivKey:[LKUserCenter shareCenter].currentLoginUser.prikey];
                             [LMCurrencyManager createCurrency:@"bitcoin" salt:salt category:category masterAddess:masterAddress complete:^(BOOL result) {
                                 if (result) {
                                     // tips
@@ -190,6 +189,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                         if ([firstPass isEqualToString:password]) {
                             [SetGlobalHandler setpayPass:password compete:^(BOOL result) {
                                 if (result) {
+                                    [LMWalletInfoManager sharedManager].baseSeed = randomSeed;
                                     NSString *salt = [[NSString alloc] initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
                                     int category = 2;
                                     LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];

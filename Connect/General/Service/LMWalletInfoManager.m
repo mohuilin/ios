@@ -11,17 +11,4 @@
 @implementation LMWalletInfoManager
 static LMWalletInfoManager *manager = nil;
 CREATE_SHARED_MANAGER(LMWalletInfoManager)
-+ (void)tearDown {
-    manager = nil;
-}
-
-+ (id)allocWithZone:(NSZone *)zone {
-    @synchronized (self) {
-        if (manager == nil) {
-            manager = [super allocWithZone:zone];
-            return manager;
-        }
-    }
-    return nil;
-}
 @end

@@ -3913,6 +3913,41 @@ typedef GPB_ENUM(ChatCookieHistory_FieldNumber) {
 
 @end
 
+#pragma mark - Luckypackage
+
+typedef GPB_ENUM(Luckypackage_FieldNumber) {
+  Luckypackage_FieldNumber_Total = 1,
+  Luckypackage_FieldNumber_Fee = 2,
+  Luckypackage_FieldNumber_Amount = 3,
+  Luckypackage_FieldNumber_Type = 4,
+  Luckypackage_FieldNumber_Currency = 5,
+  Luckypackage_FieldNumber_Category = 6,
+  Luckypackage_FieldNumber_FromAddressesArray = 7,
+};
+
+/**
+ * ===== add =====
+ **/
+@interface Luckypackage : GPBMessage
+
+@property(nonatomic, readwrite) int32_t total;
+
+@property(nonatomic, readwrite) int32_t fee;
+
+@property(nonatomic, readwrite) int32_t amount;
+
+@property(nonatomic, readwrite) int32_t type;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *currency;
+
+@property(nonatomic, readwrite) int32_t category;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *fromAddressesArray;
+/** The number of items in @c fromAddressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger fromAddressesArray_Count;
+
+@end
+
 NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END

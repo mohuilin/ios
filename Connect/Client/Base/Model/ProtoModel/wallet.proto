@@ -1,0 +1,15 @@
+syntax = "proto3";
+package wallet;
+// 新的钱包
+message RequestWalletInfo {
+string check_sum = 1;
+string payload = 2;
+string salt = 3;
+int32 n = 4;
+string wid = 5;
+int32 version = 6;
+}
+
+message RequestUserInfo {
+string uid = 1;
+}

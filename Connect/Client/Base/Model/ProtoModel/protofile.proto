@@ -1214,11 +1214,3 @@ string currency = 5;
 int32 category = 6;
 repeated string from_addresses = 7;
 }
-
-message Outertransfer {
-int32 amount = 1;
-int32 fee = 2;
-int32 amount = 3;
-string currency = 4;
-repeated string from_addresses = 5;
-}
