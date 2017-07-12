@@ -11,7 +11,7 @@
 #import "NSString+Size.h"
 #import "UIView+Toast.h"
 #import "YYImageCache.h"
-
+#import "LMCurrencyModel.h"
 @interface LMReceiptViewController () <UITextFieldDelegate>
 
 @property(nonatomic, copy) NSString *userNameAccoutInformation;
@@ -42,12 +42,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
     [self setNavigationRight:@"wallet_share_payment"];
     self.title = LMLocalizedString(@"Wallet Receipt", nil);
     // get usermessage
-    AccountInfo *ainfo = [[LKUserCenter shareCenter] currentLoginUser];
-    self.userNameAccoutInformation = [NSString stringWithFormat:@"bitcoin:%@",ainfo.address];
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = '%@' ",self.currency]] lastObject];
+    self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyModel.currency,currencyModel.masterAddress];
     self.view.backgroundColor = [UIColor blackColor];
     // qr code
     [self addQRcodeImageView];
@@ -199,8 +198,9 @@
     NSDecimalNumber *amount = [NSDecimalNumber decimalNumberWithString:textField.text];
     self.rightBarBtn.enabled = amount.doubleValue > 0;
     if (self.rightBarBtn.enabled) {
-        NSString *address = [self.userNameAccoutInformation stringByReplacingOccurrencesOfString:@"bitcoin:" withString:@""];
-        NSString *moneyAddress = [NSString stringWithFormat:@"bitcoin:%@?amount=%@", address, self.bitTextField.text];
+        NSString * currency = [NSString stringWithFormat:@"%@:",self.currency];
+        NSString *address = [self.userNameAccoutInformation stringByReplacingOccurrencesOfString:currency withString:@""];
+        NSString *moneyAddress = [NSString stringWithFormat:@"%@:%@?amount=%@", self.currency,address, self.bitTextField.text];
         self.payRequestUrl = moneyAddress;
         _imageView.image = [BarCodeTool barCodeImageWithString:moneyAddress withSize:400];
     }

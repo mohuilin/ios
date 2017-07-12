@@ -15,10 +15,7 @@
 #import "WalletItemCell.h"
 #import "ScanAddPage.h"
 #import "LMHandleScanResultManager.h"
-#import "SetGlobalHandler.h"
-#import "NetWorkOperationTool.h"
-
-
+#import "LMWalletCreatManager.h"
 
 
 
@@ -62,6 +59,10 @@
     [self setupSubView];
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
+
+}
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [self creatNewWallet];
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -118,7 +119,7 @@
 #pragma mark action
 - (void)creatNewWallet{
     //Synchronize wallet data and create wallet
-  [SetGlobalHandler creatNewWalletWithController:self complete:^(BOOL isFinish) {
+  [LMWalletCreatManager creatNewWalletWithController:self currency:@"bitcoin" complete:^(BOOL isFinish) {
       if (isFinish) {
           [GCDQueue executeInMainQueue:^{
            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
@@ -196,8 +197,8 @@
         case 0: {
             LMReceiptViewController *bigReVc = [[LMReceiptViewController alloc] init];
             bigReVc.hidesBottomBarWhenPushed = YES;
+            bigReVc.currency = @"bitcnin";
             [self.navigationController pushViewController:bigReVc animated:YES];
-            LMLocalizedString(@"Wallet Transfer", nil);
         }
             break;
         case 1: {

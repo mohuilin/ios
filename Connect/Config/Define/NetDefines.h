@@ -382,6 +382,20 @@
   
    Interface description
   
+   PATH: /wallet/v1/currency
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define CreatCurrencyUrl baseServer "/wallet/" APIVersion "/currency"
+/**
+ Payment settings
+  
+   Interface description
+  
    PATH: /wallet/" APIVersion "/base
    METHOD: POST
    Data Format: Protobuf
@@ -390,7 +404,7 @@
    Protobuf file: IMRequest
  
  */
-#define EncryptionBaseSeedUrl baseServer "/wallet/" APIVersion "/base"
+#define EncryptionBaseSeedUrl baseServer "/wallet/" APIVersion "/creat"
 /**
  Payment settings
   

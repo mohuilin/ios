@@ -32,6 +32,8 @@ typedef NS_ENUM(NSInteger, PassWordTag) {
 
 + (InputPayPassView *)showInputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, BOOL result))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock;
 
++ (InputPayPassView *)inputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete;
+
 - (IBAction)closeView:(id)sender;
 
 @end

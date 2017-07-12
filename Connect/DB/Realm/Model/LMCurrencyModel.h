@@ -7,14 +7,17 @@
 //
 
 #import "LMBaseModel.h"
+#import "LMCurrencyAddress.h"
 
 @interface LMCurrencyModel : LMBaseModel
 
-@property NSString *currency;
-@property int category;
-@property NSString *salt;
-@property NSString *masterAddress;
-@property int status;
-@property long long int blance;
+@property(copy ,nonatomic) NSString *currency;
+@property(assign ,nonatomic) int category;
+@property(copy ,nonatomic) NSString *salt;
+@property(copy ,nonatomic) NSString *masterAddress;
+@property(assign ,nonatomic) int status;
+@property(assign ,nonatomic) long long int blance;
+@property(copy ,nonatomic) NSString *payload;
+@property(strong, nonatomic) RLMArray<LMCurrencyAddress *> <LMCurrencyAddress> *addressListArray;
 
 @end

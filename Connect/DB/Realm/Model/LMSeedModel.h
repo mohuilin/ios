@@ -10,7 +10,6 @@
 
 @interface LMSeedModel : LMBaseModel
 
-@property NSString *walletId;
 @property NSString *encryptSeed;
 @property NSString *salt;
 @property int n;
