@@ -869,6 +869,7 @@
 		D9E857051D48A3D7001C35A2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857041D48A3D7001C35A2 /* CoreLocation.framework */; };
 		D9E857071D48A3E0001C35A2 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857061D48A3E0001C35A2 /* MapKit.framework */; };
 		E39C2CB69BB018BF89D2831C /* libPods-ConnectTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA05F3C052536B3AAD8C0B5 /* libPods-ConnectTests.a */; };
+		F100BC681F161A6400F95A1D /* LMWalletInfoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F100BC671F161A6400F95A1D /* LMWalletInfoManager.m */; };
 		F10F2C701EFCC0D20017C32C /* LMFriendRecommandInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */; };
 		F10F2C731EFCC2A70017C32C /* LMRamMemberInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F10F2C721EFCC2A70017C32C /* LMRamMemberInfo.m */; };
 		F116E9601EA06AA500DCAED4 /* LMMessageExtendManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */; };
@@ -2647,6 +2648,8 @@
 		D9E857061D48A3E0001C35A2 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		D9F86ED21E6CF5E700398C66 /* Connect.IMUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Connect.IMUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB39D5B93F12A5570FB2900B /* Pods-ConnectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConnectTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ConnectTests/Pods-ConnectTests.release.xcconfig"; sourceTree = "<group>"; };
+		F100BC661F161A6400F95A1D /* LMWalletInfoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletInfoManager.h; sourceTree = "<group>"; };
+		F100BC671F161A6400F95A1D /* LMWalletInfoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletInfoManager.m; sourceTree = "<group>"; };
 		F10F2C6E1EFCC0D20017C32C /* LMFriendRecommandInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRecommandInfo.h; sourceTree = "<group>"; };
 		F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRecommandInfo.m; sourceTree = "<group>"; };
 		F10F2C711EFCC2A70017C32C /* LMRamMemberInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamMemberInfo.h; sourceTree = "<group>"; };
@@ -13883,6 +13886,8 @@
 				F1437EA81F14ABE500758F1C /* LMWalletCreatManager.m */,
 				F127E1371F148BAE003E448F /* LMCurrencyManager.h */,
 				F127E1381F148BAE003E448F /* LMCurrencyManager.m */,
+				F100BC661F161A6400F95A1D /* LMWalletInfoManager.h */,
+				F100BC671F161A6400F95A1D /* LMWalletInfoManager.m */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -33316,6 +33321,7 @@
 				D9222FC31E822A3100D67110 /* NSObject+YYAddForKVO.m in Sources */,
 				D92232B21E822BF800D67110 /* KeyHandle.mm in Sources */,
 				19234F491E8113D60022D844 /* LocalAccountLoginPage.m in Sources */,
+				F100BC681F161A6400F95A1D /* LMWalletInfoManager.m in Sources */,
 				1923514C1E8121CB0022D844 /* WXInputView.m in Sources */,
 				D92232C91E822BF900D67110 /* BadgeNumberManager.m in Sources */,
 				192350001E811CB20022D844 /* TopImageBottomItem.m in Sources */,

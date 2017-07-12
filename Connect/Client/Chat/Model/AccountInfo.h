@@ -24,12 +24,6 @@ typedef NS_ENUM(NSInteger,RequestFriendStatus) {
     RequestFriendStatusAdded,
     RequestFriendStatusAdd
 };
-
-typedef NS_ENUM(NSInteger,CategoryType) {
-    CategoryTypeOldUser    = 1,
-    CategoryTypeNewUser    = 2,
-    CategoryTypeImportUser = 3
-};
 typedef void(^AccountOperation)();
 typedef void(^AccountOperationWithUserInfo)(id userInfo);
 
@@ -75,8 +69,8 @@ typedef void(^AccountOperationWithUserInfo)(id userInfo);
 @property (nonatomic ,assign) BOOL isUnRegisterAddress;
 @property (nonatomic ,assign) int recommandStatus; //2:sent 1:unsend
 @property (nonatomic ,assign) BOOL recommend;
-@property (nonatomic, assign) CategoryType categorys;
-@property (nonatomic, copy) NSString *baseSeed;
+
+
 
 
 @end

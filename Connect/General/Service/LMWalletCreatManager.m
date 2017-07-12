@@ -51,28 +51,33 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                 [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                     [realm addOrUpdateObject:saveSeedModel];
                 }];
-                [LKUserCenter shareCenter].currentLoginUser.categorys = 1;
-                switch ([LKUserCenter shareCenter].currentLoginUser.categorys) {
-                    case CurrencyTypePrikey:
-                    {
-                        // creat old page
-                        [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
+                // array count
+                if (/* DISABLES CODE */ (YES)) {
+                    
+                }else {
+                    [LMWalletInfoManager sharedManager].categorys = 1;
+                    switch ([LMWalletInfoManager sharedManager].categorys) {
+                        case CurrencyTypePrikey:
+                        {
+                            // creat old page
+                            [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
+                        }
+                            break;
+                        case CurrencyTypeBaseSeed:
+                        {
+                            // creat new page
+                            [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
+                        }
+                            break;
+                        case CurrencyTypeImport:
+                        {
+                            [LMWalletCreatManager creatImportWallet:nil complete:complete];
+                        }
+                            break;
+                            
+                        default:
+                            break;
                     }
-                        break;
-                    case CurrencyTypeBaseSeed:
-                    {
-                        // creat new page
-                        [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
-                    }
-                        break;
-                    case CurrencyTypeImport:
-                    {
-                        [LMWalletCreatManager creatImportWallet:nil complete:complete];
-                    }
-                        break;
-                        
-                    default:
-                        break;
                 }
             }
         } fail:^(NSError *error) {
@@ -167,7 +172,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
     seedVc.seedSourceType = SeedSouceTypeWallet;
     seedVc.SeedBlock = ^(NSString *randomSeed) {
         if (!GJCFStringIsNull(randomSeed)) {
-            [LKUserCenter shareCenter].currentLoginUser.baseSeed = randomSeed;
+            [LMWalletInfoManager sharedManager].baseSeed = randomSeed;
             NSString __block *firstPass = nil;
             [GCDQueue executeInMainQueue:^{
                 KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];

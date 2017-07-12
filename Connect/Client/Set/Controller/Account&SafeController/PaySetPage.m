@@ -303,10 +303,10 @@
 }
 - (BOOL)decodeEncryPtion:(NSString *)passWord {
     // old user
-    if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeOldUser) {
+    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
         
         
-    }else if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeNewUser) { // new user
+    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser) { // new user
     
         
     }

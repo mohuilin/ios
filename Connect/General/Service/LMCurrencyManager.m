@@ -36,9 +36,9 @@
         [addressList addObject:masterAddess];
         [currencyModel.addressListArray addObjects:addressList];
         
-        if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeOldUser) {
+        if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
             currencyModel.payload = nil;
-        }else if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeNewUser){
+        }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
             currencyModel.payload = nil;
         }
         [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {

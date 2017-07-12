@@ -1188,10 +1188,10 @@
         payPass = @"";
     }
     NSString *needStr = nil;
-    if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeOldUser) {
+    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
         needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
-    }else if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeNewUser){
-        needStr = [LKUserCenter shareCenter].currentLoginUser.baseSeed;
+    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
+        needStr = [LMWalletInfoManager sharedManager].baseSeed;
     }
     NSString *payLoad = [LMBTCWalletHelper encodeWalletSeed:needStr userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
     NSData *saltData = [LMIMHelper createRandom512bits];
@@ -1242,12 +1242,12 @@
     if (payPass == nil) {
         payPass = @"";
     }
-    if ([LKUserCenter shareCenter].currentLoginUser.categorys >= 1) {
+    if ([LMWalletInfoManager sharedManager].categorys >= 1) {
         NSString *needStr = nil;
-        if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeOldUser) {
+        if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
             needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
-        }else if ([LKUserCenter shareCenter].currentLoginUser.categorys == CategoryTypeNewUser){
-            needStr = [LKUserCenter shareCenter].currentLoginUser.baseSeed;
+        }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
+            needStr = [LMWalletInfoManager sharedManager].baseSeed;
         }
         NSString *payLoad = [LMBTCWalletHelper encodeWalletSeed:needStr userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
         NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];

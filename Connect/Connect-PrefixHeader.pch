@@ -12,6 +12,7 @@
 #import "Define.h"
 #import "NetDefines.h"
 #import "SessionManager.h"
+#import "LMWalletInfoManager.h"
 //-------- Internationalization --------
 #import "Language.h"
 
