@@ -11,6 +11,7 @@
 #import "ConnectTool.h"
 #import "NSData+Hash.h"
 #import "UserDBManager.h"
+#import "LMIMHelper.h"
 
 #define SocketIp @"SocketIp"
 
@@ -158,8 +159,8 @@ CREATE_SHARED_MANAGER(LMHistoryCacheManager)
 }
 
 - (NSData *)cacheDBPassSaltData {
-    NSString *randomPubkey = [KeyHandle createPubkeyByPrikey:[KeyHandle creatNewPrivkey]];
-    NSData *salt = [KeyHandle createRandom512bits];
+    NSString *randomPubkey = [LMIMHelper getPubkeyByPrikey:[LMIMHelper creatNewPrivkey]];
+    NSData *salt = [LMIMHelper createRandom512bits];
     DBPassword *dbpass = [[DBPassword alloc] init];
     dbpass.pubKey = randomPubkey;
     dbpass.salt = salt;
@@ -169,8 +170,8 @@ CREATE_SHARED_MANAGER(LMHistoryCacheManager)
     [manager close];
 
 
-//    NSData *ecdh = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:dbpass.pubKey];
-//    return [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdh salt:dbpass.salt];
+//    NSData *ecdh = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:dbpass.pubKey];
+//    return [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdh salt:dbpass.salt];
     return salt;
 }
 
@@ -184,8 +185,8 @@ CREATE_SHARED_MANAGER(LMHistoryCacheManager)
         return [self cacheDBPassSaltData];
     }
     DBPassword *dbpass = [DBPassword parseFromData:data error:nil];
-//    NSData *ecdh = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:dbpass.pubKey];
-//    return [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdh salt:dbpass.salt];
+//    NSData *ecdh = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:dbpass.pubKey];
+//    return [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdh salt:dbpass.salt];
     
     return dbpass.salt;
 }

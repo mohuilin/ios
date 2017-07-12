@@ -10,6 +10,7 @@
 #import "Message.h"
 #import "ConnectTool.h"
 #import "NSData+Hash.h"
+#import "LMIMHelper.h"
 
 #define SOCKET_HEAD_LEN 13
 
@@ -63,7 +64,7 @@ static inline unsigned int bswap_32(unsigned int v) {
     [dataM appendData:extensionData];
 
     //salt
-    NSData *saltData = [[KeyHandle createRandom512bits] subdataWithRange:NSMakeRange(0, 4)];
+    NSData *saltData = [[LMIMHelper createRandom512bits] subdataWithRange:NSMakeRange(0, 4)];
     [dataM appendData:saltData];
 
     // ，1 + 4 + 1 + 4

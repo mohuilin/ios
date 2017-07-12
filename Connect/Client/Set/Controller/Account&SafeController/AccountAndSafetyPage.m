@@ -12,6 +12,7 @@
 #import "ExportEncodePrivkeyPage.h"
 #import "PaySetPage.h"
 #import "ChangeLoginPassPage.h"
+#import "LMIMHelper.h"
 
 
 @interface AccountAndSafetyPage ()
@@ -159,7 +160,7 @@
         [GCDQueue executeInGlobalQueue:^{
 
             weakSelf.navigationController.view.userInteractionEnabled = NO;
-            NSDictionary *decodeDict = [KeyHandle decodePrikeyGetDict:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
+            NSDictionary *decodeDict = [LMIMHelper decodeEncryptPrikey:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
             weakSelf.navigationController.view.userInteractionEnabled = YES;
 
             if (decodeDict) {
@@ -204,7 +205,7 @@
                 return;
             }
             weakSelf.navigationController.view.userInteractionEnabled = NO;
-            NSDictionary *decodeDict = [KeyHandle decodePrikeyGetDict:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
+            NSDictionary *decodeDict = [LMIMHelper decodeEncryptPrikey:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
             weakSelf.navigationController.view.userInteractionEnabled = YES;
 
             if (decodeDict) {

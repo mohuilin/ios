@@ -20,6 +20,7 @@
 #import "LMMessageExtendManager.h"
 #import "LMHistoryCacheManager.h"
 #import "LMMessageAdapter.h"
+#import "LMIMHelper.h"
 
 @interface PeerMessageHandler ()
 
@@ -111,7 +112,7 @@
         chatMessage.messageOwer = msg.pubKey;
         chatMessage.messageType = messageInfo.type;
         chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        chatMessage.senderAddress = [KeyHandle getAddressByPubkey:msg.pubKey];
+        chatMessage.senderAddress = [LMIMHelper getAddressByPubkey:msg.pubKey];
         
         //transfer message
         if (chatMessage.messageType == GJGCChatFriendContentTypeTransfer) {

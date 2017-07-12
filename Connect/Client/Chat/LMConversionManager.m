@@ -14,6 +14,7 @@
 #import "IMService.h"
 #import "ConnectTool.h"
 #import "LMRecentChat.h"
+#import "LMIMHelper.h"
 
 @interface LMConversionManager ()
 
@@ -373,7 +374,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     RecentChatModel *recentModel = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:message.publicKey groupChat:type == GJGCChatFriendTalkTypeGroup lastContentShowType:0 lastContent:lastContentString];
     
     if (recentModel.stranger && recentModel.talkType == GJGCChatFriendTalkTypePrivate) {
-        recentModel.stranger = ![[UserDBManager sharedManager] isFriendByAddress:[KeyHandle getAddressByPubkey:recentModel.identifier]];
+        recentModel.stranger = ![[UserDBManager sharedManager] isFriendByAddress:[LMIMHelper getAddressByPubkey:recentModel.identifier]];
         recentModel.chatUser.stranger = recentModel.stranger;
     }
     [self reloadRecentChatWithRecentChatModel:recentModel needReloadBadge:NO];

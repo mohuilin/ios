@@ -285,7 +285,7 @@
     privateSign.passwordHint = self.loginUser.password_hint;
 
     [MBProgressHUD showMessage:LMLocalizedString(@"Common Loading", nil) toView:self.view];
-    [NetWorkOperationTool POSTWithUrlString:PrivkeySignupUrl postProtoData:privateSign.data pirkey:self.privteKey publickey:[KeyHandle createPubkeyByPrikey:self.privteKey] complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:PrivkeySignupUrl postProtoData:privateSign.data pirkey:self.privteKey publickey:[LMIMHelper getPubkeyByPrikey:self.privteKey] complete:^(id response) {
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD hideHUDForView:self.view];
             HttpResponse *hResponse = (HttpResponse *) response;

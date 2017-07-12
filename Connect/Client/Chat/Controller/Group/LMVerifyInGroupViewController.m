@@ -19,6 +19,7 @@
 #import "GJGCChatGroupViewController.h"
 #import "LMVerifyTableHeadView.h"
 #import "LMRamGroupInfo.h"
+#import "LMIMHelper.h"
 
 typedef NS_ENUM(NSUInteger, CellType) {
     CellTypeOther = 0,
@@ -294,7 +295,7 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
     GroupReviewed *reviewed = [GroupReviewed new];
     reviewed.identifier = self.model.groupIdentifier;
     reviewed.verificationCode = self.model.verificationCode;
-    reviewed.address = [KeyHandle getAddressByPubkey:self.model.publickey];
+    reviewed.address = [LMIMHelper getAddressByPubkey:self.model.publickey];
 
     CreateGroupMessage *createGroup = [CreateGroupMessage new];
     createGroup.identifier = reviewed.identifier;
@@ -309,7 +310,7 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
     NSString *messageID = [ConnectTool generateMessageId];
     MessageData *messageData = [[MessageData alloc] init];
     messageData.cipherData = groupInfoGcmData;
-    messageData.receiverAddress = [KeyHandle getAddressByPubkey:self.model.publickey];
+    messageData.receiverAddress = [LMIMHelper getAddressByPubkey:self.model.publickey];
     messageData.msgId = messageID;
     NSString *sign = [ConnectTool signWithData:messageData.data];
     MessagePost *messagePost = [[MessagePost alloc] init];
@@ -362,7 +363,7 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
     GroupReviewed *reviewed = [GroupReviewed new];
     reviewed.identifier = self.model.groupIdentifier;
     reviewed.verificationCode = self.model.verificationCode;
-    reviewed.address = [KeyHandle getAddressByPubkey:self.model.publickey];
+    reviewed.address = [LMIMHelper getAddressByPubkey:self.model.publickey];
 
     [MBProgressHUD showLoadingMessageToView:self.view];
     [NetWorkOperationTool POSTWithUrlString:GroupRejectUrl postProtoData:reviewed.data complete:^(id response) {

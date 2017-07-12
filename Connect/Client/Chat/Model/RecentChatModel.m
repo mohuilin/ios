@@ -9,6 +9,7 @@
 #import "RecentChatModel.h"
 #import "UserDBManager.h"
 #import "GroupDBManager.h"
+#import "LMIMHelper.h"
 
 @implementation RecentChatModel
 
@@ -56,7 +57,7 @@
         if (self.stranger) {
             _chatUser = [AccountInfo new];
             _chatUser.pub_key = self.identifier;
-            _chatUser.address = [KeyHandle getAddressByPubkey:self.identifier];
+            _chatUser.address = [LMIMHelper getAddressByPubkey:self.identifier];
             _chatUser.username = self.name;
             _chatUser.avatar = self.headUrl;
             _chatUser.stranger = YES;

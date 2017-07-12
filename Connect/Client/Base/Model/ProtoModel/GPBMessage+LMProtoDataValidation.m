@@ -11,6 +11,7 @@
 #import "NSObject+Swing.h"
 #import "XMLReader.h"
 #import "NSObject+MJProperty.h"
+#import "LMIMHelper.h"
 
 #define CASE(str)                       if ([__s__ isEqualToString:(str)])
 #define SWITCH(s)                       for (NSString *__s__ = (s); ; )
@@ -124,7 +125,7 @@ static NSDictionary *pbRuleDict;
         }
         CASE(@"address") {
             NSString *checkString = (NSString *)value;
-            return [KeyHandle checkAddress:checkString];
+            return [LMIMHelper checkAddress:checkString];
             break;
         }
         DEFAULT {

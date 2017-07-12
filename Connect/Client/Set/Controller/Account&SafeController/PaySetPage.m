@@ -9,6 +9,7 @@
 #import "PaySetPage.h"
 #import "SetTransferFeePage.h"
 #import "WJTouchID.h"
+#import "LMIMHelper.h"
 #import "LMSeedModel.h"
 #import "LMWalletCreatManager.h"
 
@@ -220,7 +221,7 @@
         [GCDQueue executeInGlobalQueue:^{
 
             weakSelf.navigationController.view.userInteractionEnabled = NO;
-            NSDictionary *decodeDict = [KeyHandle decodePrikeyGetDict:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
+            NSDictionary *decodeDict = [LMIMHelper decodeEncryptPrikey:loginUser.encryption_pri withPassword:weakSelf.passTextField.text];
             weakSelf.navigationController.view.userInteractionEnabled = YES;
 
             if (decodeDict) {

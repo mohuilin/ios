@@ -8,7 +8,9 @@
 
 #import "StringTool.h"
 #import "NSData+Hash.h"
+#import "LMIMHelper.h"
 #import <objc/message.h>
+
 @implementation StringTool
 
 unsigned char strToChar (char a, char b)
@@ -162,7 +164,7 @@ unsigned char strToChar (char a, char b)
  */
 +(NSString*)getSystemUrl
 {
-    NSData *randomData = [KeyHandle createRandom512bits];
+    NSData *randomData = [LMIMHelper createRandom512bits];
     return [self hexStringFromData:randomData];
 }
 

@@ -862,8 +862,8 @@
         return;
     }
 
-    NSString *randomPublickey = [KeyHandle createPubkeyByPrikey:[KeyHandle creatNewPrivkey]];
-    NSData *ecdhKey = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:randomPublickey];
+    NSString *randomPublickey = [LMIMHelper getPubkeyByPrikey:[LMIMHelper creatNewPrivkey]];
+    NSData *ecdhKey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:randomPublickey];
     GcmData *ecdhKeyGcmData = [ConnectTool createGcmWithData:groupEcdhKey ecdhKey:ecdhKey needEmptySalt:YES];
     
     GroupCollaborative *groupColl = [[GroupCollaborative alloc] init];
@@ -910,8 +910,8 @@
                 NSArray *array = [groupColl.collaborative componentsSeparatedByString:@"/"];
                 if (array.count == 2) {
                     NSString *randomPublickey = [array objectAtIndexCheck:0];
-                    NSData *ecdhKey = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:randomPublickey];
-                    ecdhKey = [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdhKey salt:[ConnectTool get64ZeroData]];
+                    NSData *ecdhKey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey publicKey:randomPublickey];
+                    ecdhKey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhKey salt:[ConnectTool get64ZeroData]];
                     GcmData *ecdhKeyGcmData = [GcmData parseFromData:[StringTool hexStringToData:[array objectAtIndexCheck:1]] error:nil];
                     NSData *ecdh = [ConnectTool decodeGcmDataWithEcdhKey:ecdhKey GcmData:ecdhKeyGcmData haveStructData:NO];
                     NSString *ecdhKeyString = [[NSString alloc] initWithData:ecdh encoding:NSUTF8StringEncoding];
@@ -1193,10 +1193,7 @@
     }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
         needStr = [LMWalletInfoManager sharedManager].baseSeed;
     }
-    NSString *payLoad = [LMBTCWalletHelper encodeWalletSeed:needStr userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
-    NSData *saltData = [LMIMHelper createRandom512bits];
-    NSString *saltString = [[NSString alloc] initWithData:saltData encoding:NSUTF8StringEncoding];
-    int n = 17;
+    NSString *payLoad = [LMBTCWalletHelper encodeValue:needStr password:payPass n:17];
     NSString *checkSum = nil;
     
     [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:nil complete:^(id response) {
@@ -1249,9 +1246,7 @@
         }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
             needStr = [LMWalletInfoManager sharedManager].baseSeed;
         }
-        NSString *payLoad = [LMBTCWalletHelper encodeWalletSeed:needStr userAddress:[LKUserCenter shareCenter].currentLoginUser.address password:payPass];
-        NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
-        int n = 17;
+        NSString *payLoad = [LMBTCWalletHelper encodeValue:needStr password:payPass n:17];
         NSString *checkSum = nil;
         
         [NetWorkOperationTool POSTWithUrlString:UpdateBaseSeedUrl postProtoData:nil complete:^(id response) {
@@ -1266,7 +1261,6 @@
                     PayPinVersion *version = [PayPinVersion parseFromData:data error:nil];
                     LMSeedModel *saveSeedModel = [LMSeedModel new];
                     saveSeedModel.encryptSeed = payLoad;
-                    saveSeedModel.salt = salt;
                     saveSeedModel.n = 17;
                     saveSeedModel.status = 0;
                     saveSeedModel.version = [version.version intValue];;
@@ -1403,7 +1397,7 @@
                         if (GJCFStringIsNull(aad) || GJCFStringIsNull(iv)||GJCFStringIsNull(tag) ||GJCFStringIsNull(ciphertext)) {
                             return;
                         }
-                        NSString *payPass = [KeyHandle xtalkDecodeAES_GCM:[[LKUserCenter shareCenter] getLocalGCDEcodePass] data:ciphertext aad:aad iv:iv tag:tag];
+                        NSString *payPass = [LMIMHelper xtalkDecodeAES_GCM:[[LKUserCenter shareCenter] getLocalGCDEcodePass] data:ciphertext aad:aad iv:iv tag:tag];
                         [[MMAppSetting sharedSetting]  setPayPass:payPass];
                     } else{
                         NSData *data = [StringTool hexStringToData:paySet.payPin];

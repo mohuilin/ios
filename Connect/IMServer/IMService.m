@@ -18,6 +18,7 @@
 #import "LMMessageAdapter.h"
 #import "LMMessageSendManager.h"
 #import "LMMessageTool.h"
+#import "LMIMHelper.h"
 
 @implementation UploadChatCookieModel
 
@@ -185,8 +186,8 @@ static dispatch_once_t onceToken;
 - (void)handleAuthStatus:(Message *)msg {
     IMResponse *response = (IMResponse *) msg.body;
     GcmData *gcmData = response.cipherData;
-    NSData *password = [KeyHandle getECDHkeyWithPrivkey:[LKUserCenter shareCenter].currentLoginUser.prikey publicKey:[[ServerCenter shareCenter] getCurrentServer].data.pub_key];
-    password = [KeyHandle getAes256KeyByECDHKeyAndSalt:password salt:[ConnectTool get64ZeroData]];
+    NSData *password = [LMIMHelper getECDHkeyWithPrivkey:[LKUserCenter shareCenter].currentLoginUser.prikey publicKey:[[ServerCenter shareCenter] getCurrentServer].data.pub_key];
+    password = [LMIMHelper getAes256KeyByECDHKeyAndSalt:password salt:[ConnectTool get64ZeroData]];
     NSData *handAckData = [ConnectTool decodeGcmDataWithEcdhKey:password GcmData:gcmData];
     if (!handAckData || handAckData.length <= 0) {
         return;
@@ -195,8 +196,8 @@ static dispatch_once_t onceToken;
 
     NSData *saltData = [StringTool DataXOR1:self.sendSalt DataXOR2:conn.salt];
 
-    NSData *passwordTem = [KeyHandle getECDHkeyWithPrivkey:self.randomPrivkey publicKey:[StringTool hexStringFromData:conn.pubKey]];
-    NSData *extensionPass = [KeyHandle getAes256KeyByECDHKeyAndSalt:passwordTem salt:saltData];
+    NSData *passwordTem = [LMIMHelper getECDHkeyWithPrivkey:self.randomPrivkey publicKey:[StringTool hexStringFromData:conn.pubKey]];
+    NSData *extensionPass = [LMIMHelper getAes256KeyByECDHKeyAndSalt:passwordTem salt:saltData];
     [ServerCenter shareCenter].extensionPass = extensionPass;
 
     //upload device info
@@ -308,9 +309,9 @@ static dispatch_once_t onceToken;
     
     ChatCacheCookie *chatCookie = [ChatCacheCookie new];
     ChatCookieData *cookieData = [ChatCookieData new];
-    chatCookie.chatPrivkey = [KeyHandle creatNewPrivkey];
-    chatCookie.chatPubKey = [KeyHandle createPubkeyByPrikey:chatCookie.chatPrivkey];
-    chatCookie.salt = [KeyHandle createRandom512bits];
+    chatCookie.chatPrivkey = [LMIMHelper creatNewPrivkey];
+    chatCookie.chatPubKey = [LMIMHelper getPubkeyByPrikey:chatCookie.chatPrivkey];
+    chatCookie.salt = [LMIMHelper createRandom512bits];
     cookieData.expired = [[NSDate date] timeIntervalSince1970] + 24 * 60 * 60;
     
     cookieData.chatPubKey = chatCookie.chatPubKey;
@@ -889,10 +890,10 @@ static dispatch_once_t onceToken;
                     if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
                         ecdhkey = [StringTool hexStringToData:ecdhKey];
                     } else if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypePrivate) {
-                        ecdhkey = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
+                        ecdhkey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
                                                          publicKey:[SessionManager sharedManager].chatSession];
                     }
-                    ecdhkey = [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
+                    ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
                     GcmData *thumbGcmdata = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:uploadThumbData aad:nil];
                     GcmData *iamgeGcmdata = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:uploadImageData aad:nil];
                     
@@ -926,10 +927,10 @@ static dispatch_once_t onceToken;
                     if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
                         ecdhkey = [StringTool hexStringToData:ecdhKey];
                     } else if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypePrivate) {
-                        ecdhkey = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
+                        ecdhkey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
                                                          publicKey:[SessionManager sharedManager].chatSession];
                     }
-                    ecdhkey = [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
+                    ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
                     GcmData *gcmData = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:videoCoverData aad:nil];
                     GcmData *videoGcmData = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:videoData aad:nil];
                     
@@ -954,10 +955,10 @@ static dispatch_once_t onceToken;
                 if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
                     ecdhkey = [StringTool hexStringToData:ecdhKey];
                 } else if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypePrivate) {
-                    ecdhkey = [KeyHandle getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
+                    ecdhkey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
                                                      publicKey:[SessionManager sharedManager].chatSession];
                 }
-                ecdhkey = [KeyHandle getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
+                ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
                 GcmData *gcmData = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:uploadData aad:nil];
                 RichMedia *richMedia = [[RichMedia alloc] init];
                 richMedia.entity = gcmData.data;
@@ -1119,16 +1120,16 @@ static dispatch_once_t onceToken;
     }
 
     NewConnection *conn = [[NewConnection alloc] init];
-    self.sendSalt = [KeyHandle createRandom512bits];
+    self.sendSalt = [LMIMHelper createRandom512bits];
     conn.salt = self.sendSalt;
 
 
-    self.randomPrivkey = [KeyHandle creatNewPrivkey];
-    self.randomPublickey = [KeyHandle createPubkeyByPrikey:self.randomPrivkey];
+    self.randomPrivkey = [LMIMHelper creatNewPrivkey];
+    self.randomPublickey = [LMIMHelper getPubkeyByPrikey:self.randomPrivkey];
     conn.pubKey = [StringTool hexStringToData:self.randomPublickey];
 
-    NSData *password = [KeyHandle getECDHkeyWithPrivkey:[LKUserCenter shareCenter].currentLoginUser.prikey publicKey:[[ServerCenter shareCenter] getCurrentServer].data.pub_key];
-    NSData *extensionPass = [KeyHandle getAes256KeyByECDHKeyAndSalt:password salt:[ConnectTool get64ZeroData]];
+    NSData *password = [LMIMHelper getECDHkeyWithPrivkey:[LKUserCenter shareCenter].currentLoginUser.prikey publicKey:[[ServerCenter shareCenter] getCurrentServer].data.pub_key];
+    NSData *extensionPass = [LMIMHelper getAes256KeyByECDHKeyAndSalt:password salt:[ConnectTool get64ZeroData]];
     IMRequest *request = [ConnectTool createRequestWithEcdhKey:extensionPass data:conn.data aad:[ServerCenter shareCenter].defineAad];
     Message *m = [[Message alloc] init];
     m.typechar = BM_HANDSHAKE_TYPE;

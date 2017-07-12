@@ -7,6 +7,8 @@
 //
 
 #import "LMUnspentCheckTool.h"
+#import "LMBTCWalletHelper.h"
+#import "LMIMHelper.h"
 
 @implementation LMUnspentCheckTool
 
@@ -75,7 +77,7 @@
         return tranction;
     }
     
-    if (GJCFStringIsNull(address) || [KeyHandle checkAddress:address]) {
+    if (GJCFStringIsNull(address) || [LMIMHelper checkAddress:address]) {
         address = [[LKUserCenter shareCenter] currentLoginUser].address;
     }
     
@@ -99,7 +101,7 @@
         }
         [outputs setObject:@([NSDecimalNumber decimalNumberWithString:[temD valueForKey:@"amount"]].floatValue) forKey:[temD valueForKey:@"address"]];
     }
-    NSString *rawTransaction = [KeyHandle createRawTranscationWithTvsArray:tvsArr outputs:outputs];
+    NSString *rawTransaction = [LMBTCWalletHelper createRawTranscationWithTvsArray:tvsArr outputs:outputs];
     tranction.vtsArray = tvsArr;
     tranction.rawTrancation = rawTransaction;
     
@@ -220,7 +222,7 @@
                               decimalNumberByDividingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].floatValue) forKey:[[LKUserCenter shareCenter] currentLoginUser].address];
     }
 
-    NSString *rawTransaction = [KeyHandle createRawTranscationWithTvsArray:tvsArr outputs:outputs];
+    NSString *rawTransaction = [LMBTCWalletHelper createRawTranscationWithTvsArray:tvsArr outputs:outputs];
     rawTrancation.vtsArray = tvsArr;
     rawTrancation.rawTrancation = rawTransaction;
 

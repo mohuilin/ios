@@ -10,6 +10,7 @@
 #import "TextFieldRoundCell.h"
 #import "Protofile.pbobjc.h"
 #import "NetWorkOperationTool.h"
+#import "LMIMHelper.h"
 
 @interface ChangeLoginPassPage ()
 // new pass
@@ -36,7 +37,7 @@
         return;
     }
 
-    NSString *encodePrivkey = [KeyHandle getEncodePrikey:[[LKUserCenter shareCenter] currentLoginUser].prikey withBitAddress:[[LKUserCenter shareCenter] currentLoginUser].address password:self.passNew];
+    NSString *encodePrivkey = [LMIMHelper encodeWithPrikey:[[LKUserCenter shareCenter] currentLoginUser].prikey address:[[LKUserCenter shareCenter] currentLoginUser].address password:self.passNew];
     [[LKUserCenter shareCenter] currentLoginUser].encryption_pri = encodePrivkey;
     ChangeLoginPassword *changePass = [[ChangeLoginPassword alloc] init];
     changePass.encryptionPri = encodePrivkey;

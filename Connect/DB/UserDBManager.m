@@ -12,6 +12,7 @@
 #import "BadgeNumberManager.h"
 #import "LMContactAccountInfo.h"
 #import "LMFriendRequestInfo.h"
+#import "LMIMHelper.h"
 
 static UserDBManager *manager = nil;
 
@@ -80,7 +81,7 @@ static UserDBManager *manager = nil;
     //delete chat setting
     [[RecentChatDBManager sharedManager] deleteRecentChatSettingWithIdentifier:pubKey];
     //delete request
-    [self deleteRequestUserByAddress:[KeyHandle getAddressByPubkey:pubKey]];
+    [self deleteRequestUserByAddress:[LMIMHelper getAddressByPubkey:pubKey]];
     //delete user
     RLMResults <LMContactAccountInfo *> *results = [LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'", pubKey]];
     if (results.firstObject) {
@@ -129,7 +130,7 @@ static UserDBManager *manager = nil;
     if (GJCFStringIsNull(publickey)) {
         return nil;
     }
-    NSString *address = [KeyHandle getAddressByPubkey:publickey];
+    NSString *address = [LMIMHelper getAddressByPubkey:publickey];
     if ([publickey isEqualToString:kSystemIdendifier]) {
         address = @"Connect";
     }

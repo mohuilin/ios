@@ -21,6 +21,7 @@
 #import "LMConversionManager.h"
 #import "SystemTool.h"
 #import "LMRealmDBManager.h"
+#import "LMIMHelper.h"
 
 
 @interface ChatPage () <
@@ -65,7 +66,7 @@
                     showPage = [[GJGCChatSystemNotiViewController alloc] initWithTalkInfo:talk];
                 } else {
                     if (recentModel.stranger) {
-                        BOOL isFriend = [[UserDBManager sharedManager] isFriendByAddress:[KeyHandle getAddressByPubkey:recentModel.identifier]];
+                        BOOL isFriend = [[UserDBManager sharedManager] isFriendByAddress:[LMIMHelper getAddressByPubkey:recentModel.identifier]];
                         if (isFriend) {
                             [[LMConversionManager sharedManager] setRecentStrangerStatusWithIdentifier:recentModel.identifier stranger:NO];
                         }
@@ -386,7 +387,7 @@
         [self.navigationController pushViewController:privateChat animated:YES];
     } else {
         if (recentModel.stranger) {
-            BOOL isFriend = [[UserDBManager sharedManager] isFriendByAddress:[KeyHandle getAddressByPubkey:recentModel.identifier]];
+            BOOL isFriend = [[UserDBManager sharedManager] isFriendByAddress:[LMIMHelper getAddressByPubkey:recentModel.identifier]];
             if (isFriend) {
                 [[LMConversionManager sharedManager] setRecentStrangerStatusWithIdentifier:recentModel.identifier stranger:NO];
             }

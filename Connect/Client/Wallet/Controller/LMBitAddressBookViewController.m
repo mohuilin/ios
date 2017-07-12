@@ -13,6 +13,7 @@
 #import "ScanAddPage.h"
 #import "StringTool.h"
 #import "LMRamAddressBook.h"
+#import "LMIMHelper.h"
 
 @interface LMBitAddressBookViewController () <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
 
@@ -253,7 +254,7 @@ static NSString *address = @"address";
     [self.bitAddressTextField resignFirstResponder];
     self.bitAddressTextField.hidden = YES;
     self.addBtn.hidden = NO;
-    if ([KeyHandle checkAddress:text]) {
+    if ([LMIMHelper checkAddress:text]) {
         [self postAddressToServer:text];
     } else {
         [GCDQueue executeInMainQueue:^{
@@ -341,7 +342,7 @@ static NSString *address = @"address";
     __weak typeof(self) weakSelf = self;
     ScanAddPage *scanPage = [[ScanAddPage alloc] initWithScanComplete:^(NSString *result) {
         result = [result stringByReplacingOccurrencesOfString:@"bitcoin:" withString:@""];
-        if ([KeyHandle checkAddress:result]) {// Adapt the rules of the btc platform
+        if ([LMIMHelper checkAddress:result]) {// Adapt the rules of the btc platform
             [self postAddressToServer:result];
         } else {
             [GCDQueue executeInMainQueue:^{

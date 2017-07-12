@@ -525,6 +525,22 @@ extern "C"{
     return result;
 }
 
+
++ (NSString *)getHash256:(NSString *)string{
+    char hashstr[256];
+    char *data = (char *)[string UTF8String];
+    GetHash256(data, hashstr);
+    return [NSString stringWithUTF8String:hashstr];
+}
+
+//hash256  1000次
+void GetHash256(char *indata, char *outhashstr)
+{
+    uint256 hashMsg = Hash((unsigned char *)indata, (unsigned char *)indata+strlen(indata));
+    string hashstring=HexStr(hashMsg.begin(), hashMsg.end());
+    sprintf(outhashstr,"%s",hashstring.c_str());
+}
+
 #pragma mark - sign math
 
 + (NSString *)signHashWithPrivkey:(NSString *)privkey data:(NSString *)data {
