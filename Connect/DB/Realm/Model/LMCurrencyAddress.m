@@ -9,5 +9,7 @@
 #import "LMCurrencyAddress.h"
 
 @implementation LMCurrencyAddress
-
++ (NSString *)primaryKey {
+ return @"address";
+}
 @end

@@ -44,9 +44,13 @@
     [super viewDidLoad];
     [self setNavigationRight:@"wallet_share_payment"];
     self.title = LMLocalizedString(@"Wallet Receipt", nil);
+    int coin = 0;
+    if ([self.currency isEqualToString:@"bitcoin"]) {
+        coin = 0;
+    }
     // get usermessage
-    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = '%@' ",self.currency]] lastObject];
-    self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyModel.currency,currencyModel.masterAddress];
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",coin]] lastObject];
+    self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",self.currency,currencyModel.masterAddress];
     self.view.backgroundColor = [UIColor blackColor];
     // qr code
     [self addQRcodeImageView];

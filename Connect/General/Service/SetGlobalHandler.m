@@ -1190,12 +1190,11 @@
         payPass = @"";
     }
     NSString *needStr = nil;
-//    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-//        needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
-//    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
-//        needStr = [LMWalletInfoManager sharedManager].baseSeed;
-//    }
-    needStr = [LMWalletInfoManager sharedManager].baseSeed;
+    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
+        needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
+    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
+        needStr = [LMWalletInfoManager sharedManager].baseSeed;
+    }
     RequestWalletInfo *creatWallet = [RequestWalletInfo new];
     NSString *payLoad = [LMBTCWalletHelper encodeValue:needStr password:payPass n:17];
     NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
