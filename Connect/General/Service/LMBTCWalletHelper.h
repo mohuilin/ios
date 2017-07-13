@@ -59,4 +59,12 @@
  */
 + (void)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password complete:(void (^)(NSString *decodeValue, BOOL success))complete;
 
+
+/**
+ * decode encrypt value by password
+ * @param encryptValue
+ * @param password
+ */
++ (BOOL)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password;
+
 @end
