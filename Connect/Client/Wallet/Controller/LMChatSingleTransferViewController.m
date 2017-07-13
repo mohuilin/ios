@@ -7,9 +7,7 @@
 //
 
 #import "LMChatSingleTransferViewController.h"
-#import "WallteNetWorkTool.h"
 #import "TransferInputView.h"
-#import "LMPayCheck.h"
 
 
 @interface LMChatSingleTransferViewController ()
@@ -118,7 +116,7 @@
     }];
 }
 
-- (void)tapBalance{
+- (void)tapBalance {
     if (![[MMAppSetting sharedSetting] canAutoCalculateTransactionFee]) {
         long long maxAmount = self.blance - [[MMAppSetting sharedSetting] getTranferFee];
         self.inputAmountView.defaultAmountString = [[[NSDecimalNumber alloc] initWithLongLong:maxAmount] decimalNumberByDividingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].stringValue;
@@ -131,7 +129,7 @@
     UITapGestureRecognizer *tapBalance = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapBalance)];
     [self.BalanceLabel addGestureRecognizer:tapBalance];
     self.BalanceLabel.userInteractionEnabled = YES;
-    
+
     self.BalanceLabel.textColor = [UIColor colorWithHexString:@"38425F"];
     self.BalanceLabel.font = [UIFont systemFontOfSize:FONT_SIZE(28)];
     self.BalanceLabel.textAlignment = NSTextAlignmentCenter;
@@ -172,28 +170,12 @@
 
 
 - (void)createTranscationWithMoney:(NSDecimalNumber *)money note:(NSString *)note {
-    __weak typeof(&*self) weakSelf = self;
-    // balance
-    if ([PayTool getPOW8Amount:money] > self.blance) {
-       [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Insufficient balance", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-       }];
-        self.comfrimButton.enabled = YES;
-        return;
-    }
+
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
 
-    NSArray *toAddresses = @[@{@"address": self.info.address, @"amount": money.stringValue}];
-    BOOL isDusk = [LMPayCheck dirtyAlertWithAddress:toAddresses withController:self];
-    if (isDusk) {
-        self.comfrimButton.enabled = YES;
-        return;
-    }
-    AccountInfo *ainfo = [[LKUserCenter shareCenter] currentLoginUser];
-    [WallteNetWorkTool unspentV2WithAddress:ainfo.address fee:[[MMAppSetting sharedSetting] getTranferFee] toAddress:toAddresses createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-        [LMPayCheck payCheck:nil withVc:weakSelf withTransferType:TransferTypeChatSingle unSpent:unspent withArray:toAddresses withMoney:money withNote:note withType:0 withRedPackage:nil withError:error];
-
+    [[LMBTCTransferManager sharedManager] transferFromIndexes:nil fee:1000 toAddresses:@[self.info.address] perAddressAmount:money.integerValue tips:note complete:^(id data, NSError *error) {
+        
     }];
 }
 
@@ -255,7 +237,7 @@
                 }];
                 return;
             }
-    [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
+            [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
                 if (result) {
                     [weakSelf successAction:rawModel decimalMoney:amount note:note passView:passView];
                 } else {
@@ -266,7 +248,7 @@
                         }];
                     }
                 }
-            }   forgetPassBlock:^{
+            }                              forgetPassBlock:^{
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD hideHUDForView:weakSelf.view];
                     weakSelf.comfrimButton.enabled = YES;
@@ -282,8 +264,9 @@
         }
     }];
 }
+
 - (void)successAction:(LMRawTransactionModel *)rawModel decimalMoney:(NSDecimalNumber *)amount note:(NSString *)note passView:(InputPayPassView *)passView {
-    __weak typeof(self)weakSelf = self;
+    __weak typeof(self) weakSelf = self;
     [self transferToAddress:self.info.address decimalMoney:amount tips:note complete:^(NSString *hashId, NSError *error) {
         if (error) {
             weakSelf.comfrimButton.enabled = YES;

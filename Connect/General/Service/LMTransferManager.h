@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Wallet.pbobjc.h"
+#import "Protofile.pbobjc.h"
 
 typedef NS_ENUM(NSInteger ,LuckypackageType) {
     LuckypackageTypeInner = 1,
@@ -18,9 +20,9 @@ typedef NS_ENUM(NSInteger ,LuckypackageAmountType) {
     LuckypackageAmountTypeSame
 };
 
-typedef NS_ENUM(NSInteger ,TransferType) {
-    TransferTypeInnerConnect = 0,
-    TransferTypeOuterUrl,
+typedef NS_ENUM(NSInteger ,WalletTransferType) {
+    WalletTransferTypeInnerConnect = 0,
+    WalletTransferTypeOuterUrl,
 };
 
 typedef NS_ENUM(NSInteger ,CurrencyType) {
@@ -29,21 +31,25 @@ typedef NS_ENUM(NSInteger ,CurrencyType) {
     CurrencyTypeETH,
 };
 
-typedef void (^CompleteBlock)(NSError *error);
-
 typedef void (^CompleteWithDataBlock)(id data,NSError *error);
 
 @interface LMTransferManager : NSObject
 
++ (instancetype)sharedManager;
+
 /**
- * transfer from addresses
+ * transger from addresses to addresses
  * @param addresses
  * @param fee
  * @param toAddresses
  * @param perAddressAmount
+ * @param tips
  * @param complete
  */
-- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(void (^)(NSString *vts,NSString *rawTransaction ,NSError *error))complete;
+- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete;
+
+
+- (void)transferWithFee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete;
 
 /**
  * transfer from indexes
@@ -53,7 +59,7 @@ typedef void (^CompleteWithDataBlock)(id data,NSError *error);
  * @param perAddressAmount
  * @param complete
  */
-- (void)transferFromIndexes:(NSArray *)indexes fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(CompleteBlock)complete;
+- (void)transferFromIndexes:(NSArray *)indexes fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete;
 
 /**
  * transaction history

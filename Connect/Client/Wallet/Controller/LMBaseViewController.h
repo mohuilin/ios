@@ -16,6 +16,7 @@
 #import "UIAlertController+Blocks.h"
 #import "LMUnspentCheckTool.h"
 #import "ConnectButton.h"
+#import "LMBTCTransferManager.h"
 
 typedef void (^baseBitRequestInfoComplete)(BOOL complete, BitcoinInfo *info);
 

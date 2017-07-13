@@ -9,8 +9,6 @@
 #import "LMBTCTransferManager.h"
 #import "LMBTCWalletHelper.h"
 #import "InputPayPassView.h"
-#import "Wallet.pbobjc.h"
-#import "Protofile.pbobjc.h"
 #import "NetWorkOperationTool.h"
 #import "ConnectTool.h"
 #import "LMWalletInfoManager.h"
@@ -21,7 +19,7 @@
 
 CREATE_SHARED_MANAGER(LMBTCTransferManager)
 
-- (void)sendLuckyPackageWithTotal:(int)total amount:(NSInteger)amount fee:(NSInteger)fee amountType:(LuckypackageAmountType)amountType luckyPackageType:(LuckypackageType)luckyPackageType tips:(NSString *)tips indexes:(NSArray *)indexes complete:(CompleteBlock)complete{
+- (void)sendLuckyPackageWithTotal:(int)total amount:(NSInteger)amount fee:(NSInteger)fee amountType:(LuckypackageAmountType)amountType luckyPackageType:(LuckypackageType)luckyPackageType tips:(NSString *)tips indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
     NSArray *fromAddresses = [self addressesFromIndexes:indexes];
     LuckyPackageRequest *request = [[LuckyPackageRequest alloc] init];
     request.total = total;
@@ -36,7 +34,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
             }
         } else {
             NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
@@ -48,43 +46,43 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
                     [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
                         if (baseSeed) {
                             /// sign and publish
-                            [self signRawTransactionAndPublishTransactionWithRaw:oriTransaction.rawhex vts:oriTransaction.vts seed:baseSeed indexes:indexes complete:^(NSError *error) {
+                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed indexes:indexes complete:^(id data,NSError *error) {
                                 if (complete) {
-                                    complete(error);
+                                    complete(data,error);
                                 }
                             }];
                         }
                     }];
                 } else {
                     if (complete) {
-                        complete(error);
+                        complete(nil,error);
                     }
                 }
             }
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(error);
+            complete(nil,error);
         }
     }];
 }
 
 
-- (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee indexes:(NSArray *)indexes complete:(CompleteBlock)complete{
+- (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
     NSArray *fromAddresses = [self addressesFromIndexes:indexes];
     
     TransferRequest *request = [[TransferRequest alloc] init];
     request.fromAddressesArray = fromAddresses.mutableCopy;
     request.amount = amount;
     request.fee = fee;
-    request.transferType = TransferTypeOuterUrl;
+    request.transferType = WalletTransferTypeOuterUrl;
     
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
             }
         } else {
             NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
@@ -95,23 +93,23 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
                     [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
                         if (baseSeed) {
                             /// sign and publish
-                            [self signRawTransactionAndPublishTransactionWithRaw:oriTransaction.rawhex vts:oriTransaction.vts seed:baseSeed indexes:indexes complete:^(NSError *signError) {
+                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed indexes:indexes complete:^(id data,NSError *signError) {
                                 if (complete) {
-                                    complete(signError);
+                                    complete(data,signError);
                                 }
                             }];
                         }
                     }];
                 } else {
                     if (complete) {
-                        complete(error);
+                        complete(nil,error);
                     }
                 }
             }
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(error);
+            complete(nil,error);
         }
     }];
 }
@@ -153,7 +151,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     }];
 }
 
-- (void)payCrowdfuningWithTxId:(NSString *)txId indexes:(NSArray *)indexes complete:(CompleteBlock)complete{
+- (void)payCrowdfuningWithTxId:(NSString *)txId indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
     
     NSArray *fromAddresses = [self addressesFromIndexes:indexes];
     
@@ -167,7 +165,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
             }
         } else {
             NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
@@ -178,29 +176,29 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
                     [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
                         if (baseSeed) {
                             /// sign and publish
-                            [self signRawTransactionAndPublishTransactionWithRaw:oriTransaction.rawhex vts:oriTransaction.vts seed:baseSeed indexes:indexes complete:^(NSError *signError) {
+                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed indexes:indexes complete:^(id data,NSError *signError) {
                                 if (complete) {
-                                    complete(signError);
+                                    complete(data,signError);
                                 }
                             }];
                         }
                     }];
                 } else {
                     if (complete) {
-                        complete(error);
+                        complete(nil,error);
                     }
                 }
             }
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(error);
+            complete(nil,error);
         }
     }];
 
 }
 
-- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(NSString *,NSString * ,NSError *))complete{
+- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete{
     
     TransferRequest *request = [[TransferRequest alloc] init];
     request.toAddressesArray = toAddresses.mutableCopy;
@@ -208,14 +206,14 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     request.amount = perAddressAmount;
     request.fee = fee;
     request.tips = tips;
-    request.transferType = TransferTypeInnerConnect;
+    request.transferType = WalletTransferTypeInnerConnect;
     
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(nil,nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
             }
         } else {
             NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
@@ -224,47 +222,64 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
                 OriginalTransaction *oriTransaction = [OriginalTransaction parseFromData:data error:&error];
                 if (!error) {
                     if (complete) {
-                        complete(oriTransaction.vts,oriTransaction.rawhex,nil);
+                        complete(oriTransaction,nil);
                     }
                 } else {
                     if (complete) {
-                        complete(nil,nil,error);
+                        complete(nil,error);
                     }
                 }
             }
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(nil,nil,error);
+            complete(nil,error);
         }
     }];
 }
 
-- (void)transferFromIndexes:(NSArray *)indexes fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(CompleteBlock)complete{
+- (void)transferWithFee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete{
+    TransferRequest *request = [[TransferRequest alloc] init];
+    request.toAddressesArray = toAddresses.mutableCopy;
+    request.amount = perAddressAmount;
+    request.fee = fee;
+    request.tips = tips;
+    request.transferType = WalletTransferTypeInnerConnect;
+}
+
+
+- (void)transferFromIndexes:(NSArray *)indexes fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
     NSArray *fromAddresses = [self addressesFromIndexes:indexes];
-    [self transferFromAddress:fromAddresses fee:fee toAddresses:toAddresses perAddressAmount:perAddressAmount complete:^(NSString *vts,NSString *rawTransaction, NSError *rawTransactionError) {
-        if (!rawTransactionError) {
-            /// password verfiy --- encrypt seed
-            
-            [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
-                if (baseSeed) {
-                    /// sign and publish
-                    [self signRawTransactionAndPublishTransactionWithRaw:rawTransaction vts:vts seed:baseSeed indexes:indexes complete:^(NSError *signError) {
-                        if (complete) {
-                            complete(signError);
-                        }
-                    }];
+    
+    [self transferFromAddress:fromAddresses fee:fee toAddresses:toAddresses perAddressAmount:perAddressAmount tips:tips complete:^(OriginalTransaction *originalTransaction,NSError *rawTransactionError) {
+            if (!rawTransactionError) {
+                /// password verfiy --- encrypt seed
+                [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
+                    if (baseSeed) {
+                        /// sign and publish
+                        [self signRawTransactionAndPublishWihtOriginalTransaction:originalTransaction seed:baseSeed indexes:indexes complete:^ (id data,NSError *signError) {
+                            if (signError) {
+                                if (passView.requestCallBack) {
+                                    passView.requestCallBack(signError);
+                                }
+                            } else {
+                                if (complete) {
+                                    complete(data,nil);
+                                }
+                            }
+                        }];
+                    }
+                }];
+            } else {
+                if (complete) {
+                    complete(nil,rawTransactionError);
                 }
-            }];
-        } else {
-            if (complete) {
-                complete(rawTransactionError);
             }
-        }
     }];
 }
 
-- (void)signRawTransactionAndPublishTransactionWithRaw:(NSString *)rawTransaction vts:(NSString *)vts seed:(NSString *)seed indexes:(NSArray *)indexes complete:(CompleteBlock)complete{
+
+- (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction seed:(NSString *)seed indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
     
     /// query btc salt  -> seed - btcseed
     
@@ -275,26 +290,27 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
             [privkeyArray addObject:inputsPrivkey];
         }
     }
-    NSString *signTransaction = [LMBTCWalletHelper signRawTranscationWithTvs:vts privkeys:privkeyArray rawTranscation:rawTransaction];
+    NSString *signTransaction = [LMBTCWalletHelper signRawTranscationWithTvs:originalTransaction.vts privkeys:privkeyArray rawTranscation:originalTransaction.rawhex];
     
     PublishTransaction *publish = [[PublishTransaction alloc] init];
     publish.signedHex = signTransaction;
+    publish.transactionId = originalTransaction.transactionId;
     
     /// publish
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:publish.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
             }
         } else {
             if (complete) {
-                complete(nil);
+                complete(originalTransaction.transactionId,nil);
             }
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(error);
+            complete(nil,error);
         }
     }];
 }
@@ -337,6 +353,9 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 #pragma mark - private 
 
 - (NSArray *)addressesFromIndexes:(NSArray *)indexes{
+    if (!indexes.count) {
+        return nil;
+    }
     NSMutableArray *addressArray = [NSMutableArray array];
     RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = 0 and index in (%@)",[indexes componentsJoinedByString:@","]]];
     for (LMCurrencyAddress *currencyAddress in result) {

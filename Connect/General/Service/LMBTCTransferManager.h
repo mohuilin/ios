@@ -22,7 +22,7 @@
  * @param indexes
  * @param complete
  */
-- (void)sendLuckyPackageWithTotal:(int)total amount:(NSInteger)amount fee:(NSInteger)fee amountType:(LuckypackageAmountType)amountType luckyPackageType:(LuckypackageType)luckyPackageType tips:(NSString *)tips indexes:(NSArray *)indexes complete:(CompleteBlock)complete;
+- (void)sendLuckyPackageWithTotal:(int)total amount:(NSInteger)amount fee:(NSInteger)fee amountType:(LuckypackageAmountType)amountType luckyPackageType:(LuckypackageType)luckyPackageType tips:(NSString *)tips indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete;
 
 /**
  * send outer transfer
@@ -31,7 +31,7 @@
  * @param indexes
  * @param complete
  */
-- (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee indexes:(NSArray *)indexes complete:(CompleteBlock)complete;
+- (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete;
 
 /**
  * send crowdfuning
@@ -48,17 +48,6 @@
  * @param indexes
  * @param complete
  */
-- (void)payCrowdfuningWithTxId:(NSString *)txId indexes:(NSArray *)indexes complete:(CompleteBlock)complete;
-
-/**
- * transger from addresses to addresses
- * @param addresses
- * @param fee
- * @param toAddresses
- * @param perAddressAmount
- * @param tips
- * @param complete
- */
-- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(NSString *,NSString * ,NSError *))complete;
+- (void)payCrowdfuningWithTxId:(NSString *)txId indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete;
 
 @end
