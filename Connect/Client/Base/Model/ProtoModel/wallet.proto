@@ -109,6 +109,28 @@ message PublishTransaction {
 string signed_hex = 1;
 }
 
+message TransactionFlowingRequest {
+int32 currency = 1;
+}
+
+message TransactionFlowing {
+int32 status =1; // confirm unconfirm
+int32 category = 2; // transfer luckypackage
+int64 amount = 3;
+int64 time = 4;
+string avatar = 5;
+string username = 6;
+string address = 7;
+string txid = 8;
+int32 currency = 9; // btc ltc
+}
+
+message TransactionFlowings {
+int32 currency = 1; // btc ltc
+repeated TransactionFlowing transaction_history = 2;
+}
+
+
 message CreateCoinArgs {
 int32 category =1;
 int32 currency = 2;

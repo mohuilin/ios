@@ -30,6 +30,7 @@ CF_EXTERN_C_BEGIN
 @class Coin;
 @class CoinInfo;
 @class Coins;
+@class TransactionFlowing;
 @class Wallet;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -385,6 +386,75 @@ typedef GPB_ENUM(PublishTransaction_FieldNumber) {
 @interface PublishTransaction : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *signedHex;
+
+@end
+
+#pragma mark - TransactionFlowingRequest
+
+typedef GPB_ENUM(TransactionFlowingRequest_FieldNumber) {
+  TransactionFlowingRequest_FieldNumber_Currency = 1,
+};
+
+@interface TransactionFlowingRequest : GPBMessage
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@end
+
+#pragma mark - TransactionFlowing
+
+typedef GPB_ENUM(TransactionFlowing_FieldNumber) {
+  TransactionFlowing_FieldNumber_Status = 1,
+  TransactionFlowing_FieldNumber_Category = 2,
+  TransactionFlowing_FieldNumber_Amount = 3,
+  TransactionFlowing_FieldNumber_Time = 4,
+  TransactionFlowing_FieldNumber_Avatar = 5,
+  TransactionFlowing_FieldNumber_Username = 6,
+  TransactionFlowing_FieldNumber_Address = 7,
+  TransactionFlowing_FieldNumber_Txid = 8,
+  TransactionFlowing_FieldNumber_Currency = 9,
+};
+
+@interface TransactionFlowing : GPBMessage
+
+/** confirm unconfirm */
+@property(nonatomic, readwrite) int32_t status;
+
+/** transfer luckypackage */
+@property(nonatomic, readwrite) int32_t category;
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@property(nonatomic, readwrite) int64_t time;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *avatar;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *username;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *txid;
+
+/** btc ltc */
+@property(nonatomic, readwrite) int32_t currency;
+
+@end
+
+#pragma mark - TransactionFlowings
+
+typedef GPB_ENUM(TransactionFlowings_FieldNumber) {
+  TransactionFlowings_FieldNumber_Currency = 1,
+  TransactionFlowings_FieldNumber_TransactionHistoryArray = 2,
+};
+
+@interface TransactionFlowings : GPBMessage
+
+/** btc ltc */
+@property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<TransactionFlowing*> *transactionHistoryArray;
+/** The number of items in @c transactionHistoryArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger transactionHistoryArray_Count;
 
 @end
 
