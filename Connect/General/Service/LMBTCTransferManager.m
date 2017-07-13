@@ -9,6 +9,8 @@
 #import "LMBTCTransferManager.h"
 #import "LMBTCWalletHelper.h"
 #import "InputPayPassView.h"
+#import "Wallet.pbobjc.h"
+#import "NetWorkOperationTool.h"
 
 @implementation LMBTCTransferManager
 
@@ -16,9 +18,27 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 
 - (void)sendLuckyPackageWithTotal:(int)total amount:(NSInteger)amount fee:(NSInteger)fee amountType:(LuckypackageAmountType)amountType luckyPackageType:(LuckypackageType)luckyPackageType indexes:(NSArray *)indexes complete:(CompleteBlock)complete{
     NSArray *fromAddresses = [self addressesFromIndexes:indexes];
-    
+    LuckyPackageRequest *request = [[LuckyPackageRequest alloc] init];
+    request.total = total;
+    request.amount = amount;
+    request.fee = fee;
+    request.allotType = amountType;
+    request.packageType = luckyPackageType;
+    request.addressesArray = fromAddresses;
     /// send luckypackage
-    
+    [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            
+        }
+        NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+        if (data) {
+            NSError *error = nil;
+            OriginalTransaction *oriTransaction = [OriginalTransaction parseFromData:data error:&error];
+        }
+    } fail:^(NSError *error) {
+        
+    }];
     /// input password
     
     /// sign and publish

@@ -65,3 +65,17 @@ Wallet wallet = 1;
 int32 status = 2;
 Coins Coins = 3;
 }
+
+message LuckyPackageRequest {
+int32 total = 1;
+int64 amount = 2;
+int64 fee = 3;
+int32 allot_type = 4;
+int32 package_type = 5;
+repeated string addresses = 6;
+}
+
+message OriginalTransaction {
+string rawhex = 1;
+string vts = 2;
+}

@@ -740,6 +740,158 @@ typedef struct RespSyncWallet__storage_ {
 
 @end
 
+#pragma mark - LuckyPackageRequest
+
+@implementation LuckyPackageRequest
+
+@dynamic total;
+@dynamic amount;
+@dynamic fee;
+@dynamic allotType;
+@dynamic packageType;
+@dynamic addressesArray, addressesArray_Count;
+
+typedef struct LuckyPackageRequest__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t total;
+  int32_t allotType;
+  int32_t packageType;
+  NSMutableArray *addressesArray;
+  int64_t amount;
+  int64_t fee;
+} LuckyPackageRequest__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "total",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_Total,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, total),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_Amount,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "fee",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_Fee,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, fee),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "allotType",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_AllotType,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, allotType),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "packageType",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_PackageType,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, packageType),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "addressesArray",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_AddressesArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, addressesArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[LuckyPackageRequest class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(LuckyPackageRequest__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - OriginalTransaction
+
+@implementation OriginalTransaction
+
+@dynamic rawhex;
+@dynamic vts;
+
+typedef struct OriginalTransaction__storage_ {
+  uint32_t _has_storage_[1];
+  NSString *rawhex;
+  NSString *vts;
+} OriginalTransaction__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "rawhex",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_Rawhex,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, rawhex),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "vts",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_Vts,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, vts),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[OriginalTransaction class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(OriginalTransaction__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
 
 #pragma clang diagnostic pop
 

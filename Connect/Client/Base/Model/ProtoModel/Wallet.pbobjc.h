@@ -251,6 +251,50 @@ typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
 
 @end
 
+#pragma mark - LuckyPackageRequest
+
+typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
+  LuckyPackageRequest_FieldNumber_Total = 1,
+  LuckyPackageRequest_FieldNumber_Amount = 2,
+  LuckyPackageRequest_FieldNumber_Fee = 3,
+  LuckyPackageRequest_FieldNumber_AllotType = 4,
+  LuckyPackageRequest_FieldNumber_PackageType = 5,
+  LuckyPackageRequest_FieldNumber_AddressesArray = 6,
+};
+
+@interface LuckyPackageRequest : GPBMessage
+
+@property(nonatomic, readwrite) int32_t total;
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@property(nonatomic, readwrite) int64_t fee;
+
+@property(nonatomic, readwrite) int32_t allotType;
+
+@property(nonatomic, readwrite) int32_t packageType;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *addressesArray;
+/** The number of items in @c addressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger addressesArray_Count;
+
+@end
+
+#pragma mark - OriginalTransaction
+
+typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
+  OriginalTransaction_FieldNumber_Rawhex = 1,
+  OriginalTransaction_FieldNumber_Vts = 2,
+};
+
+@interface OriginalTransaction : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *rawhex;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *vts;
+
+@end
+
 NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END
