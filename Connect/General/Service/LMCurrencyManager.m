@@ -35,6 +35,8 @@
                 complete(NO);
             }
         }else {
+            
+            
             // save db
             LMCurrencyModel *currencyModel = [LMCurrencyModel new];
             currencyModel.currency = currency;
@@ -48,7 +50,7 @@
             [currencyModel.addressListArray addObjects:addressList];
             
             if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-                currencyModel.payload = nil;
+                currencyModel.payload = [LMWalletInfoManager sharedManager].encryPtionSeed;
             }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
                 currencyModel.payload = nil;
             }
