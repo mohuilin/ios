@@ -52,46 +52,65 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                 [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                     [realm addOrUpdateObject:saveSeedModel];
                 }];
-                if (syncWallet.coins.coinsArray_Count > 0) {
-                    for (Coin *coin in syncWallet.coins.coinsArray) {
+                BOOL flag = YES;
+                if (syncWallet.coinsArray_Count > 0) {
+                    for (CoinsDetail *coinDetail in syncWallet.coinsArray) {
                         LMCurrencyModel *currenncyMoedl = [LMCurrencyModel new];
-                        currenncyMoedl.currency = coin.currency;
-                        currenncyMoedl.category = coin.category;
-                        currenncyMoedl.salt = coin.salt;
-                        currenncyMoedl.masterAddress = nil;
-                        currenncyMoedl.status = coin.status;
-                        currenncyMoedl.blance = coin.balance;
-                        currenncyMoedl.payload = coin.payload;
-                        currenncyMoedl.addressListArray = nil;
+                        currenncyMoedl.currency = coinDetail.coin.currency;
+                        currenncyMoedl.category = coinDetail.coin.category;
+                        currenncyMoedl.salt = coinDetail.coin.salt;
+                        currenncyMoedl.status = coinDetail.coin.status;
+                        currenncyMoedl.blance = coinDetail.coin.balance;
+                        currenncyMoedl.payload = coinDetail.coin.payload;
+                        NSMutableArray *addressList = [NSMutableArray array];
+                        for (CoinInfo *info in coinDetail.coinInfosArray) {
+                            flag = NO;
+                            if (info.index == 0) {
+                                currenncyMoedl.masterAddress = info.address;
+                            }
+                            LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
+                            addressModel.label = info.label;
+                            addressModel.address = info.address;
+                            addressModel.currency = coinDetail.coin.currency;
+                            addressModel.index = info.index;
+                            addressModel.balance = info.balance;
+                            addressModel.status = info.status;
+                            [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                                [realm addOrUpdateObject:addressModel];
+                            }];
+                            [addressList addObject:addressModel];
+                        }
+                        [currenncyMoedl.addressListArray addObjects:addressList];
                         [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                             [realm addOrUpdateObject:currenncyMoedl];
                         }];
                     }
                 }
-                [LMWalletInfoManager sharedManager].categorys = syncWallet.status;
-                switch ([LMWalletInfoManager sharedManager].categorys) {
-                    case CurrencyTypePrikey:
-                    {
-                        // creat old page
-                        [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
+                if (flag) {
+                    [LMWalletInfoManager sharedManager].categorys = syncWallet.status;
+                    switch ([LMWalletInfoManager sharedManager].categorys) {
+                        case CurrencyTypePrikey:
+                        {
+                            // creat old page
+                            [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
+                        }
+                            break;
+                        case CurrencyTypeBaseSeed:
+                        {
+                            // creat new page
+                            [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
+                        }
+                            break;
+                        case CurrencyTypeImport:
+                        {
+                            [LMWalletCreatManager creatImportWallet:nil complete:complete];
+                        }
+                            break;
+                            
+                        default:
+                            break;
                     }
-                        break;
-                    case CurrencyTypeBaseSeed:
-                    {
-                        // creat new page
-                        [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
-                    }
-                        break;
-                    case CurrencyTypeImport:
-                    {
-                        [LMWalletCreatManager creatImportWallet:nil complete:complete];
-                    }
-                        break;
-                        
-                    default:
-                        break;
                 }
-                
             }
         } fail:^(NSError *error) {
             if (complete) {

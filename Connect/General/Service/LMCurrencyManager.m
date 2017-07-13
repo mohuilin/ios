@@ -73,16 +73,42 @@
  *
  */
 + (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray *coinList))complete{
-
-
+    
+    [NetWorkOperationTool POSTWithUrlString:GetCurrencyList postProtoData:nil complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            
+            
+        }else {
+            
+            // save db
+      }
+    } fail:^(NSError *error) {
+        
+    }];
 }
 
 /**
  *  set currency messageInfo
  *
  */
-+ (void)setCurrencyStatus:(int)status complete:(void (^)(BOOL result))complte{
-
++ (void)setCurrencyStatus:(int)status currency:(int)currency complete:(void (^)(BOOL result))complte{
+    
+    Coin *coin = [Coin new];
+    coin.currency = currency;
+    coin.status = status;
+    [NetWorkOperationTool POSTWithUrlString:SetCurrencyInfo postProtoData:coin.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            
+            
+        }else {
+            
+            // save db
+        }
+    } fail:^(NSError *error) {
+        
+    }];
 
 }
 
@@ -90,8 +116,27 @@
  *  add currency address
  *
  */
-+ (void)addCurrencyAddressWithCurrency:(NSString *)currency lable:(NSString *)lable index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete{
-
++ (void)addCurrencyAddressWithCurrency:(int)currency label:(NSString *)label index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete{
+    
+    
+    RequestCreateCoinInfo *coin = [RequestCreateCoinInfo new];
+    coin.currency = currency;
+    coin.label = label;
+    coin.index = index;
+    coin.address = address;
+    coin.status = 0;
+    [NetWorkOperationTool POSTWithUrlString:AddCurrencyAddress postProtoData:coin.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            
+            
+        }else {
+            
+            // save db
+        }
+    } fail:^(NSError *error) {
+        
+    }];
 
 }
 
@@ -99,9 +144,21 @@
  *  get currency addresss list
  *
  */
-+ (void)getCurrencyAddressListWithCurrency:(NSString *)currency complete:(void (^)(BOOL result,NSArray *addressList))complte {
-
-
++ (void)getCurrencyAddressListWithCurrency:(int)currency complete:(void (^)(BOOL result,NSArray *addressList)) complte {
+    Coin *coin = [Coin new];
+    coin.currency = currency;
+    [NetWorkOperationTool POSTWithUrlString:AddCurrencyAddress postProtoData:coin.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            
+            
+        }else {
+            
+            // save db
+        }
+    } fail:^(NSError *error) {
+        
+    }];
 }
 
 /**
@@ -109,6 +166,21 @@
  *
  */
 + (void)setCurrencyAddressMessageWithAddress:(NSString *)address lable:(NSString *)lable status:(int)status complete:(void (^)(BOOL result))complete {
-
+    CoinInfo *coinInfo = [CoinInfo new];
+    coinInfo.address = address;
+    coinInfo.label = lable;
+    coinInfo.status = status;
+    [NetWorkOperationTool POSTWithUrlString:SetCurrencyAddressInfo postProtoData:coinInfo.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            
+            
+        }else {
+            
+            // save db
+        }
+    } fail:^(NSError *error) {
+        
+    }];
 }
 @end

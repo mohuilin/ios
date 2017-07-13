@@ -29,7 +29,7 @@ CF_EXTERN_C_BEGIN
 
 @class Coin;
 @class CoinInfo;
-@class Coins;
+@class CoinsDetail;
 @class Wallet;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -234,7 +234,7 @@ typedef GPB_ENUM(CoinInfo_FieldNumber) {
 typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
   RespSyncWallet_FieldNumber_Wallet = 1,
   RespSyncWallet_FieldNumber_Status = 2,
-  RespSyncWallet_FieldNumber_Coins = 3,
+  RespSyncWallet_FieldNumber_CoinsArray = 3,
 };
 
 @interface RespSyncWallet : GPBMessage
@@ -245,9 +245,9 @@ typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
 
 @property(nonatomic, readwrite) int32_t status;
 
-@property(nonatomic, readwrite, strong, null_resettable) Coins *coins;
-/** Test to see if @c coins has been set. */
-@property(nonatomic, readwrite) BOOL hasCoins;
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<CoinsDetail*> *coinsArray;
+/** The number of items in @c coinsArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger coinsArray_Count;
 
 @end
 
@@ -273,6 +273,33 @@ typedef GPB_ENUM(CreateCoinArgs_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *masterAddress;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
+
+@end
+
+#pragma mark - RequestCreateCoinInfo
+
+typedef GPB_ENUM(RequestCreateCoinInfo_FieldNumber) {
+  RequestCreateCoinInfo_FieldNumber_Index = 1,
+  RequestCreateCoinInfo_FieldNumber_Status = 2,
+  RequestCreateCoinInfo_FieldNumber_Address = 3,
+  RequestCreateCoinInfo_FieldNumber_Label = 4,
+  RequestCreateCoinInfo_FieldNumber_Currency = 5,
+  RequestCreateCoinInfo_FieldNumber_WId = 6,
+};
+
+@interface RequestCreateCoinInfo : GPBMessage
+
+@property(nonatomic, readwrite) int32_t index;
+
+@property(nonatomic, readwrite) int32_t status;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *label;
+
+@property(nonatomic, readwrite) int32_t currency;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
 

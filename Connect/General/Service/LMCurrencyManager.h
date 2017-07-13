@@ -25,19 +25,19 @@
  *  set currency messageInfo
  *
  */
-+ (void)setCurrencyStatus:(int)status complete:(void (^)(BOOL result))complte;
++ (void)setCurrencyStatus:(int)status currency:(int)currency complete:(void (^)(BOOL result))complte;
 
 /**
  *  add currency address
  *
  */
-+ (void)addCurrencyAddressWithCurrency:(NSString *)currency lable:(NSString *)lable index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete;
++ (void)addCurrencyAddressWithCurrency:(int)currency label:(NSString *)label index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete;
 
 /**
  *  get currency addresss list
  *
  */
-+ (void)getCurrencyAddressListWithCurrency:(NSString *)currency complete:(void (^)(BOOL result,NSArray *addressList)) complte;
++ (void)getCurrencyAddressListWithCurrency:(int)currency complete:(void (^)(BOOL result,NSArray *addressList)) complte;
 
 /**
  * set currency address message
