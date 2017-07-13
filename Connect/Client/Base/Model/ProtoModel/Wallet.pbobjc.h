@@ -367,6 +367,7 @@ typedef GPB_ENUM(PayCrowdRequest_FieldNumber) {
 typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
   OriginalTransaction_FieldNumber_Rawhex = 1,
   OriginalTransaction_FieldNumber_Vts = 2,
+  OriginalTransaction_FieldNumber_TransactionId = 3,
 };
 
 @interface OriginalTransaction : GPBMessage
@@ -375,17 +376,22 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *vts;
 
+@property(nonatomic, readwrite, copy, null_resettable) NSString *transactionId;
+
 @end
 
 #pragma mark - PublishTransaction
 
 typedef GPB_ENUM(PublishTransaction_FieldNumber) {
   PublishTransaction_FieldNumber_SignedHex = 1,
+  PublishTransaction_FieldNumber_TransactionId = 2,
 };
 
 @interface PublishTransaction : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *signedHex;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *transactionId;
 
 @end
 

@@ -103,10 +103,12 @@ repeated string addresses = 2;
 message OriginalTransaction {
 string rawhex = 1;
 string vts = 2;
+string transaction_id = 3;
 }
 
 message PublishTransaction {
 string signed_hex = 1;
+string transaction_id = 2;
 }
 
 message TransactionFlowingRequest {
