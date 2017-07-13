@@ -29,8 +29,13 @@ CF_EXTERN_C_BEGIN
 
 @class Coin;
 @class CoinInfo;
+
+<<<<<<< HEAD
 @class CoinsDetail;
+=======
+@class Coins;
 @class TransactionFlowing;
+>>>>>>> 37ef40cb7d526f3e7320fbd53e0ed84b8da7ddcd
 @class Wallet;
 
 NS_ASSUME_NONNULL_BEGIN

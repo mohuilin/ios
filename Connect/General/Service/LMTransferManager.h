@@ -20,10 +20,34 @@ typedef NS_ENUM(NSInteger ,LuckypackageAmountType) {
 
 typedef void (^CompleteBlock)(NSError *error);
 
+typedef void (^CompleteWithDataBlock)(id data,NSError *error);
+
 @interface LMTransferManager : NSObject
 
-- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(void (^)(NSArray *vtsArray,NSString *rawTransaction ,NSError *error))complete;
+/**
+ * transfer from addresses
+ * @param addresses
+ * @param fee
+ * @param toAddresses
+ * @param perAddressAmount
+ * @param complete
+ */
+- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(void (^)(NSString *vts,NSString *rawTransaction ,NSError *error))complete;
 
+/**
+ * transfer from indexes
+ * @param indexes
+ * @param fee
+ * @param toAddresses
+ * @param perAddressAmount
+ * @param complete
+ */
 - (void)transferFromIndexes:(NSArray *)indexes fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(CompleteBlock)complete;
+
+/**
+ * transaction history
+ * @param complete
+ */
+- (void)transactionFlowingComplete:(CompleteWithDataBlock)complete;
 
 @end

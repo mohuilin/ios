@@ -11,32 +11,52 @@
 @interface LMBTCWalletHelper : NSObject
 
 /**
- Signature trading
-   *
-   * @param tvsArray
-   * @param privkeys
-   * @param rawTranscation
-   *
-   * @return
+ * Signature trading
+ * @param tvs
+ * @param privkeys
+ * @param rawTranscation
+ * @return
  */
-+ (NSString *)signRawTranscationWithTvsArray:(NSArray *)tvsArray privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation;
++ (NSString *)signRawTranscationWithTvs:(NSString *)tvs privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation;
 
 /**
  * Create the original transaction
-   *
-   * @param tvsArray
-   * @param
- *
- *  @return
+ * @param tvsArray
+ * @param
+ * @return
  */
 + (NSString *)createRawTranscationWithTvsArray:(NSArray *)tvsArray outputs:(NSDictionary *)outputs;
 
+/**
+ * address by privkey
+ * @param prvkey
+ * @return
+ */
 + (NSString *)getAddressByPrivKey:(NSString *)prvkey;
 
+/**
+ * get privkey from seed and index
+ * @param seed
+ * @param index
+ * @return
+ */
 + (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index;
 
-+(NSString *)encodeValue:(NSString *)value password:(NSString *)password n:(int)n;
+/**
+ * encode value by password  eg:privkey / seed, n default value is 17
+ * @param value
+ * @param password
+ * @param n
+ * @return
+ */
++ (NSString *)encodeValue:(NSString *)value password:(NSString *)password n:(int)n;
 
-+(NSString *)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password;
+/**
+ * decode encrypt value by password
+ * @param encryptValue
+ * @param password
+ * @param complete
+ */
++ (void)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password complete:(void (^)(NSString *decodeValue, BOOL success))complete;
 
 @end
