@@ -305,20 +305,25 @@
 - (BOOL)decodeEncryPtion:(NSString *)passWord {
     // old user
     if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-       NSString *priKey = [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord];
-        if ([priKey isEqualToString:[LKUserCenter shareCenter].currentLoginUser.prikey]) {
-            return YES;
-        }else {
-            return NO;
-        }
-        
+        [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord complete:^(NSString *decodeValue, BOOL success) {
+            [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord complete:^(NSString *decodeValue, BOOL success) {
+                if (success) {
+                    if ([decodeValue isEqualToString:[LKUserCenter shareCenter].currentLoginUser.prikey]) {
+                        
+                    }else {
+                        
+                    }
+                }
+            }];
+        }];
     }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser) { // new user
-        NSString *baseSeed = [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord];
-        if ([baseSeed isEqualToString:[LMWalletInfoManager sharedManager].baseSeed]) {
-            return YES;
-        }else {
-            return NO;
-        }
+        [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord complete:^(NSString *decodeValue, BOOL success) {
+            if ([decodeValue isEqualToString:[LMWalletInfoManager sharedManager].baseSeed]) {
+                
+            }else {
+                
+            }
+        }];
     }
     return YES;
 }

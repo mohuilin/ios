@@ -11,6 +11,8 @@
 #import "JxbLoadingView.h"
 #import "LocalAuthentication/LAContext.h"
 #import "WJTouchID.h"
+#import "LMBTCWalletHelper.h"
+#import "LMWalletInfoManager.h"
 
 @interface InputPayPassView () <PassInputFieldViewDelegate, WJTouchIDDelegate>
 @property(strong, nonatomic) UIView *contentView;
@@ -154,15 +156,11 @@
 }
 + (InputPayPassView *)inputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete{
     InputPayPassView *passView = [[InputPayPassView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    if ([[MMAppSetting sharedSetting] getPayPass]) {
-        passView.style = InputPayPassViewVerfyPass;
-        __weak __typeof(&*passView) weakSelf = passView;
-        passView.requestCallBack = ^(NSError *error) {
-            [weakSelf showResultStatusWithError:error];
-        };
-    } else {
-        passView.style = InputPayPassViewSetPass;
-    }
+    passView.style = InputPayPassViewVerfyPass;
+    __weak __typeof(&*passView) weakSelf = passView;
+    passView.requestCallBack = ^(NSError *error) {
+        [weakSelf showResultStatusWithError:error];
+    };
     passView.payCompleteBlock = complete;
     passView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
@@ -600,52 +598,37 @@
             self.isPassTag = NO;
             self.payPassView.hidden = NO;
             [self endEditing:YES];
-            [SetGlobalHandler syncPaypinversionWithComplete:^(NSString *password, NSError *error) {
-                if (error) {
-                    self.titleLabel.text = LMLocalizedString(@"Network Server error", nil);
-                    _walletLayer.speed = 0;
-                    [_walletLayer removeFromSuperlayer];
-                    self.statusLabel.hidden = NO;
-                    self.statusLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Error code Domain Pelese try later", nil), (int) error.code, [LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:@""]];
+            
+            //verfiy pass
+            [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
+                if (success) {
                     [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
                         make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
                     }];
+                    self.passErrorContentView.hidden = YES;
+                    self.animationContentView.hidden = NO;
+                    [UIView animateWithDuration:0.2 animations:^{
+                        [self.contentView layoutIfNeeded];
+                    }];
+                    
+                    self.statusLabel.text = LMLocalizedString(@"Wallet Verifying", nil);
+                    [self.animationView startLoading];
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        if (self.payCompleteBlock) {
+                            self.payCompleteBlock(self,nil,decodeValue);
+                        }
+                    });
+                } else {
+                    [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
+                    }];
+                    self.passErrorContentView.hidden = NO;
+                    self.animationContentView.hidden = YES;
+                    self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
                     [UIView animateWithDuration:0.3 animations:^{
                         [self.contentView layoutIfNeeded];
                     }];
-                    self.passErrorContentView.hidden = YES;
-                    self.animationContentView.hidden = NO;
-                } else {
-                    if ([password isEqualToString:passWord.textStore]) {
-                        [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
-                            make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
-                        }];
-                        self.passErrorContentView.hidden = YES;
-                        self.animationContentView.hidden = NO;
-                        [UIView animateWithDuration:0.2 animations:^{
-                            [self.contentView layoutIfNeeded];
-                        }];
-
-                        self.statusLabel.text = LMLocalizedString(@"Wallet Verifying", nil);
-                        [self.animationView startLoading];
-                        __weak typeof(self) weakSelf = self;
-                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                            if (weakSelf.completeBlock) {
-                                weakSelf.completeBlock(weakSelf, nil, YES);
-                            }
-                        });
-                    } else {
-                        [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
-                            make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
-                        }];
-                        self.passErrorContentView.hidden = NO;
-                        self.animationContentView.hidden = YES;
-                        self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
-                        [UIView animateWithDuration:0.3 animations:^{
-                            [self.contentView layoutIfNeeded];
-                        }];
-                        [self.animationView finishFailure:nil];
-                    }
+                    [self.animationView finishFailure:nil];
                 }
             }];
         }

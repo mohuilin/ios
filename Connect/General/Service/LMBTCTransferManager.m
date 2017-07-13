@@ -298,20 +298,49 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     }];
 }
 
+- (void)transactionFlowingComplete:(CompleteWithDataBlock)complete{
+    TransactionFlowingRequest *request = [TransactionFlowingRequest new];
+    request.currency = 0;
+    /// publish
+    [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+            }
+        } else {
+            NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                NSError *error = nil;
+                TransactionFlowings *transactionFlowing = [TransactionFlowings parseFromData:data error:&error];
+                if (!error) {
+                    if (complete) {
+                        complete(transactionFlowing,nil);
+                    }
+                } else {
+                    if (complete) {
+                        complete(nil,error);
+                    }
+                }
+            }
+        }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(nil,error);
+        }
+    }];
+}
+
 #pragma mark - private 
 
 - (NSArray *)addressesFromIndexes:(NSArray *)indexes{
-
     NSMutableArray *addressArray = [NSMutableArray array];
-    NSString *seed = [LMWalletInfoManager sharedManager].baseSeed;
-    for (NSNumber *index in indexes) {
-        NSString *inputsPrivkey = [LMBTCWalletHelper getPrivkeyBySeed:seed index:index.intValue];
-        if (inputsPrivkey) {
-            NSString *inputsAddress = [LMBTCWalletHelper getAddressByPrivKey:inputsPrivkey];
-            [addressArray addObject:inputsAddress];
+    RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = 0 and index in (%@)",[indexes componentsJoinedByString:@","]]];
+    for (LMCurrencyAddress *currencyAddress in result) {
+        if (currencyAddress.address) {
+            [addressArray addObject:currencyAddress.address];
         }
     }
-    
     return addressArray;
 }
 

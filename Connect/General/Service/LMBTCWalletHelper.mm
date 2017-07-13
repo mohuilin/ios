@@ -89,13 +89,12 @@ extern "C" {
     char *signedtrans_ret;
     char inparam[1024 * 100];
 
-    NSArray *privkeyArr_ = privkeys;//
     // Signature parameters json data
     NSMutableString *signParamStr = [NSMutableString stringWithFormat:@"%s", rawtrans_str];
     [signParamStr appendString:@" "];
     [signParamStr appendString:tvsJson];
     [signParamStr appendString:@" "];
-    NSString *privKeyJson = [self ObjectTojsonString:privkeyArr_];
+    NSString *privKeyJson = [self ObjectTojsonString:privkeys];
     [signParamStr appendString:privKeyJson];
     const char *inparam2 = [signParamStr UTF8String];//sign data
     strcpy(inparam, inparam2);
@@ -129,21 +128,28 @@ extern "C" {
 }
 
 +(NSString *)encodeValue:(NSString *)value password:(NSString *)password n:(int)n{
+    if (n <= 0) {
+        n = 17; //default
+    }
     char *v = (char *)[value UTF8String];
     char *pass = (char *)[password UTF8String];
     std::string retString=connectWalletEncrypt(v,pass,n, 1);
     return [NSString stringWithFormat:@"%s",retString.c_str()];
 }
 
-+(NSString *)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password{
++(void)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password complete:(void (^)(NSString *decodeValue,BOOL success))complete{
     char value[256];
     char *ev = (char *)[encryptValue UTF8String];
     char *pass = (char *)[password UTF8String];
     int result = connectWalletDecrypt(ev,pass,1, value);
     if (result == 1) {
-        return [NSString stringWithUTF8String:value];
+        if (complete) {
+            complete([NSString stringWithUTF8String:value],YES);
+        }
     } else {
-        return @"";
+        if (complete) {
+            complete(nil,NO);
+        }
     }
 }
 

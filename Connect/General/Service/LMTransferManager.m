@@ -18,4 +18,8 @@
     
 }
 
+- (void)transactionFlowingComplete:(CompleteWithDataBlock)complete{
+    
+}
+
 @end
