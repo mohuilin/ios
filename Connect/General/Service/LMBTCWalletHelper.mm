@@ -83,24 +83,7 @@ extern "C" {
     return rawTranscation;
 }
 
-+ (NSString *)signRawTranscationWithTvsArray:(NSArray *)tvsArray privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation {
-
-    for (NSDictionary *temD in tvsArray) {
-        if (![temD isKindOfClass:[NSDictionary class]]) {
-            return nil;
-        }
-        if (![temD.allKeys containsObject:@"vout"]) {
-            return nil;
-        }
-        if (![temD.allKeys containsObject:@"txid"]) {
-            return nil;
-        }
-        if (![temD.allKeys containsObject:@"scriptPubKey"]) {
-            return nil;
-        }
-    }
-
-    NSString *tvsJson = [self ObjectTojsonString:tvsArray];
++ (NSString *)signRawTranscationWithTvs:(NSString *)tvsJson privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation {
 
     const char *rawtrans_str = [rawTranscation UTF8String];
     char *signedtrans_ret;

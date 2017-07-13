@@ -259,7 +259,8 @@ typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
   LuckyPackageRequest_FieldNumber_Fee = 3,
   LuckyPackageRequest_FieldNumber_AllotType = 4,
   LuckyPackageRequest_FieldNumber_PackageType = 5,
-  LuckyPackageRequest_FieldNumber_AddressesArray = 6,
+  LuckyPackageRequest_FieldNumber_Tips = 6,
+  LuckyPackageRequest_FieldNumber_AddressesArray = 7,
 };
 
 @interface LuckyPackageRequest : GPBMessage
@@ -273,6 +274,86 @@ typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
 @property(nonatomic, readwrite) int32_t allotType;
 
 @property(nonatomic, readwrite) int32_t packageType;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *addressesArray;
+/** The number of items in @c addressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger addressesArray_Count;
+
+@end
+
+#pragma mark - TransferRequest
+
+typedef GPB_ENUM(TransferRequest_FieldNumber) {
+  TransferRequest_FieldNumber_Amount = 1,
+  TransferRequest_FieldNumber_Fee = 2,
+  TransferRequest_FieldNumber_TransferType = 3,
+  TransferRequest_FieldNumber_Tips = 4,
+  TransferRequest_FieldNumber_FromAddressesArray = 5,
+  TransferRequest_FieldNumber_ToAddressesArray = 6,
+};
+
+@interface TransferRequest : GPBMessage
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@property(nonatomic, readwrite) int64_t fee;
+
+@property(nonatomic, readwrite) int32_t transferType;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *fromAddressesArray;
+/** The number of items in @c fromAddressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger fromAddressesArray_Count;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *toAddressesArray;
+/** The number of items in @c toAddressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger toAddressesArray_Count;
+
+@end
+
+#pragma mark - CrowdfuningRequest
+
+typedef GPB_ENUM(CrowdfuningRequest_FieldNumber) {
+  CrowdfuningRequest_FieldNumber_Amount = 1,
+  CrowdfuningRequest_FieldNumber_Total = 2,
+  CrowdfuningRequest_FieldNumber_Tips = 3,
+};
+
+@interface CrowdfuningRequest : GPBMessage
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@property(nonatomic, readwrite) int32_t total;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+
+@end
+
+#pragma mark - CrowdfuningResp
+
+typedef GPB_ENUM(CrowdfuningResp_FieldNumber) {
+  CrowdfuningResp_FieldNumber_TxId = 1,
+};
+
+@interface CrowdfuningResp : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *txId;
+
+@end
+
+#pragma mark - PayCrowdRequest
+
+typedef GPB_ENUM(PayCrowdRequest_FieldNumber) {
+  PayCrowdRequest_FieldNumber_TxId = 1,
+  PayCrowdRequest_FieldNumber_AddressesArray = 2,
+};
+
+@interface PayCrowdRequest : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *txId;
 
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *addressesArray;
 /** The number of items in @c addressesArray without causing the array to be created. */
@@ -292,6 +373,45 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *rawhex;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *vts;
+
+@end
+
+#pragma mark - PublishTransaction
+
+typedef GPB_ENUM(PublishTransaction_FieldNumber) {
+  PublishTransaction_FieldNumber_SignedHex = 1,
+};
+
+@interface PublishTransaction : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *signedHex;
+
+@end
+
+#pragma mark - CreateCoinArgs
+
+typedef GPB_ENUM(CreateCoinArgs_FieldNumber) {
+  CreateCoinArgs_FieldNumber_Category = 1,
+  CreateCoinArgs_FieldNumber_Currency = 2,
+  CreateCoinArgs_FieldNumber_Salt = 3,
+  CreateCoinArgs_FieldNumber_MasterAddress = 4,
+  CreateCoinArgs_FieldNumber_Payload = 5,
+  CreateCoinArgs_FieldNumber_WId = 6,
+};
+
+@interface CreateCoinArgs : GPBMessage
+
+@property(nonatomic, readwrite) int32_t category;
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *salt;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *masterAddress;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
 
 @end
 

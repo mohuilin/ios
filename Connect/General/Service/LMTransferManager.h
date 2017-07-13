@@ -22,7 +22,7 @@ typedef void (^CompleteBlock)(NSError *error);
 
 @interface LMTransferManager : NSObject
 
-- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(void (^)(NSArray *vtsArray,NSString *rawTransaction ,NSError *error))complete;
+- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(void (^)(NSString *vts,NSString *rawTransaction ,NSError *error))complete;
 
 - (void)transferFromIndexes:(NSArray *)indexes fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount complete:(CompleteBlock)complete;
 

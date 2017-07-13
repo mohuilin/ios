@@ -72,10 +72,48 @@ int64 amount = 2;
 int64 fee = 3;
 int32 allot_type = 4;
 int32 package_type = 5;
-repeated string addresses = 6;
+string tips = 6;
+repeated string addresses = 7;
+}
+
+message TransferRequest {
+int64 amount = 1;
+int64 fee = 2;
+int32 transfer_type = 3;
+string tips = 4;
+repeated string from_addresses = 5;
+repeated string to_addresses = 6;
+}
+
+message CrowdfuningRequest {
+int64 amount = 1;
+int32 total = 2;
+string tips = 3;
+}
+
+message CrowdfuningResp {
+string txId = 1;
+}
+
+message PayCrowdRequest {
+string txId = 1;
+repeated string addresses = 2;
 }
 
 message OriginalTransaction {
 string rawhex = 1;
 string vts = 2;
+}
+
+message PublishTransaction {
+string signed_hex = 1;
+}
+
+message CreateCoinArgs {
+int32 category =1;
+int32 currency = 2;
+string salt = 3;
+string master_address = 4;
+string payload = 5;
+string w_id =6;
 }
