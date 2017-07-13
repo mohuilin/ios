@@ -77,7 +77,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     request.fromAddressesArray = fromAddresses.mutableCopy;
     request.amount = amount;
     request.fee = fee;
-    request.transferType = 1;
+    request.transferType = TransferTypeOuterUrl;
     
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
@@ -208,6 +208,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     request.amount = perAddressAmount;
     request.fee = fee;
     request.tips = tips;
+    request.transferType = TransferTypeInnerConnect;
     
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
@@ -300,7 +301,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 
 - (void)transactionFlowingComplete:(CompleteWithDataBlock)complete{
     TransactionFlowingRequest *request = [TransactionFlowingRequest new];
-    request.currency = 0;
+    request.currency = CurrencyTypeBTC;
     /// publish
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -313,6 +314,8 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
             if (data) {
                 NSError *error = nil;
                 TransactionFlowings *transactionFlowing = [TransactionFlowings parseFromData:data error:&error];
+                //save to db
+                
                 if (!error) {
                     if (complete) {
                         complete(transactionFlowing,nil);

@@ -153,6 +153,14 @@ extern "C" {
     }
 }
 
++ (BOOL)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password{
+    char value[256];
+    char *ev = (char *)[encryptValue UTF8String];
+    char *pass = (char *)[password UTF8String];
+    int result = connectWalletDecrypt(ev,pass,1, value);
+    return result == 1;
+}
+
 // Data is converted to JsonString type
 + (NSString *)ObjectTojsonString:(id)object {
     if (object == nil) {

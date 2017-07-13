@@ -18,6 +18,17 @@ typedef NS_ENUM(NSInteger ,LuckypackageAmountType) {
     LuckypackageAmountTypeSame
 };
 
+typedef NS_ENUM(NSInteger ,TransferType) {
+    TransferTypeInnerConnect = 0,
+    TransferTypeOuterUrl,
+};
+
+typedef NS_ENUM(NSInteger ,CurrencyType) {
+    CurrencyTypeBTC = 0,
+    CurrencyTypeLTC,
+    CurrencyTypeETH,
+};
+
 typedef void (^CompleteBlock)(NSError *error);
 
 typedef void (^CompleteWithDataBlock)(id data,NSError *error);
