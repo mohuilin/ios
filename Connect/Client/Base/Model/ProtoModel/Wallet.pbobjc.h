@@ -251,6 +251,33 @@ typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
 
 @end
 
+#pragma mark - CreateCoinArgs
+
+typedef GPB_ENUM(CreateCoinArgs_FieldNumber) {
+  CreateCoinArgs_FieldNumber_Category = 1,
+  CreateCoinArgs_FieldNumber_Currency = 2,
+  CreateCoinArgs_FieldNumber_Salt = 3,
+  CreateCoinArgs_FieldNumber_MasterAddress = 4,
+  CreateCoinArgs_FieldNumber_Payload = 5,
+  CreateCoinArgs_FieldNumber_WId = 6,
+};
+
+@interface CreateCoinArgs : GPBMessage
+
+@property(nonatomic, readwrite) int32_t category;
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *salt;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *masterAddress;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
+
+@end
+
 NS_ASSUME_NONNULL_END
 
 CF_EXTERN_C_END

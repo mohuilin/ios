@@ -215,7 +215,7 @@
 		192352A61E81275B0022D844 /* RedPacketHistoryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 192352541E81275B0022D844 /* RedPacketHistoryCell.xib */; };
 		2C65A2F77344813C490750ED /* libPods-Connect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D7FC9FA4528B022EBC0831 /* libPods-Connect.a */; };
 		71C3EDF9126EE9B5FCB64F2F /* libPods-ConnectUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */; };
-		D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */; };
+		D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		D912F5511CEB8DA6008E04D0 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D912F54F1CEB8DA6008E04D0 /* Localizable.strings */; };
 		D91DBB701E08F4F20096E6DC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D91DBB6F1E08F4F20096E6DC /* libc++.tbd */; };
 		D9217ED31CE03D9100953F51 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D9217ED21CE03D9100953F51 /* main.m */; };

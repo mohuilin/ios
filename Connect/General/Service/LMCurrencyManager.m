@@ -10,41 +10,55 @@
 #import "NetWorkOperationTool.h"
 #import "LMCurrencyModel.h"
 #import "LMRealmManager.h"
-
+#import "Wallet.pbobjc.h"
+#import "Protofile.pbobjc.h"
 @implementation LMCurrencyManager
 /**
  *  creat currency
  *
  */
-+ (void)createCurrency:(NSString *)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
++ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
+   
     
+    CreateCoinArgs *currencyCoin = [CreateCoinArgs new];
+    currencyCoin.salt = salt;
+    currencyCoin.category = category;
+    currencyCoin.masterAddress = masterAddess;
+    currencyCoin.currency = currency;
+    currencyCoin.payload = nil;
+    currencyCoin.wId = nil;
     
     [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:nil complete:^(id response) {
-        
-        
-        // save db
-        LMCurrencyModel *currencyModel = [LMCurrencyModel new];
-        currencyModel.currency = currency;
-        currencyModel.category = category;
-        currencyModel.salt = salt;
-        currencyModel.masterAddress = masterAddess;
-        currencyModel.status = 0;
-        currencyModel.blance = 0;
-        NSMutableArray *addressList = [NSMutableArray array];
-        [addressList addObject:masterAddess];
-        [currencyModel.addressListArray addObjects:addressList];
-        
-        if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-            currencyModel.payload = nil;
-        }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
-            currencyModel.payload = nil;
-        }
-        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-            [realm addOrUpdateObject:currencyModel];
-        }];
-        
-        if (complete) {
-            complete(YES);
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete(NO);
+            }
+        }else {
+            // save db
+            LMCurrencyModel *currencyModel = [LMCurrencyModel new];
+            currencyModel.currency = currency;
+            currencyModel.category = category;
+            currencyModel.salt = salt;
+            currencyModel.masterAddress = masterAddess;
+            currencyModel.status = 0;
+            currencyModel.blance = 0;
+            NSMutableArray *addressList = [NSMutableArray array];
+            [addressList addObject:masterAddess];
+            [currencyModel.addressListArray addObjects:addressList];
+            
+            if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
+                currencyModel.payload = nil;
+            }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
+                currencyModel.payload = nil;
+            }
+            [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                [realm addOrUpdateObject:currencyModel];
+            }];
+            
+            if (complete) {
+                complete(YES);
+            }
         }
     } fail:^(NSError *error) {
         if (complete) {

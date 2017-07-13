@@ -20,6 +20,8 @@
 #import "LMSeedModel.h"
 #import "LMIMHelper.h"
 #import "LMRealmManager.h"
+#import "Wallet.pbobjc.h"
+
 
 @implementation SetGlobalHandler
 
@@ -1188,17 +1190,27 @@
         payPass = @"";
     }
     NSString *needStr = nil;
-    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-        needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
-    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
-        needStr = [LMWalletInfoManager sharedManager].baseSeed;
-    }
+//    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
+//        needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
+//    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
+//        needStr = [LMWalletInfoManager sharedManager].baseSeed;
+//    }
+    needStr = [LMWalletInfoManager sharedManager].baseSeed;
+    RequestWalletInfo *creatWallet = [RequestWalletInfo new];
     NSString *payLoad = [LMBTCWalletHelper encodeValue:needStr password:payPass n:17];
     NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
     int n = 17;
-    NSString *checkSum = [[NSString stringWithFormat:@"%d%@%@",n,payLoad,salt] sha256String];
+    NSString *checkStr = [NSString stringWithFormat:@"%d%@%@",n,payLoad,salt];
+    if ([checkStr containsString:@"(null)"]) {
+        checkStr = [checkStr stringByReplacingOccurrencesOfString:@"(null)" withString:@""];
+    }
+    NSString *checkSum = [checkStr sha256String];
+    creatWallet.salt = salt;
+    creatWallet.n = n;
+    creatWallet.payload = payLoad;
+    creatWallet.checkSum = checkSum;
     
-    [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:nil complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:creatWallet.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
@@ -1218,6 +1230,7 @@
                     [realm addOrUpdateObject:saveSeedModel];
                 }];
             }
+            [LMWalletInfoManager sharedManager].encryPtionSeed = payLoad;
             [[MMAppSetting sharedSetting]  setPayPass:payPass];
             if (complete) {
                 complete(YES);

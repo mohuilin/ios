@@ -11,7 +11,7 @@
 
 @interface LMCurrencyModel : LMBaseModel
 
-@property(copy ,nonatomic) NSString *currency;
+@property(assign ,nonatomic) int currency;
 @property(assign ,nonatomic) int category;
 @property(copy ,nonatomic) NSString *salt;
 @property(copy ,nonatomic) NSString *masterAddress;

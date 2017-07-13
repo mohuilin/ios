@@ -47,6 +47,7 @@
 @property(nonatomic, strong) NSMutableArray *walletItems;
 @property(nonatomic, copy) NSString *resultContent;
 @property(nonatomic, strong) NSDecimalNumber *money;
+@property(nonatomic, assign) BOOL isCreatWallet;
 
 @end
 
@@ -59,11 +60,16 @@
     [self setupSubView];
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
+    self.isCreatWallet = YES;
 
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self creatNewWallet];
+    if (self.isCreatWallet) {
+        [self creatNewWallet];
+        self.isCreatWallet = NO;
+    }
+    
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];

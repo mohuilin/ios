@@ -65,3 +65,11 @@ Wallet wallet = 1;
 int32 status = 2;
 Coins Coins = 3;
 }
+message CreateCoinArgs {
+int32 category =1;
+int32 currency = 2;
+string salt = 3;
+string master_address = 4;
+string payload = 5;
+string w_id =6;
+}

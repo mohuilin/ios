@@ -11,9 +11,9 @@
 #define successCode 2000
 
 #define APIVersion @"v1"
-#define SOCKET_HOST @"sandbox.connect.im"
-#define baseServer  @"https://sandbox.connect.im"
-#define ServerPublickey @"02c2c7398274aef3b94366369f51c6a75470f3636981c2e75e6fd7b39caede1ca9"
+#define SOCKET_HOST @"182.150.44.100"
+#define baseServer  @"http://192.168.40.4:10086"
+#define ServerPublickey @"03d307e51af08983cc0c13bb11d3619758e7b0b8a374e610de3503fc4ebeedfe96"
 #define SOCKET_PORT 19090
 #define DefaultHeadUrl @"https://short.connect.im/avatar/v1/b040e0a970bc6d80b675586c5a55f9e9109168ba.png"
 
@@ -390,7 +390,7 @@
    Protobuf file: IMRequest
  
  */
-#define CreatCurrencyUrl baseServer "/wallet/" APIVersion "/currency"
+#define CreatCurrencyUrl @"http://192.168.40.110:18083/wallet/v2/currency"
 /**
  Payment settings
   
@@ -404,7 +404,7 @@
    Protobuf file: IMRequest
  
  */
-#define EncryptionBaseSeedUrl baseServer "/wallet/" APIVersion "/creat"
+#define EncryptionBaseSeedUrl @"http://192.168.40.110:18083/wallet/v2/create"
 /**
  Payment settings
   

@@ -13,7 +13,7 @@
  *  creat currency
  *
  */
-+ (void)createCurrency:(NSString *)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete;
++ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete;
 
 /**
  *  get currrency list

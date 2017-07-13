@@ -740,6 +740,104 @@ typedef struct RespSyncWallet__storage_ {
 
 @end
 
+#pragma mark - CreateCoinArgs
+
+@implementation CreateCoinArgs
+
+@dynamic category;
+@dynamic currency;
+@dynamic salt;
+@dynamic masterAddress;
+@dynamic payload;
+@dynamic wId;
+
+typedef struct CreateCoinArgs__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t category;
+  int32_t currency;
+  NSString *salt;
+  NSString *masterAddress;
+  NSString *payload;
+  NSString *wId;
+} CreateCoinArgs__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "category",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinArgs_FieldNumber_Category,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(CreateCoinArgs__storage_, category),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinArgs_FieldNumber_Currency,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(CreateCoinArgs__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "salt",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinArgs_FieldNumber_Salt,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(CreateCoinArgs__storage_, salt),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "masterAddress",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinArgs_FieldNumber_MasterAddress,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(CreateCoinArgs__storage_, masterAddress),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "payload",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinArgs_FieldNumber_Payload,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(CreateCoinArgs__storage_, payload),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "wId",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinArgs_FieldNumber_WId,
+        .hasIndex = 5,
+        .offset = (uint32_t)offsetof(CreateCoinArgs__storage_, wId),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[CreateCoinArgs class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(CreateCoinArgs__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
 
 #pragma clang diagnostic pop
 
