@@ -174,7 +174,7 @@
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
 
-    [[LMBTCTransferManager sharedManager] transferFromIndexes:nil fee:1000 toAddresses:@[self.info.address] perAddressAmount:money.integerValue tips:note complete:^(id data, NSError *error) {
+    [[LMBTCTransferManager sharedManager] transferFromIndexes:nil fee:5000 toAddresses:@[self.info.address] perAddressAmount:money.integerValue tips:note complete:^(id data, NSError *error) {
         
     }];
 }

@@ -46,7 +46,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
                     [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
                         if (baseSeed) {
                             /// sign and publish
-                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed indexes:indexes complete:^(id data,NSError *error) {
+                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed complete:^(id data,NSError *error) {
                                 if (complete) {
                                     complete(data,error);
                                 }
@@ -69,13 +69,13 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 
 
 - (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
-    NSArray *fromAddresses = [self addressesFromIndexes:indexes];
     
-    TransferRequest *request = [[TransferRequest alloc] init];
-    request.fromAddressesArray = fromAddresses.mutableCopy;
-    request.amount = amount;
+    NSArray *fromAddresses = [self addressesFromIndexes:indexes];
+    URLTransferRequest *request = [[URLTransferRequest alloc] init];
     request.fee = fee;
-    request.transferType = WalletTransferTypeOuterUrl;
+    request.amount = amount;
+    request.fromAddressesArray = fromAddresses.mutableCopy;
+    request.currency = CurrencyTypeBTC;
     
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
@@ -93,7 +93,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
                     [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
                         if (baseSeed) {
                             /// sign and publish
-                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed indexes:indexes complete:^(id data,NSError *signError) {
+                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed complete:^(id data,NSError *signError) {
                                 if (complete) {
                                     complete(data,signError);
                                 }
@@ -176,7 +176,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
                     [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
                         if (baseSeed) {
                             /// sign and publish
-                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed indexes:indexes complete:^(id data,NSError *signError) {
+                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction seed:baseSeed  complete:^(id data,NSError *signError) {
                                 if (complete) {
                                     complete(data,signError);
                                 }
@@ -201,15 +201,25 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 - (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete{
     
     TransferRequest *request = [[TransferRequest alloc] init];
-    request.toAddressesArray = toAddresses.mutableCopy;
+    
+    NSMutableArray *toAddressesAmount = [NSMutableArray array];
+    for (NSString *address in toAddresses) {
+        AddressAndAmount *addressAmount = [AddressAndAmount new];
+        addressAmount.address = address;
+        addressAmount.amount = perAddressAmount;
+        [toAddressesAmount addObject:addressAmount];
+    }
+    
+    request.toAddressesArray = toAddressesAmount;
     request.fromAddressesArray = addresses.mutableCopy;
-    request.amount = perAddressAmount;
+    
+    
     request.fee = fee;
     request.tips = tips;
     request.transferType = WalletTransferTypeInnerConnect;
     
     /// send luckypackage
-    [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:WalletServiceTransfer postProtoData:request.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
@@ -240,8 +250,16 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 
 - (void)transferWithFee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete{
     TransferRequest *request = [[TransferRequest alloc] init];
-    request.toAddressesArray = toAddresses.mutableCopy;
-    request.amount = perAddressAmount;
+    
+    NSMutableArray *toAddressesAmount = [NSMutableArray array];
+    for (NSString *address in toAddresses) {
+        AddressAndAmount *addressAmount = [AddressAndAmount new];
+        addressAmount.address = address;
+        addressAmount.amount = perAddressAmount;
+        [toAddressesAmount addObject:addressAmount];
+    }
+    
+    request.toAddressesArray = toAddressesAmount;
     request.fee = fee;
     request.tips = tips;
     request.transferType = WalletTransferTypeInnerConnect;
@@ -250,14 +268,14 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 
 - (void)transferFromIndexes:(NSArray *)indexes fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
     NSArray *fromAddresses = [self addressesFromIndexes:indexes];
-    
+    fromAddresses = @[[LKUserCenter shareCenter].currentLoginUser.address];
     [self transferFromAddress:fromAddresses fee:fee toAddresses:toAddresses perAddressAmount:perAddressAmount tips:tips complete:^(OriginalTransaction *originalTransaction,NSError *rawTransactionError) {
             if (!rawTransactionError) {
                 /// password verfiy --- encrypt seed
                 [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
                     if (baseSeed) {
                         /// sign and publish
-                        [self signRawTransactionAndPublishWihtOriginalTransaction:originalTransaction seed:baseSeed indexes:indexes complete:^ (id data,NSError *signError) {
+                        [self signRawTransactionAndPublishWihtOriginalTransaction:originalTransaction seed:baseSeed complete:^ (id data,NSError *signError) {
                             if (signError) {
                                 if (passView.requestCallBack) {
                                     passView.requestCallBack(signError);
@@ -279,13 +297,15 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 }
 
 
-- (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction seed:(NSString *)seed indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
+- (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction seed:(NSString *)seed complete:(CompleteWithDataBlock)complete{
     
     /// query btc salt  -> seed - btcseed
     
+    RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and address in (%@)",(int)CurrencyTypeBTC, [originalTransaction.addressesArray componentsJoinedByString:@","]]];
+    
     NSMutableArray *privkeyArray = [NSMutableArray array];
-    for (NSNumber *index in indexes) {
-        NSString *inputsPrivkey = [LMBTCWalletHelper getPrivkeyBySeed:seed index:index.intValue];
+    for (LMCurrencyAddress *currrencyAddress in result) {
+        NSString *inputsPrivkey = [LMBTCWalletHelper getPrivkeyBySeed:seed index:currrencyAddress.index];
         if (inputsPrivkey) {
             [privkeyArray addObject:inputsPrivkey];
         }
@@ -357,7 +377,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
         return nil;
     }
     NSMutableArray *addressArray = [NSMutableArray array];
-    RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = 0 and index in (%@)",[indexes componentsJoinedByString:@","]]];
+    RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and index in (%@)",(int)CurrencyTypeBTC,[indexes componentsJoinedByString:@","]]];
     for (LMCurrencyAddress *currencyAddress in result) {
         if (currencyAddress.address) {
             [addressArray addObject:currencyAddress.address];
