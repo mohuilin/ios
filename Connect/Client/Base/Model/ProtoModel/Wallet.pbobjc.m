@@ -1120,11 +1120,13 @@ typedef struct PayCrowdRequest__storage_ {
 
 @dynamic rawhex;
 @dynamic vts;
+@dynamic transactionId;
 
 typedef struct OriginalTransaction__storage_ {
   uint32_t _has_storage_[1];
   NSString *rawhex;
   NSString *vts;
+  NSString *transactionId;
 } OriginalTransaction__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1151,6 +1153,15 @@ typedef struct OriginalTransaction__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
+      {
+        .name = "transactionId",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_TransactionId,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, transactionId),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[OriginalTransaction class]
@@ -1173,10 +1184,12 @@ typedef struct OriginalTransaction__storage_ {
 @implementation PublishTransaction
 
 @dynamic signedHex;
+@dynamic transactionId;
 
 typedef struct PublishTransaction__storage_ {
   uint32_t _has_storage_[1];
   NSString *signedHex;
+  NSString *transactionId;
 } PublishTransaction__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1191,6 +1204,15 @@ typedef struct PublishTransaction__storage_ {
         .number = PublishTransaction_FieldNumber_SignedHex,
         .hasIndex = 0,
         .offset = (uint32_t)offsetof(PublishTransaction__storage_, signedHex),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "transactionId",
+        .dataTypeSpecific.className = NULL,
+        .number = PublishTransaction_FieldNumber_TransactionId,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(PublishTransaction__storage_, transactionId),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
