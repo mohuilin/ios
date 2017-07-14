@@ -25,7 +25,7 @@ CREATE_SHARED_MANAGER(LMWalletInfoManager)
 - (BOOL)isHaveWallet{
     [LMSeedModel setDefaultRealm];
     LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
-    if (seedModel > 0) {
+    if (seedModel.encryptSeed.length > 0) {
         return YES;
     }else {
         return NO;

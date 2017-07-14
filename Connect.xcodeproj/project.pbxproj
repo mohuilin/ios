@@ -882,7 +882,6 @@
 		F127E12A1F146AD8003E448F /* LMSeedModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E1291F146AD8003E448F /* LMSeedModel.m */; };
 		F127E12D1F146E30003E448F /* LMCurrencyModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E12C1F146E30003E448F /* LMCurrencyModel.m */; };
 		F127E1391F148BAE003E448F /* LMCurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E1381F148BAE003E448F /* LMCurrencyManager.m */; };
-		F1310D081F1746F4005D1EEC /* LMTemManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F1310D071F1746F4005D1EEC /* LMTemManager.m */; };
 		F1437EA91F14ABE600758F1C /* LMWalletCreatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EA81F14ABE500758F1C /* LMWalletCreatManager.m */; };
 		F1437EAF1F14B14A00758F1C /* LMRealmManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EAE1F14B14A00758F1C /* LMRealmManager.m */; };
 		F1437EB51F14EDA100758F1C /* LMCurrencyAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EB41F14EDA100758F1C /* LMCurrencyAddress.m */; };
@@ -2678,8 +2677,6 @@
 		F127E12C1F146E30003E448F /* LMCurrencyModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyModel.m; sourceTree = "<group>"; };
 		F127E1371F148BAE003E448F /* LMCurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyManager.h; sourceTree = "<group>"; };
 		F127E1381F148BAE003E448F /* LMCurrencyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyManager.m; sourceTree = "<group>"; };
-		F1310D061F1746F4005D1EEC /* LMTemManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTemManager.h; sourceTree = "<group>"; };
-		F1310D071F1746F4005D1EEC /* LMTemManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTemManager.m; sourceTree = "<group>"; };
 		F1437EA71F14ABE500758F1C /* LMWalletCreatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletCreatManager.h; sourceTree = "<group>"; };
 		F1437EA81F14ABE500758F1C /* LMWalletCreatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletCreatManager.m; sourceTree = "<group>"; };
 		F1437EAD1F14B14A00758F1C /* LMRealmManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRealmManager.h; sourceTree = "<group>"; };
@@ -13906,8 +13903,6 @@
 				F127E1381F148BAE003E448F /* LMCurrencyManager.m */,
 				F100BC661F161A6400F95A1D /* LMWalletInfoManager.h */,
 				F100BC671F161A6400F95A1D /* LMWalletInfoManager.m */,
-				F1310D061F1746F4005D1EEC /* LMTemManager.h */,
-				F1310D071F1746F4005D1EEC /* LMTemManager.m */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -33367,7 +33362,6 @@
 				D9B084BE1E810DDC0067EC4A /* GestureSetPage.m in Sources */,
 				D92232571E822BF800D67110 /* BEMCheckBox.m in Sources */,
 				D95C043F1E810902006C5C8A /* ChatMapCell.m in Sources */,
-				F1310D081F1746F4005D1EEC /* LMTemManager.m in Sources */,
 				192351251E8121CB0022D844 /* CollectionReusableView.m in Sources */,
 				F16FD7D21EC3205B002F9395 /* json_spirit_value.cpp in Sources */,
 				D97FDCAF1E86664800B161C8 /* YYTextMagnifier.m in Sources */,

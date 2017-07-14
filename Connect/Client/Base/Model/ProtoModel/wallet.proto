@@ -63,7 +63,7 @@ int64 balance = 5;
 message RespSyncWallet {
 Wallet wallet = 1;
 int32 status = 2;
-repeated CoinsDetail Coins = 3;
+repeated Coin coins = 3;
 }
 
 message LuckyPackageRequest {

@@ -29,7 +29,6 @@ CF_EXTERN_C_BEGIN
 
 @class Coin;
 @class CoinInfo;
-@class CoinsDetail;
 @class DefaultAddress;
 @class TransactionFlowing;
 @class Wallet;
@@ -247,7 +246,7 @@ typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
 
 @property(nonatomic, readwrite) int32_t status;
 
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<CoinsDetail*> *coinsArray;
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<Coin*> *coinsArray;
 /** The number of items in @c coinsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger coinsArray_Count;
 

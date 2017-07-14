@@ -20,7 +20,6 @@
  */
 + (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
    
-    
     CreateCoinArgs *currencyCoin = [CreateCoinArgs new];
     currencyCoin.salt = salt;
     currencyCoin.category = category;
@@ -29,73 +28,98 @@
     currencyCoin.payload = nil;
     currencyCoin.wId = nil;
     
-    [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(NO);
+    [LMCurrencyModel setDefaultRealm];
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],currency] lastObject];
+    if (!currencyModel) {
+        // sync currency
+        [LMCurrencyManager getCurrencyListWithWalletId:nil complete:^(BOOL result, NSArray<Coin *> *coinList) {
+            BOOL flag = NO;
+            for (Coin *coin in coinList) {
+                if (coin.currency == currency) {
+                    flag = YES;
+                    break;
+                }
             }
-        }else {
-            
-            // save db
-            LMCurrencyModel *currencyModel = [LMCurrencyModel new];
-            currencyModel.currency = currency;
-            currencyModel.category = category;
-            currencyModel.salt = salt;
-            currencyModel.masterAddress = masterAddess;
-            currencyModel.status = 0;
-            currencyModel.blance = 0;
-            currencyModel.defaultAddress = masterAddess;
-            // save address
-            LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
-            addressModel.address = masterAddess;
-            addressModel.index = 0;
-            addressModel.status = 1;
-            addressModel.label = nil;
-            addressModel.currency = currency;
-            addressModel.balance = 0;
-            [[LMRealmManager sharedManager]executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                [realm addOrUpdateObject:addressModel];
-            }];
-            [currencyModel.addressListArray addObject:addressModel];
-            // save db to currency Address
-            
-            if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-                currencyModel.payload = [LMWalletInfoManager sharedManager].encryPtionSeed;
-            }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
-                currencyModel.payload = nil;
+            if (flag) {
+                [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
+                    HttpResponse *hResponse = (HttpResponse *)response;
+                    if (hResponse.code != successCode) {
+                        if (complete) {
+                            complete(NO);
+                        }
+                    }else {
+                        
+                        // save db
+                        LMCurrencyModel *currencyModel = [LMCurrencyModel new];
+                        currencyModel.currency = currency;
+                        currencyModel.category = category;
+                        currencyModel.salt = salt;
+                        currencyModel.masterAddress = masterAddess;
+                        currencyModel.status = 0;
+                        currencyModel.blance = 0;
+                        currencyModel.defaultAddress = masterAddess;
+                        // save address
+                        LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
+                        addressModel.address = masterAddess;
+                        addressModel.index = 0;
+                        addressModel.status = 1;
+                        addressModel.label = nil;
+                        addressModel.currency = currency;
+                        addressModel.balance = 0;
+                        [[LMRealmManager sharedManager]executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                            [realm addOrUpdateObject:addressModel];
+                        }];
+                        [currencyModel.addressListArray addObject:addressModel];
+                        // save db to currency Address
+                        
+                        if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
+                            currencyModel.payload = [LMWalletInfoManager sharedManager].encryPtionSeed;
+                        }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
+                            currencyModel.payload = nil;
+                        }
+                        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                            [realm addOrUpdateObject:currencyModel];
+                        }];
+                        
+                        if (complete) {
+                            complete(YES);
+                        }
+                    }
+                } fail:^(NSError *error) {
+                    if (complete) {
+                        complete(NO);
+                    }
+                }];
             }
-            [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                [realm addOrUpdateObject:currencyModel];
-            }];
-            
-            if (complete) {
-                complete(YES);
-            }
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(NO);
-        }
-    }];
+        }];
+    }
 }
 /**
  *  get currrency list
  *
  */
-+ (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray *coinList))complete{
++ (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete{
     
     [NetWorkOperationTool POSTWithUrlString:GetCurrencyList postProtoData:nil complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
-            NSLog(@"sadasd");
+            if (complete) {
+                complete(NO,nil);
+            }
             
         }else {
-            
-            // save db
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                Coins *coin = [Coins parseFromData:data error:nil];
+                if (complete) {
+                    complete(NO,coin.coinsArray);
+                }
+            }
       }
     } fail:^(NSError *error) {
-        
+        if (complete) {
+            complete(NO,nil);
+        }
     }];
 }
 

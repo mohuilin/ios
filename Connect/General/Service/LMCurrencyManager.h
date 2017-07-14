@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "Wallet.pbobjc.h"
 @interface LMCurrencyManager : NSObject
 /**
  *  creat currency
@@ -19,7 +19,7 @@
  *  get currrency list
  *
  */
-+ (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray *coinList))complete;
++ (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete;
 
 /**
  *  set currency messageInfo
@@ -56,5 +56,6 @@
  *
  */
 + (void)getCurrencyDefaultAddressArrayWithcomplete:(void (^)(BOOL result,NSArray *defaultAddrssArray ))complete;
+
 
 @end

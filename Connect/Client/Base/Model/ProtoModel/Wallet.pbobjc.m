@@ -711,11 +711,11 @@ typedef struct RespSyncWallet__storage_ {
       },
       {
         .name = "coinsArray",
-        .dataTypeSpecific.className = GPBStringifySymbol(CoinsDetail),
+        .dataTypeSpecific.className = GPBStringifySymbol(Coin),
         .number = RespSyncWallet_FieldNumber_CoinsArray,
         .hasIndex = GPBNoHasBit,
         .offset = (uint32_t)offsetof(RespSyncWallet__storage_, coinsArray),
-        .flags = (GPBFieldFlags)(GPBFieldRepeated | GPBFieldTextFormatNameCustom),
+        .flags = GPBFieldRepeated,
         .dataType = GPBDataTypeMessage,
       },
     };
@@ -727,11 +727,6 @@ typedef struct RespSyncWallet__storage_ {
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(RespSyncWallet__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
-#if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
-    static const char *extraTextFormatInfo =
-        "\001\003\000Coins\000";
-    [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
-#endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

@@ -18,7 +18,6 @@
 #import "LMWalletCreatManager.h"
 #import "LMSeedModel.h"
 #import "LMTransferManager.h"
-#import "LMTemManager.h"
 #import "LMCurrencyModel.h"
 
 
@@ -150,13 +149,11 @@
         if (!error) {
             for (LMCurrencyModel *currentModel in results) {
                 [[MMAppSetting sharedSetting] saveBalance:currentModel.blance];
-                [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@", [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateNormal];
+                [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %0.2f", [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateNormal];
                 break;
             }
         }
     }];
-    
-
 }
 - (void)currencyChange {
     [super currencyChange];
@@ -255,11 +252,6 @@
 
 - (void)queryBlance {
     __weak __typeof(&*self) weakSelf = self;
-//    [[PayTool sharedInstance] getBlanceWithComplete:^(NSString *blance, UnspentAmount *unspentAmount, NSError *error) {
-//        if (!error) {
-//           [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@", [PayTool getBtcStringWithAmount:unspentAmount.amount]] forState:UIControlStateNormal];
-//        }
-//    }];
     [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
         if (!error) {
             [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", weakSelf.symbol, rate.doubleValue * [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateSelected];
