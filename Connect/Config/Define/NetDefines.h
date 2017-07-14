@@ -377,6 +377,65 @@
 /**======================================================================================
  *                                wallet
  * ====================================================================================== */
+
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define SetCurrencyAddressInfo @"http://192.168.40.110:18083/wallet/v2/coins/addresses/update"
+
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define AddCurrencyAddress @"http://192.168.40.110:18083/wallet/v2/coins/addresses/create"
+
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define SetCurrencyInfo @"http://192.168.40.110:18083/wallet/v2/coins/update"
+/**
+Payment settings
+ 
+  Interface description
+ 
+  PATH: /wallet/v1/currency
+  METHOD: POST
+  Data Format: Protobuf
+  Request parameter
+ 
+  Protobuf file: IMRequest
+
+*/
+#define GetCurrencyList @"http://192.168.40.110:18083/wallet/v2/coins/list"
 /**
  Payment settings
   
@@ -418,7 +477,7 @@
    Protobuf file: IMRequest
  
  */
-#define UpdateBaseSeedUrl baseServer "/wallet/" APIVersion "/update"
+#define UpdateBaseSeedUrl @"http://192.168.40.110:18083/wallet/v2/update"
 /**
  Payment settings
   

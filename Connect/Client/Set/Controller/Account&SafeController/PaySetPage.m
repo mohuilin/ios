@@ -262,7 +262,7 @@
             if (GJCFStringIsNull(firstPass)) {
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                if (![self decodeEncryPtion:password]) {
+                if (![LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password]) {
                     [weakPassView setTitleString:LMLocalizedString(@"原密码输入错误哈哈,请重新输入", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                     firstPass = nil;
                 }
@@ -301,31 +301,6 @@
         };
         [weakSelf presentViewController:passView animated:NO completion:nil];
     }];
-}
-- (BOOL)decodeEncryPtion:(NSString *)passWord {
-    // old user
-    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-        [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord complete:^(NSString *decodeValue, BOOL success) {
-            [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord complete:^(NSString *decodeValue, BOOL success) {
-                if (success) {
-                    if ([decodeValue isEqualToString:[LKUserCenter shareCenter].currentLoginUser.prikey]) {
-                        
-                    }else {
-                        
-                    }
-                }
-            }];
-        }];
-    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser) { // new user
-        [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord complete:^(NSString *decodeValue, BOOL success) {
-            if ([decodeValue isEqualToString:[LMWalletInfoManager sharedManager].baseSeed]) {
-                
-            }else {
-                
-            }
-        }];
-    }
-    return YES;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 

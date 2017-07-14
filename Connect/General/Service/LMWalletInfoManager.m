@@ -7,8 +7,19 @@
 //
 
 #import "LMWalletInfoManager.h"
+#import "LMSeedModel.h"
+#import "LMBTCWalletHelper.h"
 
 @implementation LMWalletInfoManager
 static LMWalletInfoManager *manager = nil;
 CREATE_SHARED_MANAGER(LMWalletInfoManager)
+
+- (NSString *)encryPtionSeed{
+    if (_encryPtionSeed.length <= 0) {
+        LMSeedModel *baseModel = [[LMSeedModel allObjects] lastObject];
+        return baseModel.encryptSeed;
+    }
+    return _encryPtionSeed;
+}
+
 @end
