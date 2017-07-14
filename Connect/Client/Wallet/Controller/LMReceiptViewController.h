@@ -10,6 +10,6 @@
 
 @interface LMReceiptViewController : LMBaseViewController
 
-@property(nonatomic, copy) NSString *currency;
+@property(nonatomic, assign) int currency;
 
 @end

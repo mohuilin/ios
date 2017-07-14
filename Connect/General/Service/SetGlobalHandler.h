@@ -232,7 +232,7 @@
    * @param payPass to pay the password
    * @ Param fee
  */
-+ (void)resetPayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete;
++ (void)resetPayPass:(NSString *)payPass baseSeed:(NSString *)baseSeed compete:(void(^)(BOOL result))complete;
 
 + (void)syncPaypinversionWithComplete:(void(^)(NSString *password,NSError *error))complete;
 + (void)getPaySetComplete:(void (^)(NSError *erro))complete;

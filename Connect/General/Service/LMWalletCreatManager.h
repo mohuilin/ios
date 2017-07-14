@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "LMTransferManager.h"
 @interface LMWalletCreatManager : NSObject
 /**
  * creat new wallet
@@ -15,5 +15,5 @@
  * @param contacts
  * @param complete
  */
-+ (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(NSString *)currency complete:(void (^)(BOOL isFinish))complete;
++ (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(int)currency complete:(void (^)(BOOL isFinish,NSString *error))complete;
 @end

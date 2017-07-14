@@ -19,5 +19,7 @@
 + (void)getAddressList;
 // 设置币种地址信息
 + (void)setCurrencyAddressInfo;
+// 更新默认地址
++ (void)updateDefaultAddrss;
 
 @end

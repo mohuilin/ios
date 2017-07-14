@@ -12,6 +12,11 @@
 #import "UIView+Toast.h"
 #import "YYImageCache.h"
 #import "LMCurrencyModel.h"
+#import "LMCurrencyManager.h"
+#import "Wallet.pbobjc.h"
+#import "LMTransferManager.h"
+#import "LMRealmManager.h"
+
 @interface LMReceiptViewController () <UITextFieldDelegate>
 
 @property(nonatomic, copy) NSString *userNameAccoutInformation;
@@ -44,19 +49,41 @@
     [super viewDidLoad];
     [self setNavigationRight:@"wallet_share_payment"];
     self.title = LMLocalizedString(@"Wallet Receipt", nil);
-    int coin = 0;
-    if ([self.currency isEqualToString:@"bitcoin"]) {
-        coin = 0;
-    }
-    // get usermessage
-    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",coin]] lastObject];
-    self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",self.currency,currencyModel.masterAddress];
     self.view.backgroundColor = [UIColor blackColor];
-    // qr code
-    [self addQRcodeImageView];
     [self.view addSubview:self.errorTipLabel];
+    
+    [self getDefaultAddress];
+    
 }
+- (void)getDefaultAddress {
+    __weak typeof(self)weakSelf = self;
+    NSString *currencyName = nil;
+    if (self.currency == CurrencyTypeBTC) {
+        currencyName = @"bitcoin";
+    }
+    [LMCurrencyManager getCurrencyDefaultAddressArrayWithcomplete:^(BOOL result, NSArray *defaultAddrssArray) {
+        if (result) {
+            for (DefaultAddress *defaultAddress in defaultAddrssArray) {
+                if (defaultAddress.currency == self.currency) {
+                    // get usermessage
+                    self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,defaultAddress.address];
+                    // save defaultAddress
+                    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],(int)defaultAddress.currency] lastObject];
+                    [[LMRealmManager sharedManager] executeRealmWithBlock:^{
+                        currencyModel.defaultAddress = defaultAddress.address;
+                    }];
+                    // qr code
+                    [self addQRcodeImageView];
+                }
+            }
+        }else{
+            [GCDQueue executeInMainQueue:^{
+                [MBProgressHUD showToastwithText:@"获取默认地址失败" withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+            }];
+        }
+    }];
 
+}
 - (void)doRight:(id)sender {
 
     NSString *lang = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
@@ -202,11 +229,29 @@
     NSDecimalNumber *amount = [NSDecimalNumber decimalNumberWithString:textField.text];
     self.rightBarBtn.enabled = amount.doubleValue > 0;
     if (self.rightBarBtn.enabled) {
-        NSString * currency = [NSString stringWithFormat:@"%@:",self.currency];
-        NSString *address = [self.userNameAccoutInformation stringByReplacingOccurrencesOfString:currency withString:@""];
-        NSString *moneyAddress = [NSString stringWithFormat:@"%@:%@?amount=%@", self.currency,address, self.bitTextField.text];
-        self.payRequestUrl = moneyAddress;
-        _imageView.image = [BarCodeTool barCodeImageWithString:moneyAddress withSize:400];
+        if (self.userNameAccoutInformation.length > 0) {
+            NSString *currencyName = nil;
+            switch (self.currency) {
+                case CurrencyTypeBTC:
+                {
+                    currencyName = @"bitcoin";
+                }
+                    break;
+                case CurrencyTypeLTC:
+                {
+                    currencyName = nil;
+                }
+                    break;
+                    
+                default:
+                    break;
+            }
+            NSString *currency = [NSString stringWithFormat:@"%@:",currencyName];
+            NSString *address = [self.userNameAccoutInformation stringByReplacingOccurrencesOfString:currency withString:@""];
+            NSString *moneyAddress = [NSString stringWithFormat:@"%@%@?amount=%@", currency,address, self.bitTextField.text];
+            self.payRequestUrl = moneyAddress;
+            _imageView.image = [BarCodeTool barCodeImageWithString:moneyAddress withSize:400];
+        }
     }
 }
 

@@ -12,6 +12,7 @@
 #import "LMRealmManager.h"
 #import "Wallet.pbobjc.h"
 #import "Protofile.pbobjc.h"
+#import "ConnectTool.h"
 @implementation LMCurrencyManager
 /**
  *  creat currency
@@ -28,14 +29,13 @@
     currencyCoin.payload = nil;
     currencyCoin.wId = nil;
     
-    [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:nil complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
                 complete(NO);
             }
         }else {
-            
             
             // save db
             LMCurrencyModel *currencyModel = [LMCurrencyModel new];
@@ -45,9 +45,20 @@
             currencyModel.masterAddress = masterAddess;
             currencyModel.status = 0;
             currencyModel.blance = 0;
-            NSMutableArray *addressList = [NSMutableArray array];
-            [addressList addObject:masterAddess];
-            [currencyModel.addressListArray addObjects:addressList];
+            currencyModel.defaultAddress = masterAddess;
+            // save address
+            LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
+            addressModel.address = masterAddess;
+            addressModel.index = 0;
+            addressModel.status = 1;
+            addressModel.label = nil;
+            addressModel.currency = currency;
+            addressModel.balance = 0;
+            [[LMRealmManager sharedManager]executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                [realm addOrUpdateObject:addressModel];
+            }];
+            [currencyModel.addressListArray addObject:addressModel];
+            // save db to currency Address
             
             if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
                 currencyModel.payload = [LMWalletInfoManager sharedManager].encryPtionSeed;
@@ -77,7 +88,7 @@
     [NetWorkOperationTool POSTWithUrlString:GetCurrencyList postProtoData:nil complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
-            
+            NSLog(@"sadasd");
             
         }else {
             
@@ -103,7 +114,7 @@
             
             
         }else {
-            
+            NSLog(@"asdasd");
             // save db
         }
     } fail:^(NSError *error) {
@@ -131,7 +142,7 @@
             
             
         }else {
-            
+            NSLog(@"asdasd");
             // save db
         }
     } fail:^(NSError *error) {
@@ -176,11 +187,62 @@
             
             
         }else {
-            
+            NSLog(@"asdasd");
             // save db
         }
     } fail:^(NSError *error) {
         
     }];
+}
+/**
+ * update default address
+ *
+ */
++ (void)updateCurrencyDefaultAddress:(NSString *)address currency:(int)currency complete:(void (^)(BOOL result))complete {
+ 
+    RequestCreateCoinInfo *info = [RequestCreateCoinInfo new];
+    info.address = address;
+    info.currency = currency;
+    [NetWorkOperationTool POSTWithUrlString:UpdateCurrencyDefaultAddress postProtoData:info.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            
+            
+        }else {
+            NSLog(@"asdasd");
+            // save db
+        }
+    } fail:^(NSError *error) {
+        
+    }];
+}
+/**
+ * get default address
+ *
+ */
++ (void)getCurrencyDefaultAddressArrayWithcomplete:(void (^)(BOOL result,NSArray *defaultAddrssArray ))complete{
+    
+    [NetWorkOperationTool POSTWithUrlString:GetCurrencyDefaultAddress postProtoData:nil complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete(NO,nil);
+            }
+        }else {
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                ListDefaultAddress *listAddress = [ListDefaultAddress parseFromData:data error:nil];
+                if (complete) {
+                    complete(YES,listAddress.defaultAddressesArray);
+                }
+            }
+            // save db
+        }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(NO,nil);
+        }
+    }];
+
 }
 @end

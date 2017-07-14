@@ -51,5 +51,12 @@
      
    }];
 }
+// 更新默认地址
++ (void)updateDefaultAddrss {
+ LMCurrencyModel *curency = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = 0 "]] lastObject];
+    [LMCurrencyManager updateCurrencyDefaultAddress:curency.masterAddress currency:0 complete:^(BOOL result) {
+        
+    }];
+}
 
 @end

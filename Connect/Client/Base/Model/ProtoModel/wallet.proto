@@ -147,3 +147,11 @@ string label = 4;
 int32 currency = 5;
 string w_id = 6;
 }
+message DefaultAddress {
+int32 currency = 1;
+string address =2;
+}
+
+message ListDefaultAddress {
+repeated DefaultAddress defaultAddresses = 1;
+}

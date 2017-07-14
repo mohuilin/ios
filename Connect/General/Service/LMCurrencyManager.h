@@ -45,4 +45,16 @@
  */
 + (void)setCurrencyAddressMessageWithAddress:(NSString *)address lable:(NSString *)lable status:(int)status complete:(void (^)(BOOL result))complete;
 
+/**
+ * update default address
+ *
+ */
++ (void)updateCurrencyDefaultAddress:(NSString *)address currency:(int)currency complete:(void (^)(BOOL result))complete;
+
+/**
+ * get default address
+ *
+ */
++ (void)getCurrencyDefaultAddressArrayWithcomplete:(void (^)(BOOL result,NSArray *defaultAddrssArray ))complete;
+
 @end

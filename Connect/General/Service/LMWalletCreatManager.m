@@ -19,11 +19,6 @@
 #import "LMBTCWalletHelper.h"
 #import "Wallet.pbobjc.h"
 
-typedef NS_ENUM(NSUInteger,CurrencyType) {
-    CurrencyTypePrikey   = 1,
-    CurrencyTypeBaseSeed = 2,
-    CurrencyTypeImport   = 3
-};
 @implementation LMWalletCreatManager
 /**
  * creat new wallet
@@ -31,14 +26,15 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
  * @param contacts
  * @param complete
  */
-+ (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(NSString *)currency complete:(void (^)(BOOL isFinish))complete{
-    LMSeedModel *saveSeedModel = [[LMSeedModel allObjects] lastObject];
-    if (!saveSeedModel) {
++ (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(int)currency complete:(void (^)(BOOL isFinish,NSString *error))complete{
+    if (![LMWalletInfoManager sharedManager].isHaveWallet) {
         // Synchronize wallet data and create wallet
         [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
             if (hResponse.code != successCode) {
-                
+                if (complete) {
+                    complete(NO,@"同步数据失败");
+                }
             } else{
                 NSData *data = [ConnectTool decodeHttpResponse:hResponse];
                 RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
@@ -67,6 +63,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                             flag = NO;
                             if (info.index == 0) {
                                 currenncyMoedl.masterAddress = info.address;
+                                currenncyMoedl.defaultAddress = nil;
                             }
                             LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
                             addressModel.label = info.label;
@@ -88,51 +85,81 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                 }
                 if (flag) {
                     [LMWalletInfoManager sharedManager].categorys = syncWallet.status;
+                    if ([LMWalletInfoManager sharedManager].categorys == 0) {
+                        [LMWalletInfoManager sharedManager].categorys = 2;
+                    }
                     switch ([LMWalletInfoManager sharedManager].categorys) {
-                        case CurrencyTypePrikey:
+                        case CategoryTypeOldUser:
                         {
                             // creat old page
                             [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
                         }
                             break;
-                        case CurrencyTypeBaseSeed:
+                        case CategoryTypeNewUser:
                         {
                             // creat new page
                             [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
                         }
                             break;
-                        case CurrencyTypeImport:
+                        case CategoryTypeImportUser:
                         {
                             [LMWalletCreatManager creatImportWallet:nil complete:complete];
                         }
                             break;
                             
                         default:
+                        {
+                            // creat new page
+                            [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
+                        }
                             break;
                     }
                 }
             }
         } fail:^(NSError *error) {
             if (complete) {
-                complete(NO);
+                complete(NO,@"同步数据失败");
             }
         }];
+    }else {  // create bit (btc  ltc)
+        [LMCurrencyModel setDefaultRealm];
+        LMCurrencyModel *currencyModel = [[LMCurrencyModel allObjects] lastObject];
+        if (!currencyModel) {
+            NSData *saltData = [LMIMHelper createRandom512bits];
+            NSString *salt = [[NSString alloc] initWithData:saltData encoding:NSUTF8StringEncoding];
+            NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
+            NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:[LMWalletInfoManager sharedManager].encryPtionSeed];
+            NSString *bSeedPrikey = [LMBTCWalletHelper getPrivkeyBySeed:BitSeed index:0];
+            NSString *masterAddress = [LMBTCWalletHelper getAddressByPrivKey:bSeedPrikey];
+            int category = [LMWalletInfoManager sharedManager].categorys;
+            [LMCurrencyManager createCurrency:CurrencyTypeBTC salt:salt category:category masterAddess:masterAddress complete:^(BOOL result) {
+                if (result) {
+                    if (complete) {
+                        complete(YES,nil);
+                    }
+                }else{
+                    if (complete) {
+                        complete(NO,@"创建币种失败");
+                    }
+                }
+            }];
+        }
     }
 }
 /**
  * creat import wallet
  *
  */
-+ (void)creatImportWallet:(NSString *)currency complete:(void (^)(BOOL isFinish))complete{
++ (void)creatImportWallet:(NSString *)currency complete:(void (^)(BOOL isFinish,NSString *error))complete{
     
-  [LMCurrencyManager createCurrency:nil salt:nil category:0 masterAddess:nil complete:^(BOOL result) {
+  [LMCurrencyManager createCurrency:0 salt:nil category:0 masterAddess:nil complete:^(BOOL result) {
       if (result) {
           if (complete) {
-              complete(YES);
+              complete(YES,nil);
           }
       }else{
           if (complete) {
-              complete(NO);
+              complete(NO,nil);
           }
           
       }
@@ -144,15 +171,12 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
  *
  * create old wallet
  */
-+ (void)creatOldWallet:(UIViewController *)controllerVc  complete:(void (^)(BOOL isFinish))complete{
++ (void)creatOldWallet:(UIViewController *)controllerVc complete:(void (^)(BOOL isFinish,NSString * error))complete{
     NSString __block *firstPass = nil;
     [GCDQueue executeInMainQueue:^{
         KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
         __weak __typeof(&*passView) weakPassView = passView;
         passView.fillCompleteBlock = ^(NSString *password) {
-            if (password.length != 4) {
-                return;
-            }
             if (GJCFStringIsNull(firstPass)) {
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm PIN", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
@@ -161,25 +185,29 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                 if ([firstPass isEqualToString:password]) {
                     [SetGlobalHandler setpayPass:password compete:^(BOOL result) {
                         if (result) {
-                            NSString *salt = [[NSString alloc] initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
-                            int category = 1;
-                            NSString *masterAddress = [LMBTCWalletHelper getAddressByPrivKey:[LKUserCenter shareCenter].currentLoginUser.prikey];
-                            [LMCurrencyManager createCurrency:@"bitcoin" salt:salt category:category masterAddess:masterAddress complete:^(BOOL result) {
+                            NSData *saltData = [LMIMHelper createRandom512bits];
+                            NSString *salt = [[NSString alloc] initWithData:saltData encoding:NSUTF8StringEncoding];
+                            NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
+                            NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:[LMWalletInfoManager sharedManager].encryPtionSeed];
+                            NSString *bSeedPrikey = [LMBTCWalletHelper getPrivkeyBySeed:BitSeed index:0];
+                            NSString *masterAddress = [LMBTCWalletHelper getAddressByPrivKey:bSeedPrikey];
+                            int category = [LMWalletInfoManager sharedManager].categorys;
+                            [LMCurrencyManager createCurrency:CurrencyTypeBTC salt:salt category:category masterAddess:masterAddress complete:^(BOOL result) {
                                 if (result) {
                                     // tips
                                     if (complete) {
-                                        complete(YES);
+                                        complete(YES,nil);
                                     }
                                 }else{
                                     // tips
                                     if (complete) {
-                                        complete(NO);
+                                        complete(NO,@"创建币种失败");
                                     }
                                 }
                             }];
                         }else {
                             if (complete) {
-                                complete(NO);
+                                complete(NO,@"创建币种失败");
                             }
                         }
                     }];
@@ -187,7 +215,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                     [GCDQueue executeInMainQueue:^{
                         [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:controllerVc.view complete:^{
                             if (complete) {
-                                complete(NO);
+                                complete(NO,LMLocalizedString(@"Login Password incorrect", nil));
                             }
                         }];
                     }];
@@ -201,7 +229,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
  *
  *  create new wallet
  */
-+ (void)creatNewWallet:(UIViewController *)controllerVc currency:(NSString *)currency complete:(void (^)(BOOL isFinish))complete{
++ (void)creatNewWallet:(UIViewController *)controllerVc currency:(int)currency complete:(void (^)(BOOL isFinish,NSString *error))complete{
     LMRandomSeedController *seedVc = [[LMRandomSeedController alloc] init];
     seedVc.seedSourceType = SeedSouceTypeWallet;
     seedVc.SeedBlock = ^(NSString *randomSeed) {
@@ -212,9 +240,6 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                 KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
                 __weak __typeof(&*passView) weakPassView = passView;
                 passView.fillCompleteBlock = ^(NSString *password) {
-                    if (password.length != 4) {
-                        return;
-                    }
                     if (GJCFStringIsNull(firstPass)) {
                         firstPass = password;
                         [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm PIN", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
@@ -229,24 +254,24 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                                     NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
                                     NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:[LMWalletInfoManager sharedManager].encryPtionSeed];
                                     NSString *bSeedPrikey = [LMBTCWalletHelper getPrivkeyBySeed:BitSeed index:0];
-                                    int category = 1;
+                                    int category = [LMWalletInfoManager sharedManager].categorys;
                                     NSString *masterAddress = [LMBTCWalletHelper getAddressByPrivKey:bSeedPrikey];
                                     [LMCurrencyManager createCurrency:0 salt:salt category:category masterAddess:masterAddress complete:^(BOOL result) {
                                         if (result) {
                                             // tips
                                             if (complete) {
-                                                complete(YES);
+                                                complete(YES,nil);
                                             }
                                         }else{
                                             // tips
                                             if (complete) {
-                                                complete(NO);
+                                                complete(NO,@"创建币种失败");
                                             }
                                         }
                                     }];
                                 }else {
                                     if (complete) {
-                                        complete(NO);
+                                        complete(NO,@"创建币种失败");
                                     }
                                 }
                             }];
@@ -254,7 +279,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
                             [GCDQueue executeInMainQueue:^{
                                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:controllerVc.view complete:^{
                                     if (complete) {
-                                        complete(NO);
+                                        complete(NO,LMLocalizedString(@"Login Password incorrect", nil));
                                     }
                                 }];
                             }];
@@ -266,7 +291,7 @@ typedef NS_ENUM(NSUInteger,CurrencyType) {
             
         }else {
             if (complete) {
-                complete(NO);
+                complete(NO,@"没有生成随机种子");
             }
         }
     };
