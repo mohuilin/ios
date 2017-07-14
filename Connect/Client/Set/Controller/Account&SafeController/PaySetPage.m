@@ -104,75 +104,16 @@
     // zero group
     CellGroup *group0 = [[CellGroup alloc] init];
 
-    NSString *tip = LMLocalizedString(@"Set Setting", nil);
-    if ([[MMAppSetting sharedSetting] getPayPass].length == MAX_PASS_LEN) {
-        tip = LMLocalizedString(@"Wallet Reset password", nil);
-    }
-    LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
+    NSString *tip = LMLocalizedString(@"Wallet Reset password", nil);
     CellItem *payPass = nil;
-    if (!seedModel) {
-        tip = LMLocalizedString(@"开启钱包哈哈", nil);
-        payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
-            [LMWalletCreatManager creatNewWalletWithController:self currency:@"bitcoin" complete:^(BOOL isFinish) {
-                if (isFinish) {
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:nil];
-                }
-                [weakSelf reload];
-            }];
-        }];
-    }else {
+    if ([LMWalletInfoManager sharedManager].isHaveWallet) {
         payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
             [weakSelf resetPayPass];
         }];
     }
-    CellItem *fingerPay = [CellItem itemWithTitle:LMLocalizedString(@"Set Pay with Fingerprint", nil) type:CellItemTypeSwitch operation:nil];
-    fingerPay.switchIsOn = [[MMAppSetting sharedSetting] needFingerPay];
-    fingerPay.operationWithInfo = ^(id userInfo) {
-
-        if (GJCFStringIsNull([[MMAppSetting sharedSetting] getPayPass])) {
-            // need user set pass
-            [GCDQueue executeInMainQueue:^{
-                [weakSelf setupCellData];
-                [weakSelf.tableView reloadData];
-
-            }];
-            return;
-        }
-
-        if (![[MMAppSetting sharedSetting] isDeviceSupportFingerPay]) {
-            // Need to open the fingerprint payment, and non-jailbreak of the machine
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:LMLocalizedString(@"Set tip title", nil) message:LMLocalizedString(@"Set fingerprint not allowed on jailbreaking phones", nil) preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction *okAction = [UIAlertAction actionWithTitle:LMLocalizedString(@"Wallet Confirmed", nil) style:UIAlertActionStyleDefault handler:nil];
-            [alertController addAction:okAction];
-            [GCDQueue executeInMainQueue:^{
-                [weakSelf presentViewController:alertController animated:YES completion:nil];
-                [weakSelf setupCellData];
-                [weakSelf.tableView reloadData];
-            }];
-            return;
-        }
-
-        [GCDQueue executeInMainQueue:^{
-            // Let the return button all can not click
-            self.whiteButton.enabled = NO;
-            if ([userInfo boolValue]) {
-                [[WJTouchID touchID] startWJTouchIDWithMessage:LMLocalizedString(@"Wallet Allow fingerprint to pay", nil) fallbackTitle:LMLocalizedString(@"Wallet Confirmed", nil) delegate:weakSelf];
-            } else {
-                [[WJTouchID touchID] startWJTouchIDWithMessage:LMLocalizedString(@"Set Disbale fingerprint payment", nil) fallbackTitle:LMLocalizedString(@"Wallet Confirmed", nil) delegate:weakSelf];
-            }
-        }];
-    };
-
-    CellItem *noPassPay = [CellItem itemWithTitle:LMLocalizedString(@"Set Skip password", nil) type:CellItemTypeSwitch operation:nil];
-    noPassPay.switchIsOn = [[MMAppSetting sharedSetting] isCanNoPassPay];
-    noPassPay.operationWithInfo = ^(id userInfo) {
-        [weakSelf openNoPassPay:[userInfo boolValue]];
-    };
-
-
-    group0.items = @[payPass, fingerPay, noPassPay];
-
-
+    if ([LMWalletInfoManager sharedManager].isHaveWallet) {
+      group0.items = @[payPass];
+    }
     [self.groups objectAddObject:group0];
 
 
@@ -258,25 +199,30 @@
         KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
         __weak __typeof(&*passView) weakPassView = passView;
         [weakPassView setTitleString:LMLocalizedString(@"请输入原密码哈哈", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+        NSString __block *baseSeedStr = nil;
         passView.fillCompleteBlock = ^(NSString *password) {
             if (GJCFStringIsNull(firstPass)) {
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                if (![LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password]) {
-                    [weakPassView setTitleString:LMLocalizedString(@"原密码输入错误哈哈,请重新输入", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                    firstPass = nil;
-                }
-                return;
+                [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
+                    if (!success) {
+                        [weakPassView setTitleString:LMLocalizedString(@"原密码输入错误哈哈,请重新输入", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                        firstPass = nil;
+                        return ;
+                    }else{
+                        baseSeedStr = decodeValue;
+                    }
+                }];
             }else if (GJCFStringIsNull(secondPass)){
                 secondPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm Payment password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                 return;
             }else  {
-                [weakPassView dismissWithClosed:YES];
                 if ([secondPass isEqualToString:password]) {
+                    [weakPassView dismissWithClosed:YES];
                     // save and upload
                     [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                        [SetGlobalHandler resetPayPass:password compete:^(BOOL result) {
+                        [SetGlobalHandler resetPayPass:password baseSeed:baseSeedStr compete:^(BOOL result) {
                             if (result) {
                                 [weakSelf reload];
                                 // tips
@@ -294,7 +240,7 @@
                     }];
                 } else {
                     [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+                        [MBProgressHUD showToastwithText:@"两次密码输入不一致" withType:ToastTypeFail showInView:weakSelf.view complete:nil];
                     }];
                 }
             }

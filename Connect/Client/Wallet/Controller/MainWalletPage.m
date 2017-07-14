@@ -16,7 +16,10 @@
 #import "ScanAddPage.h"
 #import "LMHandleScanResultManager.h"
 #import "LMWalletCreatManager.h"
-
+#import "LMSeedModel.h"
+#import "LMTransferManager.h"
+#import "LMTemManager.h"
+#import "LMCurrencyModel.h"
 
 
 @interface WalletItem : NSObject
@@ -47,12 +50,15 @@
 @property(nonatomic, strong) NSMutableArray *walletItems;
 @property(nonatomic, copy) NSString *resultContent;
 @property(nonatomic, strong) NSDecimalNumber *money;
-@property(nonatomic, assign) BOOL isCreatWallet;
+@property(nonatomic, strong) RLMResults *currencyResults;
+@property(nonatomic, strong) RLMNotificationToken *totalAmountToken;
+
+
 
 @end
 
 @implementation MainWalletPage
-
+#pragma mark - system methods
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.leftBarButtonItems = nil;
@@ -60,20 +66,16 @@
     [self setupSubView];
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
-    self.isCreatWallet = YES;
-
+    [self addNotification];
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (self.isCreatWallet) {
-        [self creatNewWallet];
-        self.isCreatWallet = NO;
-    }
-    
+    [self creatNewWallet];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self queryBlance];
+    
 }
 
 #pragma lazy
@@ -124,14 +126,37 @@
 }
 #pragma mark action
 - (void)creatNewWallet{
+    
     //Synchronize wallet data and create wallet
-  [LMWalletCreatManager creatNewWalletWithController:self currency:@"bitcoin" complete:^(BOOL isFinish) {
+  [LMWalletCreatManager creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(BOOL isFinish,NSString *error) {
       if (isFinish) {
           [GCDQueue executeInMainQueue:^{
            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
           }];
+      }else {
+          [GCDQueue executeInMainQueue:^{
+              [MBProgressHUD showToastwithText:error withType:ToastTypeFail showInView:self.view complete:nil];
+          }];
       }
   }];
+}
+- (void)addNotification {
+    if (!self.currencyResults) {
+        [LMCurrencyModel setDefaultRealm];
+        self.currencyResults = [LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = 0 "]];
+    }
+    __weak typeof(self)weakSelf = self;
+    self.totalAmountToken = [self.currencyResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+        if (!error) {
+            for (LMCurrencyModel *currentModel in results) {
+                [[MMAppSetting sharedSetting] saveBalance:currentModel.blance];
+                [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@", [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateNormal];
+                break;
+            }
+        }
+    }];
+    
+
 }
 - (void)currencyChange {
     [super currencyChange];
@@ -203,7 +228,7 @@
         case 0: {
             LMReceiptViewController *bigReVc = [[LMReceiptViewController alloc] init];
             bigReVc.hidesBottomBarWhenPushed = YES;
-            bigReVc.currency = @"bitcnin";
+            bigReVc.currency = CurrencyTypeBTC;
             [self.navigationController pushViewController:bigReVc animated:YES];
         }
             break;
@@ -230,12 +255,11 @@
 
 - (void)queryBlance {
     __weak __typeof(&*self) weakSelf = self;
-    [[PayTool sharedInstance] getBlanceWithComplete:^(NSString *blance, UnspentAmount *unspentAmount, NSError *error) {
-        if (!error) {
-           [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@", [PayTool getBtcStringWithAmount:unspentAmount.amount]] forState:UIControlStateNormal];
-        }
-    }];
-
+//    [[PayTool sharedInstance] getBlanceWithComplete:^(NSString *blance, UnspentAmount *unspentAmount, NSError *error) {
+//        if (!error) {
+//           [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@", [PayTool getBtcStringWithAmount:unspentAmount.amount]] forState:UIControlStateNormal];
+//        }
+//    }];
     [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
         if (!error) {
             [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", weakSelf.symbol, rate.doubleValue * [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateSelected];
@@ -282,6 +306,8 @@
 
 - (void)dealloc {
     RemoveNofify;
+    [self.totalAmountToken stop];
+    self.totalAmountToken = nil;
 }
 
 

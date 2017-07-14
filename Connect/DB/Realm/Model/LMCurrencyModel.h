@@ -18,6 +18,7 @@
 @property(assign ,nonatomic) int status;
 @property(assign ,nonatomic) long long int blance;
 @property(copy ,nonatomic) NSString *payload;
+@property(copy ,nonatomic) NSString *defaultAddress;
 @property(strong, nonatomic) RLMArray<LMCurrencyAddress *> <LMCurrencyAddress> *addressListArray;
 
 @end

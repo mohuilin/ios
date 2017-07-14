@@ -1803,6 +1803,108 @@ typedef struct RequestCreateCoinInfo__storage_ {
 
 @end
 
+#pragma mark - DefaultAddress
+
+@implementation DefaultAddress
+
+@dynamic currency;
+@dynamic address;
+
+typedef struct DefaultAddress__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t currency;
+  NSString *address;
+} DefaultAddress__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = DefaultAddress_FieldNumber_Currency,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(DefaultAddress__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "address",
+        .dataTypeSpecific.className = NULL,
+        .number = DefaultAddress_FieldNumber_Address,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(DefaultAddress__storage_, address),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[DefaultAddress class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(DefaultAddress__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - ListDefaultAddress
+
+@implementation ListDefaultAddress
+
+@dynamic defaultAddressesArray, defaultAddressesArray_Count;
+
+typedef struct ListDefaultAddress__storage_ {
+  uint32_t _has_storage_[1];
+  NSMutableArray *defaultAddressesArray;
+} ListDefaultAddress__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "defaultAddressesArray",
+        .dataTypeSpecific.className = GPBStringifySymbol(DefaultAddress),
+        .number = ListDefaultAddress_FieldNumber_DefaultAddressesArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(ListDefaultAddress__storage_, defaultAddressesArray),
+        .flags = (GPBFieldFlags)(GPBFieldRepeated | GPBFieldTextFormatNameCustom),
+        .dataType = GPBDataTypeMessage,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[ListDefaultAddress class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(ListDefaultAddress__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+#if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
+    static const char *extraTextFormatInfo =
+        "\001\001\000defaultAddresses\000";
+    [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
+#endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
 
 #pragma clang diagnostic pop
 

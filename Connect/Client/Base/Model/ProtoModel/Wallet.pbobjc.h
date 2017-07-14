@@ -31,6 +31,7 @@ CF_EXTERN_C_BEGIN
 @class Coin;
 @class CoinInfo;
 @class CoinsDetail;
+@class DefaultAddress;
 @class TransactionFlowing;
 @class Wallet;
 
@@ -559,6 +560,35 @@ typedef GPB_ENUM(RequestCreateCoinInfo_FieldNumber) {
 @property(nonatomic, readwrite) int32_t currency;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
+
+@end
+
+#pragma mark - DefaultAddress
+
+typedef GPB_ENUM(DefaultAddress_FieldNumber) {
+  DefaultAddress_FieldNumber_Currency = 1,
+  DefaultAddress_FieldNumber_Address = 2,
+};
+
+@interface DefaultAddress : GPBMessage
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+
+@end
+
+#pragma mark - ListDefaultAddress
+
+typedef GPB_ENUM(ListDefaultAddress_FieldNumber) {
+  ListDefaultAddress_FieldNumber_DefaultAddressesArray = 1,
+};
+
+@interface ListDefaultAddress : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<DefaultAddress*> *defaultAddressesArray;
+/** The number of items in @c defaultAddressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger defaultAddressesArray_Count;
 
 @end
 

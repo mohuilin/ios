@@ -22,7 +22,7 @@ typedef NS_ENUM(NSInteger,CategoryType) {
 @property (nonatomic, assign) CategoryType categorys;
 @property (nonatomic, copy) NSString *baseSeed;
 @property (nonatomic, copy) NSString *encryPtionSeed;
-
+@property (nonatomic, assign) BOOL isHaveWallet;
 
 
 

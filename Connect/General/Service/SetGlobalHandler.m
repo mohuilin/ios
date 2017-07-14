@@ -1230,7 +1230,6 @@
                 }];
             }
             [LMWalletInfoManager sharedManager].encryPtionSeed = payLoad;
-            [[MMAppSetting sharedSetting]  setPayPass:payPass];
             if (complete) {
                 complete(YES);
             }
@@ -1249,18 +1248,12 @@
    * @param payPass to pay the password
    * @ Param fee
  */
-+ (void)resetPayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete{
++ (void)resetPayPass:(NSString *)payPass baseSeed:(NSString *)baseSeed compete:(void(^)(BOOL result))complete{
     if (payPass == nil) {
         payPass = @"";
     }
-    NSString *needStr = nil;
-    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-        needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
-    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
-        needStr = [LMWalletInfoManager sharedManager].baseSeed;
-    }
     RequestWalletInfo *creatWallet = [RequestWalletInfo new];
-    NSString *payLoad = [LMBTCWalletHelper encodeValue:needStr password:payPass n:17];
+    NSString *payLoad = [LMBTCWalletHelper encodeValue:baseSeed password:payPass n:17];
     NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
     int n = 17;
     NSString *checkStr = [NSString stringWithFormat:@"%d%@%@",n,payLoad,salt];
@@ -1281,17 +1274,15 @@
             }
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-            RequestWalletInfo *requestInfo =  [RequestWalletInfo parseFromData:data error:nil];
+            RequestWalletInfo *requestInfo = [RequestWalletInfo parseFromData:data error:nil];
             if (data) {
                 // save data to db
                 LMSeedModel *saveSeedModel = [[LMSeedModel allObjects] lastObject];
                 [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                    saveSeedModel.encryptSeed = requestInfo.payload;
                     saveSeedModel.salt = salt;
                     saveSeedModel.n = n;
                     saveSeedModel.status = [LMWalletInfoManager sharedManager].categorys;
                     saveSeedModel.version = requestInfo.version;
-                    
                 }];
                 [LMWalletInfoManager sharedManager].encryPtionSeed = payLoad;
                 if (complete) {

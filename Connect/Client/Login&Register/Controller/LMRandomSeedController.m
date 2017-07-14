@@ -276,8 +276,14 @@
         }
         self.isLoaded = YES;
         self.displayLable.text = LMLocalizedString(@"Login Generating Private and Public Key", nil);
+        if (self.seedSourceType == SeedSouceTypeWallet) {
+            self.displayLable.text = LMLocalizedString(@"Login Collecting Sounds as Random Seed", nil);
+        }
     } else {
         self.displayLable.text = LMLocalizedString(@"Login Generating Bitcoin address", nil);
+        if (self.seedSourceType == SeedSouceTypeWallet) {
+            self.displayLable.text = LMLocalizedString(@"Login Collecting Sounds as Random Seed", nil);
+        }
     }
     // action
     if (self.progressView.progress == 1.0) {
