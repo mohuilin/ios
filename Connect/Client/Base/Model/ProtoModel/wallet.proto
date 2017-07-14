@@ -76,13 +76,25 @@ string tips = 6;
 repeated string addresses = 7;
 }
 
-message TransferRequest {
+message AddressAndAmount {
+string address = 1;
+int64 amount = 2;
+}
+
+message URLTransferRequest {
 int64 amount = 1;
+int64 fee = 2;
+repeated string from_addresses = 3;
+int32 currency = 4;
+}
+
+message TransferRequest {
+repeated AddressAndAmount to_addresses = 1;
 int64 fee = 2;
 int32 transfer_type = 3;
 string tips = 4;
 repeated string from_addresses = 5;
-repeated string to_addresses = 6;
+int32 currency = 6;
 }
 
 message CrowdfuningRequest {
@@ -104,6 +116,7 @@ message OriginalTransaction {
 string rawhex = 1;
 string vts = 2;
 string transaction_id = 3;
+repeated string addresses = 4;
 }
 
 message PublishTransaction {

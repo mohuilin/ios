@@ -378,6 +378,9 @@
  *                                wallet
  * ====================================================================================== */
 
+
+#define WalletServiceTransfer @"http://192.168.40.110:18083/wallet/v2/service/transfer"
+
 /**
  Payment settings
   

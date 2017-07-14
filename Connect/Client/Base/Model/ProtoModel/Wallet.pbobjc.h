@@ -27,6 +27,7 @@
 
 CF_EXTERN_C_BEGIN
 
+@class AddressAndAmount;
 @class Coin;
 @class CoinInfo;
 @class CoinsDetail;
@@ -284,20 +285,60 @@ typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
 
 @end
 
+#pragma mark - AddressAndAmount
+
+typedef GPB_ENUM(AddressAndAmount_FieldNumber) {
+  AddressAndAmount_FieldNumber_Address = 1,
+  AddressAndAmount_FieldNumber_Amount = 2,
+};
+
+@interface AddressAndAmount : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@end
+
+#pragma mark - URLTransferRequest
+
+typedef GPB_ENUM(URLTransferRequest_FieldNumber) {
+  URLTransferRequest_FieldNumber_Amount = 1,
+  URLTransferRequest_FieldNumber_Fee = 2,
+  URLTransferRequest_FieldNumber_FromAddressesArray = 3,
+  URLTransferRequest_FieldNumber_Currency = 4,
+};
+
+@interface URLTransferRequest : GPBMessage
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@property(nonatomic, readwrite) int64_t fee;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *fromAddressesArray;
+/** The number of items in @c fromAddressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger fromAddressesArray_Count;
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@end
+
 #pragma mark - TransferRequest
 
 typedef GPB_ENUM(TransferRequest_FieldNumber) {
-  TransferRequest_FieldNumber_Amount = 1,
+  TransferRequest_FieldNumber_ToAddressesArray = 1,
   TransferRequest_FieldNumber_Fee = 2,
   TransferRequest_FieldNumber_TransferType = 3,
   TransferRequest_FieldNumber_Tips = 4,
   TransferRequest_FieldNumber_FromAddressesArray = 5,
-  TransferRequest_FieldNumber_ToAddressesArray = 6,
+  TransferRequest_FieldNumber_Currency = 6,
 };
 
 @interface TransferRequest : GPBMessage
 
-@property(nonatomic, readwrite) int64_t amount;
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<AddressAndAmount*> *toAddressesArray;
+/** The number of items in @c toAddressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger toAddressesArray_Count;
 
 @property(nonatomic, readwrite) int64_t fee;
 
@@ -309,9 +350,7 @@ typedef GPB_ENUM(TransferRequest_FieldNumber) {
 /** The number of items in @c fromAddressesArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger fromAddressesArray_Count;
 
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *toAddressesArray;
-/** The number of items in @c toAddressesArray without causing the array to be created. */
-@property(nonatomic, readonly) NSUInteger toAddressesArray_Count;
+@property(nonatomic, readwrite) int32_t currency;
 
 @end
 
@@ -368,6 +407,7 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
   OriginalTransaction_FieldNumber_Rawhex = 1,
   OriginalTransaction_FieldNumber_Vts = 2,
   OriginalTransaction_FieldNumber_TransactionId = 3,
+  OriginalTransaction_FieldNumber_AddressesArray = 4,
 };
 
 @interface OriginalTransaction : GPBMessage
@@ -377,6 +417,10 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *vts;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *transactionId;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *addressesArray;
+/** The number of items in @c addressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger addressesArray_Count;
 
 @end
 

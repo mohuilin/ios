@@ -849,26 +849,76 @@ typedef struct LuckyPackageRequest__storage_ {
 
 @end
 
-#pragma mark - TransferRequest
+#pragma mark - AddressAndAmount
 
-@implementation TransferRequest
+@implementation AddressAndAmount
+
+@dynamic address;
+@dynamic amount;
+
+typedef struct AddressAndAmount__storage_ {
+  uint32_t _has_storage_[1];
+  NSString *address;
+  int64_t amount;
+} AddressAndAmount__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "address",
+        .dataTypeSpecific.className = NULL,
+        .number = AddressAndAmount_FieldNumber_Address,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(AddressAndAmount__storage_, address),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = AddressAndAmount_FieldNumber_Amount,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(AddressAndAmount__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[AddressAndAmount class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(AddressAndAmount__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - URLTransferRequest
+
+@implementation URLTransferRequest
 
 @dynamic amount;
 @dynamic fee;
-@dynamic transferType;
-@dynamic tips;
 @dynamic fromAddressesArray, fromAddressesArray_Count;
-@dynamic toAddressesArray, toAddressesArray_Count;
+@dynamic currency;
 
-typedef struct TransferRequest__storage_ {
+typedef struct URLTransferRequest__storage_ {
   uint32_t _has_storage_[1];
-  int32_t transferType;
-  NSString *tips;
+  int32_t currency;
   NSMutableArray *fromAddressesArray;
-  NSMutableArray *toAddressesArray;
   int64_t amount;
   int64_t fee;
-} TransferRequest__storage_;
+} URLTransferRequest__storage_;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
@@ -879,17 +929,97 @@ typedef struct TransferRequest__storage_ {
       {
         .name = "amount",
         .dataTypeSpecific.className = NULL,
-        .number = TransferRequest_FieldNumber_Amount,
+        .number = URLTransferRequest_FieldNumber_Amount,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(TransferRequest__storage_, amount),
+        .offset = (uint32_t)offsetof(URLTransferRequest__storage_, amount),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
       },
       {
         .name = "fee",
         .dataTypeSpecific.className = NULL,
-        .number = TransferRequest_FieldNumber_Fee,
+        .number = URLTransferRequest_FieldNumber_Fee,
         .hasIndex = 1,
+        .offset = (uint32_t)offsetof(URLTransferRequest__storage_, fee),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "fromAddressesArray",
+        .dataTypeSpecific.className = NULL,
+        .number = URLTransferRequest_FieldNumber_FromAddressesArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(URLTransferRequest__storage_, fromAddressesArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = URLTransferRequest_FieldNumber_Currency,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(URLTransferRequest__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[URLTransferRequest class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(URLTransferRequest__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - TransferRequest
+
+@implementation TransferRequest
+
+@dynamic toAddressesArray, toAddressesArray_Count;
+@dynamic fee;
+@dynamic transferType;
+@dynamic tips;
+@dynamic fromAddressesArray, fromAddressesArray_Count;
+@dynamic currency;
+
+typedef struct TransferRequest__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t transferType;
+  int32_t currency;
+  NSMutableArray *toAddressesArray;
+  NSString *tips;
+  NSMutableArray *fromAddressesArray;
+  int64_t fee;
+} TransferRequest__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "toAddressesArray",
+        .dataTypeSpecific.className = GPBStringifySymbol(AddressAndAmount),
+        .number = TransferRequest_FieldNumber_ToAddressesArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(TransferRequest__storage_, toAddressesArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "fee",
+        .dataTypeSpecific.className = NULL,
+        .number = TransferRequest_FieldNumber_Fee,
+        .hasIndex = 0,
         .offset = (uint32_t)offsetof(TransferRequest__storage_, fee),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
@@ -898,7 +1028,7 @@ typedef struct TransferRequest__storage_ {
         .name = "transferType",
         .dataTypeSpecific.className = NULL,
         .number = TransferRequest_FieldNumber_TransferType,
-        .hasIndex = 2,
+        .hasIndex = 1,
         .offset = (uint32_t)offsetof(TransferRequest__storage_, transferType),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
@@ -907,7 +1037,7 @@ typedef struct TransferRequest__storage_ {
         .name = "tips",
         .dataTypeSpecific.className = NULL,
         .number = TransferRequest_FieldNumber_Tips,
-        .hasIndex = 3,
+        .hasIndex = 2,
         .offset = (uint32_t)offsetof(TransferRequest__storage_, tips),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
@@ -922,13 +1052,13 @@ typedef struct TransferRequest__storage_ {
         .dataType = GPBDataTypeString,
       },
       {
-        .name = "toAddressesArray",
+        .name = "currency",
         .dataTypeSpecific.className = NULL,
-        .number = TransferRequest_FieldNumber_ToAddressesArray,
-        .hasIndex = GPBNoHasBit,
-        .offset = (uint32_t)offsetof(TransferRequest__storage_, toAddressesArray),
-        .flags = GPBFieldRepeated,
-        .dataType = GPBDataTypeString,
+        .number = TransferRequest_FieldNumber_Currency,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(TransferRequest__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -1126,12 +1256,14 @@ typedef struct PayCrowdRequest__storage_ {
 @dynamic rawhex;
 @dynamic vts;
 @dynamic transactionId;
+@dynamic addressesArray, addressesArray_Count;
 
 typedef struct OriginalTransaction__storage_ {
   uint32_t _has_storage_[1];
   NSString *rawhex;
   NSString *vts;
   NSString *transactionId;
+  NSMutableArray *addressesArray;
 } OriginalTransaction__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1165,6 +1297,15 @@ typedef struct OriginalTransaction__storage_ {
         .hasIndex = 2,
         .offset = (uint32_t)offsetof(OriginalTransaction__storage_, transactionId),
         .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "addressesArray",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_AddressesArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, addressesArray),
+        .flags = GPBFieldRepeated,
         .dataType = GPBDataTypeString,
       },
     };
