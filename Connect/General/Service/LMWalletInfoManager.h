@@ -8,9 +8,10 @@
 
 #import <Foundation/Foundation.h>
 typedef NS_ENUM(NSInteger,CategoryType) {
-    CategoryTypeOldUser    = 1,
-    CategoryTypeNewUser    = 2,
-    CategoryTypeImportUser = 3
+    CategoryTypeOldUser     = 1,
+    CategoryTypeNewUser     = 2,
+    CategoryTypeImportUser  = 3,
+    CategoryTypeIsExistUser = 4
 };
 @interface LMWalletInfoManager : NSObject
 + (instancetype)sharedManager;

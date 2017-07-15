@@ -13,7 +13,36 @@
 #import "Wallet.pbobjc.h"
 #import "Protofile.pbobjc.h"
 #import "ConnectTool.h"
+#import "LMWalletCreatManager.h"
+
 @implementation LMCurrencyManager
+/**
+ *  sync wallet data
+ *
+ */
++ (void)syncWalletData:(void (^)(BOOL result))complete {
+    // Synchronize wallet data and create wallet
+    [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete(NO);
+            }
+        } else{
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
+            [LMWalletCreatManager syncDataToDB:syncWallet];
+            if (complete) {
+                complete(YES);
+            }
+        }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(NO);
+        }
+    }];
+
+}
 /**
  *  creat currency
  *
@@ -33,10 +62,20 @@
     if (!currencyModel) {
         // sync currency
         [LMCurrencyManager getCurrencyListWithWalletId:nil complete:^(BOOL result, NSArray<Coin *> *coinList) {
-            BOOL flag = NO;
+            BOOL flag = YES;
             for (Coin *coin in coinList) {
                 if (coin.currency == currency) {
-                    flag = YES;
+                    flag = NO;
+                    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],currency] lastObject];
+                    [[LMRealmManager sharedManager] executeRealmWithBlock:^{
+                        currencyModel.category = category;
+                        currencyModel.salt = salt;
+                        currencyModel.masterAddress = masterAddess;
+                        currencyModel.status = 1;
+                        currencyModel.blance = coin.balance;
+                        currencyModel.payload = coin.payload;
+                        currencyModel.defaultAddress = masterAddess;
+                    }];
                     break;
                 }
             }
@@ -48,7 +87,6 @@
                             complete(NO);
                         }
                     }else {
-                        
                         // save db
                         LMCurrencyModel *currencyModel = [LMCurrencyModel new];
                         currencyModel.currency = currency;
@@ -71,11 +109,20 @@
                         }];
                         [currencyModel.addressListArray addObject:addressModel];
                         // save db to currency Address
-                        
-                        if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-                            currencyModel.payload = [LMWalletInfoManager sharedManager].encryPtionSeed;
-                        }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
-                            currencyModel.payload = nil;
+                        switch ([LMWalletInfoManager sharedManager].categorys) {
+                            case CategoryTypeOldUser:
+                            {
+                                currencyModel.payload = [LMWalletInfoManager sharedManager].encryPtionSeed;
+                            }
+                                break;
+                            case CategoryTypeNewUser:
+                            {
+                                currencyModel.payload = nil;
+                            }
+                                break;
+                                
+                            default:
+                                break;
                         }
                         [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                             [realm addOrUpdateObject:currencyModel];
@@ -112,7 +159,7 @@
             if (data) {
                 Coins *coin = [Coins parseFromData:data error:nil];
                 if (complete) {
-                    complete(NO,coin.coinsArray);
+                    complete(YES,coin.coinsArray);
                 }
             }
       }

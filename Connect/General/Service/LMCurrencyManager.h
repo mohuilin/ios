@@ -10,6 +10,12 @@
 #import "Wallet.pbobjc.h"
 @interface LMCurrencyManager : NSObject
 /**
+ *  sync wallet data
+ *
+ */
++ (void)syncWalletData:(void (^)(BOOL result))complete;
+
+/**
  *  creat currency
  *
  */

@@ -12,6 +12,7 @@
 #import "LMIMHelper.h"
 #import "LMSeedModel.h"
 #import "LMWalletCreatManager.h"
+#import "LMCurrencyManager.h"
 
 @interface PaySetPage () <WJTouchIDDelegate>
 
@@ -109,6 +110,12 @@
     if ([LMWalletInfoManager sharedManager].isHaveWallet) {
         payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
             [weakSelf resetPayPass];
+        }];
+    }else {
+        [LMCurrencyManager syncWalletData:^(BOOL result) {
+            if (result) {
+                [weakSelf reload];
+            }
         }];
     }
     if ([LMWalletInfoManager sharedManager].isHaveWallet) {

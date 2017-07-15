@@ -34,24 +34,19 @@ CREATE_SHARED_MANAGER(LMWalletInfoManager)
 -(CategoryType)categorys{
  LMSeedModel *baseModel = [[LMSeedModel allObjects] lastObject];
     switch (baseModel.status) {
-        case 1:
+        case 3:
         {
             return CategoryTypeOldUser;
         }
             break;
-        case 2:
+        case 0:
         {
             return CategoryTypeNewUser;
-        }
-            break;
-        case 3:
-        {
-            return CategoryTypeImportUser;
         }
             break;
         default:
         {
-            return CategoryTypeNewUser;
+            return CategoryTypeIsExistUser;
         }
             break;
     }
