@@ -568,9 +568,11 @@
 "Set new version"="Новая версия программы :%@";
 "Set or"="Или";
 "Set tip title"="Подсказка  ";
-"Set unlink Connect not find friend your backup deleted"="После отмены привязки учетной записи,  Connect не будет в состоянии найти любого друга из контактов в телефоне, резервная копия закрытого ключа на сервере будет удалена.";
+"Set unlink Connect not find friend your backup deleted"="После отмены привязки учетной записи,  Connect не будет в состоянии найти любого друга из контактов в телефоне, резервная копия закрытого ключа на сервере будет удалена";
 "Set verification code has been send to phone"="Проверочный код был отправлен на ваш телефон";
-"Set you can login mobile number link one account"="После внесения изменения, Вы можете войти через новый зарегистрированый телефонный номер/ n один новый телефонный номер может быть привязан к учетной записи один раз ";
+"Set you can login mobile number link one account"="После внесения изменения, Вы можете войти через новый зарегистрированый телефонный номер/ n один новый телефонный номер может быть привязан к учетной записи один раз";
+"Set please enter the original password" = "Пожалуйста, введите оригинальный пароль";
+"Set original password input error please enter again" = "Оригинальные ошибки ввода кода, пожалуйста, введите";
 "Wallet"="Модель кошелька";
 "Wallet Add note"="Оставить сообщение";
 "Wallet Address Book"="Часто употребляемая адресная книга";
@@ -717,5 +719,8 @@
 "Wallet transfer man"="Перевод денежных средств %d)";
 "Wallet transferOutVia return"="Возврат перечисленных денежных средств";
 "Wallet transferOutVia return Success"="Успешный возврат перечисленных денежных средств";
+"Wallet create currency failed" = "Создание валюты не удалось";
+"Wallet Create wallet failed" = "Не удалось создать кошелек";
+"Wallet synchronization data failed" = "Синхронные данные не удалось";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

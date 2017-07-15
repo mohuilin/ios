@@ -571,6 +571,8 @@
 "Set unlink Connect not find friend your backup deleted"="If unbound your phone, Connect will not able to find any friend from your phone contacts, your backup of private key on the server will be deleted.";
 "Set verification code has been send to phone"="A verification code has been send to phone.";
 "Set you can login mobile number link one account"="After changing, you can login with new number\n one mobile number can only be linked to one account";
+"Set please enter the original password" = "Please enter the original password";
+"Set original password input error please enter again" = "Original password input error, please enter again";
 "Wallet"="Wallet";
 "Wallet Add note"="Add note";
 "Wallet Address Book"="Address Book";
@@ -717,5 +719,8 @@
 "Wallet transfer man"="Transfer (%d)";
 "Wallet transferOutVia return"="Refund the transfer";
 "Wallet transferOutVia return Success"="Refund successfully";
+"Wallet create currency failed" = "Create currency failed";
+"Wallet Create wallet failed" = "Create wallet failed";
+"Wallet synchronization data failed" = "Synchronization data failed";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

@@ -33,7 +33,7 @@
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,@"同步数据失败");
+                complete(NO,LMLocalizedString(@"Wallet synchronization data failed", nil));
             }
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
@@ -69,7 +69,7 @@
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO,@"同步数据失败");
+            complete(NO,LMLocalizedString(@"Wallet synchronization data failed", nil));
         }
         // get currency list
         [LMCurrencyManager getCurrencyListWithWalletId:nil complete:^(BOOL result, NSArray<Coin *> *coinList) {
@@ -205,13 +205,13 @@
                                 }else{
                                     // tips
                                     if (complete) {
-                                        complete(NO,@"创建币种失败");
+                                        complete(NO,LMLocalizedString(@"Wallet create currency failed", nil));
                                     }
                                 }
                             }];
                         }else {
                             if (complete) {
-                                complete(NO,@"创建币种失败");
+                                complete(NO,LMLocalizedString(@"Wallet create currency failed", nil));
                             }
                         }
                     }];
@@ -269,13 +269,13 @@
                                         }else{
                                             // tips
                                             if (complete) {
-                                                complete(NO,@"创建币种失败");
+                                                complete(NO,LMLocalizedString(@"Wallet create currency failed", nil));
                                             }
                                         }
                                     }];
                                 }else {
                                     if (complete) {
-                                        complete(NO,@"创建钱包失败");
+                                        complete(NO,LMLocalizedString(@"Wallet Create wallet failed", nil));
                                     }
                                 }
                             }];
@@ -291,7 +291,7 @@
             
         }else {
             if (complete) {
-                complete(NO,@"没有生成随机种子");
+                complete(NO,LMLocalizedString(@"Login Generated Failure", nil));
             }
         }
     };

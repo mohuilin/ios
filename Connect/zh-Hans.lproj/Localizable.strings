@@ -572,6 +572,8 @@
 "Set unlink Connect not find friend your backup deleted"="取消绑定后，Connect将不能为你找到手机通讯录里的朋友，你保存在服务器的私钥备份也将被删除";
 "Set verification code has been send to phone"="验证码已经发送到你的手机";
 "Set you can login mobile number link one account"="修改后,你可以通过新手机号登录\n一个手机号只能绑定一个账户";
+"Set please enter the original password" = "请输入原密码";
+"Set original password input error please enter again" = "原密码输入错误,请重新输入";
 "Wallet"="钱包模块";
 "Wallet Add note"="添加留言";
 "Wallet Address Book"="常用地址簿";
@@ -718,5 +720,8 @@
 "Wallet transfer man"="转账(%d)";
 "Wallet transferOutVia return"="退回转账";
 "Wallet transferOutVia return Success"="退回转账成功";
+"Wallet create currency failed" = "创建币种失败";
+"Wallet Create wallet failed" = "创建钱包失败";
+"Wallet synchronization data failed" = "同步数据失败";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

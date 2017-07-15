@@ -205,7 +205,7 @@
     [GCDQueue executeInMainQueue:^{
         KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
         __weak __typeof(&*passView) weakPassView = passView;
-        [weakPassView setTitleString:LMLocalizedString(@"请输入原密码哈哈", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+        [weakPassView setTitleString:LMLocalizedString(@"Set please enter the original password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
         NSString __block *baseSeedStr = nil;
         passView.fillCompleteBlock = ^(NSString *password) {
             if (GJCFStringIsNull(firstPass)) {
@@ -213,7 +213,7 @@
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                 [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
                     if (!success) {
-                        [weakPassView setTitleString:LMLocalizedString(@"原密码输入错误哈哈,请重新输入", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                        [weakPassView setTitleString:LMLocalizedString(@"Set original password input error please enter again", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                         firstPass = nil;
                         return ;
                     }else{
