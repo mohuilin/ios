@@ -71,6 +71,47 @@
         if (complete) {
             complete(NO,@"同步数据失败");
         }
+        // get currency list
+        [LMCurrencyManager getCurrencyListWithWalletId:nil complete:^(BOOL result, NSArray<Coin *> *coinList) {
+            if (coinList.count > 0) {
+                RLMResults<LMCurrencyModel *> *currencyArray = [LMCurrencyModel allObjects];
+                for (Coin *coin in coinList) {
+                    BOOL flag = YES;
+                    if (currencyArray.count > 0) {
+                        for (LMCurrencyModel *currencyModel in currencyArray) {
+                            if (coin.currency == currencyModel.currency) {
+                                flag = NO;
+                            }
+                        }
+                        if (flag) {
+                            LMCurrencyModel *currencyM = [LMCurrencyModel new];
+                            currencyM.currency = coin.currency;
+                            currencyM.category = coin.category;
+                            currencyM.salt = coin.salt;
+                            currencyM.status = coin.status;
+                            currencyM.blance = coin.balance;
+                            currencyM.payload = coin.payload;
+                            [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                                [realm addOrUpdateObject:currencyM];
+                            }];
+                        }
+                    }else {
+                        LMCurrencyModel *currencyM = [LMCurrencyModel new];
+                        currencyM.currency = coin.currency;
+                        currencyM.category = coin.category;
+                        currencyM.salt = coin.salt;
+                        currencyM.status = coin.status;
+                        currencyM.blance = coin.balance;
+                        currencyM.payload = coin.payload;
+                        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                            [realm addOrUpdateObject:currencyM];
+                        }];
+                    }
+                }
+                
+            }
+        }];
+        
     }];
 }
 /**
