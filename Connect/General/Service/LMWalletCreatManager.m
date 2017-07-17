@@ -37,34 +37,36 @@
             }
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-            RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-            switch (syncWallet.status) {
-                case ServerStatusNoHaveWallet:     // no wallet
-                {
-                    // creat new page
-                    [LMWalletInfoManager sharedManager].categorys = CategoryTypeNewUser;
-                    [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
-                    
+            if (data) {
+                RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
+                switch (syncWallet.status) {
+                    case ServerStatusNoHaveWallet:     // no wallet
+                    {
+                        // creat new page
+                        [LMWalletInfoManager sharedManager].categorys = CategoryTypeNewUser;
+                        [LMWalletCreatManager creatNewWallet:controllerVc currency:currency complete:complete];
+                        
+                    }
+                        break;
+                    case ServerStatusIsExisetWallet:   // exist user
+                    {
+                        // save data to db
+                        [self syncDataToDB:syncWallet];
+                    }
+                        break;
+                    case ServerStatusOldUser:          // old user
+                    {
+                        [self syncDataToDB:syncWallet];
+                        // creat old page
+                        [LMWalletInfoManager sharedManager].categorys = CategoryTypeOldUser;
+                        [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
+                        
+                    }
+                        break;
+                        
+                    default:
+                        break;
                 }
-                    break;
-                case ServerStatusIsExisetWallet:   // exist user
-                {
-                    // save data to db
-                    [self syncDataToDB:syncWallet];
-                }
-                    break;
-                case ServerStatusOldUser:          // old user
-                {
-                     [self syncDataToDB:syncWallet];
-                    // creat old page
-                    [LMWalletInfoManager sharedManager].categorys = CategoryTypeOldUser;
-                    [LMWalletCreatManager creatOldWallet:controllerVc complete:complete];
-                    
-                }
-                    break;
-                    
-                default:
-                    break;
             }
         }
     } fail:^(NSError *error) {
@@ -108,7 +110,6 @@
                         }];
                     }
                 }
-                
             }
         }];
         
@@ -122,32 +123,32 @@
     // save data to db
     LMSeedModel *getSeedModel = [[LMSeedModel allObjects] lastObject];
     LMSeedModel *saveSeedModel = [LMSeedModel new];
-    if (getSeedModel.encryptSeed.length <= 0) {
+    if (getSeedModel.encryptSeed.length <= 0 && syncWallet.wallet.payLoad.length > 0) {
         saveSeedModel.encryptSeed = syncWallet.wallet.payLoad;
     }
-    saveSeedModel.salt = syncWallet.wallet.salt;
-    saveSeedModel.n = syncWallet.wallet.pbkdf2Iterations;
-    saveSeedModel.status = syncWallet.status;
-    saveSeedModel.version = syncWallet.wallet.version;
-    [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-        [realm addOrUpdateObject:saveSeedModel];
-    }];
-    if (syncWallet.coinsArray_Count > 0) {
-        for (Coin *coinInfo in syncWallet.coinsArray) {
-            LMCurrencyModel *getCurencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],coinInfo.currency] lastObject];
-            LMCurrencyModel *currenncyMoedl = [LMCurrencyModel new];
-            if (!getCurencyModel) {
-                currenncyMoedl.currency = coinInfo.currency;
-            }
-            currenncyMoedl.category = coinInfo.category;
-            currenncyMoedl.salt = coinInfo.salt;
-            currenncyMoedl.status = coinInfo.status;
-            currenncyMoedl.blance = coinInfo.balance;
-            currenncyMoedl.payload = coinInfo.payload;
-            [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                [realm addOrUpdateObject:currenncyMoedl];
-            }];
+    if (syncWallet.wallet.payLoad.length > 0) {
+        saveSeedModel.salt = syncWallet.wallet.salt;
+        saveSeedModel.n = syncWallet.wallet.pbkdf2Iterations;
+        saveSeedModel.status = syncWallet.status;
+        saveSeedModel.version = syncWallet.wallet.version;
+        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm addOrUpdateObject:saveSeedModel];
+        }];
+    }
+    for (Coin *coinInfo in syncWallet.coinsArray) {
+        LMCurrencyModel *getCurencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],coinInfo.currency] lastObject];
+        LMCurrencyModel *currenncyMoedl = [LMCurrencyModel new];
+        if (!getCurencyModel) {
+            currenncyMoedl.currency = coinInfo.currency;
         }
+        currenncyMoedl.category = coinInfo.category;
+        currenncyMoedl.salt = coinInfo.salt;
+        currenncyMoedl.status = coinInfo.status;
+        currenncyMoedl.blance = coinInfo.balance;
+        currenncyMoedl.payload = coinInfo.payload;
+        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm addOrUpdateObject:currenncyMoedl];
+        }];
     }
 }
 /**

@@ -211,15 +211,21 @@
             if (GJCFStringIsNull(firstPass)) {
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
-                    if (!success) {
-                        [weakPassView setTitleString:LMLocalizedString(@"Set original password input error please enter again", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                        firstPass = nil;
-                        return ;
-                    }else{
-                        baseSeedStr = decodeValue;
-                    }
-                }];
+                if ([LMWalletInfoManager sharedManager].encryPtionSeed.length > 0) {
+                    [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
+                        if (!success) {
+                            [weakPassView setTitleString:LMLocalizedString(@"Login Password incorrect", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                            firstPass = nil;
+                            return ;
+                        }else{
+                            baseSeedStr = decodeValue;
+                        }
+                    }];
+                }else {
+                    [weakPassView setTitleString:LMLocalizedString(@"ErrorCode data error", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                    firstPass = nil;
+                    return ;
+                }
             }else if (GJCFStringIsNull(secondPass)){
                 secondPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm Payment password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
@@ -247,7 +253,7 @@
                     }];
                 } else {
                     [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:@"两次密码输入不一致" withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
                     }];
                 }
             }

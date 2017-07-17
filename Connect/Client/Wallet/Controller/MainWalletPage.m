@@ -19,6 +19,7 @@
 #import "LMSeedModel.h"
 #import "LMTransferManager.h"
 #import "LMCurrencyModel.h"
+#import "LMCurrencyManager.h"
 
 
 @interface WalletItem : NSObject
@@ -66,10 +67,14 @@
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
     [self addNotification];
+    if (![LMWalletInfoManager sharedManager].isHaveWallet) {
+        [self creatNewWallet];
+    }
+    
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self creatNewWallet];
+    [LMCurrencyManager syncWalletData:nil];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -126,15 +131,16 @@
 #pragma mark action
 - (void)creatNewWallet{
     
+    __weak typeof(self)weakSelf = self;
     //Synchronize wallet data and create wallet
   [LMWalletCreatManager creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(BOOL isFinish,NSString *error) {
       if (isFinish) {
           [GCDQueue executeInMainQueue:^{
-           [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
+           [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:nil];
           }];
       }else {
           [GCDQueue executeInMainQueue:^{
-              [MBProgressHUD showToastwithText:error withType:ToastTypeFail showInView:self.view complete:nil];
+              [MBProgressHUD showToastwithText:error withType:ToastTypeFail showInView:weakSelf.view complete:nil];
           }];
       }
   }];
@@ -149,7 +155,7 @@
         if (!error) {
             for (LMCurrencyModel *currentModel in results) {
                 [[MMAppSetting sharedSetting] saveBalance:currentModel.blance];
-                [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %0.2f", [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateNormal];
+                [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %0.8f", [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateNormal];
                 break;
             }
         }

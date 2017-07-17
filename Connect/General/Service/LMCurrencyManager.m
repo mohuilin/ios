@@ -31,7 +31,9 @@
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
             RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-            [LMWalletCreatManager syncDataToDB:syncWallet];
+            if (syncWallet.status == 1 || syncWallet.status == 3) {
+               [LMWalletCreatManager syncDataToDB:syncWallet];
+            }
             if (complete) {
                 complete(YES);
             }
