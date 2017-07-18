@@ -7,13 +7,13 @@
 //
 
 #import "LMBTCTransferManager.h"
-#import "LMBTCWalletHelper.h"
 #import "InputPayPassView.h"
 #import "NetWorkOperationTool.h"
 #import "ConnectTool.h"
 #import "LMWalletInfoManager.h"
 #import "LMRealmManager.h"
 #import "LMCurrencyAddress.h"
+#import "LMBaseCurrencyManager.h"
 
 @implementation LMBTCTransferManager
 
@@ -29,7 +29,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     request.allotType = amountType;
     request.packageType = luckyPackageType;
     request.addressesArray = fromAddresses.mutableCopy;
-    /// send luckypackage
+    // send luckypackage
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
@@ -285,12 +285,12 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     
     NSMutableArray *privkeyArray = [NSMutableArray array];
     for (NSNumber *index in indexes) {
-        NSString *inputsPrivkey = [LMBTCWalletHelper getPrivkeyBySeed:seed index:index.intValue];
+        NSString *inputsPrivkey = [LMBaseCurrencyManager getPrivkeyBySeed:seed index:index.intValue];
         if (inputsPrivkey) {
             [privkeyArray addObject:inputsPrivkey];
         }
     }
-    NSString *signTransaction = [LMBTCWalletHelper signRawTranscationWithTvs:originalTransaction.vts privkeys:privkeyArray rawTranscation:originalTransaction.rawhex];
+    NSString *signTransaction = [LMBaseCurrencyManager signRawTranscationWithTvs:originalTransaction.vts privkeys:privkeyArray rawTranscation:originalTransaction.rawhex];
     
     PublishTransaction *publish = [[PublishTransaction alloc] init];
     publish.signedHex = signTransaction;

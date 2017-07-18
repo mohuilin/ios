@@ -53,12 +53,12 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - RequestWalletInfo
 
 typedef GPB_ENUM(RequestWalletInfo_FieldNumber) {
-  RequestWalletInfo_FieldNumber_CheckSum = 1,
-  RequestWalletInfo_FieldNumber_Payload = 2,
-  RequestWalletInfo_FieldNumber_Salt = 3,
-  RequestWalletInfo_FieldNumber_N = 4,
-  RequestWalletInfo_FieldNumber_Wid = 5,
-  RequestWalletInfo_FieldNumber_Version = 6,
+  RequestWalletInfo_FieldNumber_Payload = 1,
+  RequestWalletInfo_FieldNumber_CheckSum = 2,
+  RequestWalletInfo_FieldNumber_Ver = 3,
+  RequestWalletInfo_FieldNumber_WId = 4,
+  RequestWalletInfo_FieldNumber_Version = 5,
+  RequestWalletInfo_FieldNumber_UserIdentifier = 6,
 };
 
 /**
@@ -66,17 +66,17 @@ typedef GPB_ENUM(RequestWalletInfo_FieldNumber) {
  **/
 @interface RequestWalletInfo : GPBMessage
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *checkSum;
-
 @property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *salt;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *checkSum;
 
-@property(nonatomic, readwrite) int32_t n;
+@property(nonatomic, readwrite) int32_t ver;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *wid;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
 
 @property(nonatomic, readwrite) int32_t version;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *userIdentifier;
 
 @end
 
@@ -84,11 +84,14 @@ typedef GPB_ENUM(RequestWalletInfo_FieldNumber) {
 
 typedef GPB_ENUM(RequestUserInfo_FieldNumber) {
   RequestUserInfo_FieldNumber_Uid = 1,
+  RequestUserInfo_FieldNumber_Currency = 2,
 };
 
 @interface RequestUserInfo : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *uid;
+
+@property(nonatomic, readwrite) int32_t currency;
 
 @end
 
@@ -104,42 +107,24 @@ typedef GPB_ENUM(Address_FieldNumber) {
 
 @end
 
-#pragma mark - Balance
-
-typedef GPB_ENUM(Balance_FieldNumber) {
-  Balance_FieldNumber_Amount = 1,
-  Balance_FieldNumber_Pending = 2,
-};
-
-@interface Balance : GPBMessage
-
-@property(nonatomic, readwrite) int64_t amount;
-
-@property(nonatomic, readwrite) int64_t pending;
-
-@end
-
 #pragma mark - Wallet
 
 typedef GPB_ENUM(Wallet_FieldNumber) {
-  Wallet_FieldNumber_Pbkdf2Iterations = 1,
+  Wallet_FieldNumber_PayLoad = 1,
   Wallet_FieldNumber_Version = 2,
-  Wallet_FieldNumber_Uuid = 3,
-  Wallet_FieldNumber_PayLoad = 4,
-  Wallet_FieldNumber_Salt = 5,
+  Wallet_FieldNumber_Ver = 3,
+  Wallet_FieldNumber_CheckSum = 4,
 };
 
 @interface Wallet : GPBMessage
 
-@property(nonatomic, readwrite) int32_t pbkdf2Iterations;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *payLoad;
 
 @property(nonatomic, readwrite) int32_t version;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *uuid;
+@property(nonatomic, readwrite) int32_t ver;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *payLoad;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *salt;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *checkSum;
 
 @end
 
@@ -151,8 +136,8 @@ typedef GPB_ENUM(Coin_FieldNumber) {
   Coin_FieldNumber_Category = 3,
   Coin_FieldNumber_Salt = 4,
   Coin_FieldNumber_Balance = 5,
-  Coin_FieldNumber_WId = 6,
-  Coin_FieldNumber_Payload = 7,
+  Coin_FieldNumber_Payload = 6,
+  Coin_FieldNumber_Amount = 7,
 };
 
 @interface Coin : GPBMessage
@@ -167,9 +152,9 @@ typedef GPB_ENUM(Coin_FieldNumber) {
 
 @property(nonatomic, readwrite) int64_t balance;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
-
 @property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
+
+@property(nonatomic, readwrite) int64_t amount;
 
 @end
 
@@ -206,21 +191,43 @@ typedef GPB_ENUM(CoinsDetail_FieldNumber) {
 
 @end
 
+#pragma mark - CreateCoinAddress
+
+typedef GPB_ENUM(CreateCoinAddress_FieldNumber) {
+  CreateCoinAddress_FieldNumber_Index = 1,
+  CreateCoinAddress_FieldNumber_Address = 2,
+  CreateCoinAddress_FieldNumber_Label = 3,
+  CreateCoinAddress_FieldNumber_Status = 4,
+  CreateCoinAddress_FieldNumber_Currency = 5,
+};
+
+@interface CreateCoinAddress : GPBMessage
+
+@property(nonatomic, readwrite) int32_t index;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *label;
+
+@property(nonatomic, readwrite) int32_t status;
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@end
+
 #pragma mark - CoinInfo
 
 typedef GPB_ENUM(CoinInfo_FieldNumber) {
   CoinInfo_FieldNumber_Index = 1,
-  CoinInfo_FieldNumber_Status = 2,
-  CoinInfo_FieldNumber_Address = 3,
-  CoinInfo_FieldNumber_Label = 4,
-  CoinInfo_FieldNumber_Balance = 5,
+  CoinInfo_FieldNumber_Address = 2,
+  CoinInfo_FieldNumber_Label = 3,
+  CoinInfo_FieldNumber_Balance = 4,
+  CoinInfo_FieldNumber_Status = 5,
 };
 
 @interface CoinInfo : GPBMessage
 
 @property(nonatomic, readwrite) int32_t index;
-
-@property(nonatomic, readwrite) int32_t status;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *address;
 
@@ -228,14 +235,15 @@ typedef GPB_ENUM(CoinInfo_FieldNumber) {
 
 @property(nonatomic, readwrite) int64_t balance;
 
+@property(nonatomic, readwrite) int32_t status;
+
 @end
 
 #pragma mark - RespSyncWallet
 
 typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
   RespSyncWallet_FieldNumber_Wallet = 1,
-  RespSyncWallet_FieldNumber_Status = 2,
-  RespSyncWallet_FieldNumber_CoinsArray = 3,
+  RespSyncWallet_FieldNumber_CoinsArray = 2,
 };
 
 @interface RespSyncWallet : GPBMessage
@@ -243,8 +251,6 @@ typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
 @property(nonatomic, readwrite, strong, null_resettable) Wallet *wallet;
 /** Test to see if @c wallet has been set. */
 @property(nonatomic, readwrite) BOOL hasWallet;
-
-@property(nonatomic, readwrite) int32_t status;
 
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<Coin*> *coinsArray;
 /** The number of items in @c coinsArray without causing the array to be created. */
@@ -446,6 +452,30 @@ typedef GPB_ENUM(TransactionFlowing_FieldNumber) {
 
 @end
 
+#pragma mark - CreateCoinRequest
+
+typedef GPB_ENUM(CreateCoinRequest_FieldNumber) {
+  CreateCoinRequest_FieldNumber_Currency = 1,
+  CreateCoinRequest_FieldNumber_MasterAddress = 2,
+  CreateCoinRequest_FieldNumber_Payload = 3,
+  CreateCoinRequest_FieldNumber_Category = 4,
+  CreateCoinRequest_FieldNumber_Salt = 5,
+};
+
+@interface CreateCoinRequest : GPBMessage
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *masterAddress;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
+
+@property(nonatomic, readwrite) int32_t category;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *salt;
+
+@end
+
 #pragma mark - TransactionFlowings
 
 typedef GPB_ENUM(TransactionFlowings_FieldNumber) {
@@ -461,33 +491,6 @@ typedef GPB_ENUM(TransactionFlowings_FieldNumber) {
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<TransactionFlowing*> *transactionHistoryArray;
 /** The number of items in @c transactionHistoryArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger transactionHistoryArray_Count;
-
-@end
-
-#pragma mark - CreateCoinArgs
-
-typedef GPB_ENUM(CreateCoinArgs_FieldNumber) {
-  CreateCoinArgs_FieldNumber_Category = 1,
-  CreateCoinArgs_FieldNumber_Currency = 2,
-  CreateCoinArgs_FieldNumber_Salt = 3,
-  CreateCoinArgs_FieldNumber_MasterAddress = 4,
-  CreateCoinArgs_FieldNumber_Payload = 5,
-  CreateCoinArgs_FieldNumber_WId = 6,
-};
-
-@interface CreateCoinArgs : GPBMessage
-
-@property(nonatomic, readwrite) int32_t category;
-
-@property(nonatomic, readwrite) int32_t currency;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *salt;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *masterAddress;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
 
 @end
 

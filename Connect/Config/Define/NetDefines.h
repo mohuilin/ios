@@ -392,12 +392,13 @@
  
  */
 #define SetCurrencyAddressInfo @"http://192.168.40.110:18083/wallet/v2/coins/addresses/update"
+
 /**
  Payment settings
   
    Interface description
   
-   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
+   PATH: /wallet/v1/currency
    METHOD: POST
    Data Format: Protobuf
    Request parameter
@@ -405,7 +406,7 @@
    Protobuf file: IMRequest
  
  */
-#define GetCurrencyDefaultAddress @"http://192.168.40.110:18083/wallet/v2/coins/addresses/get_default"
+#define GetUserStatus @"http://192.168.40.110:18083/wallet/v2/service/user_status"
 
 /**
  Payment settings
@@ -436,6 +437,20 @@
  
  */
 #define AddCurrencyAddress @"http://192.168.40.110:18083/wallet/v2/coins/addresses/create"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define GetCurrencyAddressList @"http://192.168.40.110:18083/wallet/v2/coins/addresses/list"
 
 /**
  Payment settings

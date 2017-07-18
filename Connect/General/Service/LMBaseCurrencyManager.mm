@@ -1,12 +1,19 @@
 //
-//  LMBTCWalletHelper.m
+//  LMBaseCurrencyManager.m
 //  Connect
 //
-//  Created by MoHuilin on 2017/6/15.
+//  Created by Connect on 2017/7/18.
 //  Copyright © 2017年 Connect. All rights reserved.
 //
 
-#import "LMBTCWalletHelper.h"
+#import "LMBaseCurrencyManager.h"
+#import "NetWorkOperationTool.h"
+#import "LMCurrencyModel.h"
+#import "LMRealmManager.h"
+#import "Wallet.pbobjc.h"
+#import "Protofile.pbobjc.h"
+#import "ConnectTool.h"
+#import "LMWalletCreatManager.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -48,76 +55,207 @@ extern "C" {
 #include "json_spirit_writer_template.h"
 #include "json_spirit_value.h"
 
-@implementation LMBTCWalletHelper
-
-
-+ (NSString *)createRawTranscationWithTvsArray:(NSArray *)tvsArray outputs:(NSDictionary *)outputs {
-    // checkout format
-    for (NSDictionary *temD in tvsArray) {
-        if (![temD isKindOfClass:[NSDictionary class]]) {
-            return nil;
+@implementation LMBaseCurrencyManager
+#pragma mark - save data to db
+/**
+ *  sync model to db
+ *
+ */
++ (void)saveModelToDB:(LMSeedModel *)seedModel{
+    
+    NSString *homePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *filePath = [homePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.data",[LKUserCenter shareCenter].currentLoginUser.address]];
+    [NSKeyedArchiver archiveRootObject:seedModel toFile:filePath];
+    
+}
+/**
+ * get data from db
+ *
+ */
++ (LMSeedModel *)getModelFromDB{
+    NSString *homePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *filePath = [homePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.data",[LKUserCenter shareCenter].currentLoginUser.address]];
+    LMSeedModel *seedModel = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+    return seedModel;
+}
+#pragma mark - Interface data
+/**
+ *  sync wallet data
+ *
+ */
++ (void)syncWalletData:(void (^)(BOOL result))complete {
+    // Synchronize wallet data and create wallet
+    [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete(NO);
+            }
+        } else{
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
+            [LMWalletCreatManager syncDataToDB:syncWallet];
+            if (complete) {
+                complete(YES);
+            }
         }
-        if (![temD.allKeys containsObject:@"vout"]) {
-            return nil;
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(NO);
         }
-        if (![temD.allKeys containsObject:@"txid"]) {
-            return nil;
-        }
-        if (![temD.allKeys containsObject:@"scriptPubKey"]) {
-            return nil;
-        }
+    }];
+    
+}
+/**
+ *  creat currency
+ *
+ */
++ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
+    
+    CreateCoinRequest *currencyCoin = [CreateCoinRequest new];
+    currencyCoin.category = category;
+    currencyCoin.masterAddress = masterAddess;
+    currencyCoin.currency = currency;
+    currencyCoin.salt = salt;
+    currencyCoin.payload = nil;
+    
+    [LMCurrencyModel setDefaultRealm];
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],currency] lastObject];
+    if (!currencyModel) {
+        // sync currency
+        [LMBaseCurrencyManager getCurrencyListWithWalletId:nil complete:^(BOOL result, NSArray<Coin *> *coinList) {
+            BOOL flag = YES;
+            for (Coin *coin in coinList) {
+                if (coin.currency == currency) {
+                    flag = NO;
+                    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],currency] lastObject];
+                    [[LMRealmManager sharedManager] executeRealmWithBlock:^{
+                        currencyModel.category = category;
+                        currencyModel.salt = salt;
+                        currencyModel.masterAddress = masterAddess;
+                        currencyModel.status = 1;
+                        currencyModel.blance = coin.balance;
+                        currencyModel.payload = coin.payload;
+                        currencyModel.defaultAddress = masterAddess;
+                    }];
+                    break;
+                }
+            }
+            if (flag) {
+                [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
+                    HttpResponse *hResponse = (HttpResponse *)response;
+                    if (hResponse.code != successCode) {
+                        if (complete) {
+                            complete(NO);
+                        }
+                    }else {
+                        // save db
+                        LMCurrencyModel *currencyModel = [LMCurrencyModel new];
+                        currencyModel.currency = currency;
+                        currencyModel.category = category;
+                        currencyModel.salt = salt;
+                        currencyModel.masterAddress = masterAddess;
+                        currencyModel.status = 0;
+                        currencyModel.blance = 0;
+                        currencyModel.defaultAddress = masterAddess;
+                        // save address
+                        LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
+                        addressModel.address = masterAddess;
+                        addressModel.index = 0;
+                        addressModel.status = 1;
+                        addressModel.label = nil;
+                        addressModel.currency = currency;
+                        addressModel.balance = 0;
+                        [[LMRealmManager sharedManager]executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                            [realm addOrUpdateObject:addressModel];
+                        }];
+                        [currencyModel.addressListArray addObject:addressModel];
+                        // save db to currency Address
+                        switch ([LMWalletInfoManager sharedManager].categorys) {
+                            case CategoryTypeOldUser:
+                            {
+                                currencyModel.payload = [LMWalletInfoManager sharedManager].encryPtionSeed;
+                            }
+                                break;
+                            case CategoryTypeNewUser:
+                            {
+                                currencyModel.payload = nil;
+                            }
+                                break;
+                                
+                            default:
+                                break;
+                        }
+                        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                            [realm addOrUpdateObject:currencyModel];
+                        }];
+                        
+                        if (complete) {
+                            complete(YES);
+                        }
+                    }
+                } fail:^(NSError *error) {
+                    if (complete) {
+                        complete(NO);
+                    }
+                }];
+            }
+        }];
     }
-
-    NSString *tvsJson = [self ObjectTojsonString:tvsArray];
-    NSString *outputJson = [self ObjectTojsonString:outputs];
-    NSString *inparamStr_ = [NSString stringWithFormat:@"%@ %@", tvsJson, outputJson];
-
-    char *rawtrans_str;
-    char inparam[1024 * 100];
-
-    const char *inparam1 = [inparamStr_ UTF8String];// Naked trading data
-    strcpy(inparam, inparam1);
-    createBtcRawTranscation(inparam, &rawtrans_str);
-    NSString *rawTranscation = [NSString stringWithUTF8String:rawtrans_str];
-    free(rawtrans_str);
-    return rawTranscation;
+}
+/**
+ *  get currrency list
+ *
+ */
++ (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete{
+    
+    [NetWorkOperationTool POSTWithUrlString:GetCurrencyList postProtoData:nil complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete(NO,nil);
+            }
+            
+        }else {
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                Coins *coin = [Coins parseFromData:data error:nil];
+                if (complete) {
+                    complete(YES,coin.coinsArray);
+                }
+            }
+        }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(NO,nil);
+        }
+    }];
 }
 
-+ (NSString *)signRawTranscationWithTvs:(NSString *)tvsJson privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation {
-
-    const char *rawtrans_str = [rawTranscation UTF8String];
-    char *signedtrans_ret;
-    char inparam[1024 * 100];
-
-    // Signature parameters json data
-    NSMutableString *signParamStr = [NSMutableString stringWithFormat:@"%s", rawtrans_str];
-    [signParamStr appendString:@" "];
-    [signParamStr appendString:tvsJson];
-    [signParamStr appendString:@" "];
-    NSString *privKeyJson = [self ObjectTojsonString:privkeys];
-    [signParamStr appendString:privKeyJson];
-    const char *inparam2 = [signParamStr UTF8String];//sign data
-    strcpy(inparam, inparam2);
-
-    signBtcRawTranscation(inparam, &signedtrans_ret);
-    printf("signRawTranscation=%s\n", signedtrans_ret);
-
-    NSString *signedStr = [NSString stringWithFormat:@"%s", signedtrans_ret];
-    free(signedtrans_ret);
-    NSError *error;
-    NSDictionary *completeDic = [NSJSONSerialization JSONObjectWithData:[signedStr dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];
-    BOOL b = [[completeDic objectForKey:@"complete"] boolValue];
-    if (b) {
-        NSString *result = [completeDic objectForKey:@"hex"];
-
-        return result;
-    }
-    NSLog(@"signRawTranscation is failure,please check!");
-
-    return nil;
-
+/**
+ *  set currency messageInfo
+ *
+ */
++ (void)setCurrencyStatus:(int)status currency:(int)currency complete:(void (^)(BOOL result))complte{
+    
+    Coin *coin = [Coin new];
+    coin.currency = currency;
+    coin.status = status;
+    [NetWorkOperationTool POSTWithUrlString:SetCurrencyInfo postProtoData:coin.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            
+            
+        }else {
+            NSLog(@"asdasd");
+            // save db
+        }
+    } fail:^(NSError *error) {
+        
+    }];
+    
 }
-
+#pragma mark - encryption methods
 + (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index {
     char myRand[129] = {0};
     char *randomC = (char *) [seed UTF8String];
@@ -167,8 +305,8 @@ extern "C" {
         return nil;
     }
     NSString *jsonString = [[NSString alloc] init];
-
-
+    
+    
     // The system comes with the method
     // /*
     NSError *error;
@@ -180,13 +318,13 @@ extern "C" {
     } else {
         jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     }
-
+    
     NSMutableString *mutStr = [NSMutableString stringWithString:jsonString];
     NSRange range = {0, jsonString.length};
     [mutStr replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:range];
     NSRange range2 = {0, mutStr.length};
     [mutStr replaceOccurrencesOfString:@"\n" withString:@"" options:NSLiteralSearch range:range2];
-
+    
     return mutStr;
 }
 
@@ -196,37 +334,37 @@ std::string xtalkWalletSeedEncrypt(unsigned char *usrID, unsigned char *privKey,
     unsigned char h[64];
     unsigned char chk[2];
     unsigned char usrIDAandPrivKey[XTALK_USRID_LEN + XTALK_PRIVKEY_LEN];
-
+    
     // user id 8bytes
     memcpy(usrIDAandPrivKey, usrID, XTALK_USRID_LEN);
     // privkey 32 bytes
     memcpy(usrIDAandPrivKey + XTALK_USRID_LEN, privKey, XTALK_PRIVKEY_LEN);
-
+    
     xtalkSHA512(usrIDAandPrivKey, XTALK_USRID_LEN + XTALK_PRIVKEY_LEN, h);
-
+    
     // copy first 2 bytes to chk
     memcpy(chk, h, 2);
-
+    
     // below is the process of E2
     unsigned char salt[8];    // 8*8= 64 bits
     RAND_bytes(salt, 8);
-
+    
     // below is the process of E3
     unsigned char key[256 / 8];
     xtalkPBKDF2_HMAC_SHA512((unsigned char *) pwd, strlen(pwd), salt, 64, key, 256, n);
-
+    
     // below is the process of E4
     unsigned char chkUsrIDPrivKey[2 + XTALK_USRID_LEN + XTALK_PRIVKEY_LEN];    // 2+36+32 = 70
     memcpy(chkUsrIDPrivKey, chk, 2);
     memcpy(chkUsrIDPrivKey + 2, usrID, XTALK_USRID_LEN);
     memcpy(chkUsrIDPrivKey + 2 + XTALK_USRID_LEN, privKey, XTALK_PRIVKEY_LEN);
-
+    
     AES_KEY aes_key;
     if (AES_set_encrypt_key((const unsigned char *) key, sizeof(key) * 8, &aes_key) < 0) {
         assert(false);
         return "error";
     }
-
+    
     unsigned char *secret;
     unsigned char *data_tmp;
     unsigned int ret_len = sizeof(chkUsrIDPrivKey);    // use input data len to get the secret len
@@ -237,7 +375,7 @@ std::string xtalkWalletSeedEncrypt(unsigned char *usrID, unsigned char *privKey,
     secret = (unsigned char *) malloc(ret_len);
     memset(data_tmp, 0x00, ret_len);
     memcpy(data_tmp, chkUsrIDPrivKey, sizeof(chkUsrIDPrivKey));    // prepare data for encrypt
-
+    
     for (unsigned int i = 0; i < ret_len / AES_BLOCK_SIZE; i++) {
         unsigned char out[AES_BLOCK_SIZE];
         memset(out, 0, AES_BLOCK_SIZE);
@@ -246,21 +384,21 @@ std::string xtalkWalletSeedEncrypt(unsigned char *usrID, unsigned char *privKey,
     }
     free(data_tmp);
     // data stored in secret, length is ret_len
-
+    
     // below is the process of E5
     unsigned char *result;
     result = (unsigned char *) malloc(1 + 8 + ret_len);    // 1 byte version + 8 bytes salt + secret
-
+    
     // set v value;
     result[0] = (ver << 5) + n;
     memcpy(result + 1, salt, 8);
     memcpy(result + 9, secret, ret_len);
     free(secret);    // do not forget to free it.
-
+    
     // finally, we return the hex string. easiler for debug and show
     std::string retStr = HexStr(&result[0], &result[1 + 8 + ret_len], false);
     free(result);
-
+    
     return retStr;
 }
 
@@ -299,29 +437,29 @@ int GetBtcPrivKeyFromSeedBIP44(const char *SeedStr, char *PrivKey, unsigned int 
     CExtKey Exkey;
     std::vector<unsigned char> seed = ParseHex(SeedStr);
     Exkey.SetMaster(&seed[0], seed.size());
-
+    
     CExtKey privkey1;
     purpose |= 0x80000000;
     Exkey.Derive(privkey1, purpose);
-
+    
     CExtKey privkey2;
     coin |= 0x80000000;
     privkey1.Derive(privkey2, coin);
-
+    
     CExtKey privkey3;
     account |= 0x80000000;
     privkey2.Derive(privkey3, account);
-
+    
     CExtKey privkey4;
     privkey3.Derive(privkey4, isInternal);
-
+    
     CExtKey privkey5;
     privkey4.Derive(privkey5, addrIndex);
-
+    
     CBitcoinSecret btcSecret;
     btcSecret.SetKey(privkey5.key);
     sprintf(PrivKey, "%s", btcSecret.ToString().c_str());
-
+    
     return 0;
 }
 
@@ -510,6 +648,73 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     free(wallet);
     
     return 1;
+}
+#pragma mark -sign
++ (NSString *)createRawTranscationWithTvsArray:(NSArray *)tvsArray outputs:(NSDictionary *)outputs {
+    // checkout format
+    for (NSDictionary *temD in tvsArray) {
+        if (![temD isKindOfClass:[NSDictionary class]]) {
+            return nil;
+        }
+        if (![temD.allKeys containsObject:@"vout"]) {
+            return nil;
+        }
+        if (![temD.allKeys containsObject:@"txid"]) {
+            return nil;
+        }
+        if (![temD.allKeys containsObject:@"scriptPubKey"]) {
+            return nil;
+        }
+    }
+    
+    NSString *tvsJson = [self ObjectTojsonString:tvsArray];
+    NSString *outputJson = [self ObjectTojsonString:outputs];
+    NSString *inparamStr_ = [NSString stringWithFormat:@"%@ %@", tvsJson, outputJson];
+    
+    char *rawtrans_str;
+    char inparam[1024 * 100];
+    
+    const char *inparam1 = [inparamStr_ UTF8String];// Naked trading data
+    strcpy(inparam, inparam1);
+    createBtcRawTranscation(inparam, &rawtrans_str);
+    NSString *rawTranscation = [NSString stringWithUTF8String:rawtrans_str];
+    free(rawtrans_str);
+    return rawTranscation;
+}
+
++ (NSString *)signRawTranscationWithTvs:(NSString *)tvsJson privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation {
+    
+    const char *rawtrans_str = [rawTranscation UTF8String];
+    char *signedtrans_ret;
+    char inparam[1024 * 100];
+    
+    // Signature parameters json data
+    NSMutableString *signParamStr = [NSMutableString stringWithFormat:@"%s", rawtrans_str];
+    [signParamStr appendString:@" "];
+    [signParamStr appendString:tvsJson];
+    [signParamStr appendString:@" "];
+    NSString *privKeyJson = [self ObjectTojsonString:privkeys];
+    [signParamStr appendString:privKeyJson];
+    const char *inparam2 = [signParamStr UTF8String];//sign data
+    strcpy(inparam, inparam2);
+    
+    signBtcRawTranscation(inparam, &signedtrans_ret);
+    printf("signRawTranscation=%s\n", signedtrans_ret);
+    
+    NSString *signedStr = [NSString stringWithFormat:@"%s", signedtrans_ret];
+    free(signedtrans_ret);
+    NSError *error;
+    NSDictionary *completeDic = [NSJSONSerialization JSONObjectWithData:[signedStr dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];
+    BOOL b = [[completeDic objectForKey:@"complete"] boolValue];
+    if (b) {
+        NSString *result = [completeDic objectForKey:@"hex"];
+        
+        return result;
+    }
+    NSLog(@"signRawTranscation is failure,please check!");
+    
+    return nil;
+    
 }
 
 

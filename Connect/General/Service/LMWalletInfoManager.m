@@ -8,9 +8,9 @@
 
 #import "LMWalletInfoManager.h"
 #import "LMSeedModel.h"
-#import "LMBTCWalletHelper.h"
 #import "LMSeedModel.h"
 #import "LMCurrencyModel.h"
+#import "LMCurrencyManager.h"
 
 @implementation LMWalletInfoManager
 static LMWalletInfoManager *manager = nil;
@@ -18,22 +18,21 @@ CREATE_SHARED_MANAGER(LMWalletInfoManager)
 
 - (NSString *)encryPtionSeed{
     if (_encryPtionSeed.length <= 0) {
-        LMSeedModel *baseModel = [[LMSeedModel allObjects] firstObject];
+        LMSeedModel *baseModel = [LMCurrencyManager getModelFromDB];
         return baseModel.encryptSeed;
     }
     return _encryPtionSeed;
 }
 - (BOOL)isHaveWallet{
-    [LMSeedModel setDefaultRealm];
-    LMSeedModel *seedModel = [[LMSeedModel allObjects] firstObject];
-    if (seedModel.encryptSeed.length > 0) {
+    LMSeedModel *baseModel = [LMCurrencyManager getModelFromDB];
+    if (baseModel.encryptSeed.length > 0) {
         return YES;
     }else {
         return NO;
     }
 }
 -(CategoryType)categorys{
- LMSeedModel *baseModel = [[LMSeedModel allObjects] lastObject];
+  LMSeedModel *baseModel = [LMCurrencyManager getModelFromDB];
     switch (baseModel.status) {
         case 3:
         {

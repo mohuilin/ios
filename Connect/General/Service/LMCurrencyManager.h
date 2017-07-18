@@ -8,7 +8,20 @@
 
 #import <Foundation/Foundation.h>
 #import "Wallet.pbobjc.h"
+#import "LMSeedModel.h"
 @interface LMCurrencyManager : NSObject
+#pragma mark - save data to db
+/**
+ *  sync model to db
+ *
+ */
++ (void)saveModelToDB:(LMSeedModel *)seedModel;
+/**
+ * get data from db
+ *
+ */
++ (LMSeedModel *)getModelFromDB;
+#pragma mark - Interface data
 /**
  *  sync wallet data
  *
@@ -43,7 +56,7 @@
  *  get currency addresss list
  *
  */
-+ (void)getCurrencyAddressListWithCurrency:(int)currency complete:(void (^)(BOOL result,NSArray *addressList)) complte;
++ (void)getCurrencyAddressListWithCurrency:(int)currency complete:(void (^)(BOOL result,NSMutableArray<CoinInfo *> *addressList)) complte;
 
 /**
  * set currency address message
@@ -51,17 +64,7 @@
  */
 + (void)setCurrencyAddressMessageWithAddress:(NSString *)address lable:(NSString *)lable status:(int)status complete:(void (^)(BOOL result))complete;
 
-/**
- * update default address
- *
- */
-+ (void)updateCurrencyDefaultAddress:(NSString *)address currency:(int)currency complete:(void (^)(BOOL result))complete;
 
-/**
- * get default address
- *
- */
-+ (void)getCurrencyDefaultAddressArrayWithcomplete:(void (^)(BOOL result,NSArray *defaultAddrssArray ))complete;
 
 
 @end

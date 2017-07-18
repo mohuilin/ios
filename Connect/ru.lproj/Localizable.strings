@@ -721,6 +721,6 @@
 "Wallet create currency failed" = "Создание валюты не удалось";
 "Wallet Create wallet failed" = "Не удалось создать кошелек";
 "Wallet synchronization data failed" = "Синхронные данные не удалось";
-"Wallet Failed to get the default address" = "Получить адрес по умолчанию не удалось";
+"Wallet Failed to get the list address" = "Не удалось получить список адресов";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

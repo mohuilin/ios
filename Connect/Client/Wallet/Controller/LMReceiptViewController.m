@@ -61,32 +61,31 @@
     if (self.currency == CurrencyTypeBTC) {
         currencyName = @"bitcoin";
     }
-    [LMCurrencyManager getCurrencyDefaultAddressArrayWithcomplete:^(BOOL result, NSArray *defaultAddrssArray) {
+    [LMCurrencyManager getCurrencyAddressListWithCurrency:self.currency complete:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
+        
         if (result) {
-            if (defaultAddrssArray.count > 0) {
-                for (DefaultAddress *defaultAddress in defaultAddrssArray) {
-                    if (defaultAddress.currency == self.currency) {
-                        // get usermessage
-                        self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,defaultAddress.address];
-                        // save defaultAddress
-                        LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],(int)defaultAddress.currency] firstObject];
-                        [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                            currencyModel.defaultAddress = defaultAddress.address;
-                        }];
-                        // qr code
-                        [self addQRcodeImageView];
-                    }
-                }
+            if (addressList.count > 0) {
+                CoinInfo *address = [addressList firstObject];
+                // get usermessage
+                self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,address.address];
+                // save defaultAddress
+                LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],(int)weakSelf.currency] firstObject];
+                [[LMRealmManager sharedManager] executeRealmWithBlock:^{
+                    currencyModel.defaultAddress = address.address;
+                }];
+                // qr code
+                [self addQRcodeImageView];
+                
             }else {
                 [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Failed to get the default address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{
+                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Failed to get the list address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{
                         [weakSelf.navigationController popViewControllerAnimated:YES];
                     }];
                 }];
             }
         }else{
             [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Failed to get the default address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{
+                [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Failed to get the list address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{
                     [weakSelf.navigationController popViewControllerAnimated:YES];
                 }];
             }];

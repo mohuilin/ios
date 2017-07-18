@@ -15,12 +15,13 @@
 #import "StringTool.h"
 #import "ConnectTool.h"
 #import "LMRamGroupInfo.h"
-#import "LMBTCWalletHelper.h"
+#import "LMBaseCurrencyManager.h"
 #import "LMRandomSeedController.h"
 #import "LMSeedModel.h"
 #import "LMIMHelper.h"
 #import "LMRealmManager.h"
 #import "Wallet.pbobjc.h"
+#import "LMCurrencyManager.h"
 
 
 @implementation SetGlobalHandler
@@ -1191,18 +1192,20 @@
     }
     NSString *needStr = [LMWalletInfoManager sharedManager].baseSeed;
     RequestWalletInfo *creatWallet = [RequestWalletInfo new];
-    NSString *payLoad = [LMBTCWalletHelper encodeValue:needStr password:payPass n:17];
+    NSString *payLoad = [LMBaseCurrencyManager encodeValue:needStr password:payPass n:17];
     NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
     int n = 17;
-    NSString *checkStr = [NSString stringWithFormat:@"%d%@%@",n,payLoad,salt];
+    creatWallet.ver = 1;
+    int version = [[[MMAppSetting sharedSetting] getContactVersion] intValue];
+    NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
     if ([checkStr containsString:@"(null)"]) {
         checkStr = [checkStr stringByReplacingOccurrencesOfString:@"(null)" withString:@""];
     }
     NSString *checkSum = [checkStr sha256String];
-    creatWallet.salt = salt;
-    creatWallet.n = n;
     creatWallet.payload = payLoad;
     creatWallet.checkSum = checkSum;
+    creatWallet.version = version;
+    
     
     [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:creatWallet.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -1220,9 +1223,7 @@
                 saveSeedModel.n = n;
                 saveSeedModel.status = 1;
                 saveSeedModel.version = 0;
-                [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                    [realm addOrUpdateObject:saveSeedModel];
-                }];
+                [LMCurrencyManager saveModelToDB:saveSeedModel];
             }
             [LMWalletInfoManager sharedManager].encryPtionSeed = payLoad;
             if (complete) {
@@ -1248,16 +1249,15 @@
         payPass = @"";
     }
     RequestWalletInfo *creatWallet = [RequestWalletInfo new];
-    NSString *payLoad = [LMBTCWalletHelper encodeValue:baseSeed password:payPass n:17];
+    NSString *payLoad = [LMBaseCurrencyManager encodeValue:baseSeed password:payPass n:17];
     NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
     int n = 17;
-    NSString *checkStr = [NSString stringWithFormat:@"%d%@%@",n,payLoad,salt];
+    creatWallet.ver = 1;
+    NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
     if ([checkStr containsString:@"(null)"]) {
         checkStr = [checkStr stringByReplacingOccurrencesOfString:@"(null)" withString:@""];
     }
     NSString *checkSum = [checkStr sha256String];
-    creatWallet.salt = salt;
-    creatWallet.n = n;
     creatWallet.payload = payLoad;
     creatWallet.checkSum = checkSum;
     
@@ -1272,13 +1272,13 @@
             RequestWalletInfo *requestInfo = [RequestWalletInfo parseFromData:data error:nil];
             if (data) {
                 // save data to db
-                LMSeedModel *saveSeedModel = [[LMSeedModel allObjects] lastObject];
-                [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                    saveSeedModel.salt = salt;
-                    saveSeedModel.n = n;
-                    saveSeedModel.status = [LMWalletInfoManager sharedManager].categorys;
-                    saveSeedModel.version = requestInfo.version;
-                }];
+                LMSeedModel *saveSeedModel = [LMSeedModel new];
+                saveSeedModel.encryptSeed = payLoad;
+                saveSeedModel.salt = salt;
+                saveSeedModel.n = n;
+                saveSeedModel.status = [LMWalletInfoManager sharedManager].categorys;
+                saveSeedModel.version = requestInfo.version;
+                [LMCurrencyManager saveModelToDB:saveSeedModel];
                 [LMWalletInfoManager sharedManager].encryPtionSeed = payLoad;
                 if (complete) {
                     complete(YES);
@@ -1293,7 +1293,7 @@
 }
 + (void)syncPaypinversionWithComplete:(void(^)(NSString *password,NSError *error))complete{
     PayPinVersion *sendVersion = [[PayPinVersion alloc] init];
-    LMSeedModel *seedModel = [[LMSeedModel allObjects] lastObject];
+    LMSeedModel *seedModel = [LMCurrencyManager getModelFromDB];
     sendVersion.version = [NSString stringWithFormat:@"%d",seedModel.version];
     [NetWorkOperationTool POSTWithUrlString:PaypinversionUrl postProtoData:sendVersion.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
