@@ -209,28 +209,17 @@
         }];
         return;
     }
-    // Whether the balance is sufficient
-    if ([PayTool getPOW8Amount:money] > self.blance) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Insufficient balance", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-        }];
-        return;
-    }
-
-    [GCDQueue executeInMainQueue:^{
-        [MBProgressHUD showTransferLoadingViewtoView:self.view];
-        [self.view endEditing:YES];
-    }];
-
-    NSArray *toAddresses = @[@{@"address": self.addressTextField.text, @"amount": money.stringValue}];
     
-    BOOL isDusk = [LMPayCheck dirtyAlertWithAddress:toAddresses withController:self];
-    if (isDusk) {
-        self.comfrimButton.enabled = YES;
-        return;
-    }
-    [WallteNetWorkTool unspentV2WithAddress:self.ainfo.address fee:[[MMAppSetting sharedSetting] getTranferFee] toAddress:toAddresses createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-        [LMPayCheck payCheck:nil withVc:weakSelf withTransferType:TransferTypeBitAddress unSpent:unspent withArray:toAddresses withMoney:money withNote:note withType:0 withRedPackage:nil withError:error];
+    [MBProgressHUD showTransferLoadingViewtoView:self.view];
+    [self.view endEditing:YES];
+    
+    [[LMBTCTransferManager sharedManager] transferFromIndexes:nil fee:5000 toAddresses:@[self.addressTextField.text] perAddressAmount:[PayTool getPOW8AmountWithText:money.stringValue] tips:note complete:^(id data, NSError *error) {
+        [MBProgressHUD hideHUDForView:self.view];
+        if (error) {
+            
+        } else {
+            
+        }
     }];
 }
 

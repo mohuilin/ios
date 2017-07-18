@@ -599,6 +599,25 @@
             self.payPassView.hidden = NO;
             [self endEditing:YES];
             
+            [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
+            }];
+            self.passErrorContentView.hidden = YES;
+            self.animationContentView.hidden = NO;
+            [UIView animateWithDuration:0.2 animations:^{
+                [self.contentView layoutIfNeeded];
+            }];
+            
+            self.statusLabel.text = LMLocalizedString(@"Wallet Verifying", nil);
+            [self.animationView startLoading];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if (self.payCompleteBlock) {
+                    self.payCompleteBlock(self,nil,@"111");
+                }
+            });
+
+            return;
+            
             //verfiy pass
             [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
                 if (success) {

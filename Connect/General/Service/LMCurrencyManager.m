@@ -18,16 +18,15 @@
  *  creat currency
  *
  */
-+ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
++ (void)createCurrency:(int)currency salt:(NSString *)salt category:(CategoryType)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
    
     
-    CreateCoinArgs *currencyCoin = [CreateCoinArgs new];
+    CreateCoin *currencyCoin = [CreateCoin new];
     currencyCoin.salt = salt;
     currencyCoin.category = category;
     currencyCoin.masterAddress = masterAddess;
     currencyCoin.currency = currency;
     currencyCoin.payload = nil;
-    currencyCoin.wId = nil;
     
     [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;

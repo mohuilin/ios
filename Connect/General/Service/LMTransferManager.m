@@ -12,6 +12,30 @@
 
 CREATE_SHARED_MANAGER(LMTransferManager)
 
+
+
+- (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
+    
+}
+
+- (void)sendLuckyPackageWithReciverIdentifier:(NSString *)identifier size:(int)size amount:(NSInteger)amount fee:(NSInteger)fee luckyPackageType:(LuckypackageType)luckyPackageType tips:(NSString *)tips indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
+    
+}
+
+
+- (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier Amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(NSString *txId,NSError *error))complete{
+    
+}
+
+
+- (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(NSString *txId,NSError *error))complete{
+    
+}
+
+- (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(ReceiptType)type indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
+    
+}
+
 - (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete{
     
 }

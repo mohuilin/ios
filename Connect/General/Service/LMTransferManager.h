@@ -15,14 +15,14 @@ typedef NS_ENUM(NSInteger ,LuckypackageType) {
     LuckypackageTypeOuter = 2
 };
 
-typedef NS_ENUM(NSInteger ,LuckypackageAmountType) {
-    LuckypackageAmountTypeRandom = 0,
-    LuckypackageAmountTypeSame
-};
-
 typedef NS_ENUM(NSInteger ,WalletTransferType) {
     WalletTransferTypeInnerConnect = 0,
     WalletTransferTypeOuterUrl,
+};
+
+typedef NS_ENUM(NSInteger ,ReceiptType) {
+    ReceiptTypeCrowding = 0,
+    ReceiptTypePeerRecipt,
 };
 
 typedef NS_ENUM(NSInteger ,CurrencyType) {
@@ -36,6 +36,18 @@ typedef void (^CompleteWithDataBlock)(id data,NSError *error);
 @interface LMTransferManager : NSObject
 
 + (instancetype)sharedManager;
+
+- (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete;
+
+- (void)sendLuckyPackageWithReciverIdentifier:(NSString *)identifier size:(int)size amount:(NSInteger)amount fee:(NSInteger)fee luckyPackageType:(LuckypackageType)luckyPackageType tips:(NSString *)tips indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete;
+
+
+- (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier Amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(NSString *txId,NSError *error))complete;
+
+
+- (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(NSString *txId,NSError *error))complete;
+
+- (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(ReceiptType)type indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete;
 
 /**
  * transger from addresses to addresses
