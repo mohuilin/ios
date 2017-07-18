@@ -14,10 +14,8 @@ target 'Connect' do
     pod 'Realm'
 end
 target :'ConnectTests' do
-    pod 'Kiwi'
     pod 'Realm/Headers'
 end
 target :'ConnectUITests' do
-  pod 'Kiwi'
   pod 'Realm/Headers'
 end
