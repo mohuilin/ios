@@ -1610,12 +1610,14 @@ typedef struct OriginalTransaction__storage_ {
 @dynamic transactionType;
 @dynamic hashId;
 @dynamic txHex;
+@dynamic currency;
 
 typedef struct PublishTransaction__storage_ {
   uint32_t _has_storage_[1];
   int32_t transactionType;
   NSString *hashId;
   NSString *txHex;
+  NSString *currency;
 } PublishTransaction__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1648,6 +1650,15 @@ typedef struct PublishTransaction__storage_ {
         .number = PublishTransaction_FieldNumber_TxHex,
         .hasIndex = 2,
         .offset = (uint32_t)offsetof(PublishTransaction__storage_, txHex),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = PublishTransaction_FieldNumber_Currency,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(PublishTransaction__storage_, currency),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },

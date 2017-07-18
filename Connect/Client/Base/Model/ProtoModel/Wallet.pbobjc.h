@@ -522,6 +522,7 @@ typedef GPB_ENUM(PublishTransaction_FieldNumber) {
   PublishTransaction_FieldNumber_TransactionType = 1,
   PublishTransaction_FieldNumber_HashId = 2,
   PublishTransaction_FieldNumber_TxHex = 3,
+  PublishTransaction_FieldNumber_Currency = 4,
 };
 
 @interface PublishTransaction : GPBMessage
@@ -531,6 +532,8 @@ typedef GPB_ENUM(PublishTransaction_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *txHex;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *currency;
 
 @end
 

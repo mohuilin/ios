@@ -820,7 +820,6 @@
 		D98FD7E21D264E470048E29E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E11D264E470048E29E /* CoreGraphics.framework */; };
 		D98FD7E41D264E550048E29E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E31D264E550048E29E /* Security.framework */; };
 		D98FD7E61D264E710048E29E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E51D264E710048E29E /* libz.tbd */; };
-		D993B6481F1478C1006E95A9 /* LMBTCTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */; };
 		D993B64B1F1480EB006E95A9 /* LMTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D993B64A1F1480EB006E95A9 /* LMTransferManager.m */; };
 		D9ACCD061EDFC6BC009A5869 /* NSObject+Swing.m in Sources */ = {isa = PBXBuildFile; fileRef = D9ACCD051EDFC6BC009A5869 /* NSObject+Swing.m */; };
 		D9ACCD0A1EDFC98C009A5869 /* XMLReader.m in Sources */ = {isa = PBXBuildFile; fileRef = D9ACCD091EDFC98C009A5869 /* XMLReader.m */; };
@@ -2563,8 +2562,6 @@
 		D98FD7E11D264E470048E29E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		D98FD7E31D264E550048E29E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		D98FD7E51D264E710048E29E /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		D993B6461F1478C1006E95A9 /* LMBTCTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBTCTransferManager.h; sourceTree = "<group>"; };
-		D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBTCTransferManager.m; sourceTree = "<group>"; };
 		D993B6491F1480EB006E95A9 /* LMTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransferManager.h; sourceTree = "<group>"; };
 		D993B64A1F1480EB006E95A9 /* LMTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransferManager.m; sourceTree = "<group>"; };
 		D9ACCD041EDFC6BC009A5869 /* NSObject+Swing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Swing.h"; sourceTree = "<group>"; };
@@ -15467,8 +15464,6 @@
 			children = (
 				D993B6491F1480EB006E95A9 /* LMTransferManager.h */,
 				D993B64A1F1480EB006E95A9 /* LMTransferManager.m */,
-				D993B6461F1478C1006E95A9 /* LMBTCTransferManager.h */,
-				D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */,
 			);
 			name = WalletManager;
 			sourceTree = "<group>";
@@ -33509,7 +33504,6 @@
 				F16FD7CB1EC3205B002F9395 /* sha2.c in Sources */,
 				D97FDCBF1E86664800B161C8 /* YYTextView.m in Sources */,
 				1923517C1E8123C60022D844 /* PhoneContactInfo.m in Sources */,
-				D993B6481F1478C1006E95A9 /* LMBTCTransferManager.m in Sources */,
 				F10F2C701EFCC0D20017C32C /* LMFriendRecommandInfo.m in Sources */,
 				D9222FDE1E822A3100D67110 /* UIButton+YYWebImage.m in Sources */,
 				F16FD7BF1EC3205B002F9395 /* bignum.c in Sources */,

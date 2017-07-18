@@ -213,13 +213,8 @@
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
     
-    [[LMBTCTransferManager sharedManager] transferFromIndexes:nil fee:5000 toAddresses:@[self.addressTextField.text] perAddressAmount:[PayTool getPOW8AmountWithText:money.stringValue] tips:note complete:^(id data, NSError *error) {
-        [MBProgressHUD hideHUDForView:self.view];
-        if (error) {
-            
-        } else {
-            
-        }
+    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:@[self.addressTextField.text] perAddressAmount:10000 tips:note complete:^(id data, NSError *error) {
+        
     }];
 }
 
