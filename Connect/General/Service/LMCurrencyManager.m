@@ -41,6 +41,7 @@
    return seedModel;
 }
 #pragma mark - Interface data
+
 /**
  *  sync wallet data
  *
@@ -224,8 +225,7 @@
  */
 + (void)addCurrencyAddressWithCurrency:(int)currency label:(NSString *)label index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete{
     
-    
-    CreateCoinAddress *coinAddress = [CreateCoinAddress new];
+    CreateCoinAccount *coinAddress = [CreateCoinAccount new];
     coinAddress.currency = currency;
     coinAddress.label = label;
     coinAddress.index = index;

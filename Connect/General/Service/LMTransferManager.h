@@ -10,19 +10,20 @@
 #import "Wallet.pbobjc.h"
 #import "Protofile.pbobjc.h"
 
-typedef NS_ENUM(NSInteger ,LuckypackageType) {
-    LuckypackageTypeInner = 1,
-    LuckypackageTypeOuter = 2
+
+typedef NS_ENUM(NSInteger ,LuckypackageTypeCategory) {
+    LuckypackageTypeCategoryGroup = 0,
+    LuckypackageTypeCategoryOuterUrl,
 };
 
-typedef NS_ENUM(NSInteger ,LuckypackageAmountType) {
-    LuckypackageAmountTypeRandom = 0,
-    LuckypackageAmountTypeSame
-};
-
-typedef NS_ENUM(NSInteger ,WalletTransferType) {
-    WalletTransferTypeInnerConnect = 0,
-    WalletTransferTypeOuterUrl,
+typedef NS_ENUM(NSInteger ,TransactionType) {
+    TransactionTypeLuckypackage = 0,
+    TransactionTypeURLLuckypackage,
+    TransactionTypeSigleTransfer,
+    TransactionTypeMutiAddressTransfer,
+    TransactionTypeURLTransfer,
+    TransactionTypePayReceipt,
+    TransactionTypePayCrowding
 };
 
 typedef NS_ENUM(NSInteger ,CurrencyType) {
@@ -37,6 +38,18 @@ typedef void (^CompleteWithDataBlock)(id data,NSError *error);
 
 + (instancetype)sharedManager;
 
+- (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete;
+
+- (void)sendLuckyPackageWithReciverIdentifier:(NSString *)identifier size:(int)size amount:(NSInteger)amount fee:(NSInteger)fee luckyPackageType:(int)type category:(LuckypackageTypeCategory)category tips:(NSString *)tips fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete;
+
+
+- (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(NSString *hashId,NSError *error))complete;
+
+
+- (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(NSString *hashId,NSError *error))complete;
+
+- (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(TransactionType)type fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete;
+
 /**
  * transger from addresses to addresses
  * @param addresses
@@ -46,25 +59,7 @@ typedef void (^CompleteWithDataBlock)(id data,NSError *error);
  * @param tips
  * @param complete
  */
-- (void)transferFromAddress:(NSArray *)addresses fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete;
+- (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete;
 
-
-- (void)transferWithFee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(void (^)(OriginalTransaction *originalTransaction,NSError *error))complete;
-
-/**
- * transfer from indexes
- * @param indexes
- * @param fee
- * @param toAddresses
- * @param perAddressAmount
- * @param complete
- */
-- (void)transferFromIndexes:(NSArray *)indexes fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete;
-
-/**
- * transaction history
- * @param complete
- */
-- (void)transactionFlowingComplete:(CompleteWithDataBlock)complete;
 
 @end

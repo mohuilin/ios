@@ -820,7 +820,6 @@
 		D98FD7E21D264E470048E29E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E11D264E470048E29E /* CoreGraphics.framework */; };
 		D98FD7E41D264E550048E29E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E31D264E550048E29E /* Security.framework */; };
 		D98FD7E61D264E710048E29E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E51D264E710048E29E /* libz.tbd */; };
-		D993B6481F1478C1006E95A9 /* LMBTCTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */; };
 		D993B64B1F1480EB006E95A9 /* LMTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D993B64A1F1480EB006E95A9 /* LMTransferManager.m */; };
 		D9ACCD061EDFC6BC009A5869 /* NSObject+Swing.m in Sources */ = {isa = PBXBuildFile; fileRef = D9ACCD051EDFC6BC009A5869 /* NSObject+Swing.m */; };
 		D9ACCD0A1EDFC98C009A5869 /* XMLReader.m in Sources */ = {isa = PBXBuildFile; fileRef = D9ACCD091EDFC98C009A5869 /* XMLReader.m */; };
@@ -866,7 +865,6 @@
 		D9B906D81EFCE7AE006BAE49 /* LMFriendRequestInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B906D71EFCE7AE006BAE49 /* LMFriendRequestInfo.m */; };
 		D9C73AEB1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C73AEA1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m */; };
 		D9C9CC271E8111B90048DE92 /* MMLaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9C9CC251E8111B90048DE92 /* MMLaunchViewController.m */; };
-		D9C9CC281E8111B90048DE92 /* MMLaunchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9C9CC261E8111B90048DE92 /* MMLaunchViewController.xib */; };
 		D9CF8C5A1DFE35010035CA25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D9CF8C5C1DFE35010035CA25 /* InfoPlist.strings */; };
 		D9E857051D48A3D7001C35A2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857041D48A3D7001C35A2 /* CoreLocation.framework */; };
 		D9E857071D48A3E0001C35A2 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857061D48A3E0001C35A2 /* MapKit.framework */; };
@@ -883,6 +881,7 @@
 		F127E1391F148BAE003E448F /* LMCurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E1381F148BAE003E448F /* LMCurrencyManager.m */; };
 		F13513FC1F1DC0EC0011A96A /* LMBaseCurrencyManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = F13513FB1F1DC0EC0011A96A /* LMBaseCurrencyManager.mm */; };
 		F13513FF1F1DC10F0011A96A /* LMBaseAddressManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F13513FE1F1DC10F0011A96A /* LMBaseAddressManager.m */; };
+		F13514011F1DDE080011A96A /* MMLaunchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F13514001F1DDE080011A96A /* MMLaunchViewController.xib */; };
 		F1437EA91F14ABE600758F1C /* LMWalletCreatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EA81F14ABE500758F1C /* LMWalletCreatManager.m */; };
 		F1437EAF1F14B14A00758F1C /* LMRealmManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EAE1F14B14A00758F1C /* LMRealmManager.m */; };
 		F1437EB51F14EDA100758F1C /* LMCurrencyAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EB41F14EDA100758F1C /* LMCurrencyAddress.m */; };
@@ -2564,8 +2563,6 @@
 		D98FD7E11D264E470048E29E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		D98FD7E31D264E550048E29E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		D98FD7E51D264E710048E29E /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		D993B6461F1478C1006E95A9 /* LMBTCTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBTCTransferManager.h; sourceTree = "<group>"; };
-		D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBTCTransferManager.m; sourceTree = "<group>"; };
 		D993B6491F1480EB006E95A9 /* LMTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransferManager.h; sourceTree = "<group>"; };
 		D993B64A1F1480EB006E95A9 /* LMTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransferManager.m; sourceTree = "<group>"; };
 		D9ACCD041EDFC6BC009A5869 /* NSObject+Swing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Swing.h"; sourceTree = "<group>"; };
@@ -2650,7 +2647,6 @@
 		D9C73AEA1E8CD5E7002BF3B7 /* NSDictionary+NilSafe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NilSafe.m"; sourceTree = "<group>"; };
 		D9C9CC241E8111B90048DE92 /* MMLaunchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMLaunchViewController.h; sourceTree = "<group>"; };
 		D9C9CC251E8111B90048DE92 /* MMLaunchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMLaunchViewController.m; sourceTree = "<group>"; };
-		D9C9CC261E8111B90048DE92 /* MMLaunchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MMLaunchViewController.xib; sourceTree = "<group>"; };
 		D9CF8C5B1DFE35010035CA25 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D9CF8C5D1DFE350F0035CA25 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		D9E857041D48A3D7001C35A2 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -2681,6 +2677,7 @@
 		F13513FB1F1DC0EC0011A96A /* LMBaseCurrencyManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LMBaseCurrencyManager.mm; sourceTree = "<group>"; };
 		F13513FD1F1DC10F0011A96A /* LMBaseAddressManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseAddressManager.h; sourceTree = "<group>"; };
 		F13513FE1F1DC10F0011A96A /* LMBaseAddressManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBaseAddressManager.m; sourceTree = "<group>"; };
+		F13514001F1DDE080011A96A /* MMLaunchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MMLaunchViewController.xib; sourceTree = "<group>"; };
 		F1437EA71F14ABE500758F1C /* LMWalletCreatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletCreatManager.h; sourceTree = "<group>"; };
 		F1437EA81F14ABE500758F1C /* LMWalletCreatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletCreatManager.m; sourceTree = "<group>"; };
 		F1437EAD1F14B14A00758F1C /* LMRealmManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRealmManager.h; sourceTree = "<group>"; };
@@ -12964,6 +12961,7 @@
 		D9217ED11CE03D9100953F51 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				F13514001F1DDE080011A96A /* MMLaunchViewController.xib */,
 				D9217EDF1CE03D9100953F51 /* LaunchScreen.storyboard */,
 				D9217EDA1CE03D9100953F51 /* Main.storyboard */,
 				D9CF8C5C1DFE35010035CA25 /* InfoPlist.strings */,
@@ -12971,7 +12969,6 @@
 				D97E3F971E820D610021D710 /* Connect.entitlements */,
 				D9C9CC241E8111B90048DE92 /* MMLaunchViewController.h */,
 				D9C9CC251E8111B90048DE92 /* MMLaunchViewController.m */,
-				D9C9CC261E8111B90048DE92 /* MMLaunchViewController.xib */,
 				D9217ED41CE03D9100953F51 /* AppDelegate.h */,
 				D9217ED51CE03D9100953F51 /* AppDelegate.m */,
 				D9217ED21CE03D9100953F51 /* main.m */,
@@ -15474,8 +15471,6 @@
 			children = (
 				D993B6491F1480EB006E95A9 /* LMTransferManager.h */,
 				D993B64A1F1480EB006E95A9 /* LMTransferManager.m */,
-				D993B6461F1478C1006E95A9 /* LMBTCTransferManager.h */,
-				D993B6471F1478C1006E95A9 /* LMBTCTransferManager.m */,
 			);
 			name = WalletManager;
 			sourceTree = "<group>";
@@ -32408,7 +32403,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1923504A1E811F520022D844 /* NCellValue1.xib in Resources */,
-				D9C9CC281E8111B90048DE92 /* MMLaunchViewController.xib in Resources */,
 				D92230291E822A3100D67110 /* eye_blink@3x.png in Resources */,
 				192351291E8121CB0022D844 /* LMaddTableViewCell.xib in Resources */,
 				1923504F1E811F520022D844 /* TitleSubTitleCell.xib in Resources */,
@@ -32521,6 +32515,7 @@
 				19234F451E8113D60022D844 /* LMRandomSeedController.xib in Resources */,
 				D9222F961E822A3000D67110 /* mss_browseLoading@3x.png in Resources */,
 				F16FD8061EC3205F002F9395 /* numeric in Resources */,
+				F13514011F1DDE080011A96A /* MMLaunchViewController.xib in Resources */,
 				D92230261E822A3100D67110 /* eye_blink.gif in Resources */,
 				192351491E8121CB0022D844 /* WalletCollectionViewCell.xib in Resources */,
 				D92230101E822A3100D67110 /* chatbar_more@3x.png in Resources */,
@@ -33517,7 +33512,6 @@
 				F16FD7CB1EC3205B002F9395 /* sha2.c in Sources */,
 				D97FDCBF1E86664800B161C8 /* YYTextView.m in Sources */,
 				1923517C1E8123C60022D844 /* PhoneContactInfo.m in Sources */,
-				D993B6481F1478C1006E95A9 /* LMBTCTransferManager.m in Sources */,
 				F10F2C701EFCC0D20017C32C /* LMFriendRecommandInfo.m in Sources */,
 				D9222FDE1E822A3100D67110 /* UIButton+YYWebImage.m in Sources */,
 				F16FD7BF1EC3205B002F9395 /* bignum.c in Sources */,

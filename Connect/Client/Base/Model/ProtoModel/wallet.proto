@@ -1,32 +1,37 @@
 syntax = "proto3";
 package wallet;
 
-// 新的钱包
 message RequestWalletInfo {
 string payload = 1;
-string check_sum = 2;
-int32 ver = 3;
-string w_id = 4;
-int32 version = 5;
-string user_identifier = 6;
+int32 pbkdf2_iterations = 2;
+string check_sum = 3;
+int32 version = 4;
+int32 ver = 5;
 }
 
-message RequestUserInfo {
-string uid = 1;
-int32  currency = 2;
+message RespSyncWallet {
+Wallet wallet = 1;
+repeated Coin coins = 2;
 }
-
-
-message Address {
-string address = 1;
-}
-
 
 message Wallet {
 string pay_load = 1;
 int32 version = 2;
 int32 ver = 3;
 string check_sum = 4;
+}
+
+message Balance {
+int64 amount = 1;
+int64 pending = 2;
+}
+
+message CreateCoinRequest {
+int32 currency = 1;
+string master_address = 2;
+string payload = 3;
+int32 category = 4;
+string salt = 5;
 }
 
 message Coin {
@@ -48,7 +53,16 @@ Coin coin = 1;
 repeated CoinInfo coinInfos = 2;
 }
 
-message CreateCoinAddress {
+message CoinInfo {
+int32 index = 1;
+int32 status = 2;
+string address = 3;
+string label = 4;
+int64 balance = 5;
+int64 amount = 6;
+}
+
+message CreateCoinAccount {
 int32 index = 1;
 string address = 2;
 string label = 3;
@@ -56,107 +70,111 @@ int32 status = 4;
 int32 currency = 5;
 }
 
-message CoinInfo {
-int32 index = 1;
-string address = 2;
-string label = 3;
-int64 balance = 4;
-int32 status = 5;
+message Txin {
+repeated string addresses = 1;
 }
 
-message RespSyncWallet {
-Wallet wallet = 1;
-repeated Coin coins = 2;
+message Txout {
+string address = 1;
+int64 amount = 2;
+}
+
+message SpentCurrency {
+int32 currency = 1;
+Txin txin = 2;
 }
 
 message LuckyPackageRequest {
-int32 total = 1;
+SpentCurrency spent_currency = 1;
+string reciver_identifier = 2; //group id or user pubkey(address)
+int32 package_type = 3;// privte group outer
+int32 size = 4;
+int64 amount = 5;
+int64 fee = 6;
+string tips = 7;
+}
+
+message URLTransferRequest {
+SpentCurrency spent_currency = 1;
 int64 amount = 2;
 int64 fee = 3;
-int32 allot_type = 4;
-int32 package_type = 5;
-string tips = 6;
-repeated string addresses = 7;
 }
 
 message TransferRequest {
-int64 amount = 1;
-int64 fee = 2;
-int32 transfer_type = 3;
+SpentCurrency spent_currency = 1;
+repeated Txout tx_out = 2;
+int64 fee = 3;
 string tips = 4;
-repeated string from_addresses = 5;
-repeated string to_addresses = 6;
 }
 
 message CrowdfuningRequest {
-int64 amount = 1;
-int32 total = 2;
-string tips = 3;
+string currency = 1;
+string group_identifier = 2;
+int64 per_amount = 3;
+int32 size = 4;
+string tips = 5;
 }
 
-message CrowdfuningResp {
-string txId = 1;
+message ReceiptRequest {
+string currency = 1;
+string payer = 2; // who need pay this receipt
+int64 amount = 3;
+string tips = 4;
 }
 
-message PayCrowdRequest {
-string txId = 1;
-repeated string addresses = 2;
+message HashIdResp {
+string hash_id = 1;
+}
+
+message Pay {
+SpentCurrency spent_currency = 1;
+int32 pay_type = 2;
+string hash_id = 3;
 }
 
 message OriginalTransaction {
-string rawhex = 1;
-string vts = 2;
-string transaction_id = 3;
+string hash_id = 1;
+string rawhex = 2;
+string vts = 3;
+int64 fee = 4;
+repeated string addresses = 5;
+}
+
+message OriginalTransactionResponse {
+int32 code = 1;
+OriginalTransaction data = 2;
+string message = 3;
 }
 
 message PublishTransaction {
-string signed_hex = 1;
-string transaction_id = 2;
+int32 transaction_type = 1;
+string hash_id = 2;
+string tx_hex = 3;
+int32 currency =4;
 }
 
 message TransactionFlowingRequest {
 int32 currency = 1;
+int32 page = 2;
+int32 size = 3;
 }
 
 message TransactionFlowing {
-int32 status =1; // confirm unconfirm
-int32 category = 2; // transfer luckypackage
-int64 amount = 3;
-int64 time = 4;
-string avatar = 5;
-string username = 6;
-string address = 7;
-string txid = 8;
-int32 currency = 9; // btc ltc
-}
-
-message CreateCoinRequest {
-int32 currency = 1;
-string master_address = 2;
-string payload = 3;
-int32 category = 4;
-string salt = 5;
+int64 time = 1;
+string username = 2;
+string address = 3;
+string avatar = 4;
+int64 amount = 5;
+string txid = 6;
+int32 status =7; // confirm unconfirm
+int32 category = 8; // transfer luckypackage
 }
 
 message TransactionFlowings {
-int32 currency = 1; // btc ltc
 repeated TransactionFlowing transaction_history = 2;
 }
 
-
-message RequestCreateCoinInfo {
-int32 index = 1;
-int32 status = 2;
-string address = 3;
-string label = 4;
-int32 currency = 5;
-string w_id = 6;
-}
-message DefaultAddress {
-int32 currency = 1;
-string address =2;
-}
-
-message ListDefaultAddress {
-repeated DefaultAddress defaultAddresses = 1;
+message RequestUserInfo {
+string uid = 1;
+int32  currency = 2;
 }

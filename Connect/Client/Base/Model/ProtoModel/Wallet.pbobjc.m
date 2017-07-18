@@ -47,20 +47,18 @@ static GPBFileDescriptor *WalletRoot_FileDescriptor(void) {
 @implementation RequestWalletInfo
 
 @dynamic payload;
+@dynamic pbkdf2Iterations;
 @dynamic checkSum;
-@dynamic ver;
-@dynamic wId;
 @dynamic version;
-@dynamic userIdentifier;
+@dynamic ver;
 
 typedef struct RequestWalletInfo__storage_ {
   uint32_t _has_storage_[1];
-  int32_t ver;
+  int32_t pbkdf2Iterations;
   int32_t version;
+  int32_t ver;
   NSString *payload;
   NSString *checkSum;
-  NSString *wId;
-  NSString *userIdentifier;
 } RequestWalletInfo__storage_;
 
 // This method is threadsafe because it is initially called
@@ -79,29 +77,20 @@ typedef struct RequestWalletInfo__storage_ {
         .dataType = GPBDataTypeString,
       },
       {
-        .name = "checkSum",
+        .name = "pbkdf2Iterations",
         .dataTypeSpecific.className = NULL,
-        .number = RequestWalletInfo_FieldNumber_CheckSum,
+        .number = RequestWalletInfo_FieldNumber_Pbkdf2Iterations,
         .hasIndex = 1,
-        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, checkSum),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "ver",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestWalletInfo_FieldNumber_Ver,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, ver),
+        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, pbkdf2Iterations),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
       {
-        .name = "wId",
+        .name = "checkSum",
         .dataTypeSpecific.className = NULL,
-        .number = RequestWalletInfo_FieldNumber_WId,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, wId),
+        .number = RequestWalletInfo_FieldNumber_CheckSum,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, checkSum),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
@@ -109,19 +98,19 @@ typedef struct RequestWalletInfo__storage_ {
         .name = "version",
         .dataTypeSpecific.className = NULL,
         .number = RequestWalletInfo_FieldNumber_Version,
-        .hasIndex = 4,
+        .hasIndex = 3,
         .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, version),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
       {
-        .name = "userIdentifier",
+        .name = "ver",
         .dataTypeSpecific.className = NULL,
-        .number = RequestWalletInfo_FieldNumber_UserIdentifier,
-        .hasIndex = 5,
-        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, userIdentifier),
+        .number = RequestWalletInfo_FieldNumber_Ver,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, ver),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -140,18 +129,18 @@ typedef struct RequestWalletInfo__storage_ {
 
 @end
 
-#pragma mark - RequestUserInfo
+#pragma mark - RespSyncWallet
 
-@implementation RequestUserInfo
+@implementation RespSyncWallet
 
-@dynamic uid;
-@dynamic currency;
+@dynamic hasWallet, wallet;
+@dynamic coinsArray, coinsArray_Count;
 
-typedef struct RequestUserInfo__storage_ {
+typedef struct RespSyncWallet__storage_ {
   uint32_t _has_storage_[1];
-  int32_t currency;
-  NSString *uid;
-} RequestUserInfo__storage_;
+  Wallet *wallet;
+  NSMutableArray *coinsArray;
+} RespSyncWallet__storage_;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
@@ -160,74 +149,31 @@ typedef struct RequestUserInfo__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "uid",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestUserInfo_FieldNumber_Uid,
+        .name = "wallet",
+        .dataTypeSpecific.className = GPBStringifySymbol(Wallet),
+        .number = RespSyncWallet_FieldNumber_Wallet,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(RequestUserInfo__storage_, uid),
+        .offset = (uint32_t)offsetof(RespSyncWallet__storage_, wallet),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
+        .dataType = GPBDataTypeMessage,
       },
       {
-        .name = "currency",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestUserInfo_FieldNumber_Currency,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(RequestUserInfo__storage_, currency),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
+        .name = "coinsArray",
+        .dataTypeSpecific.className = GPBStringifySymbol(Coin),
+        .number = RespSyncWallet_FieldNumber_CoinsArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(RespSyncWallet__storage_, coinsArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeMessage,
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[RequestUserInfo class]
+        [GPBDescriptor allocDescriptorForClass:[RespSyncWallet class]
                                      rootClass:[WalletRoot class]
                                           file:WalletRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(RequestUserInfo__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
-  }
-  return descriptor;
-}
-
-@end
-
-#pragma mark - Address
-
-@implementation Address
-
-@dynamic address;
-
-typedef struct Address__storage_ {
-  uint32_t _has_storage_[1];
-  NSString *address;
-} Address__storage_;
-
-// This method is threadsafe because it is initially called
-// in +initialize for each subclass.
-+ (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
-  if (!descriptor) {
-    static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "address",
-        .dataTypeSpecific.className = NULL,
-        .number = Address_FieldNumber_Address,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(Address__storage_, address),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-    };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[Address class]
-                                     rootClass:[WalletRoot class]
-                                          file:WalletRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(Address__storage_)
+                                   storageSize:sizeof(RespSyncWallet__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
@@ -304,6 +250,147 @@ typedef struct Wallet__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(Wallet__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - Balance
+
+@implementation Balance
+
+@dynamic amount;
+@dynamic pending;
+
+typedef struct Balance__storage_ {
+  uint32_t _has_storage_[1];
+  int64_t amount;
+  int64_t pending;
+} Balance__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = Balance_FieldNumber_Amount,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(Balance__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "pending",
+        .dataTypeSpecific.className = NULL,
+        .number = Balance_FieldNumber_Pending,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(Balance__storage_, pending),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[Balance class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(Balance__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - CreateCoinRequest
+
+@implementation CreateCoinRequest
+
+@dynamic currency;
+@dynamic masterAddress;
+@dynamic payload;
+@dynamic category;
+@dynamic salt;
+
+typedef struct CreateCoinRequest__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t currency;
+  int32_t category;
+  NSString *masterAddress;
+  NSString *payload;
+  NSString *salt;
+} CreateCoinRequest__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinRequest_FieldNumber_Currency,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "masterAddress",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinRequest_FieldNumber_MasterAddress,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, masterAddress),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "payload",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinRequest_FieldNumber_Payload,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, payload),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "category",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinRequest_FieldNumber_Category,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, category),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "salt",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinRequest_FieldNumber_Salt,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, salt),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[CreateCoinRequest class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(CreateCoinRequest__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
@@ -529,102 +616,16 @@ typedef struct CoinsDetail__storage_ {
 
 @end
 
-#pragma mark - CreateCoinAddress
-
-@implementation CreateCoinAddress
-
-@dynamic index;
-@dynamic address;
-@dynamic label;
-@dynamic status;
-@dynamic currency;
-
-typedef struct CreateCoinAddress__storage_ {
-  uint32_t _has_storage_[1];
-  int32_t index;
-  int32_t status;
-  int32_t currency;
-  NSString *address;
-  NSString *label;
-} CreateCoinAddress__storage_;
-
-// This method is threadsafe because it is initially called
-// in +initialize for each subclass.
-+ (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
-  if (!descriptor) {
-    static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "index",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinAddress_FieldNumber_Index,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(CreateCoinAddress__storage_, index),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "address",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinAddress_FieldNumber_Address,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(CreateCoinAddress__storage_, address),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "label",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinAddress_FieldNumber_Label,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(CreateCoinAddress__storage_, label),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "status",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinAddress_FieldNumber_Status,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(CreateCoinAddress__storage_, status),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "currency",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinAddress_FieldNumber_Currency,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(CreateCoinAddress__storage_, currency),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-    };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[CreateCoinAddress class]
-                                     rootClass:[WalletRoot class]
-                                          file:WalletRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(CreateCoinAddress__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
-  }
-  return descriptor;
-}
-
-@end
-
 #pragma mark - CoinInfo
 
 @implementation CoinInfo
 
 @dynamic index;
+@dynamic status;
 @dynamic address;
 @dynamic label;
 @dynamic balance;
-@dynamic status;
+@dynamic amount;
 
 typedef struct CoinInfo__storage_ {
   uint32_t _has_storage_[1];
@@ -633,6 +634,7 @@ typedef struct CoinInfo__storage_ {
   NSString *address;
   NSString *label;
   int64_t balance;
+  int64_t amount;
 } CoinInfo__storage_;
 
 // This method is threadsafe because it is initially called
@@ -651,10 +653,19 @@ typedef struct CoinInfo__storage_ {
         .dataType = GPBDataTypeInt32,
       },
       {
+        .name = "status",
+        .dataTypeSpecific.className = NULL,
+        .number = CoinInfo_FieldNumber_Status,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(CoinInfo__storage_, status),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
         .name = "address",
         .dataTypeSpecific.className = NULL,
         .number = CoinInfo_FieldNumber_Address,
-        .hasIndex = 1,
+        .hasIndex = 2,
         .offset = (uint32_t)offsetof(CoinInfo__storage_, address),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
@@ -663,7 +674,7 @@ typedef struct CoinInfo__storage_ {
         .name = "label",
         .dataTypeSpecific.className = NULL,
         .number = CoinInfo_FieldNumber_Label,
-        .hasIndex = 2,
+        .hasIndex = 3,
         .offset = (uint32_t)offsetof(CoinInfo__storage_, label),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
@@ -672,19 +683,19 @@ typedef struct CoinInfo__storage_ {
         .name = "balance",
         .dataTypeSpecific.className = NULL,
         .number = CoinInfo_FieldNumber_Balance,
-        .hasIndex = 3,
+        .hasIndex = 4,
         .offset = (uint32_t)offsetof(CoinInfo__storage_, balance),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
       },
       {
-        .name = "status",
+        .name = "amount",
         .dataTypeSpecific.className = NULL,
-        .number = CoinInfo_FieldNumber_Status,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(CoinInfo__storage_, status),
+        .number = CoinInfo_FieldNumber_Amount,
+        .hasIndex = 5,
+        .offset = (uint32_t)offsetof(CoinInfo__storage_, amount),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
+        .dataType = GPBDataTypeInt64,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -703,18 +714,24 @@ typedef struct CoinInfo__storage_ {
 
 @end
 
-#pragma mark - RespSyncWallet
+#pragma mark - CreateCoinAccount
 
-@implementation RespSyncWallet
+@implementation CreateCoinAccount
 
-@dynamic hasWallet, wallet;
-@dynamic coinsArray, coinsArray_Count;
+@dynamic index;
+@dynamic address;
+@dynamic label;
+@dynamic status;
+@dynamic currency;
 
-typedef struct RespSyncWallet__storage_ {
+typedef struct CreateCoinAccount__storage_ {
   uint32_t _has_storage_[1];
-  Wallet *wallet;
-  NSMutableArray *coinsArray;
-} RespSyncWallet__storage_;
+  int32_t index;
+  int32_t status;
+  int32_t currency;
+  NSString *address;
+  NSString *label;
+} CreateCoinAccount__storage_;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
@@ -723,31 +740,209 @@ typedef struct RespSyncWallet__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "wallet",
-        .dataTypeSpecific.className = GPBStringifySymbol(Wallet),
-        .number = RespSyncWallet_FieldNumber_Wallet,
+        .name = "index",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinAccount_FieldNumber_Index,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(RespSyncWallet__storage_, wallet),
+        .offset = (uint32_t)offsetof(CreateCoinAccount__storage_, index),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
+        .dataType = GPBDataTypeInt32,
       },
       {
-        .name = "coinsArray",
-        .dataTypeSpecific.className = GPBStringifySymbol(Coin),
-        .number = RespSyncWallet_FieldNumber_CoinsArray,
-        .hasIndex = GPBNoHasBit,
-        .offset = (uint32_t)offsetof(RespSyncWallet__storage_, coinsArray),
-        .flags = GPBFieldRepeated,
-        .dataType = GPBDataTypeMessage,
+        .name = "address",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinAccount_FieldNumber_Address,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(CreateCoinAccount__storage_, address),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "label",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinAccount_FieldNumber_Label,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(CreateCoinAccount__storage_, label),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "status",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinAccount_FieldNumber_Status,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(CreateCoinAccount__storage_, status),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = CreateCoinAccount_FieldNumber_Currency,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(CreateCoinAccount__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[RespSyncWallet class]
+        [GPBDescriptor allocDescriptorForClass:[CreateCoinAccount class]
                                      rootClass:[WalletRoot class]
                                           file:WalletRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(RespSyncWallet__storage_)
+                                   storageSize:sizeof(CreateCoinAccount__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - Txin
+
+@implementation Txin
+
+@dynamic addressesArray, addressesArray_Count;
+
+typedef struct Txin__storage_ {
+  uint32_t _has_storage_[1];
+  NSMutableArray *addressesArray;
+} Txin__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "addressesArray",
+        .dataTypeSpecific.className = NULL,
+        .number = Txin_FieldNumber_AddressesArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(Txin__storage_, addressesArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[Txin class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(Txin__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - Txout
+
+@implementation Txout
+
+@dynamic address;
+@dynamic amount;
+
+typedef struct Txout__storage_ {
+  uint32_t _has_storage_[1];
+  NSString *address;
+  int64_t amount;
+} Txout__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "address",
+        .dataTypeSpecific.className = NULL,
+        .number = Txout_FieldNumber_Address,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(Txout__storage_, address),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = Txout_FieldNumber_Amount,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(Txout__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[Txout class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(Txout__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - SpentCurrency
+
+@implementation SpentCurrency
+
+@dynamic currency;
+@dynamic hasTxin, txin;
+
+typedef struct SpentCurrency__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t currency;
+  Txin *txin;
+} SpentCurrency__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = SpentCurrency_FieldNumber_Currency,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(SpentCurrency__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "txin",
+        .dataTypeSpecific.className = GPBStringifySymbol(Txin),
+        .number = SpentCurrency_FieldNumber_Txin,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(SpentCurrency__storage_, txin),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[SpentCurrency class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(SpentCurrency__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
@@ -761,21 +956,21 @@ typedef struct RespSyncWallet__storage_ {
 
 @implementation LuckyPackageRequest
 
-@dynamic total;
+@dynamic hasSpentCurrency, spentCurrency;
+@dynamic reciverIdentifier;
+@dynamic packageType;
+@dynamic size;
 @dynamic amount;
 @dynamic fee;
-@dynamic allotType;
-@dynamic packageType;
 @dynamic tips;
-@dynamic addressesArray, addressesArray_Count;
 
 typedef struct LuckyPackageRequest__storage_ {
   uint32_t _has_storage_[1];
-  int32_t total;
-  int32_t allotType;
   int32_t packageType;
+  int32_t size;
+  SpentCurrency *spentCurrency;
+  NSString *reciverIdentifier;
   NSString *tips;
-  NSMutableArray *addressesArray;
   int64_t amount;
   int64_t fee;
 } LuckyPackageRequest__storage_;
@@ -787,11 +982,38 @@ typedef struct LuckyPackageRequest__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "total",
-        .dataTypeSpecific.className = NULL,
-        .number = LuckyPackageRequest_FieldNumber_Total,
+        .name = "spentCurrency",
+        .dataTypeSpecific.className = GPBStringifySymbol(SpentCurrency),
+        .number = LuckyPackageRequest_FieldNumber_SpentCurrency,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, total),
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, spentCurrency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "reciverIdentifier",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_ReciverIdentifier,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, reciverIdentifier),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "packageType",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_PackageType,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, packageType),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "size",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_Size,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, size),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
@@ -799,7 +1021,7 @@ typedef struct LuckyPackageRequest__storage_ {
         .name = "amount",
         .dataTypeSpecific.className = NULL,
         .number = LuckyPackageRequest_FieldNumber_Amount,
-        .hasIndex = 1,
+        .hasIndex = 4,
         .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, amount),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
@@ -808,45 +1030,18 @@ typedef struct LuckyPackageRequest__storage_ {
         .name = "fee",
         .dataTypeSpecific.className = NULL,
         .number = LuckyPackageRequest_FieldNumber_Fee,
-        .hasIndex = 2,
+        .hasIndex = 5,
         .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, fee),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
       },
       {
-        .name = "allotType",
-        .dataTypeSpecific.className = NULL,
-        .number = LuckyPackageRequest_FieldNumber_AllotType,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, allotType),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "packageType",
-        .dataTypeSpecific.className = NULL,
-        .number = LuckyPackageRequest_FieldNumber_PackageType,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, packageType),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
         .name = "tips",
         .dataTypeSpecific.className = NULL,
         .number = LuckyPackageRequest_FieldNumber_Tips,
-        .hasIndex = 5,
+        .hasIndex = 6,
         .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, tips),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "addressesArray",
-        .dataTypeSpecific.className = NULL,
-        .number = LuckyPackageRequest_FieldNumber_AddressesArray,
-        .hasIndex = GPBNoHasBit,
-        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, addressesArray),
-        .flags = GPBFieldRepeated,
         .dataType = GPBDataTypeString,
       },
     };
@@ -866,24 +1061,85 @@ typedef struct LuckyPackageRequest__storage_ {
 
 @end
 
+#pragma mark - URLTransferRequest
+
+@implementation URLTransferRequest
+
+@dynamic hasSpentCurrency, spentCurrency;
+@dynamic amount;
+@dynamic fee;
+
+typedef struct URLTransferRequest__storage_ {
+  uint32_t _has_storage_[1];
+  SpentCurrency *spentCurrency;
+  int64_t amount;
+  int64_t fee;
+} URLTransferRequest__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "spentCurrency",
+        .dataTypeSpecific.className = GPBStringifySymbol(SpentCurrency),
+        .number = URLTransferRequest_FieldNumber_SpentCurrency,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(URLTransferRequest__storage_, spentCurrency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = URLTransferRequest_FieldNumber_Amount,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(URLTransferRequest__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "fee",
+        .dataTypeSpecific.className = NULL,
+        .number = URLTransferRequest_FieldNumber_Fee,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(URLTransferRequest__storage_, fee),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[URLTransferRequest class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(URLTransferRequest__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
 #pragma mark - TransferRequest
 
 @implementation TransferRequest
 
-@dynamic amount;
+@dynamic hasSpentCurrency, spentCurrency;
+@dynamic txOutArray, txOutArray_Count;
 @dynamic fee;
-@dynamic transferType;
 @dynamic tips;
-@dynamic fromAddressesArray, fromAddressesArray_Count;
-@dynamic toAddressesArray, toAddressesArray_Count;
 
 typedef struct TransferRequest__storage_ {
   uint32_t _has_storage_[1];
-  int32_t transferType;
+  SpentCurrency *spentCurrency;
+  NSMutableArray *txOutArray;
   NSString *tips;
-  NSMutableArray *fromAddressesArray;
-  NSMutableArray *toAddressesArray;
-  int64_t amount;
   int64_t fee;
 } TransferRequest__storage_;
 
@@ -894,13 +1150,22 @@ typedef struct TransferRequest__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "amount",
-        .dataTypeSpecific.className = NULL,
-        .number = TransferRequest_FieldNumber_Amount,
+        .name = "spentCurrency",
+        .dataTypeSpecific.className = GPBStringifySymbol(SpentCurrency),
+        .number = TransferRequest_FieldNumber_SpentCurrency,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(TransferRequest__storage_, amount),
+        .offset = (uint32_t)offsetof(TransferRequest__storage_, spentCurrency),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt64,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "txOutArray",
+        .dataTypeSpecific.className = GPBStringifySymbol(Txout),
+        .number = TransferRequest_FieldNumber_TxOutArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(TransferRequest__storage_, txOutArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeMessage,
       },
       {
         .name = "fee",
@@ -912,39 +1177,12 @@ typedef struct TransferRequest__storage_ {
         .dataType = GPBDataTypeInt64,
       },
       {
-        .name = "transferType",
-        .dataTypeSpecific.className = NULL,
-        .number = TransferRequest_FieldNumber_TransferType,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(TransferRequest__storage_, transferType),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
         .name = "tips",
         .dataTypeSpecific.className = NULL,
         .number = TransferRequest_FieldNumber_Tips,
-        .hasIndex = 3,
+        .hasIndex = 2,
         .offset = (uint32_t)offsetof(TransferRequest__storage_, tips),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "fromAddressesArray",
-        .dataTypeSpecific.className = NULL,
-        .number = TransferRequest_FieldNumber_FromAddressesArray,
-        .hasIndex = GPBNoHasBit,
-        .offset = (uint32_t)offsetof(TransferRequest__storage_, fromAddressesArray),
-        .flags = GPBFieldRepeated,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "toAddressesArray",
-        .dataTypeSpecific.className = NULL,
-        .number = TransferRequest_FieldNumber_ToAddressesArray,
-        .hasIndex = GPBNoHasBit,
-        .offset = (uint32_t)offsetof(TransferRequest__storage_, toAddressesArray),
-        .flags = GPBFieldRepeated,
         .dataType = GPBDataTypeString,
       },
     };
@@ -968,15 +1206,19 @@ typedef struct TransferRequest__storage_ {
 
 @implementation CrowdfuningRequest
 
-@dynamic amount;
-@dynamic total;
+@dynamic currency;
+@dynamic groupIdentifier;
+@dynamic perAmount;
+@dynamic size;
 @dynamic tips;
 
 typedef struct CrowdfuningRequest__storage_ {
   uint32_t _has_storage_[1];
-  int32_t total;
+  int32_t size;
+  NSString *currency;
+  NSString *groupIdentifier;
   NSString *tips;
-  int64_t amount;
+  int64_t perAmount;
 } CrowdfuningRequest__storage_;
 
 // This method is threadsafe because it is initially called
@@ -986,20 +1228,38 @@ typedef struct CrowdfuningRequest__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "amount",
+        .name = "currency",
         .dataTypeSpecific.className = NULL,
-        .number = CrowdfuningRequest_FieldNumber_Amount,
+        .number = CrowdfuningRequest_FieldNumber_Currency,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(CrowdfuningRequest__storage_, amount),
+        .offset = (uint32_t)offsetof(CrowdfuningRequest__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "groupIdentifier",
+        .dataTypeSpecific.className = NULL,
+        .number = CrowdfuningRequest_FieldNumber_GroupIdentifier,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(CrowdfuningRequest__storage_, groupIdentifier),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "perAmount",
+        .dataTypeSpecific.className = NULL,
+        .number = CrowdfuningRequest_FieldNumber_PerAmount,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(CrowdfuningRequest__storage_, perAmount),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
       },
       {
-        .name = "total",
+        .name = "size",
         .dataTypeSpecific.className = NULL,
-        .number = CrowdfuningRequest_FieldNumber_Total,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(CrowdfuningRequest__storage_, total),
+        .number = CrowdfuningRequest_FieldNumber_Size,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(CrowdfuningRequest__storage_, size),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
@@ -1007,7 +1267,7 @@ typedef struct CrowdfuningRequest__storage_ {
         .name = "tips",
         .dataTypeSpecific.className = NULL,
         .number = CrowdfuningRequest_FieldNumber_Tips,
-        .hasIndex = 2,
+        .hasIndex = 4,
         .offset = (uint32_t)offsetof(CrowdfuningRequest__storage_, tips),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
@@ -1029,16 +1289,22 @@ typedef struct CrowdfuningRequest__storage_ {
 
 @end
 
-#pragma mark - CrowdfuningResp
+#pragma mark - ReceiptRequest
 
-@implementation CrowdfuningResp
+@implementation ReceiptRequest
 
-@dynamic txId;
+@dynamic currency;
+@dynamic payer;
+@dynamic amount;
+@dynamic tips;
 
-typedef struct CrowdfuningResp__storage_ {
+typedef struct ReceiptRequest__storage_ {
   uint32_t _has_storage_[1];
-  NSString *txId;
-} CrowdfuningResp__storage_;
+  NSString *currency;
+  NSString *payer;
+  NSString *tips;
+  int64_t amount;
+} ReceiptRequest__storage_;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
@@ -1047,28 +1313,50 @@ typedef struct CrowdfuningResp__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "txId",
+        .name = "currency",
         .dataTypeSpecific.className = NULL,
-        .number = CrowdfuningResp_FieldNumber_TxId,
+        .number = ReceiptRequest_FieldNumber_Currency,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(CrowdfuningResp__storage_, txId),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldTextFormatNameCustom),
+        .offset = (uint32_t)offsetof(ReceiptRequest__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "payer",
+        .dataTypeSpecific.className = NULL,
+        .number = ReceiptRequest_FieldNumber_Payer,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(ReceiptRequest__storage_, payer),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = ReceiptRequest_FieldNumber_Amount,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(ReceiptRequest__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "tips",
+        .dataTypeSpecific.className = NULL,
+        .number = ReceiptRequest_FieldNumber_Tips,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(ReceiptRequest__storage_, tips),
+        .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[CrowdfuningResp class]
+        [GPBDescriptor allocDescriptorForClass:[ReceiptRequest class]
                                      rootClass:[WalletRoot class]
                                           file:WalletRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(CrowdfuningResp__storage_)
+                                   storageSize:sizeof(ReceiptRequest__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
-#if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
-    static const char *extraTextFormatInfo =
-        "\001\001\004\000";
-    [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
-#endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -1077,18 +1365,16 @@ typedef struct CrowdfuningResp__storage_ {
 
 @end
 
-#pragma mark - PayCrowdRequest
+#pragma mark - HashIdResp
 
-@implementation PayCrowdRequest
+@implementation HashIdResp
 
-@dynamic txId;
-@dynamic addressesArray, addressesArray_Count;
+@dynamic hashId;
 
-typedef struct PayCrowdRequest__storage_ {
+typedef struct HashIdResp__storage_ {
   uint32_t _has_storage_[1];
-  NSString *txId;
-  NSMutableArray *addressesArray;
-} PayCrowdRequest__storage_;
+  NSString *hashId;
+} HashIdResp__storage_;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
@@ -1097,37 +1383,88 @@ typedef struct PayCrowdRequest__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "txId",
+        .name = "hashId",
         .dataTypeSpecific.className = NULL,
-        .number = PayCrowdRequest_FieldNumber_TxId,
+        .number = HashIdResp_FieldNumber_HashId,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(PayCrowdRequest__storage_, txId),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldTextFormatNameCustom),
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "addressesArray",
-        .dataTypeSpecific.className = NULL,
-        .number = PayCrowdRequest_FieldNumber_AddressesArray,
-        .hasIndex = GPBNoHasBit,
-        .offset = (uint32_t)offsetof(PayCrowdRequest__storage_, addressesArray),
-        .flags = GPBFieldRepeated,
+        .offset = (uint32_t)offsetof(HashIdResp__storage_, hashId),
+        .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[PayCrowdRequest class]
+        [GPBDescriptor allocDescriptorForClass:[HashIdResp class]
                                      rootClass:[WalletRoot class]
                                           file:WalletRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(PayCrowdRequest__storage_)
+                                   storageSize:sizeof(HashIdResp__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
-#if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
-    static const char *extraTextFormatInfo =
-        "\001\001\004\000";
-    [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
-#endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - Pay
+
+@implementation Pay
+
+@dynamic hasSpentCurrency, spentCurrency;
+@dynamic payType;
+@dynamic hashId;
+
+typedef struct Pay__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t payType;
+  SpentCurrency *spentCurrency;
+  NSString *hashId;
+} Pay__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "spentCurrency",
+        .dataTypeSpecific.className = GPBStringifySymbol(SpentCurrency),
+        .number = Pay_FieldNumber_SpentCurrency,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(Pay__storage_, spentCurrency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "payType",
+        .dataTypeSpecific.className = NULL,
+        .number = Pay_FieldNumber_PayType,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(Pay__storage_, payType),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "hashId",
+        .dataTypeSpecific.className = NULL,
+        .number = Pay_FieldNumber_HashId,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(Pay__storage_, hashId),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[Pay class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(Pay__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -1140,15 +1477,19 @@ typedef struct PayCrowdRequest__storage_ {
 
 @implementation OriginalTransaction
 
+@dynamic hashId;
 @dynamic rawhex;
 @dynamic vts;
-@dynamic transactionId;
+@dynamic fee;
+@dynamic addressesArray, addressesArray_Count;
 
 typedef struct OriginalTransaction__storage_ {
   uint32_t _has_storage_[1];
+  NSString *hashId;
   NSString *rawhex;
   NSString *vts;
-  NSString *transactionId;
+  NSMutableArray *addressesArray;
+  int64_t fee;
 } OriginalTransaction__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1158,10 +1499,19 @@ typedef struct OriginalTransaction__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
+        .name = "hashId",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_HashId,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, hashId),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
         .name = "rawhex",
         .dataTypeSpecific.className = NULL,
         .number = OriginalTransaction_FieldNumber_Rawhex,
-        .hasIndex = 0,
+        .hasIndex = 1,
         .offset = (uint32_t)offsetof(OriginalTransaction__storage_, rawhex),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
@@ -1170,18 +1520,27 @@ typedef struct OriginalTransaction__storage_ {
         .name = "vts",
         .dataTypeSpecific.className = NULL,
         .number = OriginalTransaction_FieldNumber_Vts,
-        .hasIndex = 1,
+        .hasIndex = 2,
         .offset = (uint32_t)offsetof(OriginalTransaction__storage_, vts),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
       {
-        .name = "transactionId",
+        .name = "fee",
         .dataTypeSpecific.className = NULL,
-        .number = OriginalTransaction_FieldNumber_TransactionId,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, transactionId),
+        .number = OriginalTransaction_FieldNumber_Fee,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, fee),
         .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "addressesArray",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_AddressesArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, addressesArray),
+        .flags = GPBFieldRepeated,
         .dataType = GPBDataTypeString,
       },
     };
@@ -1201,17 +1560,86 @@ typedef struct OriginalTransaction__storage_ {
 
 @end
 
+#pragma mark - OriginalTransactionResponse
+
+@implementation OriginalTransactionResponse
+
+@dynamic code;
+@dynamic hasData_p, data_p;
+@dynamic message;
+
+typedef struct OriginalTransactionResponse__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t code;
+  OriginalTransaction *data_p;
+  NSString *message;
+} OriginalTransactionResponse__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "code",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransactionResponse_FieldNumber_Code,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(OriginalTransactionResponse__storage_, code),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "data_p",
+        .dataTypeSpecific.className = GPBStringifySymbol(OriginalTransaction),
+        .number = OriginalTransactionResponse_FieldNumber_Data_p,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(OriginalTransactionResponse__storage_, data_p),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "message",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransactionResponse_FieldNumber_Message,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(OriginalTransactionResponse__storage_, message),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[OriginalTransactionResponse class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(OriginalTransactionResponse__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
 #pragma mark - PublishTransaction
 
 @implementation PublishTransaction
 
-@dynamic signedHex;
-@dynamic transactionId;
+@dynamic transactionType;
+@dynamic hashId;
+@dynamic txHex;
+@dynamic currency;
 
 typedef struct PublishTransaction__storage_ {
   uint32_t _has_storage_[1];
-  NSString *signedHex;
-  NSString *transactionId;
+  int32_t transactionType;
+  int32_t currency;
+  NSString *hashId;
+  NSString *txHex;
 } PublishTransaction__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1221,22 +1649,40 @@ typedef struct PublishTransaction__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "signedHex",
+        .name = "transactionType",
         .dataTypeSpecific.className = NULL,
-        .number = PublishTransaction_FieldNumber_SignedHex,
+        .number = PublishTransaction_FieldNumber_TransactionType,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(PublishTransaction__storage_, signedHex),
+        .offset = (uint32_t)offsetof(PublishTransaction__storage_, transactionType),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "hashId",
+        .dataTypeSpecific.className = NULL,
+        .number = PublishTransaction_FieldNumber_HashId,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(PublishTransaction__storage_, hashId),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
       {
-        .name = "transactionId",
+        .name = "txHex",
         .dataTypeSpecific.className = NULL,
-        .number = PublishTransaction_FieldNumber_TransactionId,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(PublishTransaction__storage_, transactionId),
+        .number = PublishTransaction_FieldNumber_TxHex,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(PublishTransaction__storage_, txHex),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = PublishTransaction_FieldNumber_Currency,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(PublishTransaction__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -1260,10 +1706,14 @@ typedef struct PublishTransaction__storage_ {
 @implementation TransactionFlowingRequest
 
 @dynamic currency;
+@dynamic page;
+@dynamic size;
 
 typedef struct TransactionFlowingRequest__storage_ {
   uint32_t _has_storage_[1];
   int32_t currency;
+  int32_t page;
+  int32_t size;
 } TransactionFlowingRequest__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1278,6 +1728,24 @@ typedef struct TransactionFlowingRequest__storage_ {
         .number = TransactionFlowingRequest_FieldNumber_Currency,
         .hasIndex = 0,
         .offset = (uint32_t)offsetof(TransactionFlowingRequest__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "page",
+        .dataTypeSpecific.className = NULL,
+        .number = TransactionFlowingRequest_FieldNumber_Page,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(TransactionFlowingRequest__storage_, page),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "size",
+        .dataTypeSpecific.className = NULL,
+        .number = TransactionFlowingRequest_FieldNumber_Size,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(TransactionFlowingRequest__storage_, size),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
@@ -1302,27 +1770,25 @@ typedef struct TransactionFlowingRequest__storage_ {
 
 @implementation TransactionFlowing
 
-@dynamic status;
-@dynamic category;
-@dynamic amount;
 @dynamic time;
-@dynamic avatar;
 @dynamic username;
 @dynamic address;
+@dynamic avatar;
+@dynamic amount;
 @dynamic txid;
-@dynamic currency;
+@dynamic status;
+@dynamic category;
 
 typedef struct TransactionFlowing__storage_ {
   uint32_t _has_storage_[1];
   int32_t status;
   int32_t category;
-  int32_t currency;
-  NSString *avatar;
   NSString *username;
   NSString *address;
+  NSString *avatar;
   NSString *txid;
-  int64_t amount;
   int64_t time;
+  int64_t amount;
 } TransactionFlowing__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1332,55 +1798,19 @@ typedef struct TransactionFlowing__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "status",
-        .dataTypeSpecific.className = NULL,
-        .number = TransactionFlowing_FieldNumber_Status,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, status),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "category",
-        .dataTypeSpecific.className = NULL,
-        .number = TransactionFlowing_FieldNumber_Category,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, category),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "amount",
-        .dataTypeSpecific.className = NULL,
-        .number = TransactionFlowing_FieldNumber_Amount,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, amount),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt64,
-      },
-      {
         .name = "time",
         .dataTypeSpecific.className = NULL,
         .number = TransactionFlowing_FieldNumber_Time,
-        .hasIndex = 3,
+        .hasIndex = 0,
         .offset = (uint32_t)offsetof(TransactionFlowing__storage_, time),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
       },
       {
-        .name = "avatar",
-        .dataTypeSpecific.className = NULL,
-        .number = TransactionFlowing_FieldNumber_Avatar,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, avatar),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
         .name = "username",
         .dataTypeSpecific.className = NULL,
         .number = TransactionFlowing_FieldNumber_Username,
-        .hasIndex = 5,
+        .hasIndex = 1,
         .offset = (uint32_t)offsetof(TransactionFlowing__storage_, username),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
@@ -1389,26 +1819,53 @@ typedef struct TransactionFlowing__storage_ {
         .name = "address",
         .dataTypeSpecific.className = NULL,
         .number = TransactionFlowing_FieldNumber_Address,
-        .hasIndex = 6,
+        .hasIndex = 2,
         .offset = (uint32_t)offsetof(TransactionFlowing__storage_, address),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
       {
+        .name = "avatar",
+        .dataTypeSpecific.className = NULL,
+        .number = TransactionFlowing_FieldNumber_Avatar,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, avatar),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = TransactionFlowing_FieldNumber_Amount,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
         .name = "txid",
         .dataTypeSpecific.className = NULL,
         .number = TransactionFlowing_FieldNumber_Txid,
-        .hasIndex = 7,
+        .hasIndex = 5,
         .offset = (uint32_t)offsetof(TransactionFlowing__storage_, txid),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
       {
-        .name = "currency",
+        .name = "status",
         .dataTypeSpecific.className = NULL,
-        .number = TransactionFlowing_FieldNumber_Currency,
-        .hasIndex = 8,
-        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, currency),
+        .number = TransactionFlowing_FieldNumber_Status,
+        .hasIndex = 6,
+        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, status),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "category",
+        .dataTypeSpecific.className = NULL,
+        .number = TransactionFlowing_FieldNumber_Category,
+        .hasIndex = 7,
+        .offset = (uint32_t)offsetof(TransactionFlowing__storage_, category),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
@@ -1429,103 +1886,14 @@ typedef struct TransactionFlowing__storage_ {
 
 @end
 
-#pragma mark - CreateCoinRequest
-
-@implementation CreateCoinRequest
-
-@dynamic currency;
-@dynamic masterAddress;
-@dynamic payload;
-@dynamic category;
-@dynamic salt;
-
-typedef struct CreateCoinRequest__storage_ {
-  uint32_t _has_storage_[1];
-  int32_t currency;
-  int32_t category;
-  NSString *masterAddress;
-  NSString *payload;
-  NSString *salt;
-} CreateCoinRequest__storage_;
-
-// This method is threadsafe because it is initially called
-// in +initialize for each subclass.
-+ (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
-  if (!descriptor) {
-    static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "currency",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinRequest_FieldNumber_Currency,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, currency),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "masterAddress",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinRequest_FieldNumber_MasterAddress,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, masterAddress),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "payload",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinRequest_FieldNumber_Payload,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, payload),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "category",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinRequest_FieldNumber_Category,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, category),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "salt",
-        .dataTypeSpecific.className = NULL,
-        .number = CreateCoinRequest_FieldNumber_Salt,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(CreateCoinRequest__storage_, salt),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-    };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[CreateCoinRequest class]
-                                     rootClass:[WalletRoot class]
-                                          file:WalletRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(CreateCoinRequest__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
-  }
-  return descriptor;
-}
-
-@end
-
 #pragma mark - TransactionFlowings
 
 @implementation TransactionFlowings
 
-@dynamic currency;
 @dynamic transactionHistoryArray, transactionHistoryArray_Count;
 
 typedef struct TransactionFlowings__storage_ {
   uint32_t _has_storage_[1];
-  int32_t currency;
   NSMutableArray *transactionHistoryArray;
 } TransactionFlowings__storage_;
 
@@ -1535,15 +1903,6 @@ typedef struct TransactionFlowings__storage_ {
   static GPBDescriptor *descriptor = nil;
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "currency",
-        .dataTypeSpecific.className = NULL,
-        .number = TransactionFlowings_FieldNumber_Currency,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(TransactionFlowings__storage_, currency),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
       {
         .name = "transactionHistoryArray",
         .dataTypeSpecific.className = GPBStringifySymbol(TransactionFlowing),
@@ -1570,26 +1929,18 @@ typedef struct TransactionFlowings__storage_ {
 
 @end
 
-#pragma mark - RequestCreateCoinInfo
+#pragma mark - RequestUserInfo
 
-@implementation RequestCreateCoinInfo
+@implementation RequestUserInfo
 
-@dynamic index;
-@dynamic status;
-@dynamic address;
-@dynamic label;
+@dynamic uid;
 @dynamic currency;
-@dynamic wId;
 
-typedef struct RequestCreateCoinInfo__storage_ {
+typedef struct RequestUserInfo__storage_ {
   uint32_t _has_storage_[1];
-  int32_t index;
-  int32_t status;
   int32_t currency;
-  NSString *address;
-  NSString *label;
-  NSString *wId;
-} RequestCreateCoinInfo__storage_;
+  NSString *uid;
+} RequestUserInfo__storage_;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
@@ -1598,170 +1949,32 @@ typedef struct RequestCreateCoinInfo__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "index",
+        .name = "uid",
         .dataTypeSpecific.className = NULL,
-        .number = RequestCreateCoinInfo_FieldNumber_Index,
+        .number = RequestUserInfo_FieldNumber_Uid,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(RequestCreateCoinInfo__storage_, index),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "status",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestCreateCoinInfo_FieldNumber_Status,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(RequestCreateCoinInfo__storage_, status),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "address",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestCreateCoinInfo_FieldNumber_Address,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(RequestCreateCoinInfo__storage_, address),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "label",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestCreateCoinInfo_FieldNumber_Label,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(RequestCreateCoinInfo__storage_, label),
+        .offset = (uint32_t)offsetof(RequestUserInfo__storage_, uid),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
       {
         .name = "currency",
         .dataTypeSpecific.className = NULL,
-        .number = RequestCreateCoinInfo_FieldNumber_Currency,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(RequestCreateCoinInfo__storage_, currency),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "wId",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestCreateCoinInfo_FieldNumber_WId,
-        .hasIndex = 5,
-        .offset = (uint32_t)offsetof(RequestCreateCoinInfo__storage_, wId),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-    };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[RequestCreateCoinInfo class]
-                                     rootClass:[WalletRoot class]
-                                          file:WalletRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(RequestCreateCoinInfo__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
-  }
-  return descriptor;
-}
-
-@end
-
-#pragma mark - DefaultAddress
-
-@implementation DefaultAddress
-
-@dynamic currency;
-@dynamic address;
-
-typedef struct DefaultAddress__storage_ {
-  uint32_t _has_storage_[1];
-  int32_t currency;
-  NSString *address;
-} DefaultAddress__storage_;
-
-// This method is threadsafe because it is initially called
-// in +initialize for each subclass.
-+ (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
-  if (!descriptor) {
-    static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "currency",
-        .dataTypeSpecific.className = NULL,
-        .number = DefaultAddress_FieldNumber_Currency,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(DefaultAddress__storage_, currency),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "address",
-        .dataTypeSpecific.className = NULL,
-        .number = DefaultAddress_FieldNumber_Address,
+        .number = RequestUserInfo_FieldNumber_Currency,
         .hasIndex = 1,
-        .offset = (uint32_t)offsetof(DefaultAddress__storage_, address),
+        .offset = (uint32_t)offsetof(RequestUserInfo__storage_, currency),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[DefaultAddress class]
+        [GPBDescriptor allocDescriptorForClass:[RequestUserInfo class]
                                      rootClass:[WalletRoot class]
                                           file:WalletRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(DefaultAddress__storage_)
+                                   storageSize:sizeof(RequestUserInfo__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
-  }
-  return descriptor;
-}
-
-@end
-
-#pragma mark - ListDefaultAddress
-
-@implementation ListDefaultAddress
-
-@dynamic defaultAddressesArray, defaultAddressesArray_Count;
-
-typedef struct ListDefaultAddress__storage_ {
-  uint32_t _has_storage_[1];
-  NSMutableArray *defaultAddressesArray;
-} ListDefaultAddress__storage_;
-
-// This method is threadsafe because it is initially called
-// in +initialize for each subclass.
-+ (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
-  if (!descriptor) {
-    static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "defaultAddressesArray",
-        .dataTypeSpecific.className = GPBStringifySymbol(DefaultAddress),
-        .number = ListDefaultAddress_FieldNumber_DefaultAddressesArray,
-        .hasIndex = GPBNoHasBit,
-        .offset = (uint32_t)offsetof(ListDefaultAddress__storage_, defaultAddressesArray),
-        .flags = (GPBFieldFlags)(GPBFieldRepeated | GPBFieldTextFormatNameCustom),
-        .dataType = GPBDataTypeMessage,
-      },
-    };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[ListDefaultAddress class]
-                                     rootClass:[WalletRoot class]
-                                          file:WalletRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(ListDefaultAddress__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-#if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
-    static const char *extraTextFormatInfo =
-        "\001\001\000defaultAddresses\000";
-    [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
-#endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
