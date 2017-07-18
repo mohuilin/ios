@@ -649,6 +649,12 @@
 		D94BE0581EBC7252008BEB0B /* LMNotificationDefine.m in Sources */ = {isa = PBXBuildFile; fileRef = D94BE0561EBC7252008BEB0B /* LMNotificationDefine.m */; };
 		D95488FF1E9DC89100F200DF /* LMDBUpdataController.m in Sources */ = {isa = PBXBuildFile; fileRef = D95488FD1E9DC89100F200DF /* LMDBUpdataController.m */; };
 		D95489001E9DC89100F200DF /* LMDBUpdataController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D95488FE1E9DC89100F200DF /* LMDBUpdataController.xib */; };
+		D955095C1F1DE09C000D2B2B /* LMBaseAddressManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509511F1DE09C000D2B2B /* LMBaseAddressManager.m */; };
+		D955095D1F1DE09C000D2B2B /* LMBaseCurrencyManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.mm */; };
+		D955095E1F1DE09C000D2B2B /* LMCurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509551F1DE09C000D2B2B /* LMCurrencyManager.m */; };
+		D955095F1F1DE09C000D2B2B /* LMTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509571F1DE09C000D2B2B /* LMTransferManager.m */; };
+		D95509601F1DE09C000D2B2B /* LMWalletCreatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509591F1DE09C000D2B2B /* LMWalletCreatManager.m */; };
+		D95509611F1DE09C000D2B2B /* LMWalletInfoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D955095B1F1DE09C000D2B2B /* LMWalletInfoManager.m */; };
 		D95845131ECAAB7D004C8984 /* LMCommandAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = D95845121ECAAB7D004C8984 /* LMCommandAdapter.m */; };
 		D958451B1ECAF666004C8984 /* LMMessageSendManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D958451A1ECAF666004C8984 /* LMMessageSendManager.m */; };
 		D95845211ECAF970004C8984 /* LMMessageAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = D95845201ECAF970004C8984 /* LMMessageAdapter.m */; };
@@ -820,7 +826,6 @@
 		D98FD7E21D264E470048E29E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E11D264E470048E29E /* CoreGraphics.framework */; };
 		D98FD7E41D264E550048E29E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E31D264E550048E29E /* Security.framework */; };
 		D98FD7E61D264E710048E29E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7E51D264E710048E29E /* libz.tbd */; };
-		D993B64B1F1480EB006E95A9 /* LMTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D993B64A1F1480EB006E95A9 /* LMTransferManager.m */; };
 		D9ACCD061EDFC6BC009A5869 /* NSObject+Swing.m in Sources */ = {isa = PBXBuildFile; fileRef = D9ACCD051EDFC6BC009A5869 /* NSObject+Swing.m */; };
 		D9ACCD0A1EDFC98C009A5869 /* XMLReader.m in Sources */ = {isa = PBXBuildFile; fileRef = D9ACCD091EDFC98C009A5869 /* XMLReader.m */; };
 		D9ACCD0C1EDFCA83009A5869 /* pbrule.xml in Resources */ = {isa = PBXBuildFile; fileRef = D9ACCD0B1EDFCA83009A5869 /* pbrule.xml */; };
@@ -869,7 +874,6 @@
 		D9E857051D48A3D7001C35A2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857041D48A3D7001C35A2 /* CoreLocation.framework */; };
 		D9E857071D48A3E0001C35A2 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857061D48A3E0001C35A2 /* MapKit.framework */; };
 		E39C2CB69BB018BF89D2831C /* libPods-ConnectTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA05F3C052536B3AAD8C0B5 /* libPods-ConnectTests.a */; };
-		F100BC681F161A6400F95A1D /* LMWalletInfoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F100BC671F161A6400F95A1D /* LMWalletInfoManager.m */; };
 		F100BC6A1F1638D800F95A1D /* wallet.proto in Resources */ = {isa = PBXBuildFile; fileRef = F100BC691F1638D800F95A1D /* wallet.proto */; };
 		F10F2C701EFCC0D20017C32C /* LMFriendRecommandInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */; };
 		F10F2C731EFCC2A70017C32C /* LMRamMemberInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F10F2C721EFCC2A70017C32C /* LMRamMemberInfo.m */; };
@@ -878,11 +882,7 @@
 		F11CF9A81EFA724400750437 /* LMRamAddressBook.m in Sources */ = {isa = PBXBuildFile; fileRef = F11CF9A71EFA724400750437 /* LMRamAddressBook.m */; };
 		F127E12A1F146AD8003E448F /* LMSeedModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E1291F146AD8003E448F /* LMSeedModel.m */; };
 		F127E12D1F146E30003E448F /* LMCurrencyModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E12C1F146E30003E448F /* LMCurrencyModel.m */; };
-		F127E1391F148BAE003E448F /* LMCurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E1381F148BAE003E448F /* LMCurrencyManager.m */; };
-		F13513FC1F1DC0EC0011A96A /* LMBaseCurrencyManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = F13513FB1F1DC0EC0011A96A /* LMBaseCurrencyManager.mm */; };
-		F13513FF1F1DC10F0011A96A /* LMBaseAddressManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F13513FE1F1DC10F0011A96A /* LMBaseAddressManager.m */; };
 		F13514011F1DDE080011A96A /* MMLaunchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F13514001F1DDE080011A96A /* MMLaunchViewController.xib */; };
-		F1437EA91F14ABE600758F1C /* LMWalletCreatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EA81F14ABE500758F1C /* LMWalletCreatManager.m */; };
 		F1437EAF1F14B14A00758F1C /* LMRealmManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EAE1F14B14A00758F1C /* LMRealmManager.m */; };
 		F1437EB51F14EDA100758F1C /* LMCurrencyAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EB41F14EDA100758F1C /* LMCurrencyAddress.m */; };
 		F156BB621EC4681B00512743 /* LMlockGestureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F156BB611EC4681B00512743 /* LMlockGestureViewController.m */; };
@@ -2225,6 +2225,19 @@
 		D95488FC1E9DC89100F200DF /* LMDBUpdataController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMDBUpdataController.h; sourceTree = "<group>"; };
 		D95488FD1E9DC89100F200DF /* LMDBUpdataController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMDBUpdataController.m; sourceTree = "<group>"; };
 		D95488FE1E9DC89100F200DF /* LMDBUpdataController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LMDBUpdataController.xib; sourceTree = "<group>"; };
+		D95509501F1DE09C000D2B2B /* LMBaseAddressManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseAddressManager.h; sourceTree = "<group>"; };
+		D95509511F1DE09C000D2B2B /* LMBaseAddressManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBaseAddressManager.m; sourceTree = "<group>"; };
+		D95509521F1DE09C000D2B2B /* LMBaseCurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseCurrencyManager.h; sourceTree = "<group>"; };
+		D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LMBaseCurrencyManager.mm; sourceTree = "<group>"; };
+		D95509541F1DE09C000D2B2B /* LMCurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyManager.h; sourceTree = "<group>"; };
+		D95509551F1DE09C000D2B2B /* LMCurrencyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyManager.m; sourceTree = "<group>"; };
+		D95509561F1DE09C000D2B2B /* LMTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransferManager.h; sourceTree = "<group>"; };
+		D95509571F1DE09C000D2B2B /* LMTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransferManager.m; sourceTree = "<group>"; };
+		D95509581F1DE09C000D2B2B /* LMWalletCreatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletCreatManager.h; sourceTree = "<group>"; };
+		D95509591F1DE09C000D2B2B /* LMWalletCreatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletCreatManager.m; sourceTree = "<group>"; };
+		D955095A1F1DE09C000D2B2B /* LMWalletInfoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletInfoManager.h; sourceTree = "<group>"; };
+		D955095B1F1DE09C000D2B2B /* LMWalletInfoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletInfoManager.m; sourceTree = "<group>"; };
+		D95509621F1DE338000D2B2B /* EnumDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumDefine.h; sourceTree = "<group>"; };
 		D95845101EC9664F004C8984 /* LMSocketHandleDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSocketHandleDelegate.h; sourceTree = "<group>"; };
 		D95845111ECAAB7D004C8984 /* LMCommandAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCommandAdapter.h; sourceTree = "<group>"; };
 		D95845121ECAAB7D004C8984 /* LMCommandAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCommandAdapter.m; sourceTree = "<group>"; };
@@ -2563,8 +2576,6 @@
 		D98FD7E11D264E470048E29E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		D98FD7E31D264E550048E29E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		D98FD7E51D264E710048E29E /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		D993B6491F1480EB006E95A9 /* LMTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransferManager.h; sourceTree = "<group>"; };
-		D993B64A1F1480EB006E95A9 /* LMTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransferManager.m; sourceTree = "<group>"; };
 		D9ACCD041EDFC6BC009A5869 /* NSObject+Swing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Swing.h"; sourceTree = "<group>"; };
 		D9ACCD051EDFC6BC009A5869 /* NSObject+Swing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Swing.m"; sourceTree = "<group>"; };
 		D9ACCD081EDFC98C009A5869 /* XMLReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLReader.h; sourceTree = "<group>"; };
@@ -2653,8 +2664,6 @@
 		D9E857061D48A3E0001C35A2 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		D9F86ED21E6CF5E700398C66 /* Connect.IMUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Connect.IMUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB39D5B93F12A5570FB2900B /* Pods-ConnectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConnectTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ConnectTests/Pods-ConnectTests.release.xcconfig"; sourceTree = "<group>"; };
-		F100BC661F161A6400F95A1D /* LMWalletInfoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletInfoManager.h; sourceTree = "<group>"; };
-		F100BC671F161A6400F95A1D /* LMWalletInfoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletInfoManager.m; sourceTree = "<group>"; };
 		F100BC691F1638D800F95A1D /* wallet.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wallet.proto; sourceTree = "<group>"; };
 		F10F2C6E1EFCC0D20017C32C /* LMFriendRecommandInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMFriendRecommandInfo.h; sourceTree = "<group>"; };
 		F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMFriendRecommandInfo.m; sourceTree = "<group>"; };
@@ -2671,15 +2680,7 @@
 		F127E1291F146AD8003E448F /* LMSeedModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMSeedModel.m; sourceTree = "<group>"; };
 		F127E12B1F146E30003E448F /* LMCurrencyModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyModel.h; sourceTree = "<group>"; };
 		F127E12C1F146E30003E448F /* LMCurrencyModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyModel.m; sourceTree = "<group>"; };
-		F127E1371F148BAE003E448F /* LMCurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyManager.h; sourceTree = "<group>"; };
-		F127E1381F148BAE003E448F /* LMCurrencyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyManager.m; sourceTree = "<group>"; };
-		F13513FA1F1DC0EC0011A96A /* LMBaseCurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseCurrencyManager.h; sourceTree = "<group>"; };
-		F13513FB1F1DC0EC0011A96A /* LMBaseCurrencyManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LMBaseCurrencyManager.mm; sourceTree = "<group>"; };
-		F13513FD1F1DC10F0011A96A /* LMBaseAddressManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseAddressManager.h; sourceTree = "<group>"; };
-		F13513FE1F1DC10F0011A96A /* LMBaseAddressManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBaseAddressManager.m; sourceTree = "<group>"; };
 		F13514001F1DDE080011A96A /* MMLaunchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MMLaunchViewController.xib; sourceTree = "<group>"; };
-		F1437EA71F14ABE500758F1C /* LMWalletCreatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletCreatManager.h; sourceTree = "<group>"; };
-		F1437EA81F14ABE500758F1C /* LMWalletCreatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletCreatManager.m; sourceTree = "<group>"; };
 		F1437EAD1F14B14A00758F1C /* LMRealmManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRealmManager.h; sourceTree = "<group>"; };
 		F1437EAE1F14B14A00758F1C /* LMRealmManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRealmManager.m; sourceTree = "<group>"; };
 		F1437EB31F14EDA100758F1C /* LMCurrencyAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyAddress.h; sourceTree = "<group>"; };
@@ -13897,16 +13898,6 @@
 				D92231711E822BF800D67110 /* PayTool.m */,
 				D92231751E822BF800D67110 /* ServerCenter.h */,
 				D92231761E822BF800D67110 /* ServerCenter.m */,
-				F1437EA71F14ABE500758F1C /* LMWalletCreatManager.h */,
-				F1437EA81F14ABE500758F1C /* LMWalletCreatManager.m */,
-				F127E1371F148BAE003E448F /* LMCurrencyManager.h */,
-				F127E1381F148BAE003E448F /* LMCurrencyManager.m */,
-				F13513FA1F1DC0EC0011A96A /* LMBaseCurrencyManager.h */,
-				F13513FB1F1DC0EC0011A96A /* LMBaseCurrencyManager.mm */,
-				F13513FD1F1DC10F0011A96A /* LMBaseAddressManager.h */,
-				F13513FE1F1DC10F0011A96A /* LMBaseAddressManager.m */,
-				F100BC661F161A6400F95A1D /* LMWalletInfoManager.h */,
-				F100BC671F161A6400F95A1D /* LMWalletInfoManager.m */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -14492,6 +14483,7 @@
 				D94BE0551EBC7252008BEB0B /* LMNotificationDefine.h */,
 				D94BE0561EBC7252008BEB0B /* LMNotificationDefine.m */,
 				F1D91E1E1ECC2F81003DB234 /* NetDefines.h */,
+				D95509621F1DE338000D2B2B /* EnumDefine.h */,
 			);
 			path = Define;
 			sourceTree = "<group>";
@@ -15469,10 +15461,20 @@
 		D993B6451F147826006E95A9 /* WalletManager */ = {
 			isa = PBXGroup;
 			children = (
-				D993B6491F1480EB006E95A9 /* LMTransferManager.h */,
-				D993B64A1F1480EB006E95A9 /* LMTransferManager.m */,
+				D95509501F1DE09C000D2B2B /* LMBaseAddressManager.h */,
+				D95509511F1DE09C000D2B2B /* LMBaseAddressManager.m */,
+				D95509521F1DE09C000D2B2B /* LMBaseCurrencyManager.h */,
+				D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.mm */,
+				D95509541F1DE09C000D2B2B /* LMCurrencyManager.h */,
+				D95509551F1DE09C000D2B2B /* LMCurrencyManager.m */,
+				D95509581F1DE09C000D2B2B /* LMWalletCreatManager.h */,
+				D95509591F1DE09C000D2B2B /* LMWalletCreatManager.m */,
+				D95509561F1DE09C000D2B2B /* LMTransferManager.h */,
+				D95509571F1DE09C000D2B2B /* LMTransferManager.m */,
+				D955095A1F1DE09C000D2B2B /* LMWalletInfoManager.h */,
+				D955095B1F1DE09C000D2B2B /* LMWalletInfoManager.m */,
 			);
-			name = WalletManager;
+			path = WalletManager;
 			sourceTree = "<group>";
 		};
 		D9ACCD071EDFC98C009A5869 /* XMLReader */ = {
@@ -32993,6 +32995,7 @@
 				D95C03071E8103EB006C5C8A /* LMLinkManDataManager.m in Sources */,
 				F16FD7D61EC3205B002F9395 /* keydb.cpp in Sources */,
 				D9222FBF1E822A3100D67110 /* NSNotificationCenter+YYAdd.m in Sources */,
+				D95509611F1DE09C000D2B2B /* LMWalletInfoManager.m in Sources */,
 				192350471E811F520022D844 /* NCellTextField.m in Sources */,
 				D9B084E31E810E5A0067EC4A /* MainSetLogoutCell.m in Sources */,
 				F16FD7BD1EC3205B002F9395 /* aestab.c in Sources */,
@@ -33050,6 +33053,7 @@
 				D95C04521E810902006C5C8A /* GJGCChatFriendTimeCell.m in Sources */,
 				D92232621E822BF800D67110 /* MMProgressWebView.m in Sources */,
 				D95C044B1E810902006C5C8A /* GJGCChatFriendCellStyle.m in Sources */,
+				D955095E1F1DE09C000D2B2B /* LMCurrencyManager.m in Sources */,
 				D9B084E91E810E5A0067EC4A /* SetAvatarCell.m in Sources */,
 				D9B084BD1E810DDC0067EC4A /* GestureOpneOrClosePage.m in Sources */,
 				D92232F11E822BF900D67110 /* GJCFDispatchCenterUitil.m in Sources */,
@@ -33124,7 +33128,6 @@
 				19234F461E8113D60022D844 /* LMRegisterPrivkeyBackupTipView.m in Sources */,
 				D9222F871E822A3000D67110 /* NSArray+MASAdditions.m in Sources */,
 				D92232F41E822BF900D67110 /* GJCFStringUitil.m in Sources */,
-				F1437EA91F14ABE600758F1C /* LMWalletCreatManager.m in Sources */,
 				D95C03761E8108D8006C5C8A /* SelectContactCardController.m in Sources */,
 				D958451B1ECAF666004C8984 /* LMMessageSendManager.m in Sources */,
 				D922329C1E822BF800D67110 /* UIView+Toast.m in Sources */,
@@ -33152,6 +33155,7 @@
 				F16FD7C51EC3205B002F9395 /* keys.c in Sources */,
 				1923518E1E81247E0022D844 /* ShareMessageModel.m in Sources */,
 				D922327D1E822BF800D67110 /* NSDictionary+JSONString.m in Sources */,
+				D955095C1F1DE09C000D2B2B /* LMBaseAddressManager.m in Sources */,
 				D95C043C1E810902006C5C8A /* GJGCChatBaseConstans.m in Sources */,
 				D95C04471E810902006C5C8A /* CrowdfundReceiptCell.m in Sources */,
 				F156BB621EC4681B00512743 /* LMlockGestureViewController.m in Sources */,
@@ -33189,7 +33193,6 @@
 				F16FD7D81EC3205B002F9395 /* netbase.cpp in Sources */,
 				1923503D1E811F520022D844 /* BaseCell.m in Sources */,
 				D9222FDC1E822A3100D67110 /* CALayer+YYWebImage.m in Sources */,
-				F13513FC1F1DC0EC0011A96A /* LMBaseCurrencyManager.mm in Sources */,
 				D92232961E822BF800D67110 /* UIScreen+Frame.m in Sources */,
 				D92232561E822BF800D67110 /* BEMAnimationManager.m in Sources */,
 				D95C047B1E810902006C5C8A /* GJGCChatInputTextView.m in Sources */,
@@ -33302,6 +33305,7 @@
 				D943CD7C1EB0866C00BE94EF /* GJGCChatSystemNotiModel.m in Sources */,
 				D92232821E822BF800D67110 /* NSObject+CurrentViewController.m in Sources */,
 				19234FA71E8118730022D844 /* RecentChatStyle.m in Sources */,
+				D95509601F1DE09C000D2B2B /* LMWalletCreatManager.m in Sources */,
 				F16FD7BE1EC3205B002F9395 /* base58_bip39.c in Sources */,
 				192351421E8121CB0022D844 /* PassInputFieldView.m in Sources */,
 				19234F571E8114220022D844 /* LocalUserInfoView.m in Sources */,
@@ -33318,7 +33322,6 @@
 				192351911E81249D0022D844 /* HelpSupportModel.m in Sources */,
 				D95C03771E8108D8006C5C8A /* GJGCChatSystemNotiDataManager.m in Sources */,
 				D9222FB61E822A3100D67110 /* TFHppleElement.m in Sources */,
-				F13513FF1F1DC10F0011A96A /* LMBaseAddressManager.m in Sources */,
 				D97B44A31DDBEC3800140A2D /* HandleUrlManager.m in Sources */,
 				D95C03661E8108D8006C5C8A /* LMApplyJoinToGroupViewController.m in Sources */,
 				F1F533DD1E9F4F9500138B39 /* LMRecommandFriendManager.m in Sources */,
@@ -33350,10 +33353,8 @@
 				D92233061E822BF900D67110 /* LMUnspentCheckTool.m in Sources */,
 				D92232A81E822BF800D67110 /* GJCFAudioFileUitil.m in Sources */,
 				D9222FC31E822A3100D67110 /* NSObject+YYAddForKVO.m in Sources */,
-				D993B64B1F1480EB006E95A9 /* LMTransferManager.m in Sources */,
 				D92232B21E822BF800D67110 /* KeyHandle.mm in Sources */,
 				19234F491E8113D60022D844 /* LocalAccountLoginPage.m in Sources */,
-				F100BC681F161A6400F95A1D /* LMWalletInfoManager.m in Sources */,
 				1923514C1E8121CB0022D844 /* WXInputView.m in Sources */,
 				D92232C91E822BF900D67110 /* BadgeNumberManager.m in Sources */,
 				192350001E811CB20022D844 /* TopImageBottomItem.m in Sources */,
@@ -33398,6 +33399,7 @@
 				1923516C1E81237E0022D844 /* ServerInfo.m in Sources */,
 				D922327A1E822BF800D67110 /* NSData+Base64.m in Sources */,
 				D95C048A1E810902006C5C8A /* GJGCCommonFontColorStyle.m in Sources */,
+				D955095D1F1DE09C000D2B2B /* LMBaseCurrencyManager.mm in Sources */,
 				D922330F1E822BF900D67110 /* TZAssetCell.m in Sources */,
 				D9B084ED1E810E5A0067EC4A /* TextFieldRoundCell.m in Sources */,
 				19234FD31E811B380022D844 /* MainTabController.m in Sources */,
@@ -33466,7 +33468,6 @@
 				D9222FE21E822A3100D67110 /* YYImage.m in Sources */,
 				D92232EB1E822BF900D67110 /* GJCFCoreTextCommonDefine.m in Sources */,
 				192350491E811F520022D844 /* NCellValue1.m in Sources */,
-				F127E1391F148BAE003E448F /* LMCurrencyManager.m in Sources */,
 				D922326D1E822BF800D67110 /* UIWindow+TBAdditions.m in Sources */,
 				D958452B1ECC2C7D004C8984 /* LMMessageValidationTool.m in Sources */,
 				D97FDCB21E86664800B161C8 /* YYTextAttribute.m in Sources */,
@@ -33499,6 +33500,7 @@
 				D95C044A1E810902006C5C8A /* GJGCChatFriendBaseCell.m in Sources */,
 				D92232D71E822BF900D67110 /* UIButton+GJCFAssetsPickerStyle.m in Sources */,
 				192352931E81275B0022D844 /* KQXPasswordInputController.m in Sources */,
+				D955095F1F1DE09C000D2B2B /* LMTransferManager.m in Sources */,
 				D9B7422F1EFB9D330072DC72 /* LMTag.m in Sources */,
 				D9222FB71E822A3100D67110 /* XPathQuery.m in Sources */,
 				D92232911E822BF800D67110 /* UIImage+Color.m in Sources */,

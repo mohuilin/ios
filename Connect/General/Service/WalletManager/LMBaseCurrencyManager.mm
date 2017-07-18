@@ -682,6 +682,23 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     return rawTranscation;
 }
 
+
++ (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation currency:(CurrencyType)currency inputs:(NSArray *)inputs seed:(NSString *)seed{
+    NSMutableArray *privkeyArray = [NSMutableArray array];
+    RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and address in (%@)",(int)currency, [inputs componentsJoinedByString:@","]]];
+    
+    for (LMCurrencyAddress *currrencyAddress in result) {
+        NSString *inputsPrivkey = [LMBaseCurrencyManager getPrivkeyBySeed:seed index:currrencyAddress.index];
+        if (inputsPrivkey) {
+            [privkeyArray addObject:inputsPrivkey];
+        }
+    }
+
+    NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:privkeyArray rawTranscation:rawTranscation];
+    
+    return signTransaction;
+}
+
 + (NSString *)signRawTranscationWithTvs:(NSString *)tvsJson privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation {
     
     const char *rawtrans_str = [rawTranscation UTF8String];

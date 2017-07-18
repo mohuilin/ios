@@ -12,6 +12,7 @@
 #import "LMCurrencyAddress.h"
 #import "InputPayPassView.h"
 #import "LMBaseCurrencyManager.h"
+#import "LMBaseCurrencyManager.h"
 
 
 @implementation LMTransferManager
@@ -27,7 +28,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.tips = tips;
     
     SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
-    spentCurrency.currency = CurrencyTypeBTC;
+    spentCurrency.currency = currency;
     spentCurrency.txin = fromAddresses.mutableCopy;
     
     request.spentCurrency = spentCurrency;
@@ -177,19 +178,18 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     }
     ///--- 调用钱包服务类 ----
     //1、定义接口对象
-    
+    LMBaseCurrencyManager *currencyManager = nil;
     
     //2、根据币种类型创建不同的实例
     switch (currency) {
         case CurrencyTypeBTC:
-            
             break;
         default:
             break;
     }
     
     //3、调用抽象方法 签名
-    NSString *signTransaction = [LMBaseCurrencyManager signRawTranscationWithTvs:originalTransaction.vts privkeys:privkeyArray rawTranscation:originalTransaction.rawhex];
+    NSString *signTransaction = nil;
     
     
     //广播数据

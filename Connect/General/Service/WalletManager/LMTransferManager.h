@@ -11,27 +11,6 @@
 #import "Protofile.pbobjc.h"
 
 
-typedef NS_ENUM(NSInteger ,LuckypackageTypeCategory) {
-    LuckypackageTypeCategoryGroup = 0,
-    LuckypackageTypeCategoryOuterUrl,
-};
-
-typedef NS_ENUM(NSInteger ,TransactionType) {
-    TransactionTypeLuckypackage = 0,
-    TransactionTypeURLLuckypackage,
-    TransactionTypeSigleTransfer,
-    TransactionTypeMutiAddressTransfer,
-    TransactionTypeURLTransfer,
-    TransactionTypePayReceipt,
-    TransactionTypePayCrowding
-};
-
-typedef NS_ENUM(NSInteger ,CurrencyType) {
-    CurrencyTypeBTC = 0,
-    CurrencyTypeLTC,
-    CurrencyTypeETH,
-};
-
 typedef void (^CompleteWithDataBlock)(id data,NSError *error);
 
 @interface LMTransferManager : NSObject

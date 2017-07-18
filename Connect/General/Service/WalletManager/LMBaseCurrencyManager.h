@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Wallet.pbobjc.h"
 #import "LMSeedModel.h"
+#import "LMCurrencyAddress.h"
 
 @interface LMBaseCurrencyManager : NSObject
 /**
@@ -94,6 +95,9 @@
  * @return
  */
 + (NSString *)signRawTranscationWithTvs:(NSString *)tvs privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation;
+
+
++ (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation currency:(CurrencyType)currency inputs:(NSArray *)inputs seed:(NSString *)seed;
 
 /**
  * Create the original transaction
