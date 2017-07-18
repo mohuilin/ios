@@ -217,24 +217,7 @@
    * @ Param fee
  */
 + (void)setPaySetNoPass:(BOOL)nopass payPass:(NSString *)payPass fee:(long long)fee compete:(void(^)(BOOL result))complete;
-/**
-   * Payment payPass
-   *
-   * @param nopass whether a password is required
-   * @param payPass to pay the password
-   * @ Param fee
- */
-+ (void)setpayPass:(NSString *)payPass compete:(void(^)(BOOL result))complete;
-/**
-   * Payment resetPayPass
-   *
-   * @param nopass whether a password is required
-   * @param payPass to pay the password
-   * @ Param fee
- */
-+ (void)resetPayPass:(NSString *)payPass baseSeed:(NSString *)baseSeed compete:(void(^)(BOOL result))complete;
 
-+ (void)syncPaypinversionWithComplete:(void(^)(NSString *password,NSError *error))complete;
 + (void)getPaySetComplete:(void (^)(NSError *erro))complete;
 
 

@@ -7,7 +7,7 @@
 //
 
 #import "LMUnspentCheckTool.h"
-#import "LMBaseCurrencyManager.h"
+#import "LMBtcCurrencyManager.h"
 #import "LMIMHelper.h"
 
 @implementation LMUnspentCheckTool
@@ -101,7 +101,8 @@
         }
         [outputs setObject:@([NSDecimalNumber decimalNumberWithString:[temD valueForKey:@"amount"]].floatValue) forKey:[temD valueForKey:@"address"]];
     }
-    NSString *rawTransaction = [LMBaseCurrencyManager createRawTranscationWithTvsArray:tvsArr outputs:outputs];
+//    NSString *rawTransaction = [lmbtc createRawTranscationWithTvsArray:tvsArr outputs:outputs];
+    NSString *rawTransaction = nil;
     tranction.vtsArray = tvsArr;
     tranction.rawTrancation = rawTransaction;
     
@@ -222,7 +223,8 @@
                               decimalNumberByDividingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].floatValue) forKey:[[LKUserCenter shareCenter] currentLoginUser].address];
     }
 
-    NSString *rawTransaction = [LMBaseCurrencyManager createRawTranscationWithTvsArray:tvsArr outputs:outputs];
+//    NSString *rawTransaction = [LMBtcCurrencyManager createRawTranscationWithTvsArray:tvsArr outputs:outputs];
+     NSString *rawTransaction = [LMBtcCurrencyManager new];
     rawTrancation.vtsArray = tvsArr;
     rawTrancation.rawTrancation = rawTransaction;
 

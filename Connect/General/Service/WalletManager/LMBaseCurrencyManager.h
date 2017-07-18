@@ -12,28 +12,12 @@
 #import "LMCurrencyAddress.h"
 
 @interface LMBaseCurrencyManager : NSObject
-/**
- *  sync model to db
- *
- */
-+ (void)saveModelToDB:(LMSeedModel *)seedModel;
-/**
- * get data from db
- *
- */
-+ (LMSeedModel *)getModelFromDB;
-#pragma mark - Interface data
-/**
- *  sync wallet data
- *
- */
-+ (void)syncWalletData:(void (^)(BOOL result))complete;
 
 /**
  *  creat currency
  *
  */
-+ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete;
++ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result))complete;
 
 /**
  *  get currrency list
@@ -94,18 +78,15 @@
  * @param rawTranscation
  * @return
  */
-+ (NSString *)signRawTranscationWithTvs:(NSString *)tvs privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation;
 
-
-+ (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation currency:(CurrencyType)currency inputs:(NSArray *)inputs seed:(NSString *)seed;
-
+- (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation currency:(CurrencyType)currency inputs:(NSArray *)inputs seed:(NSString *)seed;
+#pragma mark - other methods 
 /**
- * Create the original transaction
- * @param tvsArray
- * @param
- * @return
+ * decode encrypt value by password
+ * @param encryptValue
+ * @param password
  */
-+ (NSString *)createRawTranscationWithTvsArray:(NSArray *)tvsArray outputs:(NSDictionary *)outputs;
++ (NSArray *)getCurrencyAddressList:(CurrencyType)currency;
 
 
 

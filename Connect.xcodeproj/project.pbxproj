@@ -17,7 +17,6 @@
 		1921AF611E7027960020C853 /* ConnectUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF601E7027960020C853 /* ConnectUITests.m */; };
 		1921AF6A1E70294C0020C853 /* LMUITest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF691E70294C0020C853 /* LMUITest.m */; };
 		1921AF6E1E702C660020C853 /* Connect_IMUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF6C1E702C660020C853 /* Connect_IMUITests.m */; };
-		1921AF6F1E702C660020C853 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1921AF6D1E702C660020C853 /* Info.plist */; };
 		19234F421E8113D60022D844 /* CaptureAvatarPage.m in Sources */ = {isa = PBXBuildFile; fileRef = 19234F291E8113D60022D844 /* CaptureAvatarPage.m */; };
 		19234F441E8113D60022D844 /* LMRandomSeedController.m in Sources */ = {isa = PBXBuildFile; fileRef = 19234F2D1E8113D60022D844 /* LMRandomSeedController.m */; };
 		19234F451E8113D60022D844 /* LMRandomSeedController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 19234F2E1E8113D60022D844 /* LMRandomSeedController.xib */; };
@@ -566,8 +565,6 @@
 		D92232CB1E822BF900D67110 /* BarCodeTool.m in Sources */ = {isa = PBXBuildFile; fileRef = D92231951E822BF800D67110 /* BarCodeTool.m */; };
 		D92232CD1E822BF900D67110 /* CameraTool.m in Sources */ = {isa = PBXBuildFile; fileRef = D92231991E822BF800D67110 /* CameraTool.m */; };
 		D92232CF1E822BF900D67110 /* ConnectTool.m in Sources */ = {isa = PBXBuildFile; fileRef = D922319E1E822BF800D67110 /* ConnectTool.m */; };
-		D92232D01E822BF900D67110 /* FLAnimatedImage.m in Sources */ = {isa = PBXBuildFile; fileRef = D92231A11E822BF800D67110 /* FLAnimatedImage.m */; };
-		D92232D11E822BF900D67110 /* FLAnimatedImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = D92231A31E822BF800D67110 /* FLAnimatedImageView.m */; };
 		D92232D21E822BF900D67110 /* FxFileUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = D92231A51E822BF800D67110 /* FxFileUtility.m */; };
 		D92232D31E822BF900D67110 /* GJCFAssetsPickerResourceBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D92231A71E822BF800D67110 /* GJCFAssetsPickerResourceBundle.bundle */; };
 		D92232D41E822BF900D67110 /* GJCFAssetsPickerCommonStyleDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = D92231AA1E822BF800D67110 /* GJCFAssetsPickerCommonStyleDescription.m */; };
@@ -650,11 +647,8 @@
 		D95488FF1E9DC89100F200DF /* LMDBUpdataController.m in Sources */ = {isa = PBXBuildFile; fileRef = D95488FD1E9DC89100F200DF /* LMDBUpdataController.m */; };
 		D95489001E9DC89100F200DF /* LMDBUpdataController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D95488FE1E9DC89100F200DF /* LMDBUpdataController.xib */; };
 		D955095C1F1DE09C000D2B2B /* LMBaseAddressManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509511F1DE09C000D2B2B /* LMBaseAddressManager.m */; };
-		D955095D1F1DE09C000D2B2B /* LMBaseCurrencyManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.mm */; };
-		D955095E1F1DE09C000D2B2B /* LMCurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509551F1DE09C000D2B2B /* LMCurrencyManager.m */; };
+		D955095D1F1DE09C000D2B2B /* LMBaseCurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.m */; };
 		D955095F1F1DE09C000D2B2B /* LMTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509571F1DE09C000D2B2B /* LMTransferManager.m */; };
-		D95509601F1DE09C000D2B2B /* LMWalletCreatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509591F1DE09C000D2B2B /* LMWalletCreatManager.m */; };
-		D95509611F1DE09C000D2B2B /* LMWalletInfoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D955095B1F1DE09C000D2B2B /* LMWalletInfoManager.m */; };
 		D95845131ECAAB7D004C8984 /* LMCommandAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = D95845121ECAAB7D004C8984 /* LMCommandAdapter.m */; };
 		D958451B1ECAF666004C8984 /* LMMessageSendManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D958451A1ECAF666004C8984 /* LMMessageSendManager.m */; };
 		D95845211ECAF970004C8984 /* LMMessageAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = D95845201ECAF970004C8984 /* LMMessageAdapter.m */; };
@@ -883,6 +877,9 @@
 		F127E12A1F146AD8003E448F /* LMSeedModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E1291F146AD8003E448F /* LMSeedModel.m */; };
 		F127E12D1F146E30003E448F /* LMCurrencyModel.m in Sources */ = {isa = PBXBuildFile; fileRef = F127E12C1F146E30003E448F /* LMCurrencyModel.m */; };
 		F13514011F1DDE080011A96A /* MMLaunchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F13514001F1DDE080011A96A /* MMLaunchViewController.xib */; };
+		F13514071F1DE96F0011A96A /* LMBtcCurrencyManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = F13514061F1DE96F0011A96A /* LMBtcCurrencyManager.mm */; };
+		F135140A1F1DEB2D0011A96A /* LMBtcAddressManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F13514091F1DEB2D0011A96A /* LMBtcAddressManager.m */; };
+		F135140D1F1DEC430011A96A /* LMWalletManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F135140C1F1DEC430011A96A /* LMWalletManager.m */; };
 		F1437EAF1F14B14A00758F1C /* LMRealmManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EAE1F14B14A00758F1C /* LMRealmManager.m */; };
 		F1437EB51F14EDA100758F1C /* LMCurrencyAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = F1437EB41F14EDA100758F1C /* LMCurrencyAddress.m */; };
 		F156BB621EC4681B00512743 /* LMlockGestureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F156BB611EC4681B00512743 /* LMlockGestureViewController.m */; };
@@ -2052,10 +2049,6 @@
 		D92231991E822BF800D67110 /* CameraTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraTool.m; sourceTree = "<group>"; };
 		D922319D1E822BF800D67110 /* ConnectTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectTool.h; sourceTree = "<group>"; };
 		D922319E1E822BF800D67110 /* ConnectTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectTool.m; sourceTree = "<group>"; };
-		D92231A01E822BF800D67110 /* FLAnimatedImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAnimatedImage.h; sourceTree = "<group>"; };
-		D92231A11E822BF800D67110 /* FLAnimatedImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLAnimatedImage.m; sourceTree = "<group>"; };
-		D92231A21E822BF800D67110 /* FLAnimatedImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAnimatedImageView.h; sourceTree = "<group>"; };
-		D92231A31E822BF800D67110 /* FLAnimatedImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLAnimatedImageView.m; sourceTree = "<group>"; };
 		D92231A41E822BF800D67110 /* FxFileUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FxFileUtility.h; sourceTree = "<group>"; };
 		D92231A51E822BF800D67110 /* FxFileUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FxFileUtility.m; sourceTree = "<group>"; };
 		D92231A71E822BF800D67110 /* GJCFAssetsPickerResourceBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = GJCFAssetsPickerResourceBundle.bundle; sourceTree = "<group>"; };
@@ -2228,15 +2221,9 @@
 		D95509501F1DE09C000D2B2B /* LMBaseAddressManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseAddressManager.h; sourceTree = "<group>"; };
 		D95509511F1DE09C000D2B2B /* LMBaseAddressManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBaseAddressManager.m; sourceTree = "<group>"; };
 		D95509521F1DE09C000D2B2B /* LMBaseCurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBaseCurrencyManager.h; sourceTree = "<group>"; };
-		D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LMBaseCurrencyManager.mm; sourceTree = "<group>"; };
-		D95509541F1DE09C000D2B2B /* LMCurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyManager.h; sourceTree = "<group>"; };
-		D95509551F1DE09C000D2B2B /* LMCurrencyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyManager.m; sourceTree = "<group>"; };
+		D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBaseCurrencyManager.m; sourceTree = "<group>"; };
 		D95509561F1DE09C000D2B2B /* LMTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransferManager.h; sourceTree = "<group>"; };
 		D95509571F1DE09C000D2B2B /* LMTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransferManager.m; sourceTree = "<group>"; };
-		D95509581F1DE09C000D2B2B /* LMWalletCreatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletCreatManager.h; sourceTree = "<group>"; };
-		D95509591F1DE09C000D2B2B /* LMWalletCreatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletCreatManager.m; sourceTree = "<group>"; };
-		D955095A1F1DE09C000D2B2B /* LMWalletInfoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletInfoManager.h; sourceTree = "<group>"; };
-		D955095B1F1DE09C000D2B2B /* LMWalletInfoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletInfoManager.m; sourceTree = "<group>"; };
 		D95509621F1DE338000D2B2B /* EnumDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumDefine.h; sourceTree = "<group>"; };
 		D95845101EC9664F004C8984 /* LMSocketHandleDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSocketHandleDelegate.h; sourceTree = "<group>"; };
 		D95845111ECAAB7D004C8984 /* LMCommandAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCommandAdapter.h; sourceTree = "<group>"; };
@@ -2681,6 +2668,12 @@
 		F127E12B1F146E30003E448F /* LMCurrencyModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyModel.h; sourceTree = "<group>"; };
 		F127E12C1F146E30003E448F /* LMCurrencyModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyModel.m; sourceTree = "<group>"; };
 		F13514001F1DDE080011A96A /* MMLaunchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MMLaunchViewController.xib; sourceTree = "<group>"; };
+		F13514051F1DE96F0011A96A /* LMBtcCurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBtcCurrencyManager.h; sourceTree = "<group>"; };
+		F13514061F1DE96F0011A96A /* LMBtcCurrencyManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LMBtcCurrencyManager.mm; sourceTree = "<group>"; };
+		F13514081F1DEB2D0011A96A /* LMBtcAddressManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBtcAddressManager.h; sourceTree = "<group>"; };
+		F13514091F1DEB2D0011A96A /* LMBtcAddressManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBtcAddressManager.m; sourceTree = "<group>"; };
+		F135140B1F1DEC430011A96A /* LMWalletManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletManager.h; sourceTree = "<group>"; };
+		F135140C1F1DEC430011A96A /* LMWalletManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletManager.m; sourceTree = "<group>"; };
 		F1437EAD1F14B14A00758F1C /* LMRealmManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRealmManager.h; sourceTree = "<group>"; };
 		F1437EAE1F14B14A00758F1C /* LMRealmManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRealmManager.m; sourceTree = "<group>"; };
 		F1437EB31F14EDA100758F1C /* LMCurrencyAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCurrencyAddress.h; sourceTree = "<group>"; };
@@ -14096,7 +14089,6 @@
 				F17114D81E9C80890000E270 /* PayCheck */,
 				D92231801E822BF800D67110 /* AudioCoder */,
 				D922318D1E822BF800D67110 /* BadgeManager */,
-				D922319F1E822BF800D67110 /* FLAnimatedImage */,
 				D92231A61E822BF800D67110 /* GJCFAssetsPicker */,
 				D92231CE1E822BF800D67110 /* GJCFCoreText */,
 				D92231E81E822BF800D67110 /* GJCFUitils */,
@@ -14160,17 +14152,6 @@
 				D92231931E822BF800D67110 /* BadgeNumberStore.m */,
 			);
 			path = BadgeManager;
-			sourceTree = "<group>";
-		};
-		D922319F1E822BF800D67110 /* FLAnimatedImage */ = {
-			isa = PBXGroup;
-			children = (
-				D92231A01E822BF800D67110 /* FLAnimatedImage.h */,
-				D92231A11E822BF800D67110 /* FLAnimatedImage.m */,
-				D92231A21E822BF800D67110 /* FLAnimatedImageView.h */,
-				D92231A31E822BF800D67110 /* FLAnimatedImageView.m */,
-			);
-			path = FLAnimatedImage;
 			sourceTree = "<group>";
 		};
 		D92231A61E822BF800D67110 /* GJCFAssetsPicker */ = {
@@ -15463,16 +15444,16 @@
 			children = (
 				D95509501F1DE09C000D2B2B /* LMBaseAddressManager.h */,
 				D95509511F1DE09C000D2B2B /* LMBaseAddressManager.m */,
+				F13514081F1DEB2D0011A96A /* LMBtcAddressManager.h */,
+				F13514091F1DEB2D0011A96A /* LMBtcAddressManager.m */,
 				D95509521F1DE09C000D2B2B /* LMBaseCurrencyManager.h */,
-				D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.mm */,
-				D95509541F1DE09C000D2B2B /* LMCurrencyManager.h */,
-				D95509551F1DE09C000D2B2B /* LMCurrencyManager.m */,
-				D95509581F1DE09C000D2B2B /* LMWalletCreatManager.h */,
-				D95509591F1DE09C000D2B2B /* LMWalletCreatManager.m */,
+				D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.m */,
+				F13514051F1DE96F0011A96A /* LMBtcCurrencyManager.h */,
+				F13514061F1DE96F0011A96A /* LMBtcCurrencyManager.mm */,
 				D95509561F1DE09C000D2B2B /* LMTransferManager.h */,
 				D95509571F1DE09C000D2B2B /* LMTransferManager.m */,
-				D955095A1F1DE09C000D2B2B /* LMWalletInfoManager.h */,
-				D955095B1F1DE09C000D2B2B /* LMWalletInfoManager.m */,
+				F135140B1F1DEC430011A96A /* LMWalletManager.h */,
+				F135140C1F1DEC430011A96A /* LMWalletManager.m */,
 			);
 			path = WalletManager;
 			sourceTree = "<group>";
@@ -32324,7 +32305,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = LM;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = Connect;
 				TargetAttributes = {
 					1921AF4A1E701DF50020C853 = {
@@ -32700,7 +32681,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1921AF6F1E702C660020C853 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32916,6 +32896,7 @@
 				D95C04831E810902006C5C8A /* LMCollectionEmojiTip.m in Sources */,
 				D95C02F91E8102FF006C5C8A /* PeerMessageHandler.m in Sources */,
 				F17CBE321ED536920067234D /* LMDisplayProgressView.m in Sources */,
+				F13514071F1DE96F0011A96A /* LMBtcCurrencyManager.mm in Sources */,
 				D92232541E822BF800D67110 /* Adapter.m in Sources */,
 				D95C04401E810902006C5C8A /* ChatNameCardCell.m in Sources */,
 				192350691E81200D0022D844 /* AccountWListCell.m in Sources */,
@@ -32995,7 +32976,6 @@
 				D95C03071E8103EB006C5C8A /* LMLinkManDataManager.m in Sources */,
 				F16FD7D61EC3205B002F9395 /* keydb.cpp in Sources */,
 				D9222FBF1E822A3100D67110 /* NSNotificationCenter+YYAdd.m in Sources */,
-				D95509611F1DE09C000D2B2B /* LMWalletInfoManager.m in Sources */,
 				192350471E811F520022D844 /* NCellTextField.m in Sources */,
 				D9B084E31E810E5A0067EC4A /* MainSetLogoutCell.m in Sources */,
 				F16FD7BD1EC3205B002F9395 /* aestab.c in Sources */,
@@ -33045,7 +33025,6 @@
 				192350BB1E81213F0022D844 /* LMReciptNotesViewController.m in Sources */,
 				D9B084CD1E810DDC0067EC4A /* SetMyNickViewController.m in Sources */,
 				1923514A1E8121CB0022D844 /* WalletItemCell.m in Sources */,
-				D92232D01E822BF900D67110 /* FLAnimatedImage.m in Sources */,
 				D95C043D1E810902006C5C8A /* GJGCChatContentBaseModel.m in Sources */,
 				192350DC1E8121A20022D844 /* BitcoinInfo.m in Sources */,
 				D95C043E1E810902006C5C8A /* ApplyJoinToGroupCell.m in Sources */,
@@ -33053,7 +33032,6 @@
 				D95C04521E810902006C5C8A /* GJGCChatFriendTimeCell.m in Sources */,
 				D92232621E822BF800D67110 /* MMProgressWebView.m in Sources */,
 				D95C044B1E810902006C5C8A /* GJGCChatFriendCellStyle.m in Sources */,
-				D955095E1F1DE09C000D2B2B /* LMCurrencyManager.m in Sources */,
 				D9B084E91E810E5A0067EC4A /* SetAvatarCell.m in Sources */,
 				D9B084BD1E810DDC0067EC4A /* GestureOpneOrClosePage.m in Sources */,
 				D92232F11E822BF900D67110 /* GJCFDispatchCenterUitil.m in Sources */,
@@ -33305,7 +33283,6 @@
 				D943CD7C1EB0866C00BE94EF /* GJGCChatSystemNotiModel.m in Sources */,
 				D92232821E822BF800D67110 /* NSObject+CurrentViewController.m in Sources */,
 				19234FA71E8118730022D844 /* RecentChatStyle.m in Sources */,
-				D95509601F1DE09C000D2B2B /* LMWalletCreatManager.m in Sources */,
 				F16FD7BE1EC3205B002F9395 /* base58_bip39.c in Sources */,
 				192351421E8121CB0022D844 /* PassInputFieldView.m in Sources */,
 				19234F571E8114220022D844 /* LocalUserInfoView.m in Sources */,
@@ -33314,6 +33291,7 @@
 				D96104141EF7B453001A0998 /* LMBaseModel.m in Sources */,
 				D9B084C81E810DDC0067EC4A /* ImageClipViewController.m in Sources */,
 				D92232701E822BF800D67110 /* UIBarButtonItem+WZLBadge.m in Sources */,
+				F135140A1F1DEB2D0011A96A /* LMBtcAddressManager.m in Sources */,
 				19234F6A1E81160A0022D844 /* LinkmanPage.m in Sources */,
 				D92232B11E822BF800D67110 /* GJCFCachePathManager.m in Sources */,
 				192350451E811F520022D844 /* NCellLabel.m in Sources */,
@@ -33399,7 +33377,7 @@
 				1923516C1E81237E0022D844 /* ServerInfo.m in Sources */,
 				D922327A1E822BF800D67110 /* NSData+Base64.m in Sources */,
 				D95C048A1E810902006C5C8A /* GJGCCommonFontColorStyle.m in Sources */,
-				D955095D1F1DE09C000D2B2B /* LMBaseCurrencyManager.mm in Sources */,
+				D955095D1F1DE09C000D2B2B /* LMBaseCurrencyManager.m in Sources */,
 				D922330F1E822BF900D67110 /* TZAssetCell.m in Sources */,
 				D9B084ED1E810E5A0067EC4A /* TextFieldRoundCell.m in Sources */,
 				19234FD31E811B380022D844 /* MainTabController.m in Sources */,
@@ -33440,8 +33418,8 @@
 				D95C04711E810902006C5C8A /* GJGCChatInputExpandEmojiPanelMenuBar.m in Sources */,
 				D9222FC81E822A3100D67110 /* YYCGUtilities.m in Sources */,
 				F16FD7D01EC3205B002F9395 /* hash.cpp in Sources */,
-				D92232D11E822BF900D67110 /* FLAnimatedImageView.m in Sources */,
 				D92232591E822BF800D67110 /* ChineseToPinyin.m in Sources */,
+				F135140D1F1DEC430011A96A /* LMWalletManager.m in Sources */,
 				D922326F1E822BF800D67110 /* UIImage+BoxBlur.m in Sources */,
 				19234F9F1E8117560022D844 /* UserCommonInfoSetCell.m in Sources */,
 				192352991E81275B0022D844 /* LMChatRedLuckyDetailController.m in Sources */,
@@ -33721,6 +33699,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -33731,8 +33710,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -33768,6 +33749,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -33778,8 +33760,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

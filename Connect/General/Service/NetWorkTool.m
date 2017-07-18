@@ -843,13 +843,15 @@ static inline NSString *cachePath() {
 
 // Only work on a dictionary structure
 + (NSString *)generateGETAbsoluteURL:(NSString *)url params:(id)params {
-    if (params == nil || ![params isKindOfClass:[NSDictionary class]] || [params count] == 0) {
+    NSArray *paramsArray = (NSArray *)params;
+    if (params == nil || ![params isKindOfClass:[NSDictionary class]] || paramsArray.count == 0) {
         return url;
     }
     
     NSString *queries = @"";
-    for (NSString *key in params) {
-        id value = [params objectForKey:key];
+    NSDictionary *dic = (NSDictionary *)params;
+    for (NSString *key in dic) {
+        id value = [dic objectForKey:key];
         
         if ([value isKindOfClass:[NSDictionary class]]) {
             continue;

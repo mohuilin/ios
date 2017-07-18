@@ -11,8 +11,7 @@
 #import "WJTouchID.h"
 #import "LMIMHelper.h"
 #import "LMSeedModel.h"
-#import "LMWalletCreatManager.h"
-#import "LMCurrencyManager.h"
+#import "LMWalletManager.h"
 #import "LMBaseCurrencyManager.h"
 
 @interface PaySetPage () <WJTouchIDDelegate>
@@ -108,18 +107,18 @@
 
     NSString *tip = LMLocalizedString(@"Wallet Reset password", nil);
     CellItem *payPass = nil;
-    if ([LMWalletInfoManager sharedManager].isHaveWallet) {
+    if ([LMWalletManager sharedManager].isHaveWallet) {
         payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
             [weakSelf resetPayPass];
         }];
     }else {
-        [LMCurrencyManager syncWalletData:^(BOOL result) {
+        [LMWalletManager getWalletData:^(BOOL result) {
             if (result) {
                 [weakSelf reload];
             }
         }];
     }
-    if ([LMWalletInfoManager sharedManager].isHaveWallet) {
+    if ([LMWalletManager sharedManager].isHaveWallet) {
       group0.items = @[payPass];
     }
     [self.groups objectAddObject:group0];
@@ -212,8 +211,8 @@
             if (GJCFStringIsNull(firstPass)) {
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                if ([LMWalletInfoManager sharedManager].encryPtionSeed.length > 0) {
-                    [LMBaseCurrencyManager decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
+                if ([LMWalletManager sharedManager].encryPtionSeed.length > 0) {
+                    [LMBaseCurrencyManager decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
                         if (!success) {
                             [weakPassView setTitleString:LMLocalizedString(@"Login Password incorrect", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                             firstPass = nil;
@@ -236,7 +235,7 @@
                     [weakPassView dismissWithClosed:YES];
                     // save and upload
                     [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                        [SetGlobalHandler resetPayPass:password baseSeed:baseSeedStr compete:^(BOOL result) {
+                        [LMWalletManager reSetPassWord:password baseSeed:baseSeedStr complete:^(BOOL result) {
                             if (result) {
                                 [weakSelf reload];
                                 // tips
