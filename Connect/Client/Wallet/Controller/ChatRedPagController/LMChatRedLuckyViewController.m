@@ -387,6 +387,7 @@
 #pragma mark - Send an internal red envelope to send an external red envelope
 
 - (void)sendRedbagWithMoney:(NSDecimalNumber *)money note:(NSString *)note type:(int)type {
+    
     __weak typeof(self) weakSelf = self;
     int size = 1;
     if (self.style == LMChatRedLuckyStyleGroup || self.style == LMChatRedLuckyStyleOutRedBag) {
@@ -403,23 +404,10 @@
             return;
         }
     }
-    // Whether the balance is sufficient
-    if (([PayTool getPOW8Amount:money] + [[MMAppSetting sharedSetting] getTranferFee]) > self.blance) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Insufficient balance", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-        }];
-        self.comfrimButton.enabled = YES;
-        return;
-    }
-    [GCDQueue executeInMainQueue:^{
-        [self.view endEditing:YES];
-        [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    }];
-
-
-    [RedBagNetWorkTool sendRedBagWithSendAddress:[[LKUserCenter shareCenter] currentLoginUser].address privkey:[[LKUserCenter shareCenter] currentLoginUser].prikey fee:[[MMAppSetting sharedSetting] getTranferFee] identifer:weakSelf.reciverIdentifier money:[PayTool getPOW8Amount:money] size:size category:weakSelf.style type:type tips:note complete:^(OrdinaryRedPackage *ordinaryRed, UnspentOrderResponse *unspent, NSArray *toAddresses, NSError *error) {
+    
+    
+    [[LMTransferManager sharedManager] sendLuckyPackageWithReciverIdentifier:self.reciverIdentifier size:size amount:[PayTool getPOW8Amount:money]  fee:0 luckyPackageType:type category:self.style tips:note fromAddresses:nil currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
         
-        [LMPayCheck payCheck:nil withVc:weakSelf withTransferType:TransferTypeRedPag unSpent:unspent withArray:toAddresses withMoney:money withNote:note withType:type withRedPackage:ordinaryRed withError:error];
     }];
 }
 

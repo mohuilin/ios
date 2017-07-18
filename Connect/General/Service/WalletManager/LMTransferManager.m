@@ -20,7 +20,7 @@
 CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendLuckyPackageWithReciverIdentifier:(NSString *)identifier size:(int)size amount:(NSInteger)amount fee:(NSInteger)fee luckyPackageType:(int)type category:(LuckypackageTypeCategory)category tips:(NSString *)tips fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
-    
+
     LuckyPackageRequest *request = [[LuckyPackageRequest alloc] init];
     request.size = size;
     request.amount = amount;
@@ -34,16 +34,16 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.spentCurrency = spentCurrency;
     
     //request and sign、 publish
-    [self basePostDataWithData:request.data url:nil type:TransactionTypeLuckypackage currency:currency complete:complete];
+    [self basePostDataWithData:request.data url:WalletServiceLuckpackage type:TransactionTypeLuckypackage currency:currency complete:complete];
 }
 
 
-- (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
+- (void)sendUrlTransferFromAddresses:(NSArray *)fromAddresses tips:(NSString *)tips amount:(NSInteger)amount fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
-    URLTransferRequest *request = [[URLTransferRequest alloc] init];
+    OutTransfer *request = [[OutTransfer alloc] init];
     request.fee = fee;
     request.amount = amount;
-    
+    request.tips = tips;
     
     SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
     spentCurrency.currency = CurrencyTypeBTC;
@@ -52,21 +52,21 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.spentCurrency = spentCurrency;
 
     //request and sign、 publish
-    [self basePostDataWithData:request.data url:nil type:TransactionTypeURLTransfer currency:currency complete:complete];
+    [self basePostDataWithData:request.data url:WalletServiceExternal type:TransactionTypeURLTransfer currency:currency complete:complete];
     
 }
 
 
-- (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(NSString *hashId,NSError *error))complete{
+- (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(Crowdfunding *crowdfunding,NSError *error))complete{
     
     /// send crowdfuning
-    CrowdfuningRequest *request = [[CrowdfuningRequest alloc] init];
+    CrowdfundingRequest *request = [[CrowdfundingRequest alloc] init];
     request.groupIdentifier = groupIdentifier;
-    request.perAmount = amount;
+    request.amount = amount;
     request.size = size;
     request.tips = tips;
     
-    [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:WalletServiceCrowdfuning postProtoData:request.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
@@ -75,6 +75,10 @@ CREATE_SHARED_MANAGER(LMTransferManager)
         } else {
             NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
             if (data) {
+                Crowdfunding *crowdfunding = [Crowdfunding parseFromData:data error:nil];
+                if (complete) {
+                    complete(crowdfunding,nil);
+                }
             }
         }
     } fail:^(NSError *error) {
@@ -84,15 +88,15 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     }];
 }
 
-- (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(NSString *hashId,NSError *error))complete{
+- (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(Bill *bill,NSError *error))complete{
     
     /// send crowdfuning
-    ReceiptRequest *request = [[ReceiptRequest alloc] init];
-    request.payer = payer;
+    ReceiveRequest *request = [[ReceiveRequest alloc] init];
+    request.sender = payer;
     request.amount = amount;
     request.tips = tips;
     
-    [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:WalletServiceReceive postProtoData:request.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
@@ -101,7 +105,10 @@ CREATE_SHARED_MANAGER(LMTransferManager)
         } else {
             NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
             if (data) {
-                
+                Bill *bill = [Bill parseFromData:data error:nil];
+                if (complete) {
+                    complete(bill,nil);
+                }
             }
         }
     } fail:^(NSError *error) {
@@ -111,9 +118,9 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     }];
 }
 
-- (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(TransactionType)type fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
+- (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(TransactionType)type fromAddresses:(NSArray *)fromAddresses fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     /// pay crowdfuning
-    Pay *request = [[Pay alloc] init];
+    Payment *request = [[Payment alloc] init];
     
     
     SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
@@ -123,9 +130,10 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.spentCurrency = spentCurrency;
     request.payType = type;
     request.hashId = hashId;
+    request.fee = fee;
 
     //request and sign、 publish
-    [self basePostDataWithData:request.data url:nil type:type currency:currency complete:complete];
+    [self basePostDataWithData:request.data url:WalletServicePay type:type currency:currency complete:complete];
 }
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
@@ -153,14 +161,9 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.fee = fee;
     request.tips = tips;
     
-    
-    TransactionType type = TransactionTypeSigleTransfer;
-    if (toAddresses.count > 1) {
-        type = TransactionTypeMutiAddressTransfer;
-    }
 
     //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServiceTransfer type:type currency:currency complete:complete];
+    [self basePostDataWithData:request.data url:WalletServiceTransfer type:0 currency:currency complete:complete];
 }
 
 #pragma mark - private
@@ -200,7 +203,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     publish.currency = currency;
     
     /// publish
-    [NetWorkOperationTool POSTWithUrlString:nil postProtoData:publish.data complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:WalletServicePublish postProtoData:publish.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {

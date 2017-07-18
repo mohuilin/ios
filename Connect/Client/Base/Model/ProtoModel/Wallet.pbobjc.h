@@ -350,15 +350,16 @@ typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
 
 @end
 
-#pragma mark - URLTransferRequest
+#pragma mark - OutTransfer
 
-typedef GPB_ENUM(URLTransferRequest_FieldNumber) {
-  URLTransferRequest_FieldNumber_SpentCurrency = 1,
-  URLTransferRequest_FieldNumber_Amount = 2,
-  URLTransferRequest_FieldNumber_Fee = 3,
+typedef GPB_ENUM(OutTransfer_FieldNumber) {
+  OutTransfer_FieldNumber_SpentCurrency = 1,
+  OutTransfer_FieldNumber_Amount = 2,
+  OutTransfer_FieldNumber_Fee = 3,
+  OutTransfer_FieldNumber_Tips = 4,
 };
 
-@interface URLTransferRequest : GPBMessage
+@interface OutTransfer : GPBMessage
 
 @property(nonatomic, readwrite, strong, null_resettable) SpentCurrency *spentCurrency;
 /** Test to see if @c spentCurrency has been set. */
@@ -367,6 +368,8 @@ typedef GPB_ENUM(URLTransferRequest_FieldNumber) {
 @property(nonatomic, readwrite) int64_t amount;
 
 @property(nonatomic, readwrite) int64_t fee;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
 
 @end
 
@@ -395,23 +398,23 @@ typedef GPB_ENUM(TransferRequest_FieldNumber) {
 
 @end
 
-#pragma mark - CrowdfuningRequest
+#pragma mark - CrowdfundingRequest
 
-typedef GPB_ENUM(CrowdfuningRequest_FieldNumber) {
-  CrowdfuningRequest_FieldNumber_Currency = 1,
-  CrowdfuningRequest_FieldNumber_GroupIdentifier = 2,
-  CrowdfuningRequest_FieldNumber_PerAmount = 3,
-  CrowdfuningRequest_FieldNumber_Size = 4,
-  CrowdfuningRequest_FieldNumber_Tips = 5,
+typedef GPB_ENUM(CrowdfundingRequest_FieldNumber) {
+  CrowdfundingRequest_FieldNumber_Currency = 1,
+  CrowdfundingRequest_FieldNumber_GroupIdentifier = 2,
+  CrowdfundingRequest_FieldNumber_Amount = 3,
+  CrowdfundingRequest_FieldNumber_Size = 4,
+  CrowdfundingRequest_FieldNumber_Tips = 5,
 };
 
-@interface CrowdfuningRequest : GPBMessage
+@interface CrowdfundingRequest : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *currency;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *groupIdentifier;
 
-@property(nonatomic, readwrite) int64_t perAmount;
+@property(nonatomic, readwrite) int64_t amount;
 
 @property(nonatomic, readwrite) int32_t size;
 
@@ -419,25 +422,47 @@ typedef GPB_ENUM(CrowdfuningRequest_FieldNumber) {
 
 @end
 
-#pragma mark - ReceiptRequest
+#pragma mark - ReceiveRequest
 
-typedef GPB_ENUM(ReceiptRequest_FieldNumber) {
-  ReceiptRequest_FieldNumber_Currency = 1,
-  ReceiptRequest_FieldNumber_Payer = 2,
-  ReceiptRequest_FieldNumber_Amount = 3,
-  ReceiptRequest_FieldNumber_Tips = 4,
+typedef GPB_ENUM(ReceiveRequest_FieldNumber) {
+  ReceiveRequest_FieldNumber_Sender = 1,
+  ReceiveRequest_FieldNumber_Amount = 2,
+  ReceiveRequest_FieldNumber_Tips = 3,
+  ReceiveRequest_FieldNumber_Currency = 4,
 };
 
-@interface ReceiptRequest : GPBMessage
+@interface ReceiveRequest : GPBMessage
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *currency;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *sender;
 
-/** who need pay this receipt */
-@property(nonatomic, readwrite, copy, null_resettable) NSString *payer;
-
-@property(nonatomic, readwrite) int64_t amount;
+@property(nonatomic, readwrite) uint64_t amount;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@end
+
+#pragma mark - Payment
+
+typedef GPB_ENUM(Payment_FieldNumber) {
+  Payment_FieldNumber_SpentCurrency = 1,
+  Payment_FieldNumber_PayType = 2,
+  Payment_FieldNumber_HashId = 3,
+  Payment_FieldNumber_Fee = 4,
+};
+
+@interface Payment : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) SpentCurrency *spentCurrency;
+/** Test to see if @c spentCurrency has been set. */
+@property(nonatomic, readwrite) BOOL hasSpentCurrency;
+
+@property(nonatomic, readwrite) int32_t payType;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
+
+@property(nonatomic, readwrite) int64_t fee;
 
 @end
 
@@ -448,26 +473,6 @@ typedef GPB_ENUM(HashIdResp_FieldNumber) {
 };
 
 @interface HashIdResp : GPBMessage
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
-
-@end
-
-#pragma mark - Pay
-
-typedef GPB_ENUM(Pay_FieldNumber) {
-  Pay_FieldNumber_SpentCurrency = 1,
-  Pay_FieldNumber_PayType = 2,
-  Pay_FieldNumber_HashId = 3,
-};
-
-@interface Pay : GPBMessage
-
-@property(nonatomic, readwrite, strong, null_resettable) SpentCurrency *spentCurrency;
-/** Test to see if @c spentCurrency has been set. */
-@property(nonatomic, readwrite) BOOL hasSpentCurrency;
-
-@property(nonatomic, readwrite) int32_t payType;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
 
@@ -537,6 +542,18 @@ typedef GPB_ENUM(PublishTransaction_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *txHex;
 
 @property(nonatomic, readwrite) int32_t currency;
+
+@end
+
+#pragma mark - ResponsePublish
+
+typedef GPB_ENUM(ResponsePublish_FieldNumber) {
+  ResponsePublish_FieldNumber_Txid = 1,
+};
+
+@interface ResponsePublish : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *txid;
 
 @end
 

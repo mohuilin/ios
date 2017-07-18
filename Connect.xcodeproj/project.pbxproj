@@ -655,6 +655,7 @@
 		D955095F1F1DE09C000D2B2B /* LMTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509571F1DE09C000D2B2B /* LMTransferManager.m */; };
 		D95509601F1DE09C000D2B2B /* LMWalletCreatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509591F1DE09C000D2B2B /* LMWalletCreatManager.m */; };
 		D95509611F1DE09C000D2B2B /* LMWalletInfoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D955095B1F1DE09C000D2B2B /* LMWalletInfoManager.m */; };
+		D95509651F1DFD1B000D2B2B /* LMURLRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509641F1DFD1B000D2B2B /* LMURLRouter.m */; };
 		D95845131ECAAB7D004C8984 /* LMCommandAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = D95845121ECAAB7D004C8984 /* LMCommandAdapter.m */; };
 		D958451B1ECAF666004C8984 /* LMMessageSendManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D958451A1ECAF666004C8984 /* LMMessageSendManager.m */; };
 		D95845211ECAF970004C8984 /* LMMessageAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = D95845201ECAF970004C8984 /* LMMessageAdapter.m */; };
@@ -2238,6 +2239,8 @@
 		D955095A1F1DE09C000D2B2B /* LMWalletInfoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMWalletInfoManager.h; sourceTree = "<group>"; };
 		D955095B1F1DE09C000D2B2B /* LMWalletInfoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMWalletInfoManager.m; sourceTree = "<group>"; };
 		D95509621F1DE338000D2B2B /* EnumDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumDefine.h; sourceTree = "<group>"; };
+		D95509631F1DFD1B000D2B2B /* LMURLRouter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMURLRouter.h; sourceTree = "<group>"; };
+		D95509641F1DFD1B000D2B2B /* LMURLRouter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMURLRouter.m; sourceTree = "<group>"; };
 		D95845101EC9664F004C8984 /* LMSocketHandleDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSocketHandleDelegate.h; sourceTree = "<group>"; };
 		D95845111ECAAB7D004C8984 /* LMCommandAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMCommandAdapter.h; sourceTree = "<group>"; };
 		D95845121ECAAB7D004C8984 /* LMCommandAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCommandAdapter.m; sourceTree = "<group>"; };
@@ -13581,6 +13584,8 @@
 				D92230CF1E822BF800D67110 /* Extend */,
 				D922311A1E822BF800D67110 /* Service */,
 				D922317D1E822BF800D67110 /* Tool */,
+				D95509631F1DFD1B000D2B2B /* LMURLRouter.h */,
+				D95509641F1DFD1B000D2B2B /* LMURLRouter.m */,
 			);
 			path = General;
 			sourceTree = "<group>";
@@ -33208,6 +33213,7 @@
 				D92232AA1E822BF800D67110 /* GJCFAudioModel.m in Sources */,
 				D9B084C51E810DDC0067EC4A /* BlackListPage.m in Sources */,
 				D92232D81E822BF900D67110 /* UILabel+GJCFAssetsPickerStyle.m in Sources */,
+				D95509651F1DFD1B000D2B2B /* LMURLRouter.m in Sources */,
 				1923506B1E81200D0022D844 /* ConnectTableHeaderView.m in Sources */,
 				19234FEB1E811BDA0022D844 /* TransferButton.m in Sources */,
 				D95C03581E8108D8006C5C8A /* GJGCChatDetailDataSourceManager.m in Sources */,

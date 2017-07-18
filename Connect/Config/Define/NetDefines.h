@@ -381,6 +381,18 @@
 
 #define WalletServiceTransfer @"http://192.168.40.110:18083/wallet/v2/service/transfer"
 
+#define WalletServiceReceive @"http://192.168.40.110:18083/wallet/v2/service/receive"
+
+#define WalletServicePay @"http://192.168.40.110:18083/wallet/v2/service/payment"
+
+#define WalletServiceLuckpackage @"http://192.168.40.110:18083/wallet/v2/service/luckpackage"
+
+#define WalletServiceExternal @"http://192.168.40.110:18083/wallet/v2/service/external"
+
+#define WalletServiceCrowdfuning @"http://192.168.40.110:18083/wallet/v2/service/crowdfuning"
+
+#define WalletServicePublish @"http://192.168.40.110:18083/wallet/v2/service/publish"
+
 /**
  Payment settings
   

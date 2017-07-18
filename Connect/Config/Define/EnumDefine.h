@@ -15,13 +15,11 @@ typedef NS_ENUM(NSInteger ,LuckypackageTypeCategory) {
 };
 
 typedef NS_ENUM(NSInteger ,TransactionType) {
-    TransactionTypeLuckypackage = 0,
-    TransactionTypeURLLuckypackage,
-    TransactionTypeSigleTransfer,
-    TransactionTypeMutiAddressTransfer,
-    TransactionTypeURLTransfer,
-    TransactionTypePayReceipt,
-    TransactionTypePayCrowding
+    TransactionTypePayReceipt = 1,
+    TransactionTypePayCrowding = 2,
+    TransactionTypeLuckypackage = 3,
+    TransactionTypeURLTransfer = 6,
+    TransactionTypeSystemLuckypackage = 7,
 };
 
 typedef NS_ENUM(NSInteger ,CurrencyType) {
