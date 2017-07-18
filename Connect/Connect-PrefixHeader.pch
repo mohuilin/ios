@@ -14,7 +14,6 @@
 #import "SessionManager.h"
 //-------- wallet help --------
 #import "LMWalletInfoManager.h"
-#import "LMBTCWalletHelper.h"
 //-------- Internationalization --------
 #import "Language.h"
 

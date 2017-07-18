@@ -246,6 +246,28 @@ static MMAppSetting *manager = nil;
 - (NSString *)getContactVersion{
     return [self getValue:@"im.conect.contactversionkey"];
 }
+/**
+ *  Save the address book number
+ *
+ *  @param
+ */
+- (void)saveVer:(int)ver{
+    if (ver <= 0) {
+        ver = 1;
+    }
+    NSString *verStr = [NSString stringWithFormat:@"%d",ver];
+    [self setValue:verStr forKey: @"im.conect.ver"];
+}
+/**
+ *  Get the address book version number
+ *
+ *  @return
+ */
+- (int)getVer{
+    NSString* verStr = [self getValue: @"im.conect.ver"];
+    return [verStr intValue];
+}
+
 #pragma set
 - (void)setAllowAddress{
     [self setValue:@(YES) forKey:@"appsetaddress"];

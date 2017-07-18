@@ -7,14 +7,16 @@
 //
 
 #import "LMBaseModel.h"
+#import "LMSerializeKit.h"
 
-@interface LMSeedModel : LMBaseModel
+@interface LMSeedModel : NSObject
 
 @property NSString *encryptSeed;
 @property NSString *salt;
 @property int n;
 @property int status;
 @property int version;
+
 
 
 @end

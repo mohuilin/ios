@@ -40,6 +40,18 @@
  *
  *  @param
  */
+- (void)saveVer:(int)ver;
+/**
+ *  Get the address book version number
+ *
+ *  @return
+ */
+- (int)getVer;
+/**
+ *  Save the address book number
+ *
+ *  @param
+ */
 - (void)saveContactVersion:(NSString *)version;
 /**
  *  Get the address book version number
@@ -47,7 +59,6 @@
  *  @return
  */
 - (NSString *)getContactVersion;
-
 
 
 #pragma mark - privacy setting

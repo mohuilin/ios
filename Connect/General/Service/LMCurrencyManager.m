@@ -15,7 +15,32 @@
 #import "ConnectTool.h"
 #import "LMWalletCreatManager.h"
 
+
 @implementation LMCurrencyManager
+
+#pragma mark - save data to db
+/**
+ *  sync model to db
+ *
+ */
++ (void)saveModelToDB:(LMSeedModel *)seedModel{
+  
+  NSString *homePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+  NSString *filePath = [homePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.data",[LKUserCenter shareCenter].currentLoginUser.address]];
+  [NSKeyedArchiver archiveRootObject:seedModel toFile:filePath];
+
+}
+/**
+ * get data from db
+ *
+ */
++ (LMSeedModel *)getModelFromDB{
+   NSString *homePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+   NSString *filePath = [homePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.data",[LKUserCenter shareCenter].currentLoginUser.address]];
+   LMSeedModel *seedModel = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+   return seedModel;
+}
+#pragma mark - Interface data
 
 /**
  *  sync wallet data
@@ -32,9 +57,7 @@
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
             RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-            if (syncWallet.status == 1 || syncWallet.status == 3) {
-               [LMWalletCreatManager syncDataToDB:syncWallet];
-            }
+            [LMWalletCreatManager syncDataToDB:syncWallet];
             if (complete) {
                 complete(YES);
             }
@@ -53,10 +76,10 @@
 + (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
    
     CreateCoinRequest *currencyCoin = [CreateCoinRequest new];
-    currencyCoin.salt = salt;
     currencyCoin.category = category;
     currencyCoin.masterAddress = masterAddess;
     currencyCoin.currency = currency;
+    currencyCoin.salt = salt;
     currencyCoin.payload = nil;
     
     [LMCurrencyModel setDefaultRealm];
@@ -202,14 +225,13 @@
  */
 + (void)addCurrencyAddressWithCurrency:(int)currency label:(NSString *)label index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete{
     
-    
-    CreateCoinAccount *coin = [CreateCoinAccount new];
-    coin.currency = currency;
-    coin.label = label;
-    coin.index = index;
-    coin.address = address;
-    coin.status = 0;
-    [NetWorkOperationTool POSTWithUrlString:AddCurrencyAddress postProtoData:coin.data complete:^(id response) {
+    CreateCoinAccount *coinAddress = [CreateCoinAccount new];
+    coinAddress.currency = currency;
+    coinAddress.label = label;
+    coinAddress.index = index;
+    coinAddress.address = address;
+    coinAddress.status = 1;
+    [NetWorkOperationTool POSTWithUrlString:AddCurrencyAddress postProtoData:coinAddress.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             
@@ -228,20 +250,33 @@
  *  get currency addresss list
  *
  */
-+ (void)getCurrencyAddressListWithCurrency:(int)currency complete:(void (^)(BOOL result,NSArray *addressList)) complte {
++ (void)getCurrencyAddressListWithCurrency:(int)currency complete:(void (^)(BOOL result,NSMutableArray<CoinInfo *> *addressList)) complte {
     Coin *coin = [Coin new];
     coin.currency = currency;
-    [NetWorkOperationTool POSTWithUrlString:AddCurrencyAddress postProtoData:coin.data complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:GetCurrencyAddressList postProtoData:coin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
-            
-            
+            if (complte) {
+                complte(NO,nil);
+            }
         }else {
-            
-            // save db
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                CoinsDetail *coinDetail = [CoinsDetail parseFromData:data error:nil];
+                NSMutableArray *coinDetailArray = coinDetail.coinInfosArray;
+                if (complte) {
+                    complte(YES,coinDetailArray);
+                }
+            }else {
+                if (complte) {
+                    complte(NO,nil);
+                }
+            }
         }
     } fail:^(NSError *error) {
-        
+        if (complte) {
+            complte(NO,nil);
+        }
     }];
 }
 
@@ -267,52 +302,5 @@
         
     }];
 }
-/**
- * update default address
- *
- */
-+ (void)updateCurrencyDefaultAddress:(NSString *)address currency:(int)currency complete:(void (^)(BOOL result))complete {
- 
-    CreateCoinAccount *info = [CreateCoinAccount new];
-    info.address = address;
-    info.currency = currency;
-    [NetWorkOperationTool POSTWithUrlString:UpdateCurrencyDefaultAddress postProtoData:info.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            
-            
-        }else {
-            NSLog(@"asdasd");
-            // save db
-        }
-    } fail:^(NSError *error) {
-        
-    }];
-}
-/**
- * get default address
- *
- */
-+ (void)getCurrencyDefaultAddressArrayWithcomplete:(void (^)(BOOL result,NSArray *defaultAddrssArray ))complete{
-    
-    [NetWorkOperationTool POSTWithUrlString:GetCurrencyDefaultAddress postProtoData:nil complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(NO,nil);
-            }
-        }else {
-            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-            if (data) {
-                
-            }
-            // save db
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(NO,nil);
-        }
-    }];
 
-}
 @end

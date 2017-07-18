@@ -11,7 +11,7 @@
 #import "JxbLoadingView.h"
 #import "LocalAuthentication/LAContext.h"
 #import "WJTouchID.h"
-#import "LMBTCWalletHelper.h"
+#import "LMBaseCurrencyManager.h"
 #import "LMWalletInfoManager.h"
 
 @interface InputPayPassView () <PassInputFieldViewDelegate, WJTouchIDDelegate>
@@ -101,36 +101,6 @@
         }
         [self removeFromSuperview];
     }];
-}
-
-+ (InputPayPassView *)showInputPayPassViewWithStyle:(InputPayPassViewStyle)style complete:(void (^)(InputPayPassView *passView, NSError *error, BOOL result))complete {
-    
-    InputPayPassView *passView = [[InputPayPassView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    passView.style = style;
-    passView.completeBlock = complete;
-    passView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
-    UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    [window addSubview:passView];
-    return passView;
-}
-
-+ (InputPayPassView *)showInputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, BOOL result))complete {
-    
-    InputPayPassView *passView = [[InputPayPassView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    if ([[MMAppSetting sharedSetting] getPayPass]) {
-        passView.style = InputPayPassViewVerfyPass;
-        __weak __typeof(&*passView) weakSelf = passView;
-        passView.requestCallBack = ^(NSError *error) {
-            [weakSelf showResultStatusWithError:error];
-        };
-    } else {
-        passView.style = InputPayPassViewSetPass;
-    }
-    passView.completeBlock = complete;
-    passView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
-    UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    [window addSubview:passView];
-    return passView;
 }
 
 + (InputPayPassView *)showInputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, BOOL result))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock {
@@ -360,81 +330,10 @@
     }];
 }
 
-/**
- * Turn on the relevant processing of the fingerprint
- */
-- (void)figerOpenAction {
-    BOOL fingerLock = [[MMAppSetting sharedSetting] needFingerPay];
-    if (fingerLock) {
-        return;
-    }
-    // Turn on fingerprint recognition
-    LAContext *myContext = [[LAContext alloc] init];
-    NSError *authError = nil;
-    NSString *myLocalizedReasonString = LMLocalizedString(@"Set Verify fingerPrint for Pay", nil);
-    // Determine whether the device supports fingerprint identification
-    if ([myContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
-        // Fingerprint recognition only determines whether the current user is the owner
-        [myContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-                  localizedReason:myLocalizedReasonString
-                            reply:^(BOOL success, NSError *error) {
-                                if (success) {
-                                    [[MMAppSetting sharedSetting] setFingerPay];
-                                } else {
-                                    DDLogInfo(@"Fingerprint authentication failed，%@", error.description);
-                                }
-                            }];
-
-    } else {
-        DDLogInfo(@"TTouchID device is not available");
-    }
-}
-
-- (void)setPass {
-
-    CGFloat passWH = AUTO_HEIGHT(80);
-    CGFloat margin = (DEVICE_SIZE.width - (4 * passWH)) / 2;
-    if (self.fristPassView == nil) {
-        PassInputFieldView *fristPassView = [[PassInputFieldView alloc] init];
-        self.fristPassView = fristPassView;
-        fristPassView.delegate = self;
-        fristPassView.tag = PassWordSet;
-
-        [self.passInputView addSubview:fristPassView];
-        [fristPassView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.right.equalTo(self.passInputView).offset((-margin));
-            make.height.mas_equalTo(passWH);
-            make.width.mas_equalTo(4 * passWH);
-            make.top.equalTo(self.passInputView);
-        }];
-    }
-    if (self.secondPassView == nil) {
-        PassInputFieldView *secondPassView = [[PassInputFieldView alloc] init];
-        self.secondPassView = secondPassView;
-        secondPassView.tag = PassWordSetVerification;
-        secondPassView.delegate = self;
-        [self.passInputView addSubview:secondPassView];
-        [secondPassView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.equalTo(self.fristPassView.mas_right).offset((DEVICE_SIZE.width - (4 * passWH)));
-            make.height.equalTo(self.fristPassView.mas_height);
-            make.width.equalTo(self.fristPassView.mas_width);
-            make.top.equalTo(self.passInputView);
-        }];
-
-    }
-
-    self.titleLabel.text = LMLocalizedString(@"Set Set Payment Password", nil);
-    self.passStatusLabel.text = LMLocalizedString(@"Wallet Enter 4 Digits", nil);
-    [GCDQueue executeInMainQueue:^{
-        [self.fristPassView becomeFirstResponder];
-    }             afterDelaySecs:0.3];
-}
-
 - (void)verfyPass {
     PassInputFieldView *payPassView = [[PassInputFieldView alloc] init];
     self.payPassView = payPassView;
     payPassView.delegate = self;
-    payPassView.tag = PassWordVerification;
     CGFloat passWH = AUTO_HEIGHT(80);
     [self.passInputView addSubview:payPassView];
     [payPassView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -452,10 +351,6 @@
 - (void)setStyle:(InputPayPassViewStyle)style {
     _style = style;
     switch (style) {
-        case InputPayPassViewSetPass:
-            [self setPass];
-            break;
-
         case InputPayPassViewVerfyPass:
             [self verfyPass];
             break;
@@ -468,137 +363,12 @@
 
 - (void)passWordCompleteInput:(PassInputFieldView *)passWord {
     self.titleLabel.text = LMLocalizedString(@"Set Payment Password", nil);
-    self.payPassView.hidden = YES;
-    if (self.isPassTag) {
-        passWord.tag = PassWordSet;
-    }
-    switch (passWord.tag) {
-        case PassWordSet: {
 
-            self.passInputView.hidden = NO;
-            passWord.hidden = NO;
-            self.titleLabel.text = LMLocalizedString(@"Wallet Confirm Payment password", nil);
-            self.passStatusLabel.text = LMLocalizedString(@"Wallet Enter again", nil);
-            CGFloat passWH = AUTO_HEIGHT(80);
-            CGFloat margin = (DEVICE_SIZE.width - (4 * passWH)) / 2;
-            self.fristPass = passWord.textStore;
-            if (self.fristPassView) {
-                [self.fristPassView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.right.mas_equalTo(self.passInputView.mas_left).offset(-margin);
-                }];
-            }
-            self.secondPassView.hidden = NO;
-            [UIView animateWithDuration:0.3 animations:^{
-                [self.passInputView layoutIfNeeded];
-                [self.secondPassView becomeFirstResponder];
-
-            }];
-            [self.fristPassView clearAll];
-            self.isPassTag = NO;
-
-        }
-            break;
-        case PassWordSetVerification: {
-            if ([self.fristPass isEqualToString:passWord.textStore]) {
-                self.isPassTag = NO;
-                __weak typeof(self) weakSelf = self;
-                [weakSelf.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
-                }];
-                weakSelf.passErrorContentView.hidden = YES;
-                weakSelf.animationContentView.hidden = NO;
-                [UIView animateWithDuration:0.2 animations:^{
-                    [weakSelf.contentView layoutIfNeeded];
-                }];
-                weakSelf.statusLabel.text = LMLocalizedString(@"Wallet Saving Payment Password", nil);
-                weakSelf.titleLabel.text = LMLocalizedString(@"Wallet Saving Payment Password", nil);
-                [weakSelf endEditing:YES];
-                weakSelf.passInputView.hidden = YES;
-                weakSelf.animationView.hidden = NO;
-                weakSelf.statusLabel.hidden = NO;
-                // Start the animation
-                [weakSelf.animationView startLoading];
-                /**
-                 *  Save and upload
-                 */
-                [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                    [SetGlobalHandler setPaySetNoPass:[[MMAppSetting sharedSetting] isCanNoPassPay] payPass:passWord.textStore fee:[[MMAppSetting sharedSetting] getTranferFee] compete:^(BOOL result) {
-                        [GCDQueue executeInMainQueue:^{
-                            if (result) {
-                                weakSelf.titleLabel.text = LMLocalizedString(@"Login Save successful", nil);
-                                weakSelf.statusLabel.text = LMLocalizedString(@"Wallet Set Payment Password Successful", nil);
-                                _walletLayer.speed = 0;
-                                [weakSelf.animationView finishSuccess:nil];
-                                [GCDQueue executeInMainQueue:^{
-                                    weakSelf.backgroundColor = [UIColor clearColor];
-                                    [UIView animateWithDuration:0.3 animations:^{
-                                        weakSelf.top = DEVICE_SIZE.height;
-                                    }                completion:^(BOOL finished) {
-                                        [weakSelf removeFromSuperview];
-                                        __weak __typeof(&*self) weakSelf = self;
-                                        if (weakSelf.completeBlock) {
-                                            weakSelf.completeBlock(weakSelf, nil, YES);
-                                        }
-                                        [weakSelf figerOpenAction];
-                                    }];
-                                }             afterDelaySecs:3.f];
-                            } else {
-                                weakSelf.statusLabel.text = LMLocalizedString(@"Wallet Payment Password do not match", nil);
-                                [weakSelf.animationView finishFailure:nil];
-                            }
-                        }];
-                    }];
-                }];
-            } else   // The passwords are not equal
-            {
-
-                self.titleLabel.text = LMLocalizedString(@"Set Setting Faied", nil);
-                self.passStatusLabel.text = LMLocalizedString(@"Wallet Enter again", nil);
-                self.fristPass = nil;
-                [self.payPassView resignFirstResponder];
-                [self.fristPassView removeFromSuperview];
-                [self.secondPassView removeFromSuperview];
-                self.fristPassView = nil;
-                self.secondPassView = nil;
-
-                [UIView animateWithDuration:0.3 animations:^{
-                    [self.passInputView layoutIfNeeded];
-                    [self.secondPassView resignFirstResponder];
-                    [self.fristPassView resignFirstResponder];
-                    // Create button
-                    UIButton *retryBtn = [[UIButton alloc] init];
-                    [retryBtn setTitle:LMLocalizedString(@"Wallet Retry", nil) forState:UIControlStateNormal];
-                    retryBtn.titleLabel.font = [UIFont boldSystemFontOfSize:FONT_SIZE(36)];
-                    [retryBtn setTitleColor:LMBasicBlue forState:UIControlStateNormal];
-                    [retryBtn addTarget:self action:@selector(NewRetry:) forControlEvents:UIControlEventTouchUpInside];
-                    [self.contentView addSubview:retryBtn];
-                    [retryBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-                        make.top.equalTo(self.contentView.mas_top).offset(AUTO_HEIGHT(200));
-                        make.centerX.equalTo(self.contentView);
-                        make.width.mas_equalTo(100);
-                        make.height.mas_equalTo(50);
-                    }];
-                    self.displayLbale = [[UILabel alloc] init];
-                    self.displayLbale.text = LMLocalizedString(@"Wallet Payment Password do not match", nil);
-                    self.displayLbale.font = [UIFont systemFontOfSize:FONT_SIZE(24)];
-                    self.displayLbale.textColor = LMBasicLableColor;
-                    [self.contentView addSubview:self.displayLbale];
-                    [self.displayLbale mas_makeConstraints:^(MASConstraintMaker *make) {
-                        make.top.equalTo(self.contentView.mas_top).offset(AUTO_HEIGHT(350));
-                        make.centerX.equalTo(self.contentView);
-                    }];
-
-                    self.retryNewBtn = retryBtn;
-                    self.isPassTag = YES;
-                }];
-            }
-        }
-            break;
-        case PassWordVerification: {
-            self.isPassTag = NO;
-            self.payPassView.hidden = NO;
-            [self endEditing:YES];
-            
+    self.payPassView.hidden = NO;
+    [self endEditing:YES];
+    //verfiy pass
+    [LMBaseCurrencyManager decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
+        if (success) {
             [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
                 make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
             }];
@@ -612,48 +382,21 @@
             [self.animationView startLoading];
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 if (self.payCompleteBlock) {
-                    self.payCompleteBlock(self,nil,@"111");
+                    self.payCompleteBlock(self,nil,decodeValue);
                 }
             });
-
-            return;
-            
-            //verfiy pass
-            [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
-                if (success) {
-                    [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
-                        make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
-                    }];
-                    self.passErrorContentView.hidden = YES;
-                    self.animationContentView.hidden = NO;
-                    [UIView animateWithDuration:0.2 animations:^{
-                        [self.contentView layoutIfNeeded];
-                    }];
-                    
-                    self.statusLabel.text = LMLocalizedString(@"Wallet Verifying", nil);
-                    [self.animationView startLoading];
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                        if (self.payCompleteBlock) {
-                            self.payCompleteBlock(self,nil,decodeValue);
-                        }
-                    });
-                } else {
-                    [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
-                        make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
-                    }];
-                    self.passErrorContentView.hidden = NO;
-                    self.animationContentView.hidden = YES;
-                    self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
-                    [UIView animateWithDuration:0.3 animations:^{
-                        [self.contentView layoutIfNeeded];
-                    }];
-                    [self.animationView finishFailure:nil];
-                }
+        } else {
+            [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
             }];
+            self.passErrorContentView.hidden = NO;
+            self.animationContentView.hidden = YES;
+            self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
+            [UIView animateWithDuration:0.3 animations:^{
+                [self.contentView layoutIfNeeded];
+            }];
+            [self.animationView finishFailure:nil];
         }
-            break;
-        default:
-            break;
-    }
+    }];
 }
 @end

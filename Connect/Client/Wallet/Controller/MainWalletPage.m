@@ -67,9 +67,9 @@
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
     [self addNotification];
-    if (![LMWalletInfoManager sharedManager].isHaveWallet) {
+    //if (![LMWalletInfoManager sharedManager].isHaveWallet) {
         [self creatNewWallet];
-    }
+    //}
     
 }
 - (void)viewDidAppear:(BOOL)animated {

@@ -11,6 +11,7 @@
 #import "ConnectTool.h"
 #import "LMCurrencyAddress.h"
 #import "InputPayPassView.h"
+#import "LMBaseCurrencyManager.h"
 
 
 @implementation LMTransferManager
@@ -169,7 +170,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and address in (%@)",(int)currency, [originalTransaction.addressesArray componentsJoinedByString:@","]]];
 
     for (LMCurrencyAddress *currrencyAddress in result) {
-        NSString *inputsPrivkey = [LMBTCWalletHelper getPrivkeyBySeed:seed index:currrencyAddress.index];
+        NSString *inputsPrivkey = [LMBaseCurrencyManager getPrivkeyBySeed:seed index:currrencyAddress.index];
         if (inputsPrivkey) {
             [privkeyArray addObject:inputsPrivkey];
         }
@@ -188,7 +189,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     }
     
     //3、调用抽象方法 签名
-    NSString *signTransaction = [LMBTCWalletHelper signRawTranscationWithTvs:originalTransaction.vts privkeys:privkeyArray rawTranscation:originalTransaction.rawhex];
+    NSString *signTransaction = [LMBaseCurrencyManager signRawTranscationWithTvs:originalTransaction.vts privkeys:privkeyArray rawTranscation:originalTransaction.rawhex];
     
     
     //广播数据
