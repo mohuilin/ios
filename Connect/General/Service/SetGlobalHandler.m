@@ -1189,12 +1189,7 @@
     if (payPass == nil) {
         payPass = @"";
     }
-    NSString *needStr = nil;
-    if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeOldUser) {
-        needStr = [LKUserCenter shareCenter].currentLoginUser.prikey;
-    }else if ([LMWalletInfoManager sharedManager].categorys == CategoryTypeNewUser){
-        needStr = [LMWalletInfoManager sharedManager].baseSeed;
-    }
+    NSString *needStr = [LMWalletInfoManager sharedManager].baseSeed;
     RequestWalletInfo *creatWallet = [RequestWalletInfo new];
     NSString *payLoad = [LMBTCWalletHelper encodeValue:needStr password:payPass n:17];
     NSString *salt = [[NSString alloc]initWithData:[LMIMHelper createRandom512bits] encoding:NSUTF8StringEncoding];
@@ -1204,8 +1199,6 @@
         checkStr = [checkStr stringByReplacingOccurrencesOfString:@"(null)" withString:@""];
     }
     NSString *checkSum = [checkStr sha256String];
-    creatWallet.salt = salt;
-    creatWallet.n = n;
     creatWallet.payload = payLoad;
     creatWallet.checkSum = checkSum;
     
@@ -1223,7 +1216,7 @@
                 saveSeedModel.encryptSeed = payLoad;
                 saveSeedModel.salt = salt;
                 saveSeedModel.n = n;
-                saveSeedModel.status = 0;
+                saveSeedModel.status = 1;
                 saveSeedModel.version = 0;
                 [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                     [realm addOrUpdateObject:saveSeedModel];
@@ -1261,8 +1254,6 @@
         checkStr = [checkStr stringByReplacingOccurrencesOfString:@"(null)" withString:@""];
     }
     NSString *checkSum = [checkStr sha256String];
-    creatWallet.salt = salt;
-    creatWallet.n = n;
     creatWallet.payload = payLoad;
     creatWallet.checkSum = checkSum;
     

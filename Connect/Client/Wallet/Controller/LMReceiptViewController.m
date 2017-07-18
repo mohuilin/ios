@@ -56,33 +56,7 @@
     
 }
 - (void)getDefaultAddress {
-    __weak typeof(self)weakSelf = self;
-    NSString *currencyName = nil;
-    if (self.currency == CurrencyTypeBTC) {
-        currencyName = @"bitcoin";
-    }
-    [LMCurrencyManager getCurrencyDefaultAddressArrayWithcomplete:^(BOOL result, NSArray *defaultAddrssArray) {
-        if (result) {
-            for (DefaultAddress *defaultAddress in defaultAddrssArray) {
-                if (defaultAddress.currency == self.currency) {
-                    // get usermessage
-                    self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,defaultAddress.address];
-                    // save defaultAddress
-                    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],(int)defaultAddress.currency] lastObject];
-                    [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                        currencyModel.defaultAddress = defaultAddress.address;
-                    }];
-                    // qr code
-                    [self addQRcodeImageView];
-                }
-            }
-        }else{
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:@"获取默认地址失败" withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-            }];
-        }
-    }];
-
+    
 }
 - (void)doRight:(id)sender {
 

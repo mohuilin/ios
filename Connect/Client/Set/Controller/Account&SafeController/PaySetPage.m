@@ -12,6 +12,7 @@
 #import "LMIMHelper.h"
 #import "LMSeedModel.h"
 #import "LMWalletCreatManager.h"
+#import "LMCurrencyManager.h"
 
 @interface PaySetPage () <WJTouchIDDelegate>
 
@@ -110,6 +111,12 @@
         payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
             [weakSelf resetPayPass];
         }];
+    }else {
+        [LMCurrencyManager syncWalletData:^(BOOL result) {
+            if (result) {
+                [weakSelf reload];
+            }
+        }];
     }
     if ([LMWalletInfoManager sharedManager].isHaveWallet) {
       group0.items = @[payPass];
@@ -198,21 +205,27 @@
     [GCDQueue executeInMainQueue:^{
         KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
         __weak __typeof(&*passView) weakPassView = passView;
-        [weakPassView setTitleString:LMLocalizedString(@"请输入原密码哈哈", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+        [weakPassView setTitleString:LMLocalizedString(@"Set please enter the original password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
         NSString __block *baseSeedStr = nil;
         passView.fillCompleteBlock = ^(NSString *password) {
             if (GJCFStringIsNull(firstPass)) {
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
-                    if (!success) {
-                        [weakPassView setTitleString:LMLocalizedString(@"原密码输入错误哈哈,请重新输入", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                        firstPass = nil;
-                        return ;
-                    }else{
-                        baseSeedStr = decodeValue;
-                    }
-                }];
+                if ([LMWalletInfoManager sharedManager].encryPtionSeed.length > 0) {
+                    [LMBTCWalletHelper decodeEncryptValue:[LMWalletInfoManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
+                        if (!success) {
+                            [weakPassView setTitleString:LMLocalizedString(@"Login Password incorrect", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                            firstPass = nil;
+                            return ;
+                        }else{
+                            baseSeedStr = decodeValue;
+                        }
+                    }];
+                }else {
+                    [weakPassView setTitleString:LMLocalizedString(@"ErrorCode data error", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
+                    firstPass = nil;
+                    return ;
+                }
             }else if (GJCFStringIsNull(secondPass)){
                 secondPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm Payment password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
@@ -240,7 +253,7 @@
                     }];
                 } else {
                     [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:@"两次密码输入不一致" withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
                     }];
                 }
             }

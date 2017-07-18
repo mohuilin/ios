@@ -27,14 +27,13 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     request.amount = amount;
     request.fee = fee;
     request.tips = tips;
-    request.packageType = luckyPackageType;
     
     NSArray *txIn = [self addressesFromIndexes:indexes];
-    SendCurrency *sendCurrency = [[SendCurrency alloc] init];
-    sendCurrency.currency = CurrencyTypeBTC;
-    sendCurrency.txin = txIn.mutableCopy;
+    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
+    spentCurrency.currency = CurrencyTypeBTC;
+    spentCurrency.txin = txIn.mutableCopy;
     
-    request.sendCurrency = sendCurrency;
+    request.spentCurrency = spentCurrency;
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -76,16 +75,16 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 
 - (void)sendUrlTransferAmount:(NSInteger)amount fee:(NSInteger)fee indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
     
-    NSArray *txIn = [self addressesFromIndexes:indexes];
     URLTransferRequest *request = [[URLTransferRequest alloc] init];
     request.fee = fee;
     request.amount = amount;
     
-    SendCurrency *sendCurrency = [[SendCurrency alloc] init];
-    sendCurrency.currency = CurrencyTypeBTC;
-    sendCurrency.txin = txIn.mutableCopy;
+    NSArray *txIn = [self addressesFromIndexes:indexes];
+    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
+    spentCurrency.currency = CurrencyTypeBTC;
+    spentCurrency.txin = txIn.mutableCopy;
     
-    request.sendCurrency = sendCurrency;
+    request.spentCurrency = spentCurrency;
     
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:nil postProtoData:request.data complete:^(id response) {
@@ -130,7 +129,7 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
     /// send crowdfuning
     CrowdfuningRequest *request = [[CrowdfuningRequest alloc] init];
     request.groupIdentifier = groupIdentifier;
-    request.amount = amount;
+    request.perAmount = amount;
     request.size = size;
     request.tips = tips;
     
@@ -180,18 +179,16 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
 }
 
 - (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(ReceiptType)type indexes:(NSArray *)indexes complete:(CompleteWithDataBlock)complete{
+    /// pay crowdfuning
+    Pay *request = [[Pay alloc] init];
     
     NSArray *txIn = [self addressesFromIndexes:indexes];
+    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
+    spentCurrency.currency = CurrencyTypeBTC;
+    spentCurrency.txin = txIn.mutableCopy;
     
-    /// pay crowdfuning
-    PayCrowdReceipt *request = [[PayCrowdReceipt alloc] init];
-    
-    SendCurrency *sendCurrency = [[SendCurrency alloc] init];
-    sendCurrency.currency = CurrencyTypeBTC;
-    sendCurrency.txin = txIn.mutableCopy;
-    
-    request.sendCurrency = sendCurrency;
-    request.receiptType = type;
+    request.spentCurrency = spentCurrency;
+    request.payType = type;
     request.hashId = hashId;
     
     /// send luckypackage
@@ -244,20 +241,20 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
         [txoutPuts addObject:txOut];
     }
     
-    request.outPutsArray = txoutPuts;
+    request.txOutArray = txoutPuts;
     
     Txin *txIn = [Txin new];
     txIn.addressesArray = @[@"1oZNecL2KaQkM6iRBqBRh63T7Fcbx3V6u",
                             @"1EsSmrKQvh2md4wRiNrkUGHnUpeT4nzZf3"].mutableCopy;// addresses.mutableCopy;
     
-    SendCurrency *sendCurrency = [[SendCurrency alloc] init];
-    sendCurrency.currency = CurrencyTypeBTC;
-    sendCurrency.txin = txIn;
-    request.sendCurrency = sendCurrency;
+    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
+    spentCurrency.currency = CurrencyTypeBTC;
+    spentCurrency.txin = txIn.mutableCopy;
+    
+    request.spentCurrency = spentCurrency;
     
     request.fee = fee;
     request.tips = tips;
-    request.transferType = WalletTransferTypeInnerConnect;
     
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:WalletServiceTransfer postProtoData:request.data complete:^(id response) {
@@ -299,11 +296,10 @@ CREATE_SHARED_MANAGER(LMBTCTransferManager)
         txOut.amount = 500;
         [txoutPuts addObject:txOut];
     }
-    request.outPutsArray = txoutPuts;
+    request.txOutArray = txoutPuts;
     
     request.fee = fee;
     request.tips = tips;
-    request.transferType = WalletTransferTypeInnerConnect;
 }
 
 

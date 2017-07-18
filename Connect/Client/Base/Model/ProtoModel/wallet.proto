@@ -30,9 +30,10 @@ int64 pending = 2;
 message Coin {
 int32 currency = 1;
 string payload = 2;
-int64 balance = 3;
-int32 status = 4;
-int32 category = 5;
+string salt = 3;
+int64 balance = 4;
+int32 status = 5;
+int32 category = 6;
 }
 
 message Coins {
@@ -55,8 +56,9 @@ int32 status = 5;
 message CreateCoinRequest {
 int32 currency = 1;
 string master_address = 2;
-string payload = 3;
-int32 category = 4;
+string salt = 3;
+string payload = 4;
+int32 category = 5;
 }
 
 message CreateCoinAccount {
@@ -84,7 +86,6 @@ Txin txin = 2;
 message LuckyPackageRequest {
 SpentCurrency spent_currency = 1;
 string reciver_identifier = 2; //group id or user pubkey(address)
-int32 typ = 3;// privte group outer
 int32 typ = 3;// privte group outer
 int32 size = 4;
 int64 amount = 5;

@@ -12,7 +12,7 @@
 
 +(NSString *)primaryKey{
     
-  return @"masterAddress";
+  return @"currency";
     
 }
 
