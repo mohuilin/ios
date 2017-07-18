@@ -1,19 +1,20 @@
 //
-//  LMBaseCurrencyManager.m
+//  LMBtcCurrencyManager.m
 //  Connect
 //
 //  Created by Connect on 2017/7/18.
 //  Copyright © 2017年 Connect. All rights reserved.
 //
 
-#import "LMBaseCurrencyManager.h"
+#import "LMBtcCurrencyManager.h"
 #import "NetWorkOperationTool.h"
 #import "LMCurrencyModel.h"
 #import "LMRealmManager.h"
 #import "Wallet.pbobjc.h"
 #import "Protofile.pbobjc.h"
 #import "ConnectTool.h"
-#import "LMWalletCreatManager.h"
+#import "LMWalletManager.h"
+#import "LMCurrencyModel.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -55,69 +56,21 @@ extern "C" {
 #include "json_spirit_writer_template.h"
 #include "json_spirit_value.h"
 
-@implementation LMBaseCurrencyManager
-#pragma mark - save data to db
-/**
- *  sync model to db
- *
- */
-+ (void)saveModelToDB:(LMSeedModel *)seedModel{
-    
-    NSString *homePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *filePath = [homePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.data",[LKUserCenter shareCenter].currentLoginUser.address]];
-    [NSKeyedArchiver archiveRootObject:seedModel toFile:filePath];
-    
-}
-/**
- * get data from db
- *
- */
-+ (LMSeedModel *)getModelFromDB{
-    NSString *homePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *filePath = [homePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.data",[LKUserCenter shareCenter].currentLoginUser.address]];
-    LMSeedModel *seedModel = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    return seedModel;
-}
-#pragma mark - Interface data
-/**
- *  sync wallet data
- *
- */
-+ (void)syncWalletData:(void (^)(BOOL result))complete {
-    // Synchronize wallet data and create wallet
-    [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(NO);
-            }
-        } else{
-            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-            RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-            [LMWalletCreatManager syncDataToDB:syncWallet];
-            if (complete) {
-                complete(YES);
-            }
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(NO);
-        }
-    }];
-    
-}
+
+@implementation LMBtcCurrencyManager
+
 /**
  *  creat currency
  *
  */
-+ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess complete:(void (^)(BOOL result))complete {
++ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result))complete {
     
     CreateCoinRequest *currencyCoin = [CreateCoinRequest new];
     currencyCoin.category = category;
     currencyCoin.masterAddress = masterAddess;
     currencyCoin.currency = currency;
     currencyCoin.salt = salt;
-    currencyCoin.payload = nil;
+    currencyCoin.payload = payLoad;
     
     [LMCurrencyModel setDefaultRealm];
     LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],currency] lastObject];
@@ -171,21 +124,21 @@ extern "C" {
                         }];
                         [currencyModel.addressListArray addObject:addressModel];
                         // save db to currency Address
-                        switch ([LMWalletInfoManager sharedManager].categorys) {
-                            case CategoryTypeOldUser:
-                            {
-                                currencyModel.payload = [LMWalletInfoManager sharedManager].encryPtionSeed;
-                            }
-                                break;
-                            case CategoryTypeNewUser:
-                            {
-                                currencyModel.payload = nil;
-                            }
-                                break;
-                                
-                            default:
-                                break;
-                        }
+//                        switch ([LMWalletManager sharedManager].categorys) {
+//                            case CategoryTypeOldUser:
+//                            {
+//                                currencyModel.payload = [LMWalletManager sharedManager].encryPtionSeed;
+//                            }
+//                                break;
+//                            case CategoryTypeNewUser:
+//                            {
+//                                currencyModel.payload = nil;
+//                            }
+//                                break;
+//                                
+//                            default:
+//                                break;
+//                        }
                         [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                             [realm addOrUpdateObject:currencyModel];
                         }];
@@ -693,7 +646,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
             [privkeyArray addObject:inputsPrivkey];
         }
     }
-
+    
     NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:privkeyArray rawTranscation:rawTranscation];
     
     return signTransaction;
@@ -733,6 +686,19 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     return nil;
     
 }
-
-
+#pragma mark - other methods
+/**
+ * decode encrypt value by password
+ * @param encryptValue
+ * @param password
+ */
++ (NSArray *)getCurrencyAddressList:(CurrencyType)currency {
+    
+   LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",currency]] lastObject];
+    NSMutableArray *temArray = [NSMutableArray array];
+    for (LMCurrencyAddress *address in currencyModel.addressListArray) {
+        [temArray addObject:address.address];
+    }
+    return temArray.copy;
+}
 @end

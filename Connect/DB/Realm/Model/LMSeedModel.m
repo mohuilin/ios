@@ -9,6 +9,8 @@
 #import "LMSeedModel.h"
 
 @implementation LMSeedModel
-WZLSERIALIZE_CODER_DECODER();
++(NSString *)primaryKey {
+  return @"encryptSeed";
+}
 
 @end

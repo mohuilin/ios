@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Wallet.pbobjc.h"
 #import "Protofile.pbobjc.h"
-
+#import "EnumDefine.h"
 
 typedef void (^CompleteWithDataBlock)(id data,NSError *error);
 

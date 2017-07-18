@@ -12,7 +12,7 @@
 #import "UIView+Toast.h"
 #import "YYImageCache.h"
 #import "LMCurrencyModel.h"
-#import "LMCurrencyManager.h"
+#import "LMBtcAddressManager.h"
 #import "Wallet.pbobjc.h"
 #import "LMTransferManager.h"
 #import "LMRealmManager.h"
@@ -61,7 +61,8 @@
     if (self.currency == CurrencyTypeBTC) {
         currencyName = @"bitcoin";
     }
-    [LMCurrencyManager getCurrencyAddressListWithCurrency:self.currency complete:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
+   
+    [LMBtcAddressManager getCurrencyAddressListWithCurrency:self.currency complete:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
         
         if (result) {
             if (addressList.count > 0) {

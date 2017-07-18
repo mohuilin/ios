@@ -15,11 +15,10 @@
 #import "WalletItemCell.h"
 #import "ScanAddPage.h"
 #import "LMHandleScanResultManager.h"
-#import "LMWalletCreatManager.h"
+#import "LMWalletManager.h"
 #import "LMSeedModel.h"
 #import "LMTransferManager.h"
 #import "LMCurrencyModel.h"
-#import "LMCurrencyManager.h"
 
 
 @interface WalletItem : NSObject
@@ -53,8 +52,6 @@
 @property(nonatomic, strong) RLMResults *currencyResults;
 @property(nonatomic, strong) RLMNotificationToken *totalAmountToken;
 
-
-
 @end
 
 @implementation MainWalletPage
@@ -67,14 +64,14 @@
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
     [self addNotification];
-    //if (![LMWalletInfoManager sharedManager].isHaveWallet) {
+    if (![LMWalletManager sharedManager].isHaveWallet) {
         [self creatNewWallet];
-    //}
+    }
     
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [LMCurrencyManager syncWalletData:nil];
+    [LMWalletManager syncWalletData:nil];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -133,7 +130,7 @@
     
     __weak typeof(self)weakSelf = self;
     //Synchronize wallet data and create wallet
-  [LMWalletCreatManager creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(BOOL isFinish,NSString *error) {
+  [LMWalletManager creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(BOOL isFinish,NSString *error) {
       if (isFinish) {
           [GCDQueue executeInMainQueue:^{
            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:nil];
