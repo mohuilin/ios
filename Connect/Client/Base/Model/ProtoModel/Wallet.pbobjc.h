@@ -27,12 +27,14 @@
 
 CF_EXTERN_C_BEGIN
 
-@class AddressAndAmount;
 @class Coin;
 @class CoinInfo;
 @class CoinsDetail;
 @class DefaultAddress;
+@class SendCurrency;
 @class TransactionFlowing;
+@class Txin;
+@class Txout;
 @class Wallet;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -254,31 +256,13 @@ typedef GPB_ENUM(RespSyncWallet_FieldNumber) {
 
 @end
 
-#pragma mark - LuckyPackageRequest
+#pragma mark - Txin
 
-typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
-  LuckyPackageRequest_FieldNumber_Total = 1,
-  LuckyPackageRequest_FieldNumber_Amount = 2,
-  LuckyPackageRequest_FieldNumber_Fee = 3,
-  LuckyPackageRequest_FieldNumber_AllotType = 4,
-  LuckyPackageRequest_FieldNumber_PackageType = 5,
-  LuckyPackageRequest_FieldNumber_Tips = 6,
-  LuckyPackageRequest_FieldNumber_AddressesArray = 7,
+typedef GPB_ENUM(Txin_FieldNumber) {
+  Txin_FieldNumber_AddressesArray = 1,
 };
 
-@interface LuckyPackageRequest : GPBMessage
-
-@property(nonatomic, readwrite) int32_t total;
-
-@property(nonatomic, readwrite) int64_t amount;
-
-@property(nonatomic, readwrite) int64_t fee;
-
-@property(nonatomic, readwrite) int32_t allotType;
-
-@property(nonatomic, readwrite) int32_t packageType;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+@interface Txin : GPBMessage
 
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *addressesArray;
 /** The number of items in @c addressesArray without causing the array to be created. */
@@ -286,14 +270,14 @@ typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
 
 @end
 
-#pragma mark - AddressAndAmount
+#pragma mark - Txout
 
-typedef GPB_ENUM(AddressAndAmount_FieldNumber) {
-  AddressAndAmount_FieldNumber_Address = 1,
-  AddressAndAmount_FieldNumber_Amount = 2,
+typedef GPB_ENUM(Txout_FieldNumber) {
+  Txout_FieldNumber_Address = 1,
+  Txout_FieldNumber_Amount = 2,
 };
 
-@interface AddressAndAmount : GPBMessage
+@interface Txout : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *address;
 
@@ -301,45 +285,96 @@ typedef GPB_ENUM(AddressAndAmount_FieldNumber) {
 
 @end
 
-#pragma mark - URLTransferRequest
+#pragma mark - SendCurrency
 
-typedef GPB_ENUM(URLTransferRequest_FieldNumber) {
-  URLTransferRequest_FieldNumber_Amount = 1,
-  URLTransferRequest_FieldNumber_Fee = 2,
-  URLTransferRequest_FieldNumber_FromAddressesArray = 3,
-  URLTransferRequest_FieldNumber_Currency = 4,
+typedef GPB_ENUM(SendCurrency_FieldNumber) {
+  SendCurrency_FieldNumber_Currency = 1,
+  SendCurrency_FieldNumber_Txin = 2,
 };
 
-@interface URLTransferRequest : GPBMessage
+@interface SendCurrency : GPBMessage
+
+@property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite, strong, null_resettable) Txin *txin;
+/** Test to see if @c txin has been set. */
+@property(nonatomic, readwrite) BOOL hasTxin;
+
+@end
+
+#pragma mark - LuckyPackageRequest
+
+typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
+  LuckyPackageRequest_FieldNumber_SendCurrency = 1,
+  LuckyPackageRequest_FieldNumber_ReciverIdentifier = 2,
+  LuckyPackageRequest_FieldNumber_PackageType = 3,
+  LuckyPackageRequest_FieldNumber_Size = 4,
+  LuckyPackageRequest_FieldNumber_Amount = 5,
+  LuckyPackageRequest_FieldNumber_Fee = 6,
+  LuckyPackageRequest_FieldNumber_Tips = 7,
+};
+
+@interface LuckyPackageRequest : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) SendCurrency *sendCurrency;
+/** Test to see if @c sendCurrency has been set. */
+@property(nonatomic, readwrite) BOOL hasSendCurrency;
+
+/** group id or user pubkey(address) */
+@property(nonatomic, readwrite, copy, null_resettable) NSString *reciverIdentifier;
+
+/** privte group outer */
+@property(nonatomic, readwrite) int32_t packageType;
+
+@property(nonatomic, readwrite) int32_t size;
 
 @property(nonatomic, readwrite) int64_t amount;
 
 @property(nonatomic, readwrite) int64_t fee;
 
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *fromAddressesArray;
-/** The number of items in @c fromAddressesArray without causing the array to be created. */
-@property(nonatomic, readonly) NSUInteger fromAddressesArray_Count;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
 
-@property(nonatomic, readwrite) int32_t currency;
+@end
+
+#pragma mark - URLTransferRequest
+
+typedef GPB_ENUM(URLTransferRequest_FieldNumber) {
+  URLTransferRequest_FieldNumber_SendCurrency = 1,
+  URLTransferRequest_FieldNumber_Amount = 2,
+  URLTransferRequest_FieldNumber_Fee = 3,
+};
+
+@interface URLTransferRequest : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) SendCurrency *sendCurrency;
+/** Test to see if @c sendCurrency has been set. */
+@property(nonatomic, readwrite) BOOL hasSendCurrency;
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@property(nonatomic, readwrite) int64_t fee;
 
 @end
 
 #pragma mark - TransferRequest
 
 typedef GPB_ENUM(TransferRequest_FieldNumber) {
-  TransferRequest_FieldNumber_ToAddressesArray = 1,
-  TransferRequest_FieldNumber_Fee = 2,
-  TransferRequest_FieldNumber_TransferType = 3,
-  TransferRequest_FieldNumber_Tips = 4,
-  TransferRequest_FieldNumber_FromAddressesArray = 5,
-  TransferRequest_FieldNumber_Currency = 6,
+  TransferRequest_FieldNumber_SendCurrency = 1,
+  TransferRequest_FieldNumber_OutPutsArray = 2,
+  TransferRequest_FieldNumber_Fee = 3,
+  TransferRequest_FieldNumber_TransferType = 4,
+  TransferRequest_FieldNumber_Tips = 5,
 };
 
 @interface TransferRequest : GPBMessage
 
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<AddressAndAmount*> *toAddressesArray;
-/** The number of items in @c toAddressesArray without causing the array to be created. */
-@property(nonatomic, readonly) NSUInteger toAddressesArray_Count;
+@property(nonatomic, readwrite, strong, null_resettable) SendCurrency *sendCurrency;
+/** Test to see if @c sendCurrency has been set. */
+@property(nonatomic, readwrite) BOOL hasSendCurrency;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<Txout*> *outPutsArray;
+/** The number of items in @c outPutsArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger outPutsArray_Count;
 
 @property(nonatomic, readwrite) int64_t fee;
 
@@ -347,77 +382,96 @@ typedef GPB_ENUM(TransferRequest_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
 
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *fromAddressesArray;
-/** The number of items in @c fromAddressesArray without causing the array to be created. */
-@property(nonatomic, readonly) NSUInteger fromAddressesArray_Count;
-
-@property(nonatomic, readwrite) int32_t currency;
-
 @end
 
 #pragma mark - CrowdfuningRequest
 
 typedef GPB_ENUM(CrowdfuningRequest_FieldNumber) {
-  CrowdfuningRequest_FieldNumber_Amount = 1,
-  CrowdfuningRequest_FieldNumber_Total = 2,
-  CrowdfuningRequest_FieldNumber_Tips = 3,
+  CrowdfuningRequest_FieldNumber_GroupIdentifier = 1,
+  CrowdfuningRequest_FieldNumber_Amount = 2,
+  CrowdfuningRequest_FieldNumber_Size = 3,
+  CrowdfuningRequest_FieldNumber_Tips = 4,
 };
 
 @interface CrowdfuningRequest : GPBMessage
 
+@property(nonatomic, readwrite, copy, null_resettable) NSString *groupIdentifier;
+
 @property(nonatomic, readwrite) int64_t amount;
 
-@property(nonatomic, readwrite) int32_t total;
+@property(nonatomic, readwrite) int32_t size;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
 
 @end
 
-#pragma mark - CrowdfuningResp
+#pragma mark - ReceiptRequest
 
-typedef GPB_ENUM(CrowdfuningResp_FieldNumber) {
-  CrowdfuningResp_FieldNumber_TxId = 1,
+typedef GPB_ENUM(ReceiptRequest_FieldNumber) {
+  ReceiptRequest_FieldNumber_Payer = 1,
+  ReceiptRequest_FieldNumber_Amount = 2,
+  ReceiptRequest_FieldNumber_Tips = 3,
 };
 
-@interface CrowdfuningResp : GPBMessage
+@interface ReceiptRequest : GPBMessage
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *txId;
+/** who need pay this receipt */
+@property(nonatomic, readwrite, copy, null_resettable) NSString *payer;
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
 
 @end
 
-#pragma mark - PayCrowdRequest
+#pragma mark - ReceiptResp
 
-typedef GPB_ENUM(PayCrowdRequest_FieldNumber) {
-  PayCrowdRequest_FieldNumber_TxId = 1,
-  PayCrowdRequest_FieldNumber_AddressesArray = 2,
+typedef GPB_ENUM(ReceiptResp_FieldNumber) {
+  ReceiptResp_FieldNumber_HashId = 1,
 };
 
-@interface PayCrowdRequest : GPBMessage
+@interface ReceiptResp : GPBMessage
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *txId;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
 
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *addressesArray;
-/** The number of items in @c addressesArray without causing the array to be created. */
-@property(nonatomic, readonly) NSUInteger addressesArray_Count;
+@end
+
+#pragma mark - PayCrowdReceipt
+
+typedef GPB_ENUM(PayCrowdReceipt_FieldNumber) {
+  PayCrowdReceipt_FieldNumber_SendCurrency = 1,
+  PayCrowdReceipt_FieldNumber_ReceiptType = 2,
+  PayCrowdReceipt_FieldNumber_HashId = 3,
+};
+
+@interface PayCrowdReceipt : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) SendCurrency *sendCurrency;
+/** Test to see if @c sendCurrency has been set. */
+@property(nonatomic, readwrite) BOOL hasSendCurrency;
+
+@property(nonatomic, readwrite) int32_t receiptType;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
 
 @end
 
 #pragma mark - OriginalTransaction
 
 typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
-  OriginalTransaction_FieldNumber_Rawhex = 1,
-  OriginalTransaction_FieldNumber_Vts = 2,
-  OriginalTransaction_FieldNumber_TransactionId = 3,
+  OriginalTransaction_FieldNumber_HashId = 1,
+  OriginalTransaction_FieldNumber_Rawhex = 2,
+  OriginalTransaction_FieldNumber_Vts = 3,
   OriginalTransaction_FieldNumber_AddressesArray = 4,
 };
 
 @interface OriginalTransaction : GPBMessage
 
+@property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
+
 @property(nonatomic, readwrite, copy, null_resettable) NSString *rawhex;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *vts;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *transactionId;
 
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *addressesArray;
 /** The number of items in @c addressesArray without causing the array to be created. */
@@ -428,15 +482,18 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
 #pragma mark - PublishTransaction
 
 typedef GPB_ENUM(PublishTransaction_FieldNumber) {
-  PublishTransaction_FieldNumber_SignedHex = 1,
-  PublishTransaction_FieldNumber_TransactionId = 2,
+  PublishTransaction_FieldNumber_TransactionType = 1,
+  PublishTransaction_FieldNumber_HashId = 2,
+  PublishTransaction_FieldNumber_TxHex = 3,
 };
 
 @interface PublishTransaction : GPBMessage
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *signedHex;
+@property(nonatomic, readwrite) int32_t transactionType;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *transactionId;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *txHex;
 
 @end
 
@@ -463,7 +520,6 @@ typedef GPB_ENUM(TransactionFlowing_FieldNumber) {
   TransactionFlowing_FieldNumber_Username = 6,
   TransactionFlowing_FieldNumber_Address = 7,
   TransactionFlowing_FieldNumber_Txid = 8,
-  TransactionFlowing_FieldNumber_Currency = 9,
 };
 
 @interface TransactionFlowing : GPBMessage
@@ -486,22 +542,15 @@ typedef GPB_ENUM(TransactionFlowing_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *txid;
 
-/** btc ltc */
-@property(nonatomic, readwrite) int32_t currency;
-
 @end
 
 #pragma mark - TransactionFlowings
 
 typedef GPB_ENUM(TransactionFlowings_FieldNumber) {
-  TransactionFlowings_FieldNumber_Currency = 1,
   TransactionFlowings_FieldNumber_TransactionHistoryArray = 2,
 };
 
 @interface TransactionFlowings : GPBMessage
-
-/** btc ltc */
-@property(nonatomic, readwrite) int32_t currency;
 
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<TransactionFlowing*> *transactionHistoryArray;
 /** The number of items in @c transactionHistoryArray without causing the array to be created. */
@@ -509,18 +558,17 @@ typedef GPB_ENUM(TransactionFlowings_FieldNumber) {
 
 @end
 
-#pragma mark - CreateCoinArgs
+#pragma mark - CreateCoin
 
-typedef GPB_ENUM(CreateCoinArgs_FieldNumber) {
-  CreateCoinArgs_FieldNumber_Category = 1,
-  CreateCoinArgs_FieldNumber_Currency = 2,
-  CreateCoinArgs_FieldNumber_Salt = 3,
-  CreateCoinArgs_FieldNumber_MasterAddress = 4,
-  CreateCoinArgs_FieldNumber_Payload = 5,
-  CreateCoinArgs_FieldNumber_WId = 6,
+typedef GPB_ENUM(CreateCoin_FieldNumber) {
+  CreateCoin_FieldNumber_Category = 1,
+  CreateCoin_FieldNumber_Currency = 2,
+  CreateCoin_FieldNumber_Salt = 3,
+  CreateCoin_FieldNumber_MasterAddress = 4,
+  CreateCoin_FieldNumber_Payload = 5,
 };
 
-@interface CreateCoinArgs : GPBMessage
+@interface CreateCoin : GPBMessage
 
 @property(nonatomic, readwrite) int32_t category;
 
@@ -531,8 +579,6 @@ typedef GPB_ENUM(CreateCoinArgs_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *masterAddress;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *wId;
 
 @end
 
