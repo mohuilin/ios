@@ -533,7 +533,7 @@ typedef GPB_ENUM(PublishTransaction_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *txHex;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *currency;
+@property(nonatomic, readwrite) int32_t currency;
 
 @end
 

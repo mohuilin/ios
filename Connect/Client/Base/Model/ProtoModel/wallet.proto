@@ -149,7 +149,7 @@ message PublishTransaction {
 int32 transaction_type = 1;
 string hash_id = 2;
 string tx_hex = 3;
-string currency = 4;
+int32 currency = 4;
 }
 
 message TransactionFlowingRequest {
