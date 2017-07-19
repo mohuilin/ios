@@ -11,7 +11,7 @@
 #import "JxbLoadingView.h"
 #import "LocalAuthentication/LAContext.h"
 #import "WJTouchID.h"
-#import "LMBaseCurrencyManager.h"
+#import "LMBtcCurrencyManager.h"
 #import "LMWalletManager.h"
 
 @interface InputPayPassView () <PassInputFieldViewDelegate, WJTouchIDDelegate>
@@ -367,7 +367,7 @@
     self.payPassView.hidden = NO;
     [self endEditing:YES];
     //verfiy pass
-    [LMBaseCurrencyManager decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
+    [LMBtcCurrencyManager decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
         if (success) {
             [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
                 make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);

@@ -15,7 +15,6 @@
 #import "StringTool.h"
 #import "ConnectTool.h"
 #import "LMRamGroupInfo.h"
-#import "LMBaseCurrencyManager.h"
 #import "LMRandomSeedController.h"
 #import "LMSeedModel.h"
 #import "LMIMHelper.h"

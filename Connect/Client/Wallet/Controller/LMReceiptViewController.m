@@ -89,10 +89,6 @@
                             getAddress.currency = weakSelf.currency;
                             getAddress.amount = coinAddress.amount;
                         }];
-                        [[LMRealmManager sharedManager]executeRealmWithBlock:^{
-                            [currencyModel.addressListArray addObject:getAddress];
-                        }];
-                        
                     }else {
                         LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
                         saveAddress.address = coinAddress.address;

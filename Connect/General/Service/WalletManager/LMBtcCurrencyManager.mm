@@ -72,10 +72,11 @@ extern "C" {
     currencyCoin.salt = salt;
     currencyCoin.payload = payLoad;
     LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],currency] lastObject];
-    if(currencyModel.currency >= 0){
+    if(currencyModel){
         if (complete) {
             complete(NO,@"币种已经存在了");
         }
+        return;
     }
     [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -85,11 +86,9 @@ extern "C" {
             }
         }else {
             // save db
-            LMCurrencyModel *getCurrencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],currency] lastObject];
+
             LMCurrencyModel *currencyModel = [LMCurrencyModel new];
-            if (!getCurrencyModel) {
-              currencyModel.currency = currency;
-            }
+            currencyModel.currency = currency;
             currencyModel.category = category;
             currencyModel.salt = salt;
             currencyModel.masterAddress = masterAddess;
@@ -116,7 +115,7 @@ extern "C" {
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO,@"币种创建失败");
+            complete(NO,LMLocalizedString(@"Wallet create currency failed", nil));
         }
     }];
 }
