@@ -79,7 +79,7 @@
  * @return
  */
 
-- (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation currency:(CurrencyType)currency inputs:(NSArray *)inputs seed:(NSString *)seed;
+- (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation inputs:(NSArray *)inputs seed:(NSString *)seed;
 #pragma mark - other methods 
 /**
  * decode encrypt value by password

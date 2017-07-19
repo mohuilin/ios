@@ -216,7 +216,7 @@ extern "C" {
 }
 
 // Data is converted to JsonString type
-+ (NSString *)ObjectTojsonString:(id)object {
+- (NSString *)ObjectTojsonString:(id)object {
     if (object == nil) {
         return nil;
     }
@@ -322,18 +322,6 @@ std::string xtalkWalletSeedEncrypt(unsigned char *usrID, unsigned char *privKey,
 using namespace json_spirit;
 
 Value CallRPC(string args);
-
-int createBtcRawTranscation(char *in_param, char **rawtrans_string) {
-    Value r;
-    char *ret_str;
-    string param = string("createrawtransaction ") + in_param;
-    r = CallRPC(param);
-    string notsigned = r.get_str();
-    ret_str = (char *) malloc(notsigned.size() + 1);
-    sprintf(ret_str, "%s", notsigned.c_str());
-    *rawtrans_string = ret_str;
-    return 0;
-}
 
 int signBtcRawTranscation(char *in_param, char **signedtrans_ret) {
     Value r;
@@ -565,43 +553,10 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     
     return 1;
 }
-#pragma mark -sign
-+ (NSString *)createRawTranscationWithTvsArray:(NSArray *)tvsArray outputs:(NSDictionary *)outputs {
-    // checkout format
-    for (NSDictionary *temD in tvsArray) {
-        if (![temD isKindOfClass:[NSDictionary class]]) {
-            return nil;
-        }
-        if (![temD.allKeys containsObject:@"vout"]) {
-            return nil;
-        }
-        if (![temD.allKeys containsObject:@"txid"]) {
-            return nil;
-        }
-        if (![temD.allKeys containsObject:@"scriptPubKey"]) {
-            return nil;
-        }
-    }
-    
-    NSString *tvsJson = [self ObjectTojsonString:tvsArray];
-    NSString *outputJson = [self ObjectTojsonString:outputs];
-    NSString *inparamStr_ = [NSString stringWithFormat:@"%@ %@", tvsJson, outputJson];
-    
-    char *rawtrans_str;
-    char inparam[1024 * 100];
-    
-    const char *inparam1 = [inparamStr_ UTF8String];// Naked trading data
-    strcpy(inparam, inparam1);
-    createBtcRawTranscation(inparam, &rawtrans_str);
-    NSString *rawTranscation = [NSString stringWithUTF8String:rawtrans_str];
-    free(rawtrans_str);
-    return rawTranscation;
-}
 
-
-+ (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation currency:(CurrencyType)currency inputs:(NSArray *)inputs seed:(NSString *)seed{
+- (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation inputs:(NSArray *)inputs seed:(NSString *)seed{
     NSMutableArray *privkeyArray = [NSMutableArray array];
-    RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and address in (%@)",(int)currency, [inputs componentsJoinedByString:@","]]];
+    RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and address in (%@)",(int)CurrencyTypeBTC, [inputs componentsJoinedByString:@","]]];
     
     for (LMCurrencyAddress *currrencyAddress in result) {
         NSString *inputsPrivkey = [LMBaseCurrencyManager getPrivkeyBySeed:seed index:currrencyAddress.index];
@@ -615,7 +570,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     return signTransaction;
 }
 
-+ (NSString *)signRawTranscationWithTvs:(NSString *)tvsJson privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation {
+- (NSString *)signRawTranscationWithTvs:(NSString *)tvsJson privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation {
     
     const char *rawtrans_str = [rawTranscation UTF8String];
     char *signedtrans_ret;

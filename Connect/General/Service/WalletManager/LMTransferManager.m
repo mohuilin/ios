@@ -144,7 +144,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     for (NSString *address in toAddresses) {
         Txout *txOut = [Txout new];
         txOut.address = address;
-        txOut.amount = 500;
+        txOut.amount = perAddressAmount;
         [txoutPuts addObject:txOut];
     }
     
@@ -180,23 +180,24 @@ CREATE_SHARED_MANAGER(LMTransferManager)
             [privkeyArray addObject:inputsPrivkey];
         }
     }
-    ///--- 调用钱包服务类 ----
-    //1、定义接口对象
+    
+    //1、define interface
     LMBaseCurrencyManager *currencyManager = nil;
     
-    //2、根据币种类型创建不同的实例
+    //2、create speacil manager
     switch (currency) {
         case CurrencyTypeBTC:
+            currencyManager = [[LMBtcCurrencyManager alloc] init];
             break;
         default:
             break;
     }
     
-    //3、调用抽象方法 签名
-    NSString *signTransaction = nil;
+    //3、sign rawhex
+    NSString *signTransaction = [currencyManager signRawTranscationWithTvs:originalTransaction.vts rawTranscation:originalTransaction.rawhex inputs:originalTransaction.addressesArray seed:seed];
     
     
-    //广播数据
+    //publish
     PublishTransaction *publish = [[PublishTransaction alloc] init];
     publish.txHex = signTransaction;
     publish.hashId = originalTransaction.hashId;
