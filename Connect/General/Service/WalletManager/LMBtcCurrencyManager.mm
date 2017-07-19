@@ -63,7 +63,7 @@ extern "C" {
  *  creat currency
  *
  */
-+ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result))complete {
++ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSString *error))complete {
     
     CreateCoinRequest *currencyCoin = [CreateCoinRequest new];
     currencyCoin.category = category;
@@ -71,96 +71,60 @@ extern "C" {
     currencyCoin.currency = currency;
     currencyCoin.salt = salt;
     currencyCoin.payload = payLoad;
-    
-    [LMCurrencyModel setDefaultRealm];
-    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],currency] lastObject];
-    if (!currencyModel) {
-        // sync currency
-        [LMBaseCurrencyManager getCurrencyListWithWalletId:nil complete:^(BOOL result, NSArray<Coin *> *coinList) {
-            BOOL flag = YES;
-            for (Coin *coin in coinList) {
-                if (coin.currency == currency) {
-                    flag = NO;
-                    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],currency] lastObject];
-                    [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                        currencyModel.category = category;
-                        currencyModel.salt = salt;
-                        currencyModel.masterAddress = masterAddess;
-                        currencyModel.status = 1;
-                        currencyModel.blance = coin.balance;
-                        currencyModel.payload = coin.payload;
-                        currencyModel.defaultAddress = masterAddess;
-                    }];
-                    break;
-                }
-            }
-            if (flag) {
-                [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
-                    HttpResponse *hResponse = (HttpResponse *)response;
-                    if (hResponse.code != successCode) {
-                        if (complete) {
-                            complete(NO);
-                        }
-                    }else {
-                        // save db
-                        LMCurrencyModel *currencyModel = [LMCurrencyModel new];
-                        currencyModel.currency = currency;
-                        currencyModel.category = category;
-                        currencyModel.salt = salt;
-                        currencyModel.masterAddress = masterAddess;
-                        currencyModel.status = 0;
-                        currencyModel.blance = 0;
-                        currencyModel.defaultAddress = masterAddess;
-                        // save address
-                        LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
-                        addressModel.address = masterAddess;
-                        addressModel.index = 0;
-                        addressModel.status = 1;
-                        addressModel.label = nil;
-                        addressModel.currency = currency;
-                        addressModel.balance = 0;
-                        [[LMRealmManager sharedManager]executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                            [realm addOrUpdateObject:addressModel];
-                        }];
-                        [currencyModel.addressListArray addObject:addressModel];
-                        // save db to currency Address
-//                        switch ([LMWalletManager sharedManager].categorys) {
-//                            case CategoryTypeOldUser:
-//                            {
-//                                currencyModel.payload = [LMWalletManager sharedManager].encryPtionSeed;
-//                            }
-//                                break;
-//                            case CategoryTypeNewUser:
-//                            {
-//                                currencyModel.payload = nil;
-//                            }
-//                                break;
-//                                
-//                            default:
-//                                break;
-//                        }
-                        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                            [realm addOrUpdateObject:currencyModel];
-                        }];
-                        
-                        if (complete) {
-                            complete(YES);
-                        }
-                    }
-                } fail:^(NSError *error) {
-                    if (complete) {
-                        complete(NO);
-                    }
-                }];
-            }
-        }];
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],currency] lastObject];
+    if(currencyModel.currency >= 0){
+        if (complete) {
+            complete(NO,@"币种已经存在了");
+        }
     }
+    [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete(NO,@"币种已经存在了");
+            }
+        }else {
+            // save db
+            LMCurrencyModel *getCurrencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],currency] lastObject];
+            LMCurrencyModel *currencyModel = [LMCurrencyModel new];
+            if (!getCurrencyModel) {
+              currencyModel.currency = currency;
+            }
+            currencyModel.category = category;
+            currencyModel.salt = salt;
+            currencyModel.masterAddress = masterAddess;
+            currencyModel.status = 0;
+            currencyModel.blance = 0;
+            currencyModel.defaultAddress = masterAddess;
+            // save address
+            LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
+            addressModel.address = masterAddess;
+            addressModel.index = 0;
+            addressModel.status = 1;
+            addressModel.label = nil;
+            addressModel.currency = currency;
+            addressModel.balance = 0;
+            [currencyModel.addressListArray addObject:addressModel];
+            currencyModel.payload = payLoad;
+            [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                [realm addOrUpdateObject:currencyModel];
+                [realm addOrUpdateObject:addressModel];
+            }];
+            if (complete) {
+                complete(YES,nil);
+            }
+        }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(NO,@"币种创建失败");
+        }
+    }];
 }
 /**
  *  get currrency list
  *
  */
-+ (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete{
++ (void)getCurrencyList:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete{
     
     [NetWorkOperationTool POSTWithUrlString:GetCurrencyList postProtoData:nil complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
