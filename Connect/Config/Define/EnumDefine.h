@@ -28,5 +28,9 @@ typedef NS_ENUM(NSInteger ,CurrencyType) {
     CurrencyTypeLTC,
     CurrencyTypeETH,
 };
-
+typedef NS_ENUM(NSUInteger,CategoryType) {
+    CategoryTypeOldUser = 1,
+    CategoryTypeNewUser = 2,
+    CategoryTypeImport  = 3
+};
 #endif /* EnumDefine_h */

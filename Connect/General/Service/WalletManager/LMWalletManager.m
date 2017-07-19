@@ -367,7 +367,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  * update password
  *
  */
-+ (void)updatePassWord:(NSString *)payload checkSum:(NSString *)checkSum version:(int)version ver:(int)ver n:(int)n payPass:(NSString *)payPass compete:(void(^)(BOOL result))complete{
++ (void)updatePassWord:(NSString *)payload checkSum:(NSString *)checkSum version:(int)version ver:(int)ver url:(NSString *)url payPass:(NSString *)payPass compete:(void(^)(BOOL result))complete{
     if (payPass.length <= 0) {
         return;
     }
@@ -377,7 +377,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     creatWallet.checkSum = checkSum;
     creatWallet.version = version;
     
-    [NetWorkOperationTool POSTWithUrlString:EncryptionBaseSeedUrl postProtoData:creatWallet.data complete:^(id response) {
+    [NetWorkOperationTool POSTWithUrlString:url postProtoData:creatWallet.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
@@ -437,15 +437,12 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         version = 1;
     }
     NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
-    if ([checkStr containsString:@"(null)"]) {
-        checkStr = [checkStr stringByReplacingOccurrencesOfString:@"(null)" withString:@""];
-    }
     NSString *checkSum = [checkStr sha256String];
     creatWallet.payload = payLoad;
     creatWallet.checkSum = checkSum;
     creatWallet.version = version;
 
-    [self updatePassWord:payLoad checkSum:checkSum version:version ver:creatWallet.ver n:n payPass:passWord compete:^(BOOL result) {
+    [self updatePassWord:payLoad checkSum:checkSum version:version ver:creatWallet.ver url:EncryptionBaseSeedUrl payPass:passWord compete:^(BOOL result) {
         if (result) {
             if (complete) {
                 complete(YES);
@@ -466,16 +463,6 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         passWord = @"";
     }
     RequestWalletInfo *creatWallet = [RequestWalletInfo new];
-    NSString *payLoad = [LMBtcCurrencyManager encodeValue:baseSeed password:passWord n:17];
-    int n = 17;
-    NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
-    if ([checkStr containsString:@"(null)"]) {
-        checkStr = [checkStr stringByReplacingOccurrencesOfString:@"(null)" withString:@""];
-    }
-    NSString *checkSum = [checkStr sha256String];
-    creatWallet.payload = payLoad;
-    creatWallet.checkSum = checkSum;
-    
     LMSeedModel *seedModel = [[LMSeedModel allObjects] firstObject];
     int version = 1;
     int ver = 1;
@@ -484,7 +471,14 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         ver = seedModel.ver;
     }
     creatWallet.ver = ver;
-    [self updatePassWord:payLoad checkSum:checkSum version:version ver:ver n:n payPass:passWord compete:^(BOOL result) {
+    creatWallet.version = version;
+    NSString *payLoad = [LMBtcCurrencyManager encodeValue:baseSeed password:passWord n:17];
+    NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
+    NSString *checkSum = [checkStr sha256String];
+    creatWallet.payload = payLoad;
+    creatWallet.checkSum = checkSum;
+    
+    [self updatePassWord:payLoad checkSum:checkSum version:version ver:ver url:UpdateBaseSeedUrl payPass:passWord compete:^(BOOL result) {
         if (result) {
             if (complete) {
                 complete(YES);

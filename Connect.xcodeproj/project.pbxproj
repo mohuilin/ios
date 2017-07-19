@@ -13,7 +13,6 @@
 		1910B1EA1E817A6D00576620 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1910B1E91E817A6D00576620 /* libxml2.2.tbd */; };
 		191B3E071E10CABF001F44C7 /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 191B3E061E10CABF001F44C7 /* LocalAuthentication.framework */; };
 		1921AF4E1E701DF60020C853 /* ConnectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF4D1E701DF60020C853 /* ConnectTests.m */; };
-		1921AF571E7024200020C853 /* LMTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF561E7024200020C853 /* LMTest.m */; };
 		1921AF611E7027960020C853 /* ConnectUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF601E7027960020C853 /* ConnectUITests.m */; };
 		1921AF6A1E70294C0020C853 /* LMUITest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF691E70294C0020C853 /* LMUITest.m */; };
 		1921AF6E1E702C660020C853 /* Connect_IMUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF6C1E702C660020C853 /* Connect_IMUITests.m */; };
@@ -1086,7 +1085,6 @@
 		1921AF4B1E701DF50020C853 /* ConnectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConnectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1921AF4D1E701DF60020C853 /* ConnectTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConnectTests.m; sourceTree = "<group>"; };
 		1921AF4F1E701DF60020C853 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1921AF561E7024200020C853 /* LMTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTest.m; sourceTree = "<group>"; };
 		1921AF5E1E7027960020C853 /* ConnectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConnectUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1921AF601E7027960020C853 /* ConnectUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConnectUITests.m; sourceTree = "<group>"; };
 		1921AF621E7027960020C853 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -12700,7 +12698,6 @@
 			children = (
 				1921AF4D1E701DF60020C853 /* ConnectTests.m */,
 				1921AF4F1E701DF60020C853 /* Info.plist */,
-				1921AF561E7024200020C853 /* LMTest.m */,
 			);
 			path = ConnectTests;
 			sourceTree = "<group>";
@@ -32833,7 +32830,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1921AF571E7024200020C853 /* LMTest.m in Sources */,
 				1921AF4E1E701DF60020C853 /* ConnectTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

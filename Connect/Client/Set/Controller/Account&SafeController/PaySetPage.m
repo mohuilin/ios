@@ -237,7 +237,6 @@
                     [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
                         [LMWalletManager reSetPassWord:password baseSeed:baseSeedStr complete:^(BOOL result) {
                             if (result) {
-                                [weakSelf reload];
                                 // tips
                                 [GCDQueue executeInMainQueue:^{
                                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
@@ -247,6 +246,11 @@
                                             }             afterDelaySecs:1.f];
                                         }
                                     }];
+                                }];
+                                [weakSelf reload];
+                            }else {
+                                [GCDQueue executeInMainQueue:^{
+                                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Set Save Failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
                                 }];
                             }
                         }];
