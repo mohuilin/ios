@@ -49,11 +49,6 @@ typedef NS_ENUM(NSUInteger,CategoryType) {
 + (void)getWalletData:(void(^)(BOOL result))complete;
 
 /**
- * update password
- *
- */
-+ (void)updatePassWord:(NSString *)payload checkSum:(NSString *)checkSum version:(int)version ver:(int)ver n:(int)n payPass:(NSString *)payPass compete:(void(^)(BOOL result))complete;
-/**
  * set password method
  *
  */

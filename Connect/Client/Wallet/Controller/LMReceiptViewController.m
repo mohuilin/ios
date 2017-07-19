@@ -55,10 +55,10 @@
     self.view.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.errorTipLabel];
     
-    [self getDefaultAddress];
+    [self getAddress];
     
 }
-- (void)getDefaultAddress {
+- (void)getAddress {
     __weak typeof(self)weakSelf = self;
     NSString *currencyName = nil;
     if (self.currency == CurrencyTypeBTC) {
@@ -72,15 +72,15 @@
                 CoinInfo *address = [addressList firstObject];
                 // get usermessage
                 self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,address.address];
+                // qr code
+                [self addQRcodeImageView];
                 // save defaultAddress
                 LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],(int)weakSelf.currency] firstObject];
-                [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                    currencyModel.defaultAddress = address.address;
-                }];
                 // save address db
+                NSMutableArray *saveArray = [NSMutableArray array];
                 for (CoinInfo *coinAddress in addressList) {
                  LMCurrencyAddress *getAddress = [[LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"address = '%@' "],address] lastObject];
-                    if (getAddress.address.length > 0) {
+                    if (getAddress) {
                         [[LMRealmManager sharedManager]executeRealmWithBlock:^{
                             getAddress.label = coinAddress.label;
                             getAddress.status = coinAddress.status;
@@ -89,6 +89,7 @@
                             getAddress.currency = weakSelf.currency;
                             getAddress.amount = coinAddress.amount;
                         }];
+                        [saveArray addObject:getAddress];
                     }else {
                         LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
                         saveAddress.address = coinAddress.address;
@@ -98,17 +99,16 @@
                         saveAddress.index = coinAddress.index;
                         saveAddress.currency = weakSelf.currency;
                         saveAddress.amount = coinAddress.amount;
-                        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                            [realm addOrUpdateObject:saveAddress];
-                        }];
-                        [[LMRealmManager sharedManager]executeRealmWithBlock:^{
-                            [currencyModel.addressListArray addObject:saveAddress];
-                        }];
+                        [saveArray addObject:saveAddress];
                     }
                 }
-                // qr code
-                [self addQRcodeImageView];
-                
+                [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                    [realm addObjects:saveArray];
+                }];
+                [[LMRealmManager sharedManager]executeRealmWithBlock:^{
+                    [currencyModel.addressListArray addObjects:saveArray];
+                    currencyModel.defaultAddress = address.address;
+                }];
             }else {
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Failed to get the list address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{
