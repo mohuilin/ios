@@ -16,7 +16,6 @@
 #import "StringTool.h"
 #import "LMCurrencyModel.h"
 #import "LMIMHelper.h"
-#import "LMBtcCurrencyManager.h"
 #import "Wallet.pbobjc.h"
 
 @implementation LMWalletManager
@@ -223,9 +222,19 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  * creat import wallet
  *
  */
-+ (void)creatImportWallet:(NSString *)currency complete:(void (^)(BOOL isFinish,NSError *error))complete{
++ (void)creatImportWallet:(CurrencyType)currency complete:(void (^)(BOOL isFinish,NSError *error))complete{
     
-    [LMBtcCurrencyManager createCurrency:0 salt:nil category:0 masterAddess:nil payLoad:nil complete:^(BOOL result,NSError *error) {
+    LMBaseCurrencyManager *baseCurrency = nil;
+    switch (currency) {
+        case CurrencyTypeBTC:
+            baseCurrency = [[LMBtcCurrencyManager alloc] init];
+            break;
+            
+        default:
+            break;
+    }
+    
+    [baseCurrency createCurrency:0 salt:nil category:CurrencyTypeBTC masterAddess:nil payLoad:nil complete:^(BOOL result,NSError *error) {
         if (result) {
             if (complete) {
                 complete(YES,nil);
@@ -259,10 +268,12 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                     NSData *saltData = [LMIMHelper createRandom512bits];
                     NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
                     NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:[LMWalletManager sharedManager].encryPtionSeed];
-                    NSString *bSeedPrikey = [LMBtcCurrencyManager getPrivkeyBySeed:BitSeed index:0];
-                    NSString *masterAddress = [LMBtcCurrencyManager getAddressByPrivKey:bSeedPrikey];
-                    NSString *payLoad = [LMBtcCurrencyManager encodeValue:[LKUserCenter shareCenter].currentLoginUser.prikey password:password n:17];
-                    [LMBtcCurrencyManager createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeOldUser masterAddess:masterAddress payLoad:payLoad  complete:^(BOOL result,NSError *error) {
+                    LMBaseCurrencyManager *baseCurency = nil;
+                    baseCurency = [[LMBtcCurrencyManager alloc] init];
+                    NSString *bSeedPrikey = [baseCurency getPrivkeyBySeed:BitSeed index:0];
+                    NSString *masterAddress = [baseCurency getAddressByPrivKey:bSeedPrikey];
+                    NSString *payLoad = [baseCurency encodeValue:[LKUserCenter shareCenter].currentLoginUser.prikey password:password n:17];
+                    [baseCurency createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeOldUser masterAddess:masterAddress payLoad:payLoad  complete:^(BOOL result,NSError *error) {
                         if (result) {
                             // tips
                                 if (complete) {
@@ -289,7 +300,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *
  *  create new wallet
  */
-+ (void)creatNewWallet:(UIViewController *)controllerVc currency:(int)currency complete:(void (^)(BOOL isFinish,NSError *error))complete{
++ (void)creatNewWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(BOOL isFinish,NSError *error))complete{
     LMRandomSeedController *seedVc = [[LMRandomSeedController alloc] init];
     seedVc.seedSourceType = SeedSouceTypeWallet;
     seedVc.SeedBlock = ^(NSString *randomSeed) {
@@ -312,9 +323,18 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                                     NSData *saltData = [LMIMHelper createRandom512bits];
                                     NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
                                     NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:[LMWalletManager sharedManager].encryPtionSeed];
-                                    NSString *bSeedPrikey = [LMBtcCurrencyManager getPrivkeyBySeed:BitSeed index:0];
-                                    NSString *masterAddress = [LMBtcCurrencyManager getAddressByPrivKey:bSeedPrikey];
-                                    [LMBtcCurrencyManager createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(BOOL result,NSError *error) {
+                                    LMBaseCurrencyManager *baseCurrency = nil;
+                                    switch (currency) {
+                                        case CurrencyTypeBTC:
+                                            baseCurrency = [[LMBtcCurrencyManager alloc] init];
+                                            break;
+                                            
+                                        default:
+                                            break;
+                                    }
+                                    NSString *bSeedPrikey = [baseCurrency getPrivkeyBySeed:BitSeed index:0];
+                                    NSString *masterAddress = [baseCurrency getAddressByPrivKey:bSeedPrikey];
+                                    [baseCurrency createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(BOOL result,NSError *error) {
                                         if (result) {
                                             // tips
                                             if (complete) {
@@ -407,7 +427,9 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     }
     NSString *needStr = [LMWalletManager sharedManager].baseSeed;
     RequestWalletInfo *creatWallet = [RequestWalletInfo new];
-    NSString *payLoad = [LMBtcCurrencyManager encodeValue:needStr password:passWord n:17];
+    LMBaseCurrencyManager *baseCurrency = nil;
+    baseCurrency = [[LMBtcCurrencyManager alloc] init];
+    NSString *payLoad = [baseCurrency encodeValue:needStr password:passWord n:17];
     LMSeedModel *SeedModel = [[LMSeedModel allObjects] firstObject];
     if (SeedModel.ver >= 1) {
         creatWallet.ver = SeedModel.ver;
@@ -454,7 +476,9 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     }
     creatWallet.ver = ver;
     creatWallet.version = version;
-    NSString *payLoad = [LMBtcCurrencyManager encodeValue:baseSeed password:passWord n:17];
+    LMBaseCurrencyManager *baseCurrency = nil;
+    baseCurrency = [[LMBtcCurrencyManager alloc] init];
+    NSString *payLoad = [baseCurrency encodeValue:baseSeed password:passWord n:17];
     NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
     NSString *checkSum = [checkStr sha256String];
     creatWallet.payload = payLoad;

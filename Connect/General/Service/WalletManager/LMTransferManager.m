@@ -175,7 +175,16 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and address in (%@)",(int)currency, [originalTransaction.addressesArray componentsJoinedByString:@","]]];
 
     for (LMCurrencyAddress *currrencyAddress in result) {
-        NSString *inputsPrivkey = [LMBtcCurrencyManager getPrivkeyBySeed:seed index:currrencyAddress.index];
+        LMBaseCurrencyManager *baseCurrency = nil;
+        switch (currency) {
+            case CurrencyTypeBTC:
+                baseCurrency = [[LMBtcCurrencyManager alloc] init];
+                break;
+                
+            default:
+                break;
+        }
+        NSString *inputsPrivkey = [baseCurrency getPrivkeyBySeed:seed index:currrencyAddress.index];
         if (inputsPrivkey) {
             [privkeyArray addObject:inputsPrivkey];
         }
