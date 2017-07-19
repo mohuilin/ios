@@ -29,6 +29,7 @@ CF_EXTERN_C_BEGIN
 
 @class Coin;
 @class CoinInfo;
+@class ConnectTxout;
 @class OriginalTransaction;
 @class SpentCurrency;
 @class TransactionFlowing;
@@ -417,6 +418,46 @@ typedef GPB_ENUM(CrowdfundingRequest_FieldNumber) {
 @property(nonatomic, readwrite) int64_t amount;
 
 @property(nonatomic, readwrite) int32_t size;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+
+@end
+
+#pragma mark - ConnectTxout
+
+typedef GPB_ENUM(ConnectTxout_FieldNumber) {
+  ConnectTxout_FieldNumber_Uid = 1,
+  ConnectTxout_FieldNumber_Amount = 2,
+};
+
+@interface ConnectTxout : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *uid;
+
+@property(nonatomic, readwrite) int64_t amount;
+
+@end
+
+#pragma mark - ConnectTransferRequest
+
+typedef GPB_ENUM(ConnectTransferRequest_FieldNumber) {
+  ConnectTransferRequest_FieldNumber_SpentCurrency = 1,
+  ConnectTransferRequest_FieldNumber_TxOutArray = 2,
+  ConnectTransferRequest_FieldNumber_Fee = 3,
+  ConnectTransferRequest_FieldNumber_Tips = 4,
+};
+
+@interface ConnectTransferRequest : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) SpentCurrency *spentCurrency;
+/** Test to see if @c spentCurrency has been set. */
+@property(nonatomic, readwrite) BOOL hasSpentCurrency;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<ConnectTxout*> *txOutArray;
+/** The number of items in @c txOutArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger txOutArray_Count;
+
+@property(nonatomic, readwrite) int64_t fee;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
 

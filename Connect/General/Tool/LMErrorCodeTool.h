@@ -56,8 +56,8 @@ typedef NS_ENUM(NSInteger,ErrorCodeType)
     ErrorCodeType2618    =  2618,
     ErrorCodeType2664    =  2664,
     ErrorCodeType2665    =  2665,
-    ErrorCodeType2666    =  2666
-    
+    ErrorCodeType2666    =  2666,
+    ErrorCodeType3003    =  3003
 };
 #import <Foundation/Foundation.h>
 @interface LMErrorCodeTool : NSObject
@@ -68,6 +68,10 @@ typedef NS_ENUM(NSInteger,ErrorCodeType)
  
 */
 +(NSString*)showToastErrorType:(ToastErrorType)toastErrorType withErrorCode:(ErrorCodeType)errorCodeType withUrl:(NSString*)url;
+
+
++(NSString*)messageWithErrorCode:(ErrorCodeType)errorCodeType;
+
 
 @end
 

@@ -27,12 +27,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.tips = tips;
     request.typ = type;
     request.category =category;
-    
-    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
-    spentCurrency.currency = currency;
-    spentCurrency.txin = fromAddresses.mutableCopy;
-    
-    request.spentCurrency = spentCurrency;
+
+    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
     
     //request and sign、 publish
     [self basePostDataWithData:request.data url:WalletServiceLuckpackage type:TransactionTypeLuckypackage currency:currency complete:complete];
@@ -46,11 +42,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.amount = amount;
     request.tips = tips;
     
-    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
-    spentCurrency.currency = CurrencyTypeBTC;
-    spentCurrency.txin = fromAddresses.mutableCopy;
-    
-    request.spentCurrency = spentCurrency;
+    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
 
     //request and sign、 publish
     [self basePostDataWithData:request.data url:WalletServiceExternal type:TransactionTypeURLTransfer currency:currency complete:complete];
@@ -123,12 +115,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     /// pay crowdfuning
     Payment *request = [[Payment alloc] init];
     
-    
-    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
-    spentCurrency.currency = currency;
-    spentCurrency.txin = fromAddresses.mutableCopy;
-    
-    request.spentCurrency = spentCurrency;
+    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
     request.payType = type;
     request.hashId = hashId;
     request.fee = fee;
@@ -149,15 +136,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     }
     
     request.txOutArray = txoutPuts;
-    
-    Txin *txIn = [Txin new];
-    txIn.addressesArray =fromAddresses.mutableCopy;
-    
-    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
-    spentCurrency.currency = CurrencyTypeBTC;
-    spentCurrency.txin = txIn.mutableCopy;
-    
-    request.spentCurrency = spentCurrency;
+    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
     
     request.fee = fee;
     request.tips = tips;
@@ -167,7 +146,39 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     [self basePostDataWithData:request.data url:WalletServiceTransfer type:TransactionTypeBill currency:currency complete:complete];
 }
 
+- (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toConnectUserIds:(NSArray *)userIds perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
+    
+    ConnectTransferRequest *request = [[ConnectTransferRequest alloc] init];
+    NSMutableArray *txoutPuts = [NSMutableArray array];
+    for (NSString *uid in userIds) {
+        ConnectTxout *txOut = [ConnectTxout new];
+        txOut.uid = uid;
+        txOut.amount = perAddressAmount;
+        [txoutPuts addObject:txOut];
+    }
+    
+    request.txOutArray = txoutPuts;
+    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
+    
+    request.fee = fee;
+    request.tips = tips;
+    
+    //request and sign、 publish
+    [self basePostDataWithData:request.data url:WalletServiceTransfer type:TransactionTypeBill currency:currency complete:complete];
+}
+
 #pragma mark - private
+
+- (SpentCurrency *)packageCurrencyTxinWithCurrency:(CurrencyType)currency fromAddresses:(NSArray *)fromAddresses{
+    Txin *txIn = [Txin new];
+    txIn.addressesArray =fromAddresses.mutableCopy;
+    
+    SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
+    spentCurrency.currency = currency;
+    spentCurrency.txin = txIn;
+    
+    return spentCurrency;
+}
 
 - (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction transactionType:(TransactionType)transactionType currency:(CurrencyType)currency seed:(NSString *)seed complete:(CompleteWithDataBlock)complete{
 

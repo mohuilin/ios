@@ -150,20 +150,11 @@
 }
 
 - (void)createTranscationWithMoney:(NSDecimalNumber *)money note:(NSString *)note {
-    __weak __typeof(&*self) weakSelf = self;
-    // Whether the balance is sufficient
-    if (([PayTool getPOW8Amount:money] + [[MMAppSetting sharedSetting] getTranferFee]) > self.blance) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Insufficient balance", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-        }];
-        self.comfrimButton.enabled = YES;
-        return;
-    }
 
     [self.view endEditing:YES];
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     
-    [[LMTransferManager sharedManager] sendUrlTransferFromAddresses:nil tips:note amount:[PayTool getPOW8Amount:money] fee:0 currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+    [[LMTransferManager sharedManager] sendUrlTransferFromAddresses:nil tips:note amount:[PayTool getPOW8Amount:money] fee:[[MMAppSetting sharedSetting] getTranferFee] currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
         if (error) {
             [MBProgressHUD hideHUDForView:self.view];
         } else {

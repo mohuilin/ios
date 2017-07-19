@@ -402,28 +402,31 @@
 
 - (void)sendRedbagWithMoney:(NSDecimalNumber *)money note:(NSString *)note type:(int)type {
     
-    __weak typeof(self) weakSelf = self;
     int size = 1;
     if (self.category == LuckypackageTypeCategoryOuterUrl ||
         self.category == LuckypackageTypeCategoryGroup) {
         if (GJCFStringIsNull(self.numField.text)) {
             self.comfrimButton.enabled = YES;
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Enter number", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-            }];
-            return;
-        }
-        size = [self.numField.text intValue];
-        if (size <= 0) {
-            self.comfrimButton.enabled = YES;
-            return;
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Enter number", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+        } else {
+            size = [self.numField.text intValue];
+            if (size <= 0) {
+                self.comfrimButton.enabled = YES;
+            }
         }
     }
-    
-    
-    [[LMTransferManager sharedManager] sendLuckyPackageWithReciverIdentifier:self.reciverIdentifier size:size amount:[PayTool getPOW8Amount:money]  fee:0 luckyPackageType:type category:self.category tips:note fromAddresses:nil currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
-        
-    }];
+    if (size > 0) {
+        [MBProgressHUD showTransferLoadingViewtoView:self.view];
+        [self.view endEditing:YES];
+        [[LMTransferManager sharedManager] sendLuckyPackageWithReciverIdentifier:self.reciverIdentifier size:size amount:[PayTool getPOW8Amount:money]  fee:[[MMAppSetting sharedSetting] getTranferFee] luckyPackageType:type category:self.category tips:note fromAddresses:nil currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+            self.comfrimButton.enabled = YES;
+            if (error) {
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+            } else {
+                
+            }
+        }];
+    }
 }
 
 - (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel

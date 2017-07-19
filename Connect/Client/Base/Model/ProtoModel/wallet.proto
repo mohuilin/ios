@@ -116,6 +116,18 @@ int32 size = 4;
 string tips = 5;
 }
 
+message ConnectTxout {
+string uid = 1;
+int64 amount = 2;
+}
+
+message ConnectTransferRequest {
+SpentCurrency spent_currency = 1;
+repeated ConnectTxout tx_out = 2;
+int64 fee = 3;
+string tips = 4;
+}
+
 message ReceiveRequest {
 string sender = 1;
 uint64 amount = 2;

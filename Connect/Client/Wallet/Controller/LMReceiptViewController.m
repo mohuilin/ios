@@ -61,8 +61,14 @@
 - (void)getAddress {
     __weak typeof(self)weakSelf = self;
     NSString *currencyName = nil;
-    if (self.currency == CurrencyTypeBTC) {
-        currencyName = @"bitcoin";
+    
+    switch (self.currency) {
+        case CurrencyTypeBTC:
+            currencyName = @"bitcoin";
+            break;
+            
+        default:
+            break;
     }
    
     [LMBtcAddressManager getCurrencyAddressListWithCurrency:self.currency complete:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
@@ -75,11 +81,11 @@
                 // qr code
                 [self addQRcodeImageView];
                 // save defaultAddress
-                LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],(int)weakSelf.currency] firstObject];
+                LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)weakSelf.currency]] firstObject];
                 // save address db
                 NSMutableArray *saveArray = [NSMutableArray array];
                 for (CoinInfo *coinAddress in addressList) {
-                 LMCurrencyAddress *getAddress = [[LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"address = '%@' "],address] lastObject];
+                 LMCurrencyAddress *getAddress = [[LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"address = '%@' ",coinAddress.address]] lastObject];
                     if (getAddress) {
                         [[LMRealmManager sharedManager]executeRealmWithBlock:^{
                             getAddress.label = coinAddress.label;
@@ -103,7 +109,9 @@
                     }
                 }
                 [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                    [realm addObjects:saveArray];
+                    for (LMCurrencyAddress *currency in saveArray) {
+                        [realm addOrUpdateObject:currency];
+                    }
                 }];
                 [[LMRealmManager sharedManager]executeRealmWithBlock:^{
                     [currencyModel.addressListArray addObjects:saveArray];

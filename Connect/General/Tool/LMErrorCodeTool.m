@@ -54,6 +54,20 @@
 
 @implementation LMErrorCodeTool
 
+
++(NSString*)messageWithErrorCode:(ErrorCodeType)errorCodeType{
+    NSString *errorMessage = nil;
+    switch (errorCodeType) {
+        case ErrorCodeType3003:
+            errorMessage = LMLocalizedString(@"Wallet Insufficient balance", nil);
+            break;
+            
+        default:
+            break;
+    }
+    return errorMessage;
+}
+
 +(NSString*)showToastErrorType:(ToastErrorType)toastErrorType withErrorCode:(ErrorCodeType)errorCodeType withUrl:(NSString*)url
 {
    

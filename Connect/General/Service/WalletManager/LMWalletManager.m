@@ -93,13 +93,11 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                     case CategoryTypeOldUser:
                     {
                         [LMWalletManager creatOldWallet:controllerVc complete:complete];
-                        
                     }
                         break;
                     case CategoryTypeNewUser:
                     {
                         [LMWalletManager creatNewWallet:controllerVc currency:currency complete:complete];
-                        
                     }
                         break;
                     case CategoryTypeImport:
@@ -110,12 +108,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                         }];
                     }
                         break;
-                        
                     default:
-                    {
-                        [LMWalletManager creatNewWallet:controllerVc currency:currency complete:complete];
-                        
-                    }
                         break;
                 }
                 if (complete) {
@@ -151,17 +144,18 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     
     NSMutableArray *temArray = [NSMutableArray array];
     for (Coin *coinInfo in syncWallet.coinsArray) {
-        LMCurrencyModel *getCurrencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d"],coinInfo.currency] lastObject];
+        LMCurrencyModel *getCurrencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",coinInfo.currency]] lastObject];
         if (getCurrencyModel) {
-            getCurrencyModel.category = coinInfo.category;
-            getCurrencyModel.status = coinInfo.status;
-            getCurrencyModel.blance = coinInfo.balance;
-            getCurrencyModel.amount = coinInfo.amount;
-            getCurrencyModel.salt = coinInfo.salt;
-            getCurrencyModel.masterAddress = nil;
-            getCurrencyModel.defaultAddress = nil;
-            getCurrencyModel.payload = coinInfo.payload;
-            [temArray addObject:getCurrencyModel];
+            [[LMRealmManager sharedManager] executeRealmWithBlock:^() {
+                getCurrencyModel.category = coinInfo.category;
+                getCurrencyModel.status = coinInfo.status;
+                getCurrencyModel.blance = coinInfo.balance;
+                getCurrencyModel.amount = coinInfo.amount;
+                getCurrencyModel.salt = coinInfo.salt;
+                getCurrencyModel.masterAddress = nil;
+                getCurrencyModel.defaultAddress = nil;
+                getCurrencyModel.payload = coinInfo.payload;
+            }];
         }else {
             LMCurrencyModel *currenncyMoedl = [LMCurrencyModel new];
             currenncyMoedl.currency = coinInfo.currency;
@@ -176,6 +170,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
             [temArray addObject:currenncyMoedl];
         }
     }
+    
     [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
         if (getSeedModel) {
             [realm deleteObject:getSeedModel];

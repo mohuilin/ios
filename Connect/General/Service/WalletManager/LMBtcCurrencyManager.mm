@@ -71,7 +71,7 @@ extern "C" {
     currencyCoin.currency = currency;
     currencyCoin.salt = salt;
     currencyCoin.payload = payLoad;
-    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],currency] lastObject];
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",currency]] lastObject];
     if(currencyModel){
         if (complete) {
             complete(NO,@"币种已经存在了");
@@ -612,7 +612,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
  */
 + (NSArray *)getCurrencyAddressList:(CurrencyType)currency {
     
-   LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",currency]] lastObject];
+   LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",(int)currency]] lastObject];
     NSMutableArray *temArray = [NSMutableArray array];
     for (LMCurrencyAddress *address in currencyModel.addressListArray) {
         [temArray addObject:address.address];

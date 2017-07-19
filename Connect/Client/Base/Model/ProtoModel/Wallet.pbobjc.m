@@ -1300,6 +1300,136 @@ typedef struct CrowdfundingRequest__storage_ {
 
 @end
 
+#pragma mark - ConnectTxout
+
+@implementation ConnectTxout
+
+@dynamic uid;
+@dynamic amount;
+
+typedef struct ConnectTxout__storage_ {
+  uint32_t _has_storage_[1];
+  NSString *uid;
+  int64_t amount;
+} ConnectTxout__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "uid",
+        .dataTypeSpecific.className = NULL,
+        .number = ConnectTxout_FieldNumber_Uid,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(ConnectTxout__storage_, uid),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = ConnectTxout_FieldNumber_Amount,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(ConnectTxout__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[ConnectTxout class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(ConnectTxout__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - ConnectTransferRequest
+
+@implementation ConnectTransferRequest
+
+@dynamic hasSpentCurrency, spentCurrency;
+@dynamic txOutArray, txOutArray_Count;
+@dynamic fee;
+@dynamic tips;
+
+typedef struct ConnectTransferRequest__storage_ {
+  uint32_t _has_storage_[1];
+  SpentCurrency *spentCurrency;
+  NSMutableArray *txOutArray;
+  NSString *tips;
+  int64_t fee;
+} ConnectTransferRequest__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "spentCurrency",
+        .dataTypeSpecific.className = GPBStringifySymbol(SpentCurrency),
+        .number = ConnectTransferRequest_FieldNumber_SpentCurrency,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(ConnectTransferRequest__storage_, spentCurrency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "txOutArray",
+        .dataTypeSpecific.className = GPBStringifySymbol(ConnectTxout),
+        .number = ConnectTransferRequest_FieldNumber_TxOutArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(ConnectTransferRequest__storage_, txOutArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "fee",
+        .dataTypeSpecific.className = NULL,
+        .number = ConnectTransferRequest_FieldNumber_Fee,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(ConnectTransferRequest__storage_, fee),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "tips",
+        .dataTypeSpecific.className = NULL,
+        .number = ConnectTransferRequest_FieldNumber_Tips,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(ConnectTransferRequest__storage_, tips),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[ConnectTransferRequest class]
+                                     rootClass:[WalletRoot class]
+                                          file:WalletRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(ConnectTransferRequest__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
 #pragma mark - ReceiveRequest
 
 @implementation ReceiveRequest

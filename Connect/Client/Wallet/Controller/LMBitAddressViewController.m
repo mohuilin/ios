@@ -200,9 +200,9 @@
     } else {
         [MBProgressHUD showTransferLoadingViewtoView:self.view];
         [self.view endEditing:YES];
-        [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:@[self.addressTextField.text] perAddressAmount:10000 tips:note complete:^(id data, NSError *error) {
+        [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:10000 toAddresses:@[self.addressTextField.text] perAddressAmount:10000 tips:note complete:^(id data, NSError *error) {
             if (error) {
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"fail", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
             } else {
                 [MBProgressHUD hideHUDForView:self.view];
                 [self createChatWithHashId:data address:self.addressTextField.text Amount:money.stringValue];
