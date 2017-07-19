@@ -9,17 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "LMTransferManager.h"
 
-typedef NS_ENUM(NSUInteger,ServerStatus) {
-    ServerStatusNoHaveWallet   = 0,
-    ServerStatusIsExisetWallet = 1,
-    ServerStatusOldUser        = 3
-};
-typedef NS_ENUM(NSUInteger,CategoryType) {
-    CategoryTypeOldUser = 1,
-    CategoryTypeNewUser = 2, 
-    CategoryTypeImport  = 3
-};
-
 @interface LMWalletManager : NSObject
 + (instancetype)sharedManager;
 
