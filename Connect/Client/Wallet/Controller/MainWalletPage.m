@@ -155,11 +155,14 @@
                         break;
                         
                     default:
+                    {
+                        [GCDQueue executeInMainQueue:^{
+                            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeSuccess showInView:self.view complete:nil];
+                        }];
+                    
+                    }
                         break;
                 }
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeSuccess showInView:self.view complete:nil];
-                }];
             }
         }];
     }
