@@ -156,7 +156,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
             getCurrencyModel.category = coinInfo.category;
             getCurrencyModel.status = coinInfo.status;
             getCurrencyModel.blance = coinInfo.balance;
-            getCurrencyModel.amount = coinInfo.balance;
+            getCurrencyModel.amount = coinInfo.amount;
             getCurrencyModel.salt = coinInfo.salt;
             getCurrencyModel.masterAddress = nil;
             getCurrencyModel.defaultAddress = nil;
@@ -263,13 +263,12 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                 [weakPassView dismissWithClosed:YES];
                 if ([firstPass isEqualToString:password]) {
                     NSData *saltData = [LMIMHelper createRandom512bits];
-                    NSString *salt = [[NSString alloc] initWithData:saltData encoding:NSUTF8StringEncoding];
                     NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
                     NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:[LMWalletManager sharedManager].encryPtionSeed];
                     NSString *bSeedPrikey = [LMBtcCurrencyManager getPrivkeyBySeed:BitSeed index:0];
                     NSString *masterAddress = [LMBtcCurrencyManager getAddressByPrivKey:bSeedPrikey];
                     NSString *payLoad = [LMBtcCurrencyManager encodeValue:[LKUserCenter shareCenter].currentLoginUser.prikey password:password n:17];
-                    [LMBtcCurrencyManager createCurrency:CurrencyTypeBTC salt:salt category:CategoryTypeOldUser masterAddess:masterAddress payLoad:payLoad  complete:^(BOOL result,NSString *error) {
+                    [LMBtcCurrencyManager createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeOldUser masterAddess:masterAddress payLoad:payLoad  complete:^(BOOL result,NSString *error) {
                         if (result) {
                             // tips
                                 if (complete) {
@@ -321,12 +320,11 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                                 if (result) {
                                     [LMWalletManager sharedManager].baseSeed = randomSeed;
                                     NSData *saltData = [LMIMHelper createRandom512bits];
-                                    NSString *salt = [[NSString alloc] initWithData:saltData encoding:NSUTF8StringEncoding];
                                     NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
                                     NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:[LMWalletManager sharedManager].encryPtionSeed];
                                     NSString *bSeedPrikey = [LMBtcCurrencyManager getPrivkeyBySeed:BitSeed index:0];
                                     NSString *masterAddress = [LMBtcCurrencyManager getAddressByPrivKey:bSeedPrikey];
-                                    [LMBtcCurrencyManager createCurrency:CurrencyTypeBTC salt:salt category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(BOOL result,NSString *error) {
+                                    [LMBtcCurrencyManager createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(BOOL result,NSString *error) {
                                         if (result) {
                                             // tips
                                             if (complete) {
