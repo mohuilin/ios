@@ -168,121 +168,22 @@
     [self.inputAmountView executeBlock];
 }
 
-
 - (void)createTranscationWithMoney:(NSDecimalNumber *)money note:(NSString *)note {
 
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
     
-    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:@[self.info.address] perAddressAmount:10000 tips:note complete:^(id data, NSError *error) {
-        
-    }];
-}
-
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                                   amount:(NSDecimalNumber *)amount
-                                     note:(NSString *)note {
-    // Check for change
-    __weak __typeof(&*self) weakSelf = self;
-    rawModel = [LMUnspentCheckTool checkChangeDustWithRawTrancation:rawModel];
-    switch (rawModel.unspentErrorType) {
-        case UnspentErrorTypeChangeDust: {
-            [MBProgressHUD hideHUDForView:self.view];
-            NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
-                                                        [PayTool getBtcStringWithAmount:rawModel.change]];
-            [UIAlertController showAlertInViewController:self withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController *_Nonnull controller, UIAlertAction *_Nonnull action, NSInteger buttonIndex) {
-                self.comfrimButton.enabled = YES;
-                switch (buttonIndex) {
-                    case 0: {
-                        self.comfrimButton.enabled = YES;
-                    }
-                        break;
-                    case 2: // click ok
-                    {
-                        LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:YES];
-                        // pay money
-                        [weakSelf makeTransfer:rawModelNew decimalMoney:amount note:note];
-                    }
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        }
-            break;
-        case UnspentErrorTypeNoError: {
-            LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:NO];
-            // pay money
-            [weakSelf makeTransfer:rawModelNew decimalMoney:amount note:note];
-        }
-            break;
-        default:
-            break;
-    }
-}
-
-- (void)makeTransfer:(LMRawTransactionModel *)rawModel decimalMoney:(NSDecimalNumber *)amount note:(NSString *)note {
-    [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    self.rawTransaction = rawModel.rawTrancation;
-    self.vtsArray = rawModel.vtsArray;
-    __weak __typeof(&*self) weakSelf = self;
-    [[PayTool sharedInstance] payVerfifyFingerWithComplete:^(BOOL result, NSString *errorMsg) {
-        if (result) {
-            [weakSelf successAction:rawModel decimalMoney:amount note:note passView:nil];
-        } else {
-            if ([errorMsg isEqualToString:@"NO"]) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    weakSelf.comfrimButton.enabled = YES;
-                }];
-                return;
-            }
-            [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
-                if (result) {
-                    [weakSelf successAction:rawModel decimalMoney:amount note:note passView:passView];
-                } else {
-                    weakSelf.comfrimButton.enabled = YES;
-                    if (![errorMsg isEqualToString:@"NO"]) {
-                        [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Failed", nil) withType:ToastTypeFail showInView:passView complete:nil];
-                        }];
-                    }
-                }
-            }                              forgetPassBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    weakSelf.comfrimButton.enabled = YES;
-                    PaySetPage *page = [[PaySetPage alloc] initIsNeedPoptoRoot:YES];
-                    [weakSelf.navigationController pushViewController:page animated:YES];
-                }];
-            }                                   closeBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    weakSelf.comfrimButton.enabled = YES;
-                }];
-            }];
-        }
-    }];
-}
-
-- (void)successAction:(LMRawTransactionModel *)rawModel decimalMoney:(NSDecimalNumber *)amount note:(NSString *)note passView:(InputPayPassView *)passView {
-    __weak typeof(self) weakSelf = self;
-    [self transferToAddress:self.info.address decimalMoney:amount tips:note complete:^(NSString *hashId, NSError *error) {
+    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:@[self.info.address] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
         if (error) {
-            weakSelf.comfrimButton.enabled = YES;
-            if (passView.requestCallBack) {
-                passView.requestCallBack(error);
-            }
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"fail", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
-            if (passView.requestCallBack) {
-                passView.requestCallBack(nil);
-            }
-            if (weakSelf.didGetTransferMoney) {
-                weakSelf.didGetTransferMoney(amount.stringValue, hashId, note);
-                [weakSelf dismissViewControllerAnimated:YES completion:nil];
+            [MBProgressHUD hideHUDForView:self.view];
+            if (self.didGetTransferMoney) {
+                self.didGetTransferMoney(money.stringValue, data, note);
+                [self dismissViewControllerAnimated:YES completion:nil];
             }
         }
     }];
-
 }
+
 @end

@@ -317,12 +317,13 @@ typedef GPB_ENUM(SpentCurrency_FieldNumber) {
 
 typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
   LuckyPackageRequest_FieldNumber_SpentCurrency = 1,
-  LuckyPackageRequest_FieldNumber_ReciverIdentifier = 2,
-  LuckyPackageRequest_FieldNumber_PackageType = 3,
+  LuckyPackageRequest_FieldNumber_ReceiverIdentifier = 2,
+  LuckyPackageRequest_FieldNumber_Typ = 3,
   LuckyPackageRequest_FieldNumber_Size = 4,
-  LuckyPackageRequest_FieldNumber_Amount = 5,
-  LuckyPackageRequest_FieldNumber_Fee = 6,
-  LuckyPackageRequest_FieldNumber_Tips = 7,
+  LuckyPackageRequest_FieldNumber_Category = 5,
+  LuckyPackageRequest_FieldNumber_Amount = 6,
+  LuckyPackageRequest_FieldNumber_Fee = 7,
+  LuckyPackageRequest_FieldNumber_Tips = 8,
 };
 
 @interface LuckyPackageRequest : GPBMessage
@@ -332,10 +333,12 @@ typedef GPB_ENUM(LuckyPackageRequest_FieldNumber) {
 @property(nonatomic, readwrite) BOOL hasSpentCurrency;
 
 /** group id or user pubkey(address) */
-@property(nonatomic, readwrite, copy, null_resettable) NSString *reciverIdentifier;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *receiverIdentifier;
 
 /** privte group outer */
-@property(nonatomic, readwrite) int32_t packageType;
+@property(nonatomic, readwrite) int32_t typ;
+
+@property(nonatomic, readwrite) int32_t category;
 
 @property(nonatomic, readwrite) int32_t size;
 

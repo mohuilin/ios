@@ -25,6 +25,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.amount = amount;
     request.fee = fee;
     request.tips = tips;
+    request.typ = type;
+    request.category =category;
     
     SpentCurrency *spentCurrency = [[SpentCurrency alloc] init];
     spentCurrency.currency = currency;
@@ -162,7 +164,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     
 
     //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServiceTransfer type:0 currency:currency complete:complete];
+    [self basePostDataWithData:request.data url:WalletServiceTransfer type:TransactionTypeBill currency:currency complete:complete];
 }
 
 #pragma mark - private

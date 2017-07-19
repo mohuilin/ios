@@ -117,56 +117,22 @@
 
 - (void)createTranscationWithMoney:(NSDecimalNumber *)money note:(NSString *)note {
 
-    [GCDQueue executeInMainQueue:^{
-        [self.view endEditing:YES];
-        [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    }];
-
     NSDecimalNumber *amount = [money decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLong:pow(10, 8)]];
-
-    ReceiveBill *bill = [[ReceiveBill alloc] init];
-    bill.sender = self.info.address;
-    bill.amount = amount.longValue;
-    bill.tips = note;
-    __weak typeof(self) weakSelf = self;
-    [NetWorkOperationTool POSTWithUrlString:WallteBillingReciveUrl postProtoData:bill.data complete:^(id response) {
-        weakSelf.comfrimButton.enabled = YES;
-
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:weakSelf.view];
-        }];
-
-        HttpResponse *respo = (HttpResponse *) response;
-        if (respo.code != successCode) {
-            DDLogInfo(@"Network Server error");
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"Transfer failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-            }];
-            return;
-        }
-
-        NSData *data = [ConnectTool decodeHttpResponse:respo];
-        NSError *error = nil;
-        BillHashId *hashid = [BillHashId parseFromData:data error:&error];
+    [self.view endEditing:YES];
+    [MBProgressHUD showTransferLoadingViewtoView:self.view];
+    [[LMTransferManager sharedManager] sendReceiptToPayer:self.info.address amount:[PayTool getPOW8Amount:money] tips:note complete:^(Bill *bill, NSError *error) {
         if (error) {
-            DDLogInfo(@"error === %@", [error localizedDescription]);
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"Transfer failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
-            DDLogInfo(@"hasid == %@", hashid.hash_p);
-
-            [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:0 withHashId:hashid.hash_p];
-
-            if (weakSelf.didGetMoneyAndWithAccountID) {
-                weakSelf.didGetMoneyAndWithAccountID(amount, hashid.hash_p, note);
+            [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:0 withHashId:bill.hash_p];
+            
+            if (self.didGetMoneyAndWithAccountID) {
+                self.didGetMoneyAndWithAccountID(amount, bill.hash_p, note);
             }
-            [weakSelf dismissViewControllerAnimated:YES completion:nil];
+            [self dismissViewControllerAnimated:YES completion:nil];
         }
-    }                                  fail:^(NSError *error) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:weakSelf.view];
-            weakSelf.comfrimButton.enabled = YES;
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Server Error", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-        }];
     }];
+    
 }
 
 @end

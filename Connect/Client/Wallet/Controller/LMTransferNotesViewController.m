@@ -274,121 +274,19 @@ typedef NS_ENUM(NSInteger, LMTransactionStatusType) {
 }
 
 - (void)transferBtnClick:(UIButton *)btn {
-    __weak typeof(self) weakSelf = self;
-    NSDecimalNumber *amount = [[NSDecimalNumber alloc] initWithLongLong:self.bill.amount];
-    if (amount.longLongValue > self.blance) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Insufficient balance", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-        }];
-        return;
-    }
 
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
 
-    NSArray *toAddresses = @[@{@"address": self.bill.receiver, @"amount": [amount
-            decimalNumberByDividingBy:
-                    [[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].stringValue}];
-    BOOL isDusk = [LMPayCheck dirtyAlertWithAddress:toAddresses withController:self];
-    if (isDusk) {
-        btn.enabled = YES;
-        return;
-    }
-    AccountInfo *ainfo = [[LKUserCenter shareCenter] currentLoginUser];
-    [WallteNetWorkTool unspentV2WithAddress:ainfo.address fee:[[MMAppSetting sharedSetting] getTranferFee] toAddress:toAddresses createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-        [LMPayCheck payCheck:nil withVc:weakSelf withTransferType:TransferTypeNotes unSpent:unspent withArray:toAddresses withMoney:amount withNote:nil withType:0 withRedPackage:nil withError:error];
-    }];
-}
-
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                             decimalMoney:(NSDecimalNumber *)amount {
-    // Check for change
-    __weak __typeof(&*self) weakSelf = self;
-    rawModel = [LMUnspentCheckTool checkChangeDustWithRawTrancation:rawModel];
-    switch (rawModel.unspentErrorType) {
-        case UnspentErrorTypeChangeDust: {
-            [MBProgressHUD hideHUDForView:self.view];
-            NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
-                                                        [PayTool getBtcStringWithAmount:rawModel.change]];
-            [UIAlertController showAlertInViewController:self withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController *_Nonnull controller, UIAlertAction *_Nonnull action, NSInteger buttonIndex) {
-                switch (buttonIndex) {
-                    case 0: {
-                    }
-                        break;
-                    case 2: // click sure
-                    {
-                        LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:YES];
-                        // pay money
-                        [weakSelf createTransferWithRawTransactionModel:rawModelNew decimalMoney:amount];
-                    }
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        }
-            break;
-        case UnspentErrorTypeNoError: {
-            LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:NO];
-            // pay money
-            [weakSelf createTransferWithRawTransactionModel:rawModelNew decimalMoney:amount];
-        }
-            break;
-        default:
-            break;
-    }
-}
-
-
-- (void)createTransferWithRawTransactionModel:(LMRawTransactionModel *)rawModel decimalMoney:(NSDecimalNumber *)money {
-    self.rawTransaction = rawModel.rawTrancation;
-    self.vtsArray = rawModel.vtsArray;
-    __weak __typeof(&*self) weakSelf = self;
-    [[PayTool sharedInstance] payVerfifyFingerWithComplete:^(BOOL result, NSString *errorMsg) {
-        if (result) {
-            [self successAction:rawModel decimalMoney:money passView:nil];
+    [[LMTransferManager sharedManager] payCrowdfuningReceiptWithHashId:self.bill.hash_p type:TransactionTypeBill fromAddresses:nil fee:0 currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+        if (error) {
+            
         } else {
-            if ([errorMsg isEqualToString:@"NO"]) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                }];
-                return;
-            }
-            [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
-                if (result) {
-                    [weakSelf successAction:rawModel decimalMoney:money passView:passView];
-                }
-            }                              forgetPassBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    PaySetPage *page = [[PaySetPage alloc] initIsNeedPoptoRoot:YES];
-                    [weakSelf.navigationController pushViewController:page animated:YES];
-                }];
-            }                                   closeBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                }];
-            }];
-        }
-    }];
-
-}
-- (void)successAction:(LMRawTransactionModel *)rawModel decimalMoney:(NSDecimalNumber *)money passView:(InputPayPassView *)passView {
-    __weak __typeof(&*self) weakSelf = self;
-    [self paymentToAddress:self.bill.receiver decimalMoney:money hashID:self.bill.hash_p complete:^(NSString *hashId, NSError *error) {
-        if (!error) {
-            if (passView.requestCallBack) {
-                passView.requestCallBack(nil);
-            }
             // update db status
             [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:1 withHashId:self.bill.hash_p];
             // call back
-            if (weakSelf.PayResultBlock) {
-                weakSelf.PayResultBlock(YES);
-            }
-        } else {
-            if (passView.requestCallBack) {
-                passView.requestCallBack(error);
+            if (self.PayResultBlock) {
+                self.PayResultBlock(YES);
             }
         }
     }];

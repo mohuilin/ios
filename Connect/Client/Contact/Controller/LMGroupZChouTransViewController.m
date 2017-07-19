@@ -206,142 +206,26 @@ static NSString *identifier = @"cellIdentifier";
 }
 
 - (void)payWithAmount:(long long)amount {
-    __weak typeof(self) weakSelf = self;
-    // Whether the balance is sufficient
-    if (amount > self.amount) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Insufficient balance", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-        }];
-        return;
-    }
-
-    [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    [WallteNetWorkTool payWithHashID:self.crowdfundingInfo.hashId amount:amount
-                           toAddress:self.crowdfundingInfo.sender.address
-                            complete:^(UnspentOrderResponse *unspent, NSArray *toAddresses, NSError *error) {
-                                NSDecimalNumber * num = [[NSDecimalNumber alloc] initWithLongLong:amount];
-                                [LMPayCheck payCheck:nil withVc:weakSelf withTransferType:TransferTypezChouTransfer unSpent:unspent withArray:toAddresses withMoney:num withNote:nil withType:0 withRedPackage:nil withError:error];
-                            }];
-}
-
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                                   amount:(double)amount {
-    // Change to zero
-    __weak __typeof(&*self) weakSelf = self;
-    rawModel = [LMUnspentCheckTool checkChangeDustWithRawTrancation:rawModel];
-    switch (rawModel.unspentErrorType) {
-        case UnspentErrorTypeChangeDust: {
-            [MBProgressHUD hideHUDForView:self.view];
-            NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
-                                                        [PayTool getBtcStringWithAmount:rawModel.change]];
-            [UIAlertController showAlertInViewController:self withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController *_Nonnull controller, UIAlertAction *_Nonnull action, NSInteger buttonIndex) {
-                switch (buttonIndex) {
-                    case 0: {
-
-                    }
-                        break;
-                    case 2: // click sure
-                    {
-                        LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:YES];
-                        // pay money
-                        [weakSelf payMentWithAmount:amount vtsArray:rawModelNew.vtsArray rawTransaction:rawModelNew.rawTrancation];
-                    }
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        }
-            break;
-        case UnspentErrorTypeNoError: {
-            LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:NO];
-            //pay money
-            [weakSelf payMentWithAmount:amount vtsArray:rawModelNew.vtsArray rawTransaction:rawModelNew.rawTrancation];
-        }
-            break;
-        default:
-            break;
-    }
-}
-
-- (void)payMentWithAmount:(long long)amount vtsArray:(NSArray *)vtsArray rawTransaction:(NSString *)rawTransaction {
-
-    __weak __typeof(&*self) weakSelf = self;
-    [[PayTool sharedInstance] payVerfifyFingerWithComplete:^(BOOL result, NSString *errorMsg) {
-        if (result) {
-            [self successAction:amount vtsArray:vtsArray rawTransaction:rawTransaction passView:nil];
-        } else {
-            if ([errorMsg isEqualToString:@"NO"]) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"验证失败（fanyi ）", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                }];
-            } else {
-                [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
-                    [weakSelf successAction:amount vtsArray:vtsArray rawTransaction:rawTransaction passView:passView];
-                    
-                }                              forgetPassBlock:^{
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        PaySetPage *page = [[PaySetPage alloc] initIsNeedPoptoRoot:YES];
-                        [self.navigationController pushViewController:page animated:YES];
-                    }];
-                }                                   closeBlock:^{
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                    }];
-                }];
-            }
-        }
-    }];
-}
-- (void)successAction:(long long)amount vtsArray:(NSArray *)vtsArray rawTransaction:(NSString *)rawTransaction passView:(InputPayPassView *)passView{
     
-    __weak __typeof(&*self) weakSelf = self;
-    [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    NSString *sign = [KeyHandle signRawTranscationWithTvsArray:vtsArray privkeys:@[[[LKUserCenter shareCenter] currentLoginUser].prikey] rawTranscation:rawTransaction];
-    PayCrowdfunding *crowdFunding = [[PayCrowdfunding alloc] init];
-    crowdFunding.amount = amount;
-    crowdFunding.rawTx = sign;
-    crowdFunding.hashId = self.crowdfundingInfo.hashId;
-    
-    [NetWorkOperationTool POSTWithUrlString:WalltePayCrowdfuningUrl postProtoData:crowdFunding.data complete:^(id response) {
-        [MBProgressHUD hideHUDForView:self.view];
-        HttpResponse *hResponse = (HttpResponse *) response;
-        if (hResponse.code != successCode) {
+    [[LMTransferManager sharedManager] payCrowdfuningReceiptWithHashId:self.crowdfundingInfo.hashId type:TransactionTypePayCrowding fromAddresses:nil fee:0 currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+        if (error) {
             
-        if (passView.requestCallBack) {
-            passView.requestCallBack([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-        }
-            return;
-        }
-       
-        if (passView.requestCallBack) {
-            passView.requestCallBack(nil);
-        }
-        
-        NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-        if (data) {
-            NSError *error = nil;
-            Crowdfunding *crowdInfo = [Crowdfunding parseFromData:data error:&error];
+        } else {
+            Crowdfunding *crowdInfo = (Crowdfunding *)data;
             [[LMMessageExtendManager sharedManager]updateMessageExtendPayCount:(int)(crowdInfo.size - crowdInfo.remainSize)status:(int)crowdInfo.status withHashId:crowdInfo.hashId];
             if (!error) {
-                weakSelf.crowdfundingInfo = crowdInfo;
+                self.crowdfundingInfo = crowdInfo;
                 //refresh list
-                [weakSelf reloadView];
-                if (weakSelf.PaySuccessCallBack) {
-                    weakSelf.PaySuccessCallBack(crowdInfo);
+                [self reloadView];
+                if (self.PaySuccessCallBack) {
+                    self.PaySuccessCallBack(crowdInfo);
                 }
             }
         }
-    }                                  fail:^(NSError *error) {
-       
-        if (passView.requestCallBack) {
-            passView.requestCallBack(error);
-        }
-       
     }];
-
+    
 }
+
 
 #pragma mark --tableView代理方法
 

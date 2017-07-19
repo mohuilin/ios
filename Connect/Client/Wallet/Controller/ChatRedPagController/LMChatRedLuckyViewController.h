@@ -10,11 +10,6 @@
 #import "LMRedLuckyShowView.h"
 
 @class AccountInfo;
-typedef enum LMChatRedLuckyStyle : NSInteger {
-    LMChatRedLuckyStyleSingle = 0, // signle redpack
-    LMChatRedLuckyStyleGroup = 1,  // grpoup redapck
-    LMChatRedLuckyStyleOutRedBag = 2  // outer redpack
-} redLuckyStyle;
 
 @interface LMChatRedLuckyViewController : LMBaseViewController
 
@@ -29,9 +24,7 @@ typedef enum LMChatRedLuckyStyle : NSInteger {
  *  @param reciverIdentifier : Group ID or user address
  *  @see LMChatRedLuckyStyle
  */
-- (instancetype)initChatRedLuckyViewControllerWithStyle:(redLuckyStyle)style reciverIdentifier:(NSString *)reciverIdentifier;
-
-@property(nonatomic, assign) redLuckyStyle style;            // Controller type
+- (instancetype)initChatRedLuckyViewControllerWithCategory:(LuckypackageTypeCategory)category reciverIdentifier:(NSString *)reciverIdentifier;
 
 @property(nonatomic, strong) AccountInfo *userInfo; // users
 @end

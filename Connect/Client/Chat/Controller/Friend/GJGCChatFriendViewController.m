@@ -1184,7 +1184,6 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
     __weak typeof(self) weakSelf = self;
     GJGCChatFriendContentModel *chatContentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
-
     if (chatContentModel.isCrowdfundRceipt) {
         [WallteNetWorkTool crowdfuningInfoWithHashID:chatContentModel.hashID complete:^(NSError *erro, Crowdfunding *crowdInfo) {
             [GCDQueue executeInMainQueue:^{
@@ -2366,17 +2365,14 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 #pragma mark - send luckypackge
 
 - (void)showCreateRedPage {
-    NSInteger redPackType = 0;
-    NSString *reciverIdentifier = @"";
+    LuckypackageTypeCategory category = LuckypackageTypeCategorySingle;
+    NSString *reciverIdentifier = self.taklInfo.chatUser.address;
     if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-        redPackType = LMChatRedLuckyStyleGroup;
+        category = LuckypackageTypeCategoryGroup;
         reciverIdentifier = self.taklInfo.chatIdendifier;
-    } else {
-        redPackType = LMChatRedLuckyStyleSingle;
-        reciverIdentifier = self.taklInfo.chatUser.address;
     }
     __weak __typeof(&*self) weakSelf = self;
-    LMChatRedLuckyViewController *page = [[LMChatRedLuckyViewController alloc] initChatRedLuckyViewControllerWithStyle:redPackType reciverIdentifier:reciverIdentifier];
+    LMChatRedLuckyViewController *page = [[LMChatRedLuckyViewController alloc] initChatRedLuckyViewControllerWithCategory:category reciverIdentifier:reciverIdentifier];
     page.userInfo = self.taklInfo.chatUser;
     page.didGetRedLuckyMoney = ^(NSString *money, NSString *hashId, NSString *tips) {
         [weakSelf sendRedBagWithHashID:hashId tips:tips];

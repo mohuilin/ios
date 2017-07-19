@@ -122,128 +122,16 @@
 
 
 - (void)transferBtnClick:(UIButton *)btn {
-    __weak typeof(self) weakSelf = self;
-    // Whether the balance is sufficient
-    if ([PayTool getPOW8Amount:self.trasferAmount] > self.blance) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Insufficient balance", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-        }];
-        return;
-    }
 
-    [GCDQueue executeInMainQueue:^{
-        [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    }];
-
-    NSArray *toAddresses = @[@{@"address": self.info.address, @"amount": self.trasferAmount.stringValue}];
-    BOOL isDusk = [LMPayCheck dirtyAlertWithAddress:toAddresses withController:self];
-    if (isDusk) {
-        btn.enabled = YES;
-        return;
-    }
-    AccountInfo *ainfo = [[LKUserCenter shareCenter] currentLoginUser];
-    [WallteNetWorkTool unspentV2WithAddress:ainfo.address fee:[[MMAppSetting sharedSetting] getTranferFee] toAddress:toAddresses createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-        [LMPayCheck payCheck:nil withVc:weakSelf withTransferType:TransferTypeSetMoney unSpent:unspent withArray:toAddresses withMoney:0 withNote:nil withType:0 withRedPackage:nil withError:error];
-
-    }];
-}
-
-
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel {
-    // Check for change
-    __weak __typeof(&*self) weakSelf = self;
-    rawModel = [LMUnspentCheckTool checkChangeDustWithRawTrancation:rawModel];
-    switch (rawModel.unspentErrorType) {
-        case UnspentErrorTypeChangeDust: {
-            [MBProgressHUD hideHUDForView:self.view];
-            NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
-                                                        [PayTool getBtcStringWithAmount:rawModel.change]];
-            [UIAlertController showAlertInViewController:self withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController *_Nonnull controller, UIAlertAction *_Nonnull action, NSInteger buttonIndex) {
-                switch (buttonIndex) {
-                    case 0: {
-
-                    }
-                        break;
-                    case 2: // Click OK
-                    {
-                        LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:YES];
-                        // pay money
-                        [weakSelf makeTransfer:rawModelNew money:weakSelf.trasferAmount];
-                    }
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        }
-            break;
-        case UnspentErrorTypeNoError: {
-            LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:NO];
-            // pay money
-            [weakSelf makeTransfer:rawModelNew money:weakSelf.trasferAmount];
-        }
-            break;
-        default:
-            break;
-    }
-}
-
-
-- (void)makeTransfer:(LMRawTransactionModel *)rawModel money:(NSDecimalNumber *)money {
-    self.rawTransaction = rawModel.rawTrancation;
-    self.vtsArray = rawModel.vtsArray;
-
-    __weak __typeof(&*self) weakSelf = self;
-    [[PayTool sharedInstance] payVerfifyFingerWithComplete:^(BOOL result, NSString *errorMsg) {
-        if (result) {
-            [self successAction:rawModel money:money passView:nil];
-        } else {
-            if ([errorMsg isEqualToString:@"NO"]) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                }];
-                return;
-            }
-            [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
-                if (result) {
-                    [weakSelf successAction:rawModel money:money passView:passView];
-                }
-                    
-            }                              forgetPassBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    PaySetPage *page = [[PaySetPage alloc] initIsNeedPoptoRoot:YES];
-                    [weakSelf.navigationController pushViewController:page animated:YES];
-                }];
-            }                                   closeBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                }];
-            }];
-        }
-    }];
-}
-- (void)successAction:(LMRawTransactionModel *)rawModel money:(NSDecimalNumber *)money passView:(InputPayPassView *)passView {
-    __weak __typeof(&*self) weakSelf = self;
-    [self transferToAddress:self.info.address decimalMoney:money tips:@"" complete:^(NSString *hashId, NSError *error) {
+    [MBProgressHUD showTransferLoadingViewtoView:self.view];
+    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:@[self.info.address] perAddressAmount:[PayTool getPOW8Amount:self.trasferAmount] tips:nil complete:^(id data, NSError *error) {
         if (error) {
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-            }];
-            if (passView.requestCallBack) {
-                passView.requestCallBack(error);
-            }
-            
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
-            
-            if (passView.requestCallBack) {
-                passView.requestCallBack(nil);
-            }
-            [weakSelf createChatWithHashId:hashId address:weakSelf.info.address Amount:weakSelf.trasferAmount.stringValue];
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:nil];
-            }];
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
+            [self createChatWithHashId:data address:self.info.address Amount:self.trasferAmount.stringValue];
         }
     }];
 }
+
 @end

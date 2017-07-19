@@ -39,17 +39,21 @@
 @property(strong, nonatomic) UILabel *disPlayLable;
 // title
 @property(copy, nonatomic) NSString *navTitleString;
+
+
+@property(nonatomic, assign) LuckypackageTypeCategory category;            // Controller type
+
 @end
 
 @implementation LMChatRedLuckyViewController
 
 #pragma mark - initial method
 
-- (instancetype)initChatRedLuckyViewControllerWithStyle:(redLuckyStyle)style reciverIdentifier:(NSString *)reciverIdentifier {
+- (instancetype)initChatRedLuckyViewControllerWithCategory:(LuckypackageTypeCategory)category reciverIdentifier:(NSString *)reciverIdentifier {
     self = [super init];
     if (self) {
         _reciverIdentifier = reciverIdentifier;
-        _style = style;
+        _category = category;
     }
     return self;
 }
@@ -71,23 +75,33 @@
     
 }
 - (void)setUpUiWithStyle {
-    
-    self.navTitleString = LMLocalizedString(@"Wallet Packet", nil);
-    if (_style == LMChatRedLuckyStyleOutRedBag) {
-        self.navTitleString = LMLocalizedString(@"Wallet Sent via link luck packet", nil);
-    }
-    if (_style == LMChatRedLuckyStyleGroup || _style == LMChatRedLuckyStyleOutRedBag) {
-        // If it is a group of red envelopes, you need a red envelope view and change the transfer view location
-        [self buildUpNumberOfRedLuckyFillView];
-    } else {
-        [self buildUpUserIcon];
-    }
-    if (self.style != LMChatRedLuckyStyleOutRedBag) {
-        [self addNewCloseBarItem];
-    } else {
-        [self setWhitefBackArrowItem];
-    }
 
+    switch (self.category) {
+        case LuckypackageTypeCategorySingle:
+        {
+            self.navTitleString = LMLocalizedString(@"Wallet Packet", nil);
+            [self buildUpUserIcon];
+            [self addNewCloseBarItem];
+        }
+            break;
+            
+        case LuckypackageTypeCategoryGroup:
+        {
+            self.navTitleString = LMLocalizedString(@"Wallet Packet", nil);
+            [self buildUpNumberOfRedLuckyFillView];
+            [self addNewCloseBarItem];
+        }
+            break;
+        case LuckypackageTypeCategoryOuterUrl:
+        {
+            self.navTitleString = LMLocalizedString(@"Wallet Sent via link luck packet", nil);
+            [self buildUpNumberOfRedLuckyFillView];
+            [self setWhitefBackArrowItem];
+        }
+            break;
+        default:
+            break;
+    }
 }
 - (void)setUpRightButtomItem {
     
@@ -135,7 +149,7 @@
     self.inputAmountView = view;
     [self.view addSubview:view];
     [view mas_makeConstraints:^(MASConstraintMaker *make) {
-        if (self.style == LMChatRedLuckyStyleSingle) {
+        if (self.category == LuckypackageTypeCategorySingle) {
             make.top.equalTo(self.nameLabel.mas_bottom).offset(AUTO_HEIGHT(15));
         } else {
             make.top.equalTo(self.numberOfRedLuckyView.mas_bottom).offset(AUTO_HEIGHT(15));
@@ -147,7 +161,7 @@
     view.topTipString = LMLocalizedString(@"Wallet Amount", nil);
     view.noteDefaultString = LMLocalizedString(@"Wallet Best wishes", nil);
     view.resultBlock = ^(NSDecimalNumber *btcMoney, NSString *note) {
-        if (weakSelf.style == LMChatRedLuckyStyleGroup || weakSelf.style == LMChatRedLuckyStyleOutRedBag) {
+        if (weakSelf.category == LuckypackageTypeCategoryGroup || weakSelf.category == LuckypackageTypeCategoryOuterUrl) {
             // Red packets are limited
             if ([btcMoney decimalNumberByDividingBy:[NSDecimalNumber decimalNumberWithString:weakSelf.numField.text]].doubleValue < MIN_RED_PER) {
                 [GCDQueue executeInMainQueue:^{
@@ -163,7 +177,7 @@
     };
     view.lagelBlock = ^(BOOL enabled) {
         int size = [weakSelf.numField.text intValue];
-        if (weakSelf.style == LMChatRedLuckyStyleSingle) {
+        if (weakSelf.category == LuckypackageTypeCategorySingle) {
             weakSelf.comfrimButton.enabled = enabled;
         } else {
             weakSelf.comfrimButton.enabled = enabled && size > 0;
@@ -368,14 +382,14 @@
 }
 
 - (void)createTranscationWithMoney:(NSDecimalNumber *)money note:(NSString *)note {
-    switch (self.style) {
-        case LMChatRedLuckyStyleSingle:
-        case LMChatRedLuckyStyleGroup: {
+    switch (self.category) {
+        case LuckypackageTypeCategorySingle:
+        case LuckypackageTypeCategoryGroup: {
             [self sendRedbagWithMoney:money note:note type:0];
         }
             break;
 
-        case LMChatRedLuckyStyleOutRedBag: {
+        case LuckypackageTypeCategoryOuterUrl: {
             [self sendRedbagWithMoney:money note:note type:1];
         }
             break;
@@ -390,7 +404,8 @@
     
     __weak typeof(self) weakSelf = self;
     int size = 1;
-    if (self.style == LMChatRedLuckyStyleGroup || self.style == LMChatRedLuckyStyleOutRedBag) {
+    if (self.category == LuckypackageTypeCategoryOuterUrl ||
+        self.category == LuckypackageTypeCategoryGroup) {
         if (GJCFStringIsNull(self.numField.text)) {
             self.comfrimButton.enabled = YES;
             [GCDQueue executeInMainQueue:^{
@@ -406,7 +421,7 @@
     }
     
     
-    [[LMTransferManager sharedManager] sendLuckyPackageWithReciverIdentifier:self.reciverIdentifier size:size amount:[PayTool getPOW8Amount:money]  fee:0 luckyPackageType:type category:self.style tips:note fromAddresses:nil currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+    [[LMTransferManager sharedManager] sendLuckyPackageWithReciverIdentifier:self.reciverIdentifier size:size amount:[PayTool getPOW8Amount:money]  fee:0 luckyPackageType:type category:self.category tips:note fromAddresses:nil currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
         
     }];
 }

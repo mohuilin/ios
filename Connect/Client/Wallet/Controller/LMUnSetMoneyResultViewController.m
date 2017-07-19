@@ -147,134 +147,20 @@
 
 - (void)createTranscationWithMoney:(NSDecimalNumber *)amount note:(NSString *)note {
 
-    __weak typeof(self) weakSelf = self;
-    // blance
-    if (([PayTool getPOW8Amount:amount] + [[MMAppSetting sharedSetting] getTranferFee]) > self.blance) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Insufficient balance", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-        }];
-        return;
-    }
-
-    [GCDQueue executeInMainQueue:^{
-        [MBProgressHUD showTransferLoadingViewtoView:self.view];
-        [self.view endEditing:YES];
-    }];
-
-    NSArray *toAddresses = @[@{@"address": self.info.address, @"amount": [amount stringValue]}];
-    BOOL isDusk = [LMPayCheck dirtyAlertWithAddress:toAddresses withController:self];
-    if (isDusk) {
-        self.comfrimButton.enabled = YES;
-        return;
-    }
-    AccountInfo *ainfo = [[LKUserCenter shareCenter] currentLoginUser];
-    [WallteNetWorkTool unspentV2WithAddress:ainfo.address fee:[[MMAppSetting sharedSetting] getTranferFee] toAddress:toAddresses createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-        [LMPayCheck payCheck:nil withVc:weakSelf withTransferType:TransferTypeUnsSetResult unSpent:unspent withArray:toAddresses withMoney:amount withNote:note withType:0 withRedPackage:nil withError:error];
-    }];
-}
-
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                             decimalMoney:(NSDecimalNumber *)amount
-                                     note:(NSString *)note {
-    // check to change
-    __weak __typeof(&*self) weakSelf = self;
-    rawModel = [LMUnspentCheckTool checkChangeDustWithRawTrancation:rawModel];
-    switch (rawModel.unspentErrorType) {
-        case UnspentErrorTypeChangeDust: {
-            [MBProgressHUD hideHUDForView:self.view];
-            NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
-                                                        [PayTool getBtcStringWithAmount:rawModel.change]];
-            [UIAlertController showAlertInViewController:self withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController *_Nonnull controller, UIAlertAction *_Nonnull action, NSInteger buttonIndex) {
-                self.comfrimButton.enabled = YES;
-                switch (buttonIndex) {
-                    case 0: {
-                        self.comfrimButton.enabled = YES;
-                    }
-                        break;
-                    case 2: // click sure
-                    {
-                        LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:YES];
-                        // pay money
-                        [weakSelf makeTransfer:rawModelNew decimalMoney:amount note:note];
-                    }
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        }
-            break;
-        case UnspentErrorTypeNoError: {
-            LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:NO];
-            // pay money
-            [weakSelf makeTransfer:rawModelNew decimalMoney:amount note:note];
-        }
-            break;
-        default:
-            break;
-    }
-}
-
-
-- (void)makeTransfer:(LMRawTransactionModel *)rawModel decimalMoney:(NSDecimalNumber *)amount note:(NSString *)note {
-    __weak typeof(self) weakSelf = self;
-    self.vtsArray = rawModel.vtsArray;
-    self.rawTransaction = rawModel.rawTrancation;
-    [[PayTool sharedInstance] payVerfifyFingerWithComplete:^(BOOL result, NSString *errorMsg) {
-        if (result) {
-            [self successAction:rawModel withDecimalMoney:amount withNote:note withPassView:nil];
-        } else {
-            if ([errorMsg isEqualToString:@"NO"]) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:self.view];
-                    self.comfrimButton.enabled = YES;
-                }];
-                return;
-            }
-            [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
-                if (result) {
-                    
-                 [weakSelf successAction:rawModel withDecimalMoney:amount withNote:note withPassView:passView];
-                    
-                }
-            }                              forgetPassBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    weakSelf.comfrimButton.enabled = YES;
-                    PaySetPage *page = [[PaySetPage alloc] initIsNeedPoptoRoot:YES];
-                    [self.navigationController pushViewController:page animated:YES];
-                }];
-            }                                   closeBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:self.view];
-                    self.comfrimButton.enabled = YES;
-                }];
-            }];
-        }
-    }];
-}
-- (void)successAction:(LMRawTransactionModel *)rawModel withDecimalMoney:(NSDecimalNumber *)amount withNote:(NSString *)note withPassView:(InputPayPassView *)passView {
-    __weak typeof(self) weakSelf = self;
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    [weakSelf transferToAddress:self.info.address decimalMoney:amount tips:note complete:^(NSString *hashId, NSError *error) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:self.view];
-        }];
+    [self.view endEditing:YES];
+    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:@[self.info.address] perAddressAmount:[PayTool getPOW8Amount:amount] tips:note complete:^(id data, NSError *error) {
         if (error) {
-            if (passView.requestCallBack) {
-                passView.requestCallBack(error);
-            }
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"fail", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
-            if (passView.requestCallBack) {
-                passView.requestCallBack(error);
-            }
-            [weakSelf createChatWithHashId:hashId address:self.info.address Amount:amount.stringValue];
-            [GCDQueue executeInMainQueue:^{
-                [weakSelf.navigationController popToRootViewControllerAnimated:YES];
+            [self createChatWithHashId:data address:self.info.address Amount:amount.stringValue];
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
             }];
         }
     }];
 }
+
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [self.view endEditing:YES];
 }

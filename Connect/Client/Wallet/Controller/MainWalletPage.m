@@ -239,8 +239,7 @@
         }
             break;
         case 2: {
-            LMChatRedLuckyViewController *HistoryVc = [[LMChatRedLuckyViewController alloc] init];
-            HistoryVc.style = LMChatRedLuckyStyleOutRedBag;
+            LMChatRedLuckyViewController *HistoryVc = [[LMChatRedLuckyViewController alloc] initChatRedLuckyViewControllerWithCategory:LuckypackageTypeCategoryOuterUrl reciverIdentifier:nil];
             HistoryVc.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:HistoryVc animated:YES];
         }

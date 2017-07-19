@@ -946,8 +946,9 @@ typedef struct SpentCurrency__storage_ {
 @implementation LuckyPackageRequest
 
 @dynamic hasSpentCurrency, spentCurrency;
-@dynamic reciverIdentifier;
-@dynamic packageType;
+@dynamic receiverIdentifier;
+@dynamic typ;
+@dynamic category;
 @dynamic size;
 @dynamic amount;
 @dynamic fee;
@@ -955,10 +956,11 @@ typedef struct SpentCurrency__storage_ {
 
 typedef struct LuckyPackageRequest__storage_ {
   uint32_t _has_storage_[1];
-  int32_t packageType;
+  int32_t typ;
   int32_t size;
+  int32_t category;
   SpentCurrency *spentCurrency;
-  NSString *reciverIdentifier;
+  NSString *receiverIdentifier;
   NSString *tips;
   int64_t amount;
   int64_t fee;
@@ -980,20 +982,20 @@ typedef struct LuckyPackageRequest__storage_ {
         .dataType = GPBDataTypeMessage,
       },
       {
-        .name = "reciverIdentifier",
+        .name = "receiverIdentifier",
         .dataTypeSpecific.className = NULL,
-        .number = LuckyPackageRequest_FieldNumber_ReciverIdentifier,
+        .number = LuckyPackageRequest_FieldNumber_ReceiverIdentifier,
         .hasIndex = 1,
-        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, reciverIdentifier),
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, receiverIdentifier),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
       {
-        .name = "packageType",
+        .name = "typ",
         .dataTypeSpecific.className = NULL,
-        .number = LuckyPackageRequest_FieldNumber_PackageType,
+        .number = LuckyPackageRequest_FieldNumber_Typ,
         .hasIndex = 2,
-        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, packageType),
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, typ),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
@@ -1001,8 +1003,17 @@ typedef struct LuckyPackageRequest__storage_ {
         .name = "size",
         .dataTypeSpecific.className = NULL,
         .number = LuckyPackageRequest_FieldNumber_Size,
-        .hasIndex = 3,
+        .hasIndex = 4,
         .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, size),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "category",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckyPackageRequest_FieldNumber_Category,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, category),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
@@ -1010,7 +1021,7 @@ typedef struct LuckyPackageRequest__storage_ {
         .name = "amount",
         .dataTypeSpecific.className = NULL,
         .number = LuckyPackageRequest_FieldNumber_Amount,
-        .hasIndex = 4,
+        .hasIndex = 5,
         .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, amount),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
@@ -1019,7 +1030,7 @@ typedef struct LuckyPackageRequest__storage_ {
         .name = "fee",
         .dataTypeSpecific.className = NULL,
         .number = LuckyPackageRequest_FieldNumber_Fee,
-        .hasIndex = 5,
+        .hasIndex = 6,
         .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, fee),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
@@ -1028,7 +1039,7 @@ typedef struct LuckyPackageRequest__storage_ {
         .name = "tips",
         .dataTypeSpecific.className = NULL,
         .number = LuckyPackageRequest_FieldNumber_Tips,
-        .hasIndex = 6,
+        .hasIndex = 7,
         .offset = (uint32_t)offsetof(LuckyPackageRequest__storage_, tips),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,

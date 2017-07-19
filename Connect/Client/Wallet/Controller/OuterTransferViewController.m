@@ -160,55 +160,25 @@
         return;
     }
 
-    [GCDQueue executeInMainQueue:^{
-        [self.view endEditing:YES];
-        [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    }];
-
-    [WallteNetWorkTool sendExternalBillWithSendAddress:[[LKUserCenter shareCenter] currentLoginUser].address privkey:[[LKUserCenter shareCenter] currentLoginUser].prikey fee:[[MMAppSetting sharedSetting] getTranferFee] money:[PayTool getPOW8Amount:money] tips:note complete:^(OrdinaryBilling *billing, UnspentOrderResponse *unspent, NSArray *toAddresses, NSError *error) {
-        // New payment check method
-        [LMPayCheck payCheck:billing withVc:weakSelf withTransferType:TransferTypeOuterTransfer unSpent:unspent withArray:toAddresses withMoney:0 withNote:nil withType:0 withRedPackage:0 withError:error];
+    [self.view endEditing:YES];
+    [MBProgressHUD showTransferLoadingViewtoView:self.view];
+    
+    [[LMTransferManager sharedManager] sendUrlTransferFromAddresses:nil tips:note amount:[PayTool getPOW8Amount:money] fee:0 currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+        if (error) {
+            [MBProgressHUD hideHUDForView:self.view];
+        } else {
+            [MBProgressHUD hideHUDForView:self.view];
+            ExternalBillingInfo *billInfo = (ExternalBillingInfo *)data;
+            OuterTransferDetailController *page = [[OuterTransferDetailController alloc] init];
+            page.billInfo = billInfo;
+            [self.navigationController pushViewController:page animated:YES];
+        }
     }];
 }
 
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel billing:(OrdinaryBilling *)billing {
-    // Check for change
-    __weak __typeof(&*self) weakSelf = self;
-    rawModel = [LMUnspentCheckTool checkChangeDustWithRawTrancation:rawModel];
-    switch (rawModel.unspentErrorType) {
-        case UnspentErrorTypeChangeDust: {
-            [MBProgressHUD hideHUDForView:self.view];
-            NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
-                                                        [PayTool getBtcStringWithAmount:rawModel.change]];
-            [UIAlertController showAlertInViewController:self withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController *_Nonnull controller, UIAlertAction *_Nonnull action, NSInteger buttonIndex) {
-                self.comfrimButton.enabled = YES;
-                switch (buttonIndex) {
-                    case 0: {
-                        self.comfrimButton.enabled = YES;
-                    }
-                        break;
-                    case 2: // click sure
-                    {
-                        LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:YES];
-                        // pay money
-                        [weakSelf outerTransferWithvtsArray:rawModelNew.vtsArray rawTransaction:rawModelNew.rawTrancation billing:billing];
-                    }
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        }
-            break;
-        case UnspentErrorTypeNoError: {
-            LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:NO];
-            // pay money
-            [weakSelf outerTransferWithvtsArray:rawModelNew.vtsArray rawTransaction:rawModelNew.rawTrancation billing:billing];
-        }
-            break;
-        default:
-            break;
-    }
+- (void)hidenKeyBoard {
+    [self.inputAmountView hidenKeyBoard];
+    [self.view endEditing:YES];
 }
 
 - (NSDecimalNumber *)amount {
@@ -218,85 +188,5 @@
     return _amount;
 }
 
-- (void)hidenKeyBoard {
-    [self.inputAmountView hidenKeyBoard];
-    [self.view endEditing:YES];
-}
 
-- (void)outerTransferWithvtsArray:(NSArray *)vtsArray rawTransaction:(NSString *)rawTransaction billing:(OrdinaryBilling *)billing {
-    __weak __typeof(&*self) weakSelf = self;
-    [[PayTool sharedInstance] payVerfifyFingerWithComplete:^(BOOL result, NSString *errorMsg) {
-        if (result) {
-            [self successActionWithArray:vtsArray withRawTransaction:rawTransaction withBill:billing withPassView:nil];
-        } else {
-            if ([errorMsg isEqualToString:@"NO"]) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    weakSelf.comfrimButton.enabled = YES;
-                }];
-            } else {
-                [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
-                    [self successActionWithArray:vtsArray withRawTransaction:rawTransaction withBill:billing withPassView:passView];
-                    
-                }                              forgetPassBlock:^{
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        weakSelf.comfrimButton.enabled = YES;
-                        PaySetPage *page = [[PaySetPage alloc] initIsNeedPoptoRoot:YES];
-                        [self.navigationController pushViewController:page animated:YES];
-                    }];
-                }                                   closeBlock:^{
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        weakSelf.comfrimButton.enabled = YES;
-                    }];
-                }];
-            }
-        }
-    }];
-}
-- (void)successActionWithArray:(NSArray *)vtsArray withRawTransaction:(NSString *)rawTransaction withBill:(OrdinaryBilling *)billing withPassView:(InputPayPassView *)passView {
-    
-    NSString *rawTx = [KeyHandle signRawTranscationWithTvsArray:vtsArray privkeys:@[[[LKUserCenter shareCenter] currentLoginUser].prikey] rawTranscation:rawTransaction];
-    billing.rawTx = rawTx;
-    [NetWorkOperationTool POSTWithUrlString:ExternalSendUrl postProtoData:billing.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *) response;
-        
-        if (hResponse.code != successCode) {
-            
-            if (passView.requestCallBack) {
-                passView.requestCallBack([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-            }
-           
-            return;
-        }
-        
-        if (passView.requestCallBack) {
-            passView.requestCallBack(nil);
-        }
- 
-        NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-        if (data) {
-            NSError *error = nil;
-            ExternalBillingInfo *billInfo = [ExternalBillingInfo parseFromData:data error:&error];
-            
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD hideHUDForView:self.view];
-            }];
-            // update blance
-            [[PayTool sharedInstance] getBlanceWithComplete:^(NSString *blance, UnspentAmount *unspentAmount, NSError *error) {
-            }];
-            [GCDQueue executeInMainQueue:^{
-                OuterTransferDetailController *page = [[OuterTransferDetailController alloc] init];
-                page.billInfo = billInfo;
-                [self.navigationController pushViewController:page animated:YES];
-            }];
-        }
-    }                                  fail:^(NSError *error) {
-        
-        if (passView.requestCallBack) {
-            passView.requestCallBack(error);
-        }
-    }];
-}
 @end

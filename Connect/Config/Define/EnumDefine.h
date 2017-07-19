@@ -10,16 +10,17 @@
 #define EnumDefine_h
 
 typedef NS_ENUM(NSInteger ,LuckypackageTypeCategory) {
-    LuckypackageTypeCategoryGroup = 0,
+    LuckypackageTypeCategorySingle = 0,
+    LuckypackageTypeCategoryGroup,
     LuckypackageTypeCategoryOuterUrl,
 };
 
+
 typedef NS_ENUM(NSInteger ,TransactionType) {
-    TransactionTypePayReceipt = 1,
+    TransactionTypeBill = 1,
     TransactionTypePayCrowding = 2,
     TransactionTypeLuckypackage = 3,
     TransactionTypeURLTransfer = 6,
-    TransactionTypeSystemLuckypackage = 7,
 };
 
 typedef NS_ENUM(NSInteger ,CurrencyType) {
