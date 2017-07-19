@@ -16,6 +16,9 @@
 #import "Wallet.pbobjc.h"
 #import "LMTransferManager.h"
 #import "LMRealmManager.h"
+#import "LMCurrencyAddress.h"
+
+
 
 @interface LMReceiptViewController () <UITextFieldDelegate>
 
@@ -74,6 +77,35 @@
                 [[LMRealmManager sharedManager] executeRealmWithBlock:^{
                     currencyModel.defaultAddress = address.address;
                 }];
+                // save address db
+                for (CoinInfo *coinAddress in addressList) {
+                 LMCurrencyAddress *getAddress = [[LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"address = '%@' "],address] lastObject];
+                    if (getAddress.address.length > 0) {
+                        [[LMRealmManager sharedManager]executeRealmWithBlock:^{
+                            getAddress.label = coinAddress.label;
+                            getAddress.status = coinAddress.status;
+                            getAddress.balance = coinAddress.balance;
+                            getAddress.index = coinAddress.index;
+                            getAddress.currency = weakSelf.currency;
+                            getAddress.amount = coinAddress.amount;
+                        }];
+                    }else {
+                        LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
+                        saveAddress.address = coinAddress.address;
+                        saveAddress.label = coinAddress.label;
+                        saveAddress.status = coinAddress.status;
+                        saveAddress.balance = coinAddress.balance;
+                        saveAddress.index = coinAddress.index;
+                        saveAddress.currency = weakSelf.currency;
+                        saveAddress.amount = coinAddress.amount;
+                        [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                            [realm addOrUpdateObject:saveAddress];
+                        }];
+                        [[LMRealmManager sharedManager]executeRealmWithBlock:^{
+                            [currencyModel.addressListArray addObject:saveAddress];
+                        }];
+                    }
+                }
                 // qr code
                 [self addQRcodeImageView];
                 

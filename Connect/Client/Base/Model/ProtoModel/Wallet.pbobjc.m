@@ -47,16 +47,14 @@ static GPBFileDescriptor *WalletRoot_FileDescriptor(void) {
 @implementation RequestWalletInfo
 
 @dynamic payload;
-@dynamic pbkdf2Iterations;
 @dynamic checkSum;
-@dynamic version;
 @dynamic ver;
+@dynamic version;
 
 typedef struct RequestWalletInfo__storage_ {
   uint32_t _has_storage_[1];
-  int32_t pbkdf2Iterations;
-  int32_t version;
   int32_t ver;
+  int32_t version;
   NSString *payload;
   NSString *checkSum;
 } RequestWalletInfo__storage_;
@@ -77,22 +75,22 @@ typedef struct RequestWalletInfo__storage_ {
         .dataType = GPBDataTypeString,
       },
       {
-        .name = "pbkdf2Iterations",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestWalletInfo_FieldNumber_Pbkdf2Iterations,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, pbkdf2Iterations),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
         .name = "checkSum",
         .dataTypeSpecific.className = NULL,
         .number = RequestWalletInfo_FieldNumber_CheckSum,
-        .hasIndex = 2,
+        .hasIndex = 1,
         .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, checkSum),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "ver",
+        .dataTypeSpecific.className = NULL,
+        .number = RequestWalletInfo_FieldNumber_Ver,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, ver),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
       },
       {
         .name = "version",
@@ -100,15 +98,6 @@ typedef struct RequestWalletInfo__storage_ {
         .number = RequestWalletInfo_FieldNumber_Version,
         .hasIndex = 3,
         .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, version),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "ver",
-        .dataTypeSpecific.className = NULL,
-        .number = RequestWalletInfo_FieldNumber_Ver,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(RequestWalletInfo__storage_, ver),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },

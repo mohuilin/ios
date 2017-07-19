@@ -15,8 +15,8 @@ typedef NS_ENUM(NSUInteger,ServerStatus) {
     ServerStatusOldUser        = 3
 };
 typedef NS_ENUM(NSUInteger,CategoryType) {
-    CategoryTypeNewUser = 1,
-    CategoryTypeOldUser = 2,
+    CategoryTypeOldUser = 1,
+    CategoryTypeNewUser = 2, 
     CategoryTypeImport  = 3
 };
 

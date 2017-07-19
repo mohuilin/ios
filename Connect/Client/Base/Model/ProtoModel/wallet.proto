@@ -3,10 +3,9 @@ package wallet;
 
 message RequestWalletInfo {
 string payload = 1;
-int32 pbkdf2_iterations = 2;
-string check_sum = 3;
+string check_sum = 2;
+int32 ver = 3;
 int32 version = 4;
-int32 ver = 5;
 }
 
 message RespSyncWallet {

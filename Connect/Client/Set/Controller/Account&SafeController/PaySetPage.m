@@ -12,7 +12,7 @@
 #import "LMIMHelper.h"
 #import "LMSeedModel.h"
 #import "LMWalletManager.h"
-#import "LMBaseCurrencyManager.h"
+#import "LMBtcCurrencyManager.h"
 
 @interface PaySetPage () <WJTouchIDDelegate>
 
@@ -212,7 +212,7 @@
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                 if ([LMWalletManager sharedManager].encryPtionSeed.length > 0) {
-                    [LMBaseCurrencyManager decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
+                    [LMBtcCurrencyManager decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
                         if (!success) {
                             [weakPassView setTitleString:LMLocalizedString(@"Login Password incorrect", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                             firstPass = nil;
