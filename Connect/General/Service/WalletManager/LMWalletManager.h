@@ -24,7 +24,7 @@
  * @param contacts
  * @param complete
  */
-+ (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(int)currency complete:(void (^)(BOOL isFinish,NSString *error))complete;
++ (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(BOOL isFinish,NSError *error))complete;
 
 /**
  *
@@ -41,10 +41,10 @@
  * set password method
  *
  */
-+ (void)setPassWord:(NSString *)passWord complete:(void(^)(BOOL result))complete;
++ (void)setPassWord:(NSString *)passWord complete:(void(^)(BOOL result,NSError *error))complete;
 /**
  *  reset password methods
  *
  */
-+ (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(BOOL result))complete;
++ (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(BOOL result,NSError *error))complete;
 @end

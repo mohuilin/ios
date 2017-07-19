@@ -64,10 +64,8 @@
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
     [self addNotification];
-    if (![LMWalletManager sharedManager].isHaveWallet) {
-        [self creatNewWallet];
-    }
     
+    [self creatNewWallet];
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -128,24 +126,24 @@
 #pragma mark action
 - (void)creatNewWallet{
     
-    __weak typeof(self)weakSelf = self;
-    //Synchronize wallet data and create wallet
-  [LMWalletManager creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(BOOL isFinish,NSString *error) {
-      if (isFinish) {
-          [GCDQueue executeInMainQueue:^{
-           [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:nil];
-          }];
-      }else {
-          [GCDQueue executeInMainQueue:^{
-              [MBProgressHUD showToastwithText:error withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-          }];
-      }
-  }];
+    if (![LMWalletManager sharedManager].isHaveWallet) {
+        //Synchronize wallet data and create wallet
+        [LMWalletManager creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(BOOL isFinish,NSError *error) {
+            if (isFinish) {
+                [GCDQueue executeInMainQueue:^{
+                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
+                }];
+            }else {
+                // 给出提示  错误吗的那种
+                
+            }
+        }];
+    }
 }
 - (void)addNotification {
     if (!self.currencyResults) {
         [LMCurrencyModel setDefaultRealm];
-        self.currencyResults = [LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = 0 "]];
+        self.currencyResults = [LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)CurrencyTypeBTC]];
     }
     __weak typeof(self)weakSelf = self;
     self.totalAmountToken = [self.currencyResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {

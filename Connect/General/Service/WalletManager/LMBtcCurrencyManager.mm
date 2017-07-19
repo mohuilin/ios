@@ -63,7 +63,15 @@ extern "C" {
  *  creat currency
  *
  */
-+ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSString *error))complete {
++ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSError *error))complete {
+    
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",currency]] lastObject];
+    if(currencyModel){
+        if (complete) {
+            complete(NO,[NSError errorWithDomain:@"" code:2500 userInfo:nil]);
+        }
+        return;
+    }
     
     CreateCoinRequest *currencyCoin = [CreateCoinRequest new];
     currencyCoin.category = category;
@@ -71,18 +79,12 @@ extern "C" {
     currencyCoin.currency = currency;
     currencyCoin.salt = salt;
     currencyCoin.payload = payLoad;
-    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d "],currency] lastObject];
-    if(currencyModel){
-        if (complete) {
-            complete(NO,@"币种已经存在了");
-        }
-        return;
-    }
+    
     [NetWorkOperationTool POSTWithUrlString:CreatCurrencyUrl postProtoData:currencyCoin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,@"币种已经存在了");
+                complete(NO,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
             }
         }else {
             // save db
@@ -95,6 +97,7 @@ extern "C" {
             currencyModel.status = 0;
             currencyModel.blance = 0;
             currencyModel.defaultAddress = masterAddess;
+            currencyModel.payload = payLoad;
             // save address
             LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
             addressModel.address = masterAddess;
@@ -104,10 +107,9 @@ extern "C" {
             addressModel.currency = currency;
             addressModel.balance = 0;
             [currencyModel.addressListArray addObject:addressModel];
-            currencyModel.payload = payLoad;
+            
             [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                 [realm addOrUpdateObject:currencyModel];
-                [realm addOrUpdateObject:addressModel];
             }];
             if (complete) {
                 complete(YES,nil);
@@ -115,7 +117,7 @@ extern "C" {
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO,LMLocalizedString(@"Wallet create currency failed", nil));
+           complete(NO,error);
         }
     }];
 }
@@ -657,7 +659,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
  */
 + (NSArray *)getCurrencyAddressList:(CurrencyType)currency {
     
-   LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",currency]] lastObject];
+   LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)currency]] lastObject];
     NSMutableArray *temArray = [NSMutableArray array];
     for (LMCurrencyAddress *address in currencyModel.addressListArray) {
         [temArray addObject:address.address];

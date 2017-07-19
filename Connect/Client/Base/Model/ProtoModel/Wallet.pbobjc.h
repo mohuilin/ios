@@ -410,7 +410,7 @@ typedef GPB_ENUM(CrowdfundingRequest_FieldNumber) {
 
 @interface CrowdfundingRequest : GPBMessage
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *currency;
+@property(nonatomic, readwrite) int32_t currency;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *groupIdentifier;
 
