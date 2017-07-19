@@ -57,23 +57,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef GPB_ENUM(RequestWalletInfo_FieldNumber) {
   RequestWalletInfo_FieldNumber_Payload = 1,
-  RequestWalletInfo_FieldNumber_Pbkdf2Iterations = 2,
-  RequestWalletInfo_FieldNumber_CheckSum = 3,
+  RequestWalletInfo_FieldNumber_CheckSum = 2,
+  RequestWalletInfo_FieldNumber_Ver = 3,
   RequestWalletInfo_FieldNumber_Version = 4,
-  RequestWalletInfo_FieldNumber_Ver = 5,
 };
 
 @interface RequestWalletInfo : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *payload;
 
-@property(nonatomic, readwrite) int32_t pbkdf2Iterations;
-
 @property(nonatomic, readwrite, copy, null_resettable) NSString *checkSum;
 
-@property(nonatomic, readwrite) int32_t version;
-
 @property(nonatomic, readwrite) int32_t ver;
+
+@property(nonatomic, readwrite) int32_t version;
 
 @end
 
