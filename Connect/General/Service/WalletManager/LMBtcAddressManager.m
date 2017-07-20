@@ -60,8 +60,34 @@
             if (data) {
                 CoinsDetail *coinDetail = [CoinsDetail parseFromData:data error:nil];
                 NSMutableArray *coinDetailArray = coinDetail.coinInfosArray;
-                if (complte) {
-                    complte(YES,coinDetailArray);
+                if (coinDetailArray.count > 0) {
+                    if (complte) {
+                        complte(YES,coinDetailArray);
+                    }
+                    // save address db
+                    NSMutableArray *saveArray = [NSMutableArray array];
+                    for (CoinInfo *coinAddress in coinDetailArray) {
+                       
+                        LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
+                        saveAddress.address = coinAddress.address;
+                        saveAddress.label = coinAddress.label;
+                        saveAddress.status = coinAddress.status;
+                        saveAddress.balance = coinAddress.balance;
+                        saveAddress.index = coinAddress.index;
+                        saveAddress.currency = (int)CurrencyTypeBTC;
+                        saveAddress.amount = coinAddress.amount;
+                        [saveArray addObject:saveAddress];
+                        
+                    }
+                    [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                        for (LMCurrencyAddress *saveAddress in saveArray) {
+                            [realm addOrUpdateObject:saveAddress];
+                        }
+                    }];
+                }else {
+                    if (complte) {
+                        complte(YES,nil);
+                    }
                 }
             }else {
                 if (complte) {
