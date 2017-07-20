@@ -173,7 +173,7 @@
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
     
-    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:@[self.info.address] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
+    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:[[MMAppSetting sharedSetting] getTranferFee] toConnectUserIds:@[self.info.pub_key] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
         if (error) {
             [MBProgressHUD showToastwithText:LMLocalizedString(@"fail", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
@@ -184,6 +184,7 @@
             }
         }
     }];
+    
 }
 
 @end

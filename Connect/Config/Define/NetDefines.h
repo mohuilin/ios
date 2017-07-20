@@ -11,7 +11,7 @@
 #define successCode 2000
 
 #define APIVersion @"v1"
-#define SOCKET_HOST @"182.150.44.100"
+#define SOCKET_HOST @"192.168.40.4"
 #define baseServer  @"http://192.168.40.4:10086"
 #define ServerPublickey @"03d307e51af08983cc0c13bb11d3619758e7b0b8a374e610de3503fc4ebeedfe96"
 #define SOCKET_PORT 19090
@@ -379,34 +379,22 @@
  * ====================================================================================== */
 
 
-#define WalletServiceTransfer @"http://192.168.40.110:18083/wallet/v2/service/transfer"
+#define WalletServiceTransferToAddress @"http://192.168.40.4:18083/wallet/v2/service/transfertoaddress"
 
-#define WalletServiceReceive @"http://192.168.40.110:18083/wallet/v2/service/receive"
+#define WalletServiceTransferInConnect @"http://192.168.40.4:18083/wallet/v2/service/transfer"
 
-#define WalletServicePay @"http://192.168.40.110:18083/wallet/v2/service/payment"
 
-#define WalletServiceLuckpackage @"http://192.168.40.110:18083/wallet/v2/service/luckpackage"
+#define WalletServiceReceive @"http://192.168.40.4:18083/wallet/v2/service/receive"
 
-#define WalletServiceExternal @"http://192.168.40.110:18083/wallet/v2/service/external"
+#define WalletServicePay @"http://192.168.40.4:18083/wallet/v2/service/payment"
 
-#define WalletServiceCrowdfuning @"http://192.168.40.110:18083/wallet/v2/service/crowdfuning"
+#define WalletServiceLuckpackage @"http://192.168.40.4:18083/wallet/v2/service/luckpackage"
 
-#define WalletServicePublish @"http://192.168.40.110:18083/wallet/v2/service/publish"
+#define WalletServiceExternal @"http://192.168.40.4:18083/wallet/v2/service/external"
 
-/**
- Payment settings
-  
-   Interface description
-  
-   PATH: /wallet/v1/currency
-   METHOD: POST
-   Data Format: Protobuf
-   Request parameter
-  
-   Protobuf file: IMRequest
- 
- */
-#define SetCurrencyAddressInfo @"http://192.168.40.110:18083/wallet/v2/coins/addresses/update"
+#define WalletServiceCrowdfuning @"http://192.168.40.4:18083/wallet/v2/service/crowdfuning"
+
+#define WalletServicePublish @"http://192.168.40.4:18083/wallet/v2/service/publish"
 
 /**
  Payment settings
@@ -421,51 +409,7 @@
    Protobuf file: IMRequest
  
  */
-#define GetUserStatus @"http://192.168.40.110:18083/wallet/v2/service/user_status"
-
-/**
- Payment settings
-  
-   Interface description
-  
-   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
-   METHOD: POST
-   Data Format: Protobuf
-   Request parameter
-  
-   Protobuf file: IMRequest
- 
- */
-#define UpdateCurrencyDefaultAddress @"http://192.168.40.110:18083/wallet/v2/coins/addresses/default"
-
-/**
- Payment settings
-  
-   Interface description
-  
-   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
-   METHOD: POST
-   Data Format: Protobuf
-   Request parameter
-  
-   Protobuf file: IMRequest
- 
- */
-#define AddCurrencyAddress @"http://192.168.40.110:18083/wallet/v2/coins/addresses/create"
-/**
- Payment settings
-  
-   Interface description
-  
-   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
-   METHOD: POST
-   Data Format: Protobuf
-   Request parameter
-  
-   Protobuf file: IMRequest
- 
- */
-#define GetCurrencyAddressList @"http://192.168.40.110:18083/wallet/v2/coins/addresses/list"
+#define SetCurrencyAddressInfo @"http://192.168.40.4:18083/wallet/v2/coins/addresses/update"
 
 /**
  Payment settings
@@ -480,7 +424,66 @@
    Protobuf file: IMRequest
  
  */
-#define SetCurrencyInfo @"http://192.168.40.110:18083/wallet/v2/coins/update"
+#define GetUserStatus @"http://192.168.40.4:18083/wallet/v2/service/user_status"
+
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define UpdateCurrencyDefaultAddress @"http://192.168.40.4:18083/wallet/v2/coins/addresses/default"
+
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define AddCurrencyAddress @"http://192.168.40.4:18083/wallet/v2/coins/addresses/create"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency /wallet/v2/coins/addresses/update
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define GetCurrencyAddressList @"http://192.168.40.4:18083/wallet/v2/coins/addresses/list"
+
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
+#define SetCurrencyInfo @"http://192.168.40.4:18083/wallet/v2/coins/update"
 /**
 Payment settings
  
@@ -494,7 +497,7 @@ Payment settings
   Protobuf file: IMRequest
 
 */
-#define GetCurrencyList @"http://192.168.40.110:18083/wallet/v2/coins/list"
+#define GetCurrencyList @"http://192.168.40.4:18083/wallet/v2/coins/list"
 /**
  Payment settings
   
@@ -508,7 +511,7 @@ Payment settings
    Protobuf file: IMRequest
  
  */
-#define CreatCurrencyUrl @"http://192.168.40.110:18083/wallet/v2/coins/create"
+#define CreatCurrencyUrl @"http://192.168.40.4:18083/wallet/v2/coins/create"
 /**
  Payment settings
   
@@ -522,7 +525,7 @@ Payment settings
    Protobuf file: IMRequest
  
  */
-#define EncryptionBaseSeedUrl @"http://192.168.40.110:18083/wallet/v2/create"
+#define EncryptionBaseSeedUrl @"http://192.168.40.4:18083/wallet/v2/create"
 /**
  Payment settings
   
@@ -536,7 +539,7 @@ Payment settings
    Protobuf file: IMRequest
  
  */
-#define UpdateBaseSeedUrl @"http://192.168.40.110:18083/wallet/v2/update"
+#define UpdateBaseSeedUrl @"http://192.168.40.4:18083/wallet/v2/update"
 /**
  Payment settings
   
@@ -550,7 +553,7 @@ Payment settings
    Protobuf file: IMRequest
  
  */
-#define SyncWalletDataUrl @"http://192.168.40.110:18083/wallet/v2/sync"
+#define SyncWalletDataUrl @"http://192.168.40.4:18083/wallet/v2/sync"
 /**
  Payment settings
   

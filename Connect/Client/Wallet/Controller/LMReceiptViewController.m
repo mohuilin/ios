@@ -86,7 +86,7 @@
                 NSMutableArray *saveArray = [NSMutableArray array];
                 for (CoinInfo *coinAddress in addressList) {
                  LMCurrencyAddress *getAddress = [[LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"address = '%@' ",coinAddress.address]] lastObject];
-                    if (getAddress) {
+                    if (getAddress.address.length > 0) {
                         [[LMRealmManager sharedManager]executeRealmWithBlock:^{
                             getAddress.label = coinAddress.label;
                             getAddress.status = coinAddress.status;
@@ -95,7 +95,6 @@
                             getAddress.currency = weakSelf.currency;
                             getAddress.amount = coinAddress.amount;
                         }];
-                        [saveArray addObject:getAddress];
                     }else {
                         LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
                         saveAddress.address = coinAddress.address;
@@ -108,11 +107,6 @@
                         [saveArray addObject:saveAddress];
                     }
                 }
-                [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                    for (LMCurrencyAddress *currency in saveArray) {
-                        [realm addOrUpdateObject:currency];
-                    }
-                }];
                 [[LMRealmManager sharedManager]executeRealmWithBlock:^{
                     [currencyModel.addressListArray addObjects:saveArray];
                     currencyModel.defaultAddress = address.address;

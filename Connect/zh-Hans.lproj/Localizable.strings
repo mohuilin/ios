@@ -723,5 +723,6 @@
 "Wallet Create wallet failed" = "创建钱包失败";
 "Wallet synchronization data failed" = "同步数据失败";
 "Wallet Failed to get the list address" = "获取地址列表失败";
+"Wallet The currency already exists" = "币种已经存在";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

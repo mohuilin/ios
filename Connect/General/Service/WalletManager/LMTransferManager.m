@@ -143,7 +143,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     
 
     //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServiceTransfer type:TransactionTypeBill currency:currency complete:complete];
+    [self basePostDataWithData:request.data url:WalletServiceTransferToAddress type:TransactionTypeBill currency:currency complete:complete];
 }
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toConnectUserIds:(NSArray *)userIds perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
@@ -164,7 +164,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.tips = tips;
     
     //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServiceTransfer type:TransactionTypeBill currency:currency complete:complete];
+    [self basePostDataWithData:request.data url:WalletServiceTransferInConnect type:TransactionTypeBill currency:currency complete:complete];
 }
 
 #pragma mark - private
@@ -182,16 +182,6 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction transactionType:(TransactionType)transactionType currency:(CurrencyType)currency seed:(NSString *)seed complete:(CompleteWithDataBlock)complete{
 
-    NSMutableArray *privkeyArray = [NSMutableArray array];
-    RLMResults *result = [LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and address in (%@)",(int)currency, [originalTransaction.addressesArray componentsJoinedByString:@","]]];
-
-    for (LMCurrencyAddress *currrencyAddress in result) {
-        NSString *inputsPrivkey = [LMBtcCurrencyManager getPrivkeyBySeed:seed index:currrencyAddress.index];
-        if (inputsPrivkey) {
-            [privkeyArray addObject:inputsPrivkey];
-        }
-    }
-    
     //1、define interface
     LMBaseCurrencyManager *currencyManager = nil;
     
@@ -246,13 +236,13 @@ CREATE_SHARED_MANAGER(LMTransferManager)
             NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
             if (data) {
                 NSError *error = nil;
-                OriginalTransaction *oriTransaction = [OriginalTransaction parseFromData:data error:&error];
+                OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
                 if (!error) {
                     /// password verfiy --- encrypt seed
                     [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
                         if (baseSeed) {
                             /// sign and publish
-                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransaction transactionType:type currency:currency seed:baseSeed complete:^(id data, NSError *signError) {
+                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransactionResp.data_p transactionType:type currency:currency seed:baseSeed complete:^(id data, NSError *signError) {
                                 if (passView.requestCallBack) {
                                     passView.requestCallBack(signError);
                                 }

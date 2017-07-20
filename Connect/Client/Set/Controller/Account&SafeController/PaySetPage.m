@@ -235,7 +235,7 @@
                     [weakPassView dismissWithClosed:YES];
                     // save and upload
                     [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                        [LMWalletManager reSetPassWord:password baseSeed:baseSeedStr complete:^(BOOL result) {
+                        [LMWalletManager reSetPassWord:password baseSeed:baseSeedStr complete:^(BOOL result,NSError *error) {
                             if (result) {
                                 // tips
                                 [GCDQueue executeInMainQueue:^{

@@ -13,6 +13,7 @@
 #import "TransferInputView.h"
 #import "LMPayCheck.h"
 #import "LMIMHelper.h"
+#import "UserDBManager.h"
 
 @interface LMBitAddressViewController ()
 // Enter the bit currency address
@@ -200,15 +201,30 @@
     } else {
         [MBProgressHUD showTransferLoadingViewtoView:self.view];
         [self.view endEditing:YES];
-        [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:10000 toAddresses:@[self.addressTextField.text] perAddressAmount:10000 tips:note complete:^(id data, NSError *error) {
-            if (error) {
-                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
-            } else {
-                [MBProgressHUD hideHUDForView:self.view];
-                [self createChatWithHashId:data address:self.addressTextField.text Amount:money.stringValue];
-                [self.navigationController popToRootViewControllerAnimated:YES];
-            }
-        }];
+
+        /// check is friend
+        AccountInfo *friend = [[UserDBManager sharedManager] getUserByAddress:self.addressTextField.text];
+        if (friend) {
+            [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:[[MMAppSetting sharedSetting] getTranferFee] toConnectUserIds:@[friend.pub_key] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
+                if (error) {
+                    [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+                } else {
+                    [MBProgressHUD hideHUDForView:self.view];
+                    [self createChatWithHashId:data address:self.addressTextField.text Amount:money.stringValue];
+                    [self.navigationController popToRootViewControllerAnimated:YES];
+                }
+            }];
+        } else {
+            [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:[[MMAppSetting sharedSetting] getTranferFee] toAddresses:@[self.addressTextField.text] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
+                if (error) {
+                    [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+                } else {
+                    [MBProgressHUD hideHUDForView:self.view];
+                    [self createChatWithHashId:data address:self.addressTextField.text Amount:money.stringValue];
+                    [self.navigationController popToRootViewControllerAnimated:YES];
+                }
+            }];
+        }
     }
 }
 

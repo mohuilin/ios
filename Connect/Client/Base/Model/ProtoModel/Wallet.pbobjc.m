@@ -1225,8 +1225,8 @@ typedef struct TransferRequest__storage_ {
 
 typedef struct CrowdfundingRequest__storage_ {
   uint32_t _has_storage_[1];
+  int32_t currency;
   int32_t size;
-  NSString *currency;
   NSString *groupIdentifier;
   NSString *tips;
   int64_t amount;
@@ -1245,7 +1245,7 @@ typedef struct CrowdfundingRequest__storage_ {
         .hasIndex = 0,
         .offset = (uint32_t)offsetof(CrowdfundingRequest__storage_, currency),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
+        .dataType = GPBDataTypeInt32,
       },
       {
         .name = "groupIdentifier",

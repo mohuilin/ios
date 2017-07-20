@@ -109,7 +109,7 @@ string tips = 4;
 }
 
 message CrowdfundingRequest {
-string currency = 1;
+int32 currency = 1;
 string group_identifier = 2;
 int64 amount = 3;
 int32 size = 4;

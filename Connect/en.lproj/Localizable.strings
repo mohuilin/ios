@@ -722,5 +722,6 @@
 "Wallet Create wallet failed" = "Create wallet failed";
 "Wallet synchronization data failed" = "Synchronization data failed";
 "Wallet Failed to get the list address" = "Failed to get the list address";
+"Wallet The currency already exists" = "The currency already exists";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

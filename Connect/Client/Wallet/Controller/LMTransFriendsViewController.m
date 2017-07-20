@@ -253,14 +253,16 @@ static NSString *const identifier = @"cellIdentifier";
     
     
     // dictory array
-    NSMutableArray *addresses = [NSMutableArray array];
+    NSMutableArray *userIds = [NSMutableArray array];
     for (AccountInfo *info in self.selectArr) {
-        [addresses objectAddObject:info.address];
+        [userIds objectAddObject:info.pub_key];
     }
 
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
-    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:addresses perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
+    
+    
+    [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:[[MMAppSetting sharedSetting] getTranferFee] toConnectUserIds:userIds perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
         if (error) {
             [MBProgressHUD showToastwithText:LMLocalizedString(@"fail", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
@@ -274,6 +276,7 @@ static NSString *const identifier = @"cellIdentifier";
             }];
         }
     }];
+    
 }
 
 @end
