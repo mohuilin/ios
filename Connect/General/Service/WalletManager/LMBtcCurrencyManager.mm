@@ -17,6 +17,7 @@
 #import "LMCurrencyModel.h"
 #import "LMBtcAddressManager.h"
 
+
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
@@ -636,5 +637,37 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
         [temArray addObject:address.address];
     }
     return temArray.copy;
+}
+#pragma mark - water methods
+- (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(BOOL result,NSArray *transactions))complete {
+    
+    GetTx *requestTranslation = [GetTx new];
+    requestTranslation.currency = (int)currency;
+    requestTranslation.address = address;
+    Pagination *pagination = [Pagination new];
+    pagination.page = page;
+    pagination.size = size;
+    requestTranslation.page = pagination;
+
+    [NetWorkOperationTool POSTWithUrlString:GetWaterTransction postProtoData:requestTranslation.data complete:^(id response) {
+        HttpResponse *hRespone = (HttpResponse *)response;
+        if (hRespone.code != successCode) {
+            if(complete){
+                complete(NO,nil);
+            }
+        }else{
+            NSData *data = [ConnectTool decodeHttpResponse:hRespone];
+            if (data) {
+                Transactions *transations = [Transactions parseFromData:data error:nil];
+                
+                NSLog(@"asdasd");
+            }
+        }
+    } fail:^(NSError *error) {
+        if(complete){
+            complete(NO,nil);
+        }
+    }];
+
 }
 @end

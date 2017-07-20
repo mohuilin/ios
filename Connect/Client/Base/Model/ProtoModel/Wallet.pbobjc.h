@@ -31,8 +31,8 @@ CF_EXTERN_C_BEGIN
 @class CoinInfo;
 @class ConnectTxout;
 @class OriginalTransaction;
+@class Pagination;
 @class SpentCurrency;
-@class TransactionFlowing;
 @class Txin;
 @class Txout;
 @class Wallet;
@@ -604,70 +604,38 @@ typedef GPB_ENUM(ResponsePublish_FieldNumber) {
 
 @end
 
-#pragma mark - TransactionFlowingRequest
+#pragma mark - GetTx
 
-typedef GPB_ENUM(TransactionFlowingRequest_FieldNumber) {
-  TransactionFlowingRequest_FieldNumber_Currency = 1,
-  TransactionFlowingRequest_FieldNumber_Page = 2,
-  TransactionFlowingRequest_FieldNumber_Size = 3,
+typedef GPB_ENUM(GetTx_FieldNumber) {
+  GetTx_FieldNumber_Currency = 1,
+  GetTx_FieldNumber_Address = 2,
+  GetTx_FieldNumber_Page = 3,
 };
 
-@interface TransactionFlowingRequest : GPBMessage
+@interface GetTx : GPBMessage
 
 @property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+
+@property(nonatomic, readwrite, strong, null_resettable) Pagination *page;
+/** Test to see if @c page has been set. */
+@property(nonatomic, readwrite) BOOL hasPage;
+
+@end
+
+#pragma mark - Pagination
+
+typedef GPB_ENUM(Pagination_FieldNumber) {
+  Pagination_FieldNumber_Page = 1,
+  Pagination_FieldNumber_Size = 2,
+};
+
+@interface Pagination : GPBMessage
 
 @property(nonatomic, readwrite) int32_t page;
 
 @property(nonatomic, readwrite) int32_t size;
-
-@end
-
-#pragma mark - TransactionFlowing
-
-typedef GPB_ENUM(TransactionFlowing_FieldNumber) {
-  TransactionFlowing_FieldNumber_Time = 1,
-  TransactionFlowing_FieldNumber_Username = 2,
-  TransactionFlowing_FieldNumber_Address = 3,
-  TransactionFlowing_FieldNumber_Avatar = 4,
-  TransactionFlowing_FieldNumber_Amount = 5,
-  TransactionFlowing_FieldNumber_Txid = 6,
-  TransactionFlowing_FieldNumber_Status = 7,
-  TransactionFlowing_FieldNumber_Category = 8,
-};
-
-@interface TransactionFlowing : GPBMessage
-
-@property(nonatomic, readwrite) int64_t time;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *username;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *avatar;
-
-@property(nonatomic, readwrite) int64_t amount;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *txid;
-
-/** confirm unconfirm */
-@property(nonatomic, readwrite) int32_t status;
-
-/** transfer luckypackage */
-@property(nonatomic, readwrite) int32_t category;
-
-@end
-
-#pragma mark - TransactionFlowings
-
-typedef GPB_ENUM(TransactionFlowings_FieldNumber) {
-  TransactionFlowings_FieldNumber_TransactionHistoryArray = 2,
-};
-
-@interface TransactionFlowings : GPBMessage
-
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<TransactionFlowing*> *transactionHistoryArray;
-/** The number of items in @c transactionHistoryArray without causing the array to be created. */
-@property(nonatomic, readonly) NSUInteger transactionHistoryArray_Count;
 
 @end
 

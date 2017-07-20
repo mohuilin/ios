@@ -7,7 +7,7 @@
 //
 
 #import "LMBaseModel.h"
-#import "LMCurrencyModel.h"
+
 @interface LMCurrencyAddress : LMBaseModel
 @property (nonatomic,assign) int currency;
 @property (nonatomic,assign)int index;
@@ -16,7 +16,7 @@
 @property (nonatomic,assign)long long int amount;
 @property (nonatomic,copy)NSString *label;
 @property (nonatomic,assign)int status;
-@property (readonly) RLMLinkingObjects *owners;
+//@property (readonly) RLMLinkingObjects *owners;
 @end
 
 RLM_ARRAY_TYPE(LMCurrencyAddress)

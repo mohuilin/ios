@@ -12,11 +12,11 @@
 + (NSString *)primaryKey {
  return @"address";
 }
-
+/*
 + (NSDictionary *)linkingObjectsProperties {
     return @{
              @"owners": [RLMPropertyDescriptor descriptorWithClass:LMCurrencyModel.class propertyName:@"addressListArray"],
              };
 }
-
+*/
 @end
