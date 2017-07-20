@@ -13,119 +13,11 @@
 #import "NetWorkOperationTool.h"
 #import "ConnectTool.h"
 #import "UIAlertController+Blocks.h"
-#import "NSObject+CurrentViewController.h"
+#import "UIViewController+CurrencyVC.h"
 #import "LMMessageExtendManager.h"
 #import "LMPayCheck.h"
 
 @implementation WallteNetWorkTool
-
-+ (void)MuiltTransferWithAddress:(NSString *)address privkey:(NSString *)privkey
-                             fee:(double)feeValue toAddress:(NSArray *)toAddresses
-                          amount:(long long int)perAmount tips:(NSString *)tips
-                        complete:(void (^)(UnspentOrderResponse *unspent, NSArray* toAddresses, NSError *error))complete{
-    if (GJCFStringIsNull(privkey)) {
-        if (complete) {
-            complete(nil,nil,[NSError errorWithDomain:@"Private key is empty" code:-1 userInfo:nil]);
-        }
-
-        return;
-    }
-    
-    // Verify the legitimacy of the input
-    if (GJCFStringIsNull(address) || ![LMIMHelper checkAddress:address]) {
-        if (complete) {
-            complete(nil,nil,[NSError errorWithDomain:@"Payment address is not valid" code:2617 userInfo:nil]);
-        }
-        return;
-    }
-    if (feeValue < 0) {
-        feeValue = [[MMAppSetting sharedSetting] getTranferFee];
-        if (feeValue < 0) {
-            feeValue = [MINNER_FEE longLongValue];
-        }
-    }
-    
-    if (toAddresses.count <= 0) {
-        if (complete) {
-            complete(nil,nil,[NSError errorWithDomain:@"No collection address" code:-1 userInfo:nil]);
-        }
-        return;
-    }
-    
-    for (NSString *address in toAddresses) {
-        if (![LMIMHelper checkAddress:address]) {
-            if (complete) {
-                complete(nil,nil,[NSError errorWithDomain:@"Collection address is not valid" code:-1 userInfo:nil]);
-            }
-            return;
-        }
-    }
-    
-    //Verify payment amount
-    if (perAmount <= 0) {
-        if (complete) {
-            complete(nil,nil,[NSError errorWithDomain:@"Payment amount can not be less than the person who is equal to 0" code:-1 userInfo:nil]);
-        }
-        return;
-    }
-    NSMutableArray *perAmountAddresses = [NSMutableArray array];
-    for (NSString *address in toAddresses) {
-        NSDictionary *dict = @{@"address":address,
-                               @"amount":[PayTool getBtcStringWithAmount:perAmount]};
-        [perAmountAddresses addObject:dict];
-    }
-    BOOL isDusk = [LMPayCheck dirtyAlertWithAddress:perAmountAddresses.copy withController:[self getCurrentVC]];
-    if (isDusk) {
-        if (complete) {
-            complete(nil,nil,nil);
-        }
-        return;
-    }
-    [self unspentV2WithAddress:address fee:feeValue toAddress:perAmountAddresses createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-        if (error) {
-            if (complete) {
-                complete(nil,nil,error);
-            }
-        } else{
-            if (complete) {
-                complete(unspent,perAmountAddresses,nil);
-            }
-        }
-    }];
-}
-
-+ (void)doMuiltTransfer:(MuiltSendBill *)muiltBill complete:(void (^)(NSData *response, NSError *error))complete{
-    
-    [NetWorkOperationTool POSTWithUrlString:WallteBillingMuiltSendUrl postProtoData:muiltBill.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-
-            }
-            return ;
-        }
-        NSError *error = nil;
-        NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
-        if (data) {
-            MuiltSendBillResp *billResp = [MuiltSendBillResp parseFromData:data error:&error];
-            if (!error) {
-                if (complete) {
-                    complete(billResp.data,nil);
-                }
-            } else{
-                if (complete) {
-                    complete(nil,error);
-                }
-            }
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(nil,error);
-        }
-    }];
-}
 
 + (void)unspentV2WithAddress:(NSString *)address
                          fee:(long long )feeValue
@@ -713,36 +605,6 @@ createRawTranscationComplete:(void (^)(NSArray *vtsArray, NSString *rawTransacti
     }];
 }
 
-+ (void)payWithHashID:(NSString *)hashId amount:(long long int)amount
-            toAddress:(NSString *)address
-             complete:(void (^)(UnspentOrderResponse *unspent,NSArray* toAddresses,NSError *error))complete{
-    NSArray* toAddresses = @[@{@"address":address,@"amount":[[[NSDecimalNumber alloc] initWithLongLong:amount]
-                                                             decimalNumberByDividingBy:
-                                                             [[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].stringValue}];
-    
-    BOOL isDusk = [LMPayCheck dirtyAlertWithAddress:toAddresses withController:[self getCurrentVC]];
-    if (isDusk) {
-        if (complete) {
-            complete(nil,nil,nil);
-        }
-        return;
-    }
-    [self unspentV2WithAddress:[[LKUserCenter shareCenter] currentLoginUser].address
-                           fee:[[MMAppSetting sharedSetting] getTranferFee]
-                     toAddress:toAddresses
-createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-        if (error) {
-            if (complete) {
-                complete(nil,nil,error);
-            }
-        }else
-        {
-            if (complete) {
-                complete(unspent,toAddresses,nil);
-            }
-        }
-    }];
-}
 
 + (void)crowdfuningInfoWithHashID:(NSString *)hashId complete:(void (^)(NSError *erro ,Crowdfunding *crowdInfo))complete{
     
@@ -815,54 +677,6 @@ createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *erro
         }
     }];
 }
-
-
-
-+ (void)sendExternalBillWithSendAddress:(NSString *)address
-                                privkey:(NSString *)privkey
-                                fee:(long long)fee money:(long long int)money
-                                tips:(NSString *)tips complete:(void (^)(OrdinaryBilling *billing,UnspentOrderResponse *unspent,NSArray* toAddresses,NSError *error))complete{
-    
-    long long addFee = [LMPayCheck getSuitAbleFee:fee];
-    if ([LMPayCheck dirtyAlertWithAmount:(money + addFee) withController:[self getCurrentVC]]) {
-        return;
-    }
-    [self getPendingInfoComplete:^(PendingPackage *pendRedBag, NSError *error) {
-        if (error) {
-            if (complete) {
-                complete(nil,nil,nil,error);
-            }
-            return;
-        }
-        OrdinaryBilling *ordinaryRed = [[OrdinaryBilling alloc] init];
-        ordinaryRed.hashId = pendRedBag.hashId;
-        ordinaryRed.tips = tips;
-        ordinaryRed.money = money;
-        //judge is auto
-        long long addFee = [LMPayCheck getSuitAbleFee:fee];
-
-        NSArray* toAddressArray = @[@{@"address":pendRedBag.address,
-                                      @"amount":[[[NSDecimalNumber alloc] initWithLongLong:ordinaryRed.money + addFee]
-                                                                               decimalNumberByDividingBy:
-                                                 [[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].stringValue}];
-        [WallteNetWorkTool unspentV2WithAddress:[[LKUserCenter shareCenter] currentLoginUser].address
-                           fee:fee
-                           toAddress:toAddressArray
-                           createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-                               if (error) {
-                                   if (complete) {
-                                       complete(nil,nil,nil,error);
-                                   }
-                               } else{
-                                   if (complete) {
-                                       complete(ordinaryRed,unspent,toAddressArray,nil);
-                                   }
-                               }
-                }];
-    }];
-
-}
-
 
 + (void)cancelExternalWithHashid:(NSString *)hashid complete:(void (^)(NSError *error))complete{
     BillHashId *bill = [[BillHashId alloc] init];
@@ -943,7 +757,7 @@ createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *erro
 
 
 
-+ (void)queryOuterBillInfoWithTransactionhashId:(NSString *)hashid complete:(void (^)(NSError *erro ,Bill *bill))complete{
++ (void)queryOuterBillInfoWithTransactionhashId:(NSString *)hashid complete:(void (^)(NSError *erro ,ExternalBillingInfo *externalBillingInfo))complete{
     BillHashId *bill = [[BillHashId alloc] init];
     bill.hash_p = hashid;
     
@@ -959,20 +773,17 @@ createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *erro
         NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
         if (data) {
             NSError *error = nil;
-            
-            Bill *detailBill = [Bill parseFromData:data error:&error];
-            
+            ExternalBillingInfo *externalBillingInfo = [ExternalBillingInfo parseFromData:data error:&error];
+
             if (!error) {
-                DDLogInfo(@"%@",detailBill);
-                
-                [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:detailBill.status withHashId:detailBill.hash_p];
+                [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:externalBillingInfo.status withHashId:externalBillingInfo.hash_p];
                 if (complete) {
-                    complete(nil,detailBill);
+                    complete(nil,externalBillingInfo);
                 }
             } else{
                 if (!error) {
                     if (complete) {
-                        complete(nil,detailBill);
+                        complete(nil,externalBillingInfo);
                     }
                 } else{
                     if (complete) {

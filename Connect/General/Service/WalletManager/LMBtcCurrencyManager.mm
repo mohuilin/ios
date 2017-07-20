@@ -572,33 +572,20 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     NSMutableArray *privkeyArray = [NSMutableArray array];
     RLMResults *result = [LMCurrencyAddress objectsWhere:mStr];
     
+    /**
     for (LMCurrencyAddress *currrencyAddress in result) {
         NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:currrencyAddress.index];
         if (inputsPrivkey) {
             [privkeyArray addObject:inputsPrivkey];
         }
     }
+     */
     
-    //sync
-    if (privkeyArray.count != inputs.count) {
-        LMBaseAddressManager *addressManager = [[LMBtcAddressManager alloc] init];
-        [addressManager getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
-            for (NSString *inputAddress in inputs) {
-                for (CoinInfo *coinInfo in addressList) {
-                    if ([coinInfo.address isEqualToString:inputAddress]) {
-                        NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:coinInfo.index];
-                        [privkeyArray addObject:inputsPrivkey];
-                        break;
-                    }
-                }
-            }
-        }];
-    } else {
-        
-    }
+    //TEST
+    NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:0];
+    [privkeyArray addObject:inputsPrivkey];
     
     NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:privkeyArray rawTranscation:rawTranscation];
-    
     return signTransaction;
 }
 

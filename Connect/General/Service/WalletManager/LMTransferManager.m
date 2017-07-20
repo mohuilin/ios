@@ -13,6 +13,8 @@
 #import "InputPayPassView.h"
 #import "LMBtcCurrencyManager.h"
 #import "LMBtcAddressManager.h"
+#import "UIAlertController+Blocks.h"
+#import "UIViewController+CurrencyVC.h"
 
 
 @implementation LMTransferManager
@@ -99,9 +101,16 @@ CREATE_SHARED_MANAGER(LMTransferManager)
         } else {
             NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
             if (data) {
-                Bill *bill = [Bill parseFromData:data error:nil];
-                if (complete) {
-                    complete(bill,nil);
+                NSError *error = nil;
+                Bill *bill = [Bill parseFromData:data error:&error];
+                if (error || !bill) {
+                    if (complete) {
+                        complete(nil,error);
+                    }
+                } else {
+                    if (complete) {
+                        complete(bill,nil);
+                    }
                 }
             }
         }
@@ -184,55 +193,52 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 - (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction transactionType:(TransactionType)transactionType currency:(CurrencyType)currency seed:(NSString *)seed complete:(CompleteWithDataBlock)complete{
 
     LMBaseAddressManager *addressManager = [[LMBtcAddressManager alloc] init];
-    [addressManager getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
-        for (NSString *inputAddress in originalTransaction.addressesArray) {
-            for (CoinInfo *coinInfo in addressList) {
-                if ([coinInfo.address isEqualToString:inputAddress]) {
-                    
-                }
-            }
-        }
-    }];
-    
-    
-    //1、define interface
-    LMBaseCurrencyManager *currencyManager = nil;
-    
-    //2、create speacil manager
-    switch (currency) {
-        case CurrencyTypeBTC:
-            currencyManager = [[LMBtcCurrencyManager alloc] init];
-            break;
-        default:
-            break;
-    }
-    
-    //3、sign rawhex
-    NSString *signTransaction = [currencyManager signRawTranscationWithTvs:originalTransaction.vts rawTranscation:originalTransaction.rawhex inputs:originalTransaction.addressesArray seed:seed];
-    
-    
-    //publish
-    PublishTransaction *publish = [[PublishTransaction alloc] init];
-    publish.txHex = signTransaction;
-    publish.hashId = originalTransaction.hashId;
-    publish.transactionType = transactionType;
-    publish.currency = currency;
-    
-    /// publish
-    [NetWorkOperationTool POSTWithUrlString:WalletServicePublish postProtoData:publish.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
+    [addressManager syncAddressListWithInputInputs:originalTransaction.addressesArray complete:^(NSError *error) {
+        if (error) {
             if (complete) {
-                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                complete(nil,error);
             }
         } else {
-            if (complete) {
-                complete(originalTransaction.hashId,nil);
+            //1、define interface
+            LMBaseCurrencyManager *currencyManager = nil;
+            
+            //2、create speacil manager
+            switch (currency) {
+                case CurrencyTypeBTC:
+                    currencyManager = [[LMBtcCurrencyManager alloc] init];
+                    break;
+                default:
+                    break;
             }
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(nil,error);
+            
+            //3、sign rawhex
+            NSString *signTransaction = [currencyManager signRawTranscationWithTvs:originalTransaction.vts rawTranscation:originalTransaction.rawhex inputs:originalTransaction.addressesArray seed:seed];
+            
+            
+            //publish
+            PublishTransaction *publish = [[PublishTransaction alloc] init];
+            publish.txHex = signTransaction;
+            publish.hashId = originalTransaction.hashId;
+            publish.transactionType = transactionType;
+            publish.currency = currency;
+            
+            /// publish
+            [NetWorkOperationTool POSTWithUrlString:WalletServicePublish postProtoData:publish.data complete:^(id response) {
+                HttpResponse *hResponse = (HttpResponse *)response;
+                if (hResponse.code != successCode) {
+                    if (complete) {
+                        complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                    }
+                } else {
+                    if (complete) {
+                        complete(originalTransaction.hashId,nil);
+                    }
+                }
+            } fail:^(NSError *error) {
+                if (complete) {
+                    complete(nil,error);
+                }
+            }];
         }
     }];
 }
@@ -241,42 +247,113 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:url postProtoData:postData complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+        switch (hResponse.code) {
+            case TransactionPackageErrorTypeFeeEmpty:
+            case TransactionPackageErrorTypeUnspentTooLarge:
+            case TransactionPackageErrorTypeUnspentError:
+            case TransactionPackageErrorTypeUnspentNotEnough:
+            case TransactionPackageErrorTypeOutDust:
+            {
+                if (complete) {
+                    complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                }
             }
-        } else {
-            NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
-            if (data) {
-                NSError *error = nil;
-                OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
-                if (!error) {
-                    /// password verfiy --- encrypt seed
-                    [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
-                        if (baseSeed) {
-                            /// sign and publish
-                            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransactionResp.data_p transactionType:type currency:currency seed:baseSeed complete:^(id data, NSError *signError) {
-                                if (passView.requestCallBack) {
-                                    passView.requestCallBack(signError);
-                                }
-                                if (!signError) {
-                                    if (complete) {
-                                        complete(data,nil);
-                                    }
-                                }
-                            }];
+                break;
+            case successCode:
+            {
+                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    NSError *error = nil;
+                    OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
+                    if (!error) {
+                        [self verfiyWithOriginTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
+                    } else {
+                        if (complete) {
+                            complete(nil,error);
                         }
-                    }];
-                } else {
-                    if (complete) {
-                        complete(nil,error);
                     }
                 }
             }
+                break;
+            case TransactionPackageErrorTypeFeeToolarge:{
+                
+                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    NSError *error = nil;
+                    OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
+                    NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Auto fees is greater than the maximum set maximum and continue", nil),
+                                      [PayTool getBtcStringWithAmount:oriTransactionResp.data_p.estimateFee]];
+                    [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
+                }
+            }
+                break;
+            case TransactionPackageErrorTypeFeeSamll:{
+                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    NSError *error = nil;
+                    OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
+                    NSString *tips = LMLocalizedString(@"Wallet Transaction fee too low Continue", nil);
+                    [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
+                }
+            }
+                break;
+            case TransactionPackageErrorTypeChangeDust:{
+                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    NSError *error = nil;
+                    OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
+                    NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
+                                      [PayTool getBtcStringWithAmount:oriTransactionResp.data_p.oddChange]];
+                    [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
+                }
+            }
+                break;
+            default:
+                break;
         }
     } fail:^(NSError *error) {
         if (complete) {
             complete(nil,error);
+        }
+    }];
+}
+
+- (void)askUserNeedContinueTransferWithTips:(NSString *)tips originTransactionResp:(OriginalTransactionResponse *)oriTransactionResp type:(TransactionType)type currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
+    UIViewController *controller = [UIViewController currentViewController];
+    
+    [UIAlertController showAlertInViewController:controller withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common Cancel", nil), LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex) {
+        switch (buttonIndex) {
+            case 0:
+            {
+                if (complete) {
+                    complete(nil,[NSError errorWithDomain:@"cancel" code:TransactionPackageErrorTypeCancel userInfo:nil]);
+                }
+            }
+                break;
+            case 2:
+            {
+                [self verfiyWithOriginTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
+            }
+                break;
+            default:
+                break;
+        }
+    }];
+}
+
+- (void)verfiyWithOriginTransactionResp:(OriginalTransactionResponse *)oriTransactionResp type:(TransactionType)type currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
+    /// password verfiy --- encrypt seed
+    [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
+        if (baseSeed) {
+            /// sign and publish
+            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransactionResp.data_p transactionType:type currency:currency seed:baseSeed complete:^(id data, NSError *signError) {
+                if (passView.requestCallBack) {
+                    passView.requestCallBack(signError);
+                }
+                if (complete) {
+                    complete(data,signError);
+                }
+            }];
         }
     }];
 }

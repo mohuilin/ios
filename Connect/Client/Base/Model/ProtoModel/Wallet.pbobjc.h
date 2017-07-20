@@ -527,6 +527,8 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
   OriginalTransaction_FieldNumber_Vts = 3,
   OriginalTransaction_FieldNumber_Fee = 4,
   OriginalTransaction_FieldNumber_AddressesArray = 5,
+  OriginalTransaction_FieldNumber_EstimateFee = 6,
+  OriginalTransaction_FieldNumber_OddChange = 7,
 };
 
 @interface OriginalTransaction : GPBMessage
@@ -542,6 +544,10 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *addressesArray;
 /** The number of items in @c addressesArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger addressesArray_Count;
+
+@property(nonatomic, readwrite) int64_t estimateFee;
+
+@property(nonatomic, readwrite) int64_t oddChange;
 
 @end
 

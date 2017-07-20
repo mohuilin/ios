@@ -275,13 +275,19 @@ typedef NS_ENUM(NSInteger, LMTransactionStatusType) {
 
 - (void)transferBtnClick:(UIButton *)btn {
 
+    self.comfrimButton.enabled = NO;
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
-
     [[LMTransferManager sharedManager] payCrowdfuningReceiptWithHashId:self.bill.hash_p type:TransactionTypeBill fromAddresses:nil fee:0 currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+        self.comfrimButton.enabled = YES;
         if (error) {
-            
+            if (error.code != TransactionPackageErrorTypeCancel) {
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+            } else {
+                [MBProgressHUD hideHUDForView:self.view];
+            }
         } else {
+            [MBProgressHUD hideHUDForView:self.view];
             // update db status
             [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:1 withHashId:self.bill.hash_p];
             // call back

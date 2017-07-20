@@ -157,7 +157,7 @@
                     default:
                     {
                         [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeSuccess showInView:self.view complete:nil];
+                            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeFail showInView:self.view complete:nil];
                         }];
                     
                     }

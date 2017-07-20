@@ -120,12 +120,12 @@
     NSDecimalNumber *amount = [money decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLong:pow(10, 8)]];
     [self.view endEditing:YES];
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    [[LMTransferManager sharedManager] sendReceiptToPayer:self.info.address amount:[PayTool getPOW8Amount:money] tips:note complete:^(Bill *bill, NSError *error) {
+    [[LMTransferManager sharedManager] sendReceiptToPayer:self.info.pub_key amount:[PayTool getPOW8Amount:money] tips:note complete:^(Bill *bill, NSError *error) {
         if (error) {
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Transfer failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
+            [MBProgressHUD hideHUDForView:self.view];
             [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:0 withHashId:bill.hash_p];
-            
             if (self.didGetMoneyAndWithAccountID) {
                 self.didGetMoneyAndWithAccountID(amount, bill.hash_p, note);
             }

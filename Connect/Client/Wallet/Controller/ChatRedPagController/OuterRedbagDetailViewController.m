@@ -11,6 +11,7 @@
 #import "GJGCChatSystemNotiCellStyle.h"
 #import "BarCodeTool.h"
 #import "YYImageCache.h"
+#import "RedBagNetWorkTool.h"
 
 @interface OuterRedbagDetailViewController () {
     NSTimer *timer;
@@ -19,19 +20,38 @@
 
 @property(nonatomic, strong) UILabel *countTimeLabel;
 @property(nonatomic, strong) UIView *bottomContentView;
-
+@property (nonatomic ,copy) NSString *hashId;
 @property(nonatomic, strong) UIButton *statusView;
+
+@property (nonatomic ,strong) RedPackage *redPackage;
 
 @end
 
 @implementation OuterRedbagDetailViewController
 
+- (instancetype)initWithHashId:(NSString *)hashId{
+    if (self = [super init]) {
+        self.hashId = hashId;
+    }
+    
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     self.title = LMLocalizedString(@"Wallet Packet", nil);
-
-    self.redPackage.URL = [NSString stringWithFormat:@"%@&local=%@", self.redPackage.URL, [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode]];
+    
+    [MBProgressHUD showLoadingMessageToView:self.view];
+    [RedBagNetWorkTool getRedBagDetailWithHashId:self.hashId complete:^(RedPackageInfo *bagInfo, NSError *error) {
+        if (error) {
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"Network equest failed please try again later", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+        } else {
+            [MBProgressHUD hideHUDForView:self.view];
+            self.redPackage = bagInfo.redpackage;
+            [self setupUI];
+        }
+    }];
 }
 
 - (void)dealloc {
@@ -47,7 +67,7 @@
     timer = nil;
 }
 
-- (void)setup {
+- (void)setupUI {
     UIView *topContentView = [[UIView alloc] init];
     topContentView.backgroundColor = GJCFQuickHexColor(@"F0F0F6");
     [self.view addSubview:topContentView];

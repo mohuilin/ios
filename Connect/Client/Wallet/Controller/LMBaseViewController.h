@@ -14,7 +14,6 @@
 #import "InputPayPassView.h"
 #import "PaySetPage.h"
 #import "UIAlertController+Blocks.h"
-#import "LMUnspentCheckTool.h"
 #import "ConnectButton.h"
 #import "LMTransferManager.h"
 
@@ -92,57 +91,5 @@ typedef void (^trasferComplete)();
 - (void)paymentToAddress:(NSString *)address decimalMoney:(NSDecimalNumber *)money hashID:(NSString *)hashID complete:(void (^)(NSString *hashId, NSError *error))complete;
 
 - (void)createChatWithHashId:(NSString *)hashId address:(NSString *)address Amount:(NSString *)amount;
-
-/**
- *  External Transfer Method OuterTransferViewController
- */
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel billing:(OrdinaryBilling *)billing;
-
-/**
- *  Bit Coin Address Transfer / Single Transfer LMBitAddressViewController
- */
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                                   amount:(NSDecimalNumber *)amount
-                                     note:(NSString *)note;
-
-/**
- *  Red envelope transfer audit. LMChatRedLuckyViewController
- */
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                              ordinaryRed:(OrdinaryRedPackage *)ordinaryRed
-                                     note:(NSString *)note
-                                    money:(NSDecimalNumber *)money type:(int)type;
-
-/**
- *  Transfer to friends / LMTransFriendsViewController
- */
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                                     note:(NSString *)note
-                                    money:(NSDecimalNumber *)money;
-
-/**
- *  All the chips
- */
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                                   amount:(double)amount;
-
-/**
- *  Set the payment result LMSetMoneyResultViewController
- */
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel;
-
-/**
- *  Transfer Note LMTransferNotesViewController
- */
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                             decimalMoney:(NSDecimalNumber *)amount;
-
-/**
- *  The LMUnSetMoneyResultViewController does not pay for the result
- */
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                             decimalMoney:(NSDecimalNumber *)amount
-                                     note:(NSString *)note;
-
 
 @end

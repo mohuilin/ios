@@ -172,10 +172,15 @@
 
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
-    
+    self.comfrimButton.enabled = NO;
     [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:[[MMAppSetting sharedSetting] getTranferFee] toConnectUserIds:@[self.info.pub_key] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
+        self.comfrimButton.enabled = YES;
         if (error) {
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"fail", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+            if (error.code != TransactionPackageErrorTypeCancel) {
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+            } else {
+                [MBProgressHUD hideHUDForView:self.view];
+            }
         } else {
             [MBProgressHUD hideHUDForView:self.view];
             if (self.didGetTransferMoney) {

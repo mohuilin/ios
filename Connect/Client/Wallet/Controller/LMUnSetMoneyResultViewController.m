@@ -146,12 +146,17 @@
 
 
 - (void)createTranscationWithMoney:(NSDecimalNumber *)amount note:(NSString *)note {
-
+    self.comfrimButton.enabled = NO;
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
     [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:0 toAddresses:@[self.info.address] perAddressAmount:[PayTool getPOW8Amount:amount] tips:note complete:^(id data, NSError *error) {
+        self.comfrimButton.enabled = YES;
         if (error) {
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"fail", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+            if (error.code != TransactionPackageErrorTypeCancel) {
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+            } else {
+                [MBProgressHUD hideHUDForView:self.view];
+            }
         } else {
             [self createChatWithHashId:data address:self.info.address Amount:amount.stringValue];
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:^{

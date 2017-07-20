@@ -418,153 +418,35 @@
     if (size > 0) {
         [MBProgressHUD showTransferLoadingViewtoView:self.view];
         [self.view endEditing:YES];
+        self.comfrimButton.enabled = NO;
         [[LMTransferManager sharedManager] sendLuckyPackageWithReciverIdentifier:self.reciverIdentifier size:size amount:[PayTool getPOW8Amount:money]  fee:[[MMAppSetting sharedSetting] getTranferFee] luckyPackageType:type category:self.category tips:note fromAddresses:nil currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
             self.comfrimButton.enabled = YES;
             if (error) {
-                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+                if (error.code != TransactionPackageErrorTypeCancel) {
+                    [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+                } else {
+                    [MBProgressHUD hideHUDForView:self.view];
+                }
             } else {
-                
-            }
-        }];
-    }
-}
-
-- (void)checkChangeWithRawTrancationModel:(LMRawTransactionModel *)rawModel
-                              ordinaryRed:(OrdinaryRedPackage *)ordinaryRed
-                                     note:(NSString *)note
-                                    money:(NSDecimalNumber *)money type:(int)type {
-    // Check for change
-    __weak __typeof(&*self) weakSelf = self;
-    rawModel = [LMUnspentCheckTool checkChangeDustWithRawTrancation:rawModel];
-    switch (rawModel.unspentErrorType) {
-        case UnspentErrorTypeChangeDust: {
-            [MBProgressHUD hideHUDForView:self.view];
-            NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
-                                                        [PayTool getBtcStringWithAmount:rawModel.change]];
-            [UIAlertController showAlertInViewController:self withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController *_Nonnull controller, UIAlertAction *_Nonnull action, NSInteger buttonIndex) {
-                self.comfrimButton.enabled = YES;
-                switch (buttonIndex) {
+                switch (type) {
                     case 0: {
-                        self.comfrimButton.enabled = YES;
+                        if (self.didGetRedLuckyMoney) {
+                            self.didGetRedLuckyMoney(money.stringValue, data, note);
+                        }
+                        [self dismissViewControllerAnimated:YES completion:nil];
                     }
                         break;
-                    case 2: // Click OK
-                    {
-                        LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:YES];
-                        // pay money
-                        [weakSelf sendRedpackegWithvtsArray:rawModelNew.vtsArray rawTransaction:rawModelNew.rawTrancation ordinaryRed:ordinaryRed type:type money:money note:note];
+                    case 1: {
+                        OuterRedbagDetailViewController *page = [[OuterRedbagDetailViewController alloc] initWithHashId:data];
+                        [self.navigationController pushViewController:page animated:YES];
                     }
                         break;
                     default:
                         break;
                 }
-            }];
-        }
-            break;
-        case UnspentErrorTypeNoError: {
-            LMRawTransactionModel *rawModelNew = [LMUnspentCheckTool createRawTransactionWithRawTrancation:rawModel addDustToFee:NO];
-            // pay money
-            [weakSelf sendRedpackegWithvtsArray:rawModelNew.vtsArray rawTransaction:rawModelNew.rawTrancation ordinaryRed:ordinaryRed type:type money:money note:note];
-        }
-            break;
-        default:
-            break;
+            }
+        }];
     }
 }
 
-- (void)sendRedpackegWithvtsArray:(NSArray *)vtsArray rawTransaction:(NSString *)rawTransaction ordinaryRed:(OrdinaryRedPackage *)ordinaryRed type:(int)type money:(NSDecimalNumber *)money note:(NSString *)note {
-    __weak __typeof(&*self) weakSelf = self;
-    // password
-    [[PayTool sharedInstance] payVerfifyFingerWithComplete:^(BOOL result, NSString *errorMsg) {
-        if (result) {
-             [self successAction:vtsArray rawTransaction:rawTransaction ordinaryRed:ordinaryRed type:type money:money note:note passView:nil];
-        } else {
-            if ([errorMsg isEqualToString:@"NO"]) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    weakSelf.comfrimButton.enabled = YES;
-                }];
-                return;
-            }
-            [InputPayPassView showInputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, BOOL result) {
-                if (result) {
-                    [weakSelf successAction:vtsArray rawTransaction:rawTransaction ordinaryRed:ordinaryRed type:type money:money note:note passView:passView];
-                }
-                
-            }                              forgetPassBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    weakSelf.comfrimButton.enabled = YES;
-                    PaySetPage *page = [[PaySetPage alloc] initIsNeedPoptoRoot:YES];
-                    [weakSelf.navigationController pushViewController:page animated:YES];
-                }];
-            }                                   closeBlock:^{
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD hideHUDForView:weakSelf.view];
-                    weakSelf.comfrimButton.enabled = YES;
-                }];
-            }];
-        }
-    }];
-}
-- (void)successAction:(NSArray *)vtsArray rawTransaction:(NSString *)rawTransaction ordinaryRed:(OrdinaryRedPackage *)ordinaryRed type:(int)type money:(NSDecimalNumber *)money note:(NSString *)note passView:(InputPayPassView *)passView {
-    __weak typeof(self)weakSelf = self;
-    NSString *sign = [KeyHandle signRawTranscationWithTvsArray:vtsArray privkeys:@[[[LKUserCenter shareCenter] currentLoginUser].prikey] rawTranscation:rawTransaction];
-    ordinaryRed.rawTx = sign;
-    [NetWorkOperationTool POSTWithUrlString:RedBagSendUrl postProtoData:ordinaryRed.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *) response;
-        if (hResponse.code == 2421) {
-            [GCDQueue executeInMainQueue:^{
-                NSString *alertString = [NSString stringWithFormat:LMLocalizedString(@"Wallet error lucky packet amount too small", nil), MIN_RED_PER];
-                [MBProgressHUD showToastwithText:alertString withType:ToastTypeFail showInView:self.view complete:nil];
-            }];
-            return;
-        }
-        if (hResponse.code != successCode) {
-            NSError *error = [NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil];
-            
-            if (passView.requestCallBack) {
-                passView.requestCallBack(error);
-            }
-            
-            return;
-        }
-        
-            if (passView.requestCallBack) {
-                passView.requestCallBack(nil);
-            }
-        NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-        if (data) {
-            NSError *error = nil;
-            RedPackage *redPackge = [RedPackage parseFromData:data error:&error];
-            switch (type) {
-                case 0: {
-                    [GCDQueue executeInMainQueue:^{
-                        [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                        if (weakSelf.didGetRedLuckyMoney) {
-                            weakSelf.didGetRedLuckyMoney(money.stringValue, redPackge.hashId, note);
-                        }
-                    }];
-                }
-                    break;
-                case 1: {
-                    [GCDQueue executeInMainQueue:^{
-                        OuterRedbagDetailViewController *page = [[OuterRedbagDetailViewController alloc] init];
-                        page.redPackage = redPackge;
-                        [weakSelf.navigationController pushViewController:page animated:YES];
-                    }];
-                }
-                    break;
-                default:
-                    break;
-            }
-        }
-    }                                  fail:^(NSError *error) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:weakSelf.view];
-            weakSelf.comfrimButton.enabled = YES;
-        }];
-    }];
-
-}
 @end

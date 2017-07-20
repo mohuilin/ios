@@ -313,7 +313,7 @@
             _walletLayer.speed = 0;
             [_walletLayer removeFromSuperlayer];
             weakSelf.statusLabel.hidden = NO;
-            weakSelf.statusLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Error code Domain Pelese try later", nil), (int) error.code, [LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:@""]];
+            weakSelf.statusLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Error code Domain Pelese try later", nil), (int) error.code, [LMErrorCodeTool messageWithErrorCode:error.code]];
             [weakSelf.animationView finishFailure:nil];
         } else {
             weakSelf.statusLabel.text = LMLocalizedString(@"Wallet Payment Successful", nil);

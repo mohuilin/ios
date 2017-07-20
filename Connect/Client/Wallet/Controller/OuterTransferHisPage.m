@@ -131,8 +131,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     ExternalBillingInfo *billInfo = [self.dataArr objectAtIndexCheck:indexPath.row];
-    OuterTransferDetailController *reciptVc = [[OuterTransferDetailController alloc] init];
-    reciptVc.billInfo = billInfo;
+    OuterTransferDetailController *reciptVc = [[OuterTransferDetailController alloc] initWithExternalBillInfo:billInfo];
     [self.navigationController pushViewController:reciptVc animated:YES];
     return;
 }

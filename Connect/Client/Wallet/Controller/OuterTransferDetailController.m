@@ -25,15 +25,46 @@
 
 @property(nonatomic, strong) UIButton *statusView;
 
+@property(nonatomic, strong) ExternalBillingInfo *billInfo;
+
+@property (nonatomic ,copy) NSString *hashId;
+
 @end
 
 @implementation OuterTransferDetailController
+
+- (instancetype)initWithExternalBillInfo:(ExternalBillingInfo *)billInfo{
+    if (self = [super init]) {
+        self.billInfo = billInfo;
+    }
+    return self;
+}
+
+- (instancetype)initWithHashId:(NSString *)hashId{
+    if (self = [super init]) {
+        self.hashId = hashId;
+    }
+    return self;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     self.title = LMLocalizedString(@"Wallet Transfer", nil);
-
+    if (self.billInfo && !self.hashId) {
+        [self setupUI];
+    } else if (!self.billInfo && self.hashId) {
+        [MBProgressHUD showLoadingMessageToView:self.view];
+        [WallteNetWorkTool queryOuterBillInfoWithTransactionhashId:self.hashId complete:^(NSError *erro, ExternalBillingInfo *externalBillingInfo) {
+            if (erro) {
+                [MBProgressHUD showToastwithText:LMLocalizedString(@"Network equest failed please try again later", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+            } else {
+                [MBProgressHUD hideHUDForView:self.view];
+                self.billInfo = externalBillingInfo;
+                [self setupUI];
+            }
+        }];
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -76,7 +107,7 @@
     timer = nil;
 }
 
-- (void)setup {
+- (void)setupUI {
     UIView *topContentView = [[UIView alloc] init];
     self.topContentView = topContentView;
     topContentView.backgroundColor = GJCFQuickHexColor(@"F0F0F6");

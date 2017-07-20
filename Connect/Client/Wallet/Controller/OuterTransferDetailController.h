@@ -11,6 +11,8 @@
 
 @interface OuterTransferDetailController : LMBaseViewController
 
-@property(nonatomic, strong) ExternalBillingInfo *billInfo;
+- (instancetype)initWithHashId:(NSString *)hashId;
+
+- (instancetype)initWithExternalBillInfo:(ExternalBillingInfo *)billInfo;
 
 @end

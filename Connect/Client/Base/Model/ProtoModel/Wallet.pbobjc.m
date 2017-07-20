@@ -1634,6 +1634,8 @@ typedef struct HashIdResp__storage_ {
 @dynamic vts;
 @dynamic fee;
 @dynamic addressesArray, addressesArray_Count;
+@dynamic estimateFee;
+@dynamic oddChange;
 
 typedef struct OriginalTransaction__storage_ {
   uint32_t _has_storage_[1];
@@ -1642,6 +1644,8 @@ typedef struct OriginalTransaction__storage_ {
   NSString *vts;
   NSMutableArray *addressesArray;
   int64_t fee;
+  int64_t estimateFee;
+  int64_t oddChange;
 } OriginalTransaction__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1694,6 +1698,24 @@ typedef struct OriginalTransaction__storage_ {
         .offset = (uint32_t)offsetof(OriginalTransaction__storage_, addressesArray),
         .flags = GPBFieldRepeated,
         .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "estimateFee",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_EstimateFee,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, estimateFee),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "oddChange",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_OddChange,
+        .hasIndex = 5,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, oddChange),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
       },
     };
     GPBDescriptor *localDescriptor =

@@ -379,7 +379,7 @@
  * ====================================================================================== */
 
 
-#define WalletServiceTransferToAddress @"http://192.168.40.4:18083/wallet/v2/service/transfertoaddress"
+#define WalletServiceTransferToAddress @"http://192.168.40.4:18083/wallet/v2/service/transfer_to_address"
 
 #define WalletServiceTransferInConnect @"http://192.168.40.4:18083/wallet/v2/service/transfer"
 
@@ -409,7 +409,7 @@
    Protobuf file: IMRequest
  
  */
-#define SetCurrencyAddressInfo @"http://192.168.40.4:18083/wallet/v2/coins/addresses/update"
+#define SetCurrencyAddressInfo baseServer "/wallet/v2/coins/addresses/update"
 
 /**
  Payment settings
@@ -424,7 +424,7 @@
    Protobuf file: IMRequest
  
  */
-#define GetUserStatus @"http://192.168.40.4:18083/wallet/v2/service/user_status"
+#define GetUserStatus baseServer "/wallet/v2/service/user_status"
 
 /**
  Payment settings
@@ -439,7 +439,7 @@
    Protobuf file: IMRequest
  
  */
-#define UpdateCurrencyDefaultAddress @"http://192.168.40.4:18083/wallet/v2/coins/addresses/default"
+#define UpdateCurrencyDefaultAddress baseServer "/wallet/v2/coins/addresses/default"
 
 /**
  Payment settings
@@ -454,7 +454,7 @@
    Protobuf file: IMRequest
  
  */
-#define AddCurrencyAddress @"http://192.168.40.4:18083/wallet/v2/coins/addresses/create"
+#define AddCurrencyAddress baseServer "/wallet/v2/coins/addresses/create"
 /**
  Payment settings
   
@@ -468,7 +468,7 @@
    Protobuf file: IMRequest
  
  */
-#define GetCurrencyAddressList @"http://192.168.40.4:18083/wallet/v2/coins/addresses/list"
+#define GetCurrencyAddressList baseServer "/wallet/v2/coins/addresses/list"
 
 /**
  Payment settings
@@ -483,7 +483,7 @@
    Protobuf file: IMRequest
  
  */
-#define SetCurrencyInfo @"http://192.168.40.4:18083/wallet/v2/coins/update"
+#define SetCurrencyInfo baseServer "/wallet/v2/coins/update"
 /**
 Payment settings
  
@@ -497,7 +497,7 @@ Payment settings
   Protobuf file: IMRequest
 
 */
-#define GetCurrencyList @"http://192.168.40.4:18083/wallet/v2/coins/list"
+#define GetCurrencyList baseServer "/wallet/v2/coins/list"
 /**
  Payment settings
   
@@ -511,7 +511,7 @@ Payment settings
    Protobuf file: IMRequest
  
  */
-#define CreatCurrencyUrl @"http://192.168.40.4:18083/wallet/v2/coins/create"
+#define CreatCurrencyUrl baseServer "/wallet/v2/coins/create"
 /**
  Payment settings
   
@@ -525,7 +525,7 @@ Payment settings
    Protobuf file: IMRequest
  
  */
-#define EncryptionBaseSeedUrl @"http://192.168.40.4:18083/wallet/v2/create"
+#define EncryptionBaseSeedUrl baseServer "/wallet/v2/create"
 /**
  Payment settings
   
@@ -539,7 +539,7 @@ Payment settings
    Protobuf file: IMRequest
  
  */
-#define UpdateBaseSeedUrl @"http://192.168.40.4:18083/wallet/v2/update"
+#define UpdateBaseSeedUrl baseServer "/wallet/v2/update"
 /**
  Payment settings
   
@@ -553,7 +553,7 @@ Payment settings
    Protobuf file: IMRequest
  
  */
-#define SyncWalletDataUrl @"http://192.168.40.4:18083/wallet/v2/sync"
+#define SyncWalletDataUrl baseServer "/wallet/v2/sync"
 /**
  Payment settings
   

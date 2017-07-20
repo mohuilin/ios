@@ -60,8 +60,33 @@
             if (data) {
                 CoinsDetail *coinDetail = [CoinsDetail parseFromData:data error:nil];
                 NSMutableArray *coinDetailArray = coinDetail.coinInfosArray;
-                if (complte) {
-                    complte(YES,coinDetailArray);
+                if (coinDetailArray.count > 0) {
+                    // save address db
+                    NSMutableArray *saveArray = [NSMutableArray array];
+                    for (CoinInfo *coinAddress in coinDetailArray) {
+                        LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
+                        saveAddress.address = coinAddress.address;
+                        saveAddress.label = coinAddress.label;
+                        saveAddress.status = coinAddress.status;
+                        saveAddress.balance = coinAddress.balance;
+                        saveAddress.index = coinAddress.index;
+                        saveAddress.currency = (int)CurrencyTypeBTC;
+                        saveAddress.amount = coinAddress.amount;
+                        [saveArray addObject:saveAddress];
+                        
+                    }
+                    [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                        for (LMCurrencyAddress *saveAddress in saveArray) {
+                            [realm addOrUpdateObject:saveAddress];
+                        }
+                    }];
+                    if (complte) {
+                        complte(YES,coinDetailArray);
+                    }
+                }else {
+                    if (complte) {
+                        complte(YES,nil);
+                    }
                 }
             }else {
                 if (complte) {
@@ -102,7 +127,9 @@
 
 - (void)syncAddressListWithInputInputs:(NSArray *)inputs complete:(void (^)(NSError *error))complete{
     
-    NSMutableString *mStr = [NSMutableString stringWithFormat:@"currency = %d and address in {",(int)CurrencyTypeBTC];
+    /// test
+//    inputs = @[@"1D3DoqYq5CYV6TXGXmyuSBq4EK6MwTYupx"];
+    NSMutableString *mStr = [NSMutableString stringWithFormat:@"currency = %d AND address IN {",(int)CurrencyTypeBTC];
     for (NSString *address in inputs) {
         if ([address isEqualToString:[inputs lastObject]]) {
             [mStr appendFormat:@"'%@'",address];
@@ -123,12 +150,12 @@
                     }
                 } else {
                     if (complete) {
-                        complete([NSError errorWithDomain:@"sync error" code:-1 userInfo:nil]);
+                        complete([NSError errorWithDomain:@"sync error" code:TransactionPackageErrorTypeSyncAddress_InputsAddress_NotMatch userInfo:nil]);
                     }
                 }
             } else {
                 if (complete) {
-                    complete([NSError errorWithDomain:@"sync error" code:-1 userInfo:nil]);
+                    complete([NSError errorWithDomain:@"sync error" code:TransactionPackageErrorTypeAddressSyncFail userInfo:nil]);
                 }
             }
         }];

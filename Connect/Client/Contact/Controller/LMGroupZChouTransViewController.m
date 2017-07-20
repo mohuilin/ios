@@ -206,11 +206,18 @@ static NSString *identifier = @"cellIdentifier";
 }
 
 - (void)payWithAmount:(long long)amount {
-    
+    self.comfrimButton.enabled = NO;
+    [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [[LMTransferManager sharedManager] payCrowdfuningReceiptWithHashId:self.crowdfundingInfo.hashId type:TransactionTypePayCrowding fromAddresses:nil fee:0 currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+        self.comfrimButton.enabled = YES;
         if (error) {
-            
+            if (error.code != TransactionPackageErrorTypeCancel) {
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+            } else {
+                [MBProgressHUD hideHUDForView:self.view];
+            }
         } else {
+            [MBProgressHUD hideHUDForView:self.view];
             Crowdfunding *crowdInfo = (Crowdfunding *)data;
             [[LMMessageExtendManager sharedManager]updateMessageExtendPayCount:(int)(crowdInfo.size - crowdInfo.remainSize)status:(int)crowdInfo.status withHashId:crowdInfo.hashId];
             if (!error) {

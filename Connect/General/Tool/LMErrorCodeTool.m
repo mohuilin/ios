@@ -55,13 +55,28 @@
 @implementation LMErrorCodeTool
 
 
-+(NSString*)messageWithErrorCode:(ErrorCodeType)errorCodeType{
-    NSString *errorMessage = nil;
++(NSString*)messageWithErrorCode:(TransactionPackageErrorType)errorCodeType{
+    NSString *errorMessage = LMLocalizedString(@"Chat Network connection failed please check network", nil);
     switch (errorCodeType) {
-        case ErrorCodeType3003:
+        case TransactionPackageErrorTypeUnspentTooLarge:
+            errorMessage = LMLocalizedString(@"Wallet Too much transaction can not generated", nil);
+            break;
+            
+        case TransactionPackageErrorTypeOutDust:
+            errorMessage = LMLocalizedString(@"Wallet Amount is too small", nil);
+            break;
+            
+        case TransactionPackageErrorTypeUnspentNotEnough:
             errorMessage = LMLocalizedString(@"Wallet Insufficient balance", nil);
             break;
             
+        case TransactionPackageErrorTypeAddressSyncFail:
+            errorMessage = @"同步地址失败";
+            break;
+            
+        case TransactionPackageErrorTypeSyncAddress_InputsAddress_NotMatch:
+            errorMessage = @"数据不匹配！！！";
+            break;
         default:
             break;
     }

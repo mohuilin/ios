@@ -216,40 +216,30 @@
     //Integer
     money = [money decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLong:pow(10, 8)]];
     NSDecimalNumber *totalPersions = [[NSDecimalNumber alloc] initWithString:self.totalPeTextField.text];
-    __weak typeof(self) weakSelf = self;
-    if ([totalPersions intValue] <= 0) {
+    int count = [totalPersions intValue];
+    if (count <= 0) {
         return;
     }
     if ([money longValue] <= 0) {
         return;
     }
-
-    [GCDQueue executeInMainQueue:^{
-        [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    }];
     NSDecimalNumber *totalMoney = [money decimalNumberByMultiplyingBy:totalPersions];
-    [WallteNetWorkTool createCrowdfuningBillWithGroupId:self.groupIdentifer totalAmount:[totalMoney longLongValue] size:[self.totalPeTextField.text intValue] tips:note complete:^(NSError *erro, NSString *hashId) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:weakSelf.view];
-        }];
-        if (!erro) {
-            //update status
-            [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:0 withHashId:hashId];
-            
-            
-            [GCDQueue executeInMainQueue:^{
-                if (weakSelf.didGetNumberAndMoney) {
-                    int count = [totalPersions intValue];
-                    weakSelf.didGetNumberAndMoney(count, money, hashId, note);
-                }
-                [weakSelf dismissViewControllerAnimated:YES completion:nil];
-            }];
+    
+    
+    [MBProgressHUD showTransferLoadingViewtoView:self.view];
+    [[LMTransferManager sharedManager] sendCrowdfuningToGroup:self.groupIdentifer amount:[totalMoney longLongValue] size:count tips:note complete:^(Crowdfunding *crowdfunding, NSError *error) {
+        if (error) {
+            [MBProgressHUD showToastwithText:LMLocalizedString(@"Network equest failed please try again later", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"ErrorCode Error", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-            }];
+            [MBProgressHUD hideHUDForView:self.view];
+            //update status
+            [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:0 withHashId:crowdfunding.hashId];
+            if (self.didGetNumberAndMoney) {
+                self.didGetNumberAndMoney(count, money, crowdfunding.hashId, note);
+            }
+            [self dismissViewControllerAnimated:YES completion:nil];
         }
-    }];
+    }];    
 }
 
 - (NSDecimalNumber *)amount {

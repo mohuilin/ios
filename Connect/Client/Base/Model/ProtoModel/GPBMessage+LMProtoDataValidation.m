@@ -79,8 +79,9 @@ static NSDictionary *pbRuleDict;
     DDLogInfo(@"type :%@ checkValue :%@ reg :%@",type,value,reg);
     SWITCH (type) {
         CASE (@"string") {
-            NSString *checkString = (NSString *)value;
-            return checkString && checkString.length;
+//            NSString *checkString = (NSString *)value;
+//            return checkString && checkString.length;
+            return YES;
             break;
         }
         CASE(@"bytes") {

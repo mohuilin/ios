@@ -70,7 +70,7 @@ typedef NS_ENUM(NSInteger,ErrorCodeType)
 +(NSString*)showToastErrorType:(ToastErrorType)toastErrorType withErrorCode:(ErrorCodeType)errorCodeType withUrl:(NSString*)url;
 
 
-+(NSString*)messageWithErrorCode:(ErrorCodeType)errorCodeType;
++(NSString*)messageWithErrorCode:(TransactionPackageErrorType)errorCodeType;
 
 
 @end

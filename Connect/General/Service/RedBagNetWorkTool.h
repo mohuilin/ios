@@ -20,22 +20,6 @@
 + (void)grabRedBagWithHashId:(NSString *)hashId complete:(void (^)(GrabRedPackageResp *response,NSError *error))complete;
 
 /**
-   * Send a red envelope
-   *
-   * @param address
-   * @param privkey private key
-   * @ Param fee
-   * @param identifier object ID
-   * @amam money
-   * @param size number of red envelopes
-   * @param category red envelope type
-   * @param tips tips text
- *  @param complete
- */
-+ (void)sendRedBagWithSendAddress:(NSString *)address privkey:(NSString *)privkey fee:(long long)fee identifer:(NSString *)identifier money:(long long int)money size:(int)size category:(int)category type:(int)type tips:(NSString *)tips complete:(void (^)(OrdinaryRedPackage *ordinaryRed,UnspentOrderResponse *unspent, NSArray *toAddresses,NSError *error))complete;
-
-
-/**
    * Check the red envelope details
    *
    * @param hashId query ID

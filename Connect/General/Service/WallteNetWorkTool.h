@@ -12,21 +12,6 @@
 @interface WallteNetWorkTool : BaseSetViewController
 
 /**
-   * Many people transfer
-   *
-   * @param address payment address
-   * @param privkey private key
-   * @param feeValue procedure points
-   * @param toAddresses payment address
-   * @param perAmount the amount of money per person per person
-   * @param tips message
- *  @param complete
- */
-+ (void)MuiltTransferWithAddress:(NSString *)address privkey:(NSString *)privkey fee:(double)feeValue toAddress:(NSArray *)toAddresses amount:(long long int)perAmount tips:(NSString *)tips complete:(void (^)(UnspentOrderResponse *unspent, NSArray* toAddresses, NSError *error))complete;
-
-+ (void)doMuiltTransfer:(MuiltSendBill *)muiltBill complete:(void (^)(NSData *response, NSError *error))complete;
-
-/**
    * Check before the payment and generate the original transaction method
    *
    * @param address The payment address is usually the address of the login account
@@ -94,17 +79,6 @@
  */
 + (void)crowdfuningInfoWithHashID:(NSString *)hashId complete:(void (^)(NSError *erro ,Crowdfunding *crowdInfo))complete;
 
-
-/**
-   * All pay
-   *
-   * @param hashId all raise ID
-   The amount of money
-   * @param address Initiate the address of all chips
-   * @param complete
- */
-+ (void)payWithHashID:(NSString *)hashId amount:(long long int)amount toAddress:(NSString *)address complete:(void (^)(UnspentOrderResponse *unspent,NSArray* toAddresses,NSError *error))complete;
-
 /**
    * Initiate all
    *
@@ -118,15 +92,12 @@
 
 + (void)getPendingInfoComplete:(void (^)(PendingPackage *pendRedBag ,NSError *error))complete;
 
-
-+ (void)sendExternalBillWithSendAddress:(NSString *)address privkey:(NSString *)privkey fee:(long long)fee money:(long long int)money tips:(NSString *)tips complete:(void (^)(OrdinaryBilling *billing,UnspentOrderResponse *unspent,NSArray* toAddresses,NSError *error))complete;
-
 + (void)cancelExternalWithHashid:(NSString *)hashid complete:(void (^)(NSError *error))complete;
 
 + (void)externalTransferHistoryWithPageIndex:(int)page size:(int)size complete:(void (^)(NSError *error,ExternalBillingInfos *externalBillInfos))complete;
 
 + (void)externalRedPacketHistoryWithPageIndex:(int)page size:(int)size complete:(void (^)(NSError *error,RedPackageInfos *redPackages))complete;
 
-+ (void)queryOuterBillInfoWithTransactionhashId:(NSString *)hashid complete:(void (^)(NSError *erro ,Bill *bill))complete;
++ (void)queryOuterBillInfoWithTransactionhashId:(NSString *)hashid complete:(void (^)(NSError *erro ,ExternalBillingInfo *externalBillingInfo))complete;
 
 @end

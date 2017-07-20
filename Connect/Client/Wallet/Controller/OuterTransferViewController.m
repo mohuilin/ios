@@ -153,15 +153,18 @@
 
     [self.view endEditing:YES];
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    
+    self.comfrimButton.enabled = NO;
     [[LMTransferManager sharedManager] sendUrlTransferFromAddresses:nil tips:note amount:[PayTool getPOW8Amount:money] fee:[[MMAppSetting sharedSetting] getTranferFee] currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+        self.comfrimButton.enabled = YES;
         if (error) {
-            [MBProgressHUD hideHUDForView:self.view];
+            if (error.code != TransactionPackageErrorTypeCancel) {
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+            } else {
+                [MBProgressHUD hideHUDForView:self.view];
+            }
         } else {
             [MBProgressHUD hideHUDForView:self.view];
-            ExternalBillingInfo *billInfo = (ExternalBillingInfo *)data;
-            OuterTransferDetailController *page = [[OuterTransferDetailController alloc] init];
-            page.billInfo = billInfo;
+            OuterTransferDetailController *page = [[OuterTransferDetailController alloc] initWithHashId:data];
             [self.navigationController pushViewController:page animated:YES];
         }
     }];

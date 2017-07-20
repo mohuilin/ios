@@ -12,7 +12,7 @@
 #import "ConnectTool.h"
 #import "WallteNetWorkTool.h"
 #import "UIAlertController+Blocks.h"
-#import "NSObject+CurrentViewController.h"
+#import "UIViewController+CurrencyVC.h"
 #import "LMPayCheck.h"
 
 
@@ -43,63 +43,6 @@
             complete(nil,error);
         }
     }];
-}
-
-+ (void)sendRedBagWithSendAddress:(NSString *)address privkey:(NSString *)privkey fee:(long long)fee identifer:(NSString *)identifier money:(long long int)money size:(int)size category:(int)category type:(int)type tips:(NSString *)tips complete:(void (^)(OrdinaryRedPackage *ordinaryRed,UnspentOrderResponse *unspent,NSArray *toAddresses, NSError *error))complete{
-    
-    if (type == 0) {
-        if (GJCFStringIsNull(identifier)) {
-            if (complete) {
-                complete(nil,nil,nil,[NSError errorWithDomain:@"The object ID is empty" code:-1 userInfo:nil]);
-            }
-            return;
-        }
-    }
-    if (money <= 0) {
-        if (complete) {
-            complete(nil,nil,nil,[NSError errorWithDomain:@"Red envelopes less than or equal to 0" code:-1 userInfo:nil]);
-        }
-        return;
-    }
-    // judge is dirty
-    long long addFee = [LMPayCheck getSuitAbleFee:fee];
-    if ([LMPayCheck dirtyAlertWithAmount:(money + addFee) withController:[self getCurrentVC]]) {
-        return;
-    }
-    [self getSendRedBagBaseInfoComplete:^(PendingPackage *pendRedBag, NSError *error) {
-        if (error) {
-            if (complete) {
-                complete(nil,nil,nil,error);
-            }
-            return;
-        }
-        OrdinaryRedPackage *ordinaryRed = [[OrdinaryRedPackage alloc] init];
-        ordinaryRed.hashId = pendRedBag.hashId;
-        ordinaryRed.reciverIdentifier = identifier;
-        ordinaryRed.size = size;
-        ordinaryRed.tips = tips;
-        ordinaryRed.category = category;
-        ordinaryRed.money = money;
-        ordinaryRed.type = type;
-        long long addFee = [LMPayCheck getSuitAbleFee:fee];
-        NSArray *toAddresses = @[@{@"address":pendRedBag.address,
-                                   @"amount":[[[NSDecimalNumber alloc] initWithLongLong:money + addFee]
-                                              decimalNumberByDividingBy:
-                                              [[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].stringValue}];
-        [WallteNetWorkTool unspentV2WithAddress:address fee:fee toAddress:toAddresses
-                 createRawTranscationModelComplete:^(UnspentOrderResponse *unspent, NSError *error) {
-                     if (error) {
-                         if (complete) {
-                             complete(nil,nil,nil,error);
-                         }
-                     } else{
-                         if (complete) {
-                             complete(ordinaryRed,unspent,toAddresses,nil);
-                         }
-                     }
-        }];
-    }];
-    
 }
 
 + (void)getRedBagDetailWithHashId:(NSString *)hashId complete:(void (^)(RedPackageInfo *bagInfo,NSError *error))complete{

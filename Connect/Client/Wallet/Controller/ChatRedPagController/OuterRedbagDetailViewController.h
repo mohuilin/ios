@@ -11,6 +11,6 @@
 
 @interface OuterRedbagDetailViewController : LMBaseViewController
 
-@property(nonatomic, strong) RedPackage *redPackage;
+- (instancetype)initWithHashId:(NSString *)hashId;
 
 @end

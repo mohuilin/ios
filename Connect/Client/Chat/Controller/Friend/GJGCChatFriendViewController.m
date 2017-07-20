@@ -1332,7 +1332,18 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
     }
 
     if (chatContentModel.isOuterTransfer) {
-        [WallteNetWorkTool queryOuterBillInfoWithTransactionhashId:chatContentModel.hashID complete:^(NSError *erro, Bill *bill) {
+        [WallteNetWorkTool queryOuterBillInfoWithTransactionhashId:chatContentModel.hashID complete:^(NSError *erro, ExternalBillingInfo *externalBillingInfo) {
+            
+            Bill *bill = [[Bill alloc] init];
+            bill.hash_p = externalBillingInfo.hash_p;
+            bill.sender = externalBillingInfo.sender;
+            bill.receiver = externalBillingInfo.receiver;
+            bill.amount = externalBillingInfo.amount;
+            bill.txid = externalBillingInfo.txid;
+            bill.status = externalBillingInfo.status;
+            bill.tips = externalBillingInfo.tips;
+            bill.createdAt = externalBillingInfo.createdAt;
+            
             [MBProgressHUD hideHUDForView:weakself.view];
             LMReciptNotesViewController *noteVc = [[LMReciptNotesViewController alloc] init];
             noteVc.user = user;
