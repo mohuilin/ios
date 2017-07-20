@@ -101,6 +101,7 @@ static MMAppSetting *manager = nil;
         [userSet setObject:@(NO) forKey:@"setAllowRecomand"];
         [userSet setObject:@(NO) forKey:@"setHideBalance"];
         [userSet setObject:@"" forKey:@"im.conect.contactversionkey"];
+        [userSet setObject:@(YES) forKey:@"isSyncData"];
       
         NSMutableString *currencySymbol = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencySymbol];
         if ([currencySymbol isEqualToString:@"￥"]) {
@@ -834,5 +835,13 @@ char* printEnv(void)
 - (BOOL)needReCacheEstimatefee{
     return GJCFDateDaysAgo(GJCFUDFGetValue(@"getEstimatefeeDate")) >= 1;
 }
+#pragma mark - syncData
+- (void)isSyncData:(BOOL)flag{
+    [self setValue:@(flag) forKey:@"isSyncData"];
+}
+- (BOOL)getSyncData{
+    return [[self getValue:@"isSyncData"] boolValue];
+}
+
 
 @end

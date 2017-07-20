@@ -68,7 +68,7 @@ extern "C" {
     LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)currency]] lastObject];
     if(currencyModel){
         if (complete) {
-            complete(NO,[NSError errorWithDomain:@"" code:2500 userInfo:nil]);
+            complete(NO,[NSError errorWithDomain:@"" code:135 userInfo:nil]);
         }
         return;
     }
@@ -84,11 +84,10 @@ extern "C" {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                complete(NO,[NSError errorWithDomain:hResponse.message code:131 userInfo:nil]);
             }
         }else {
             // save db
-
             LMCurrencyModel *currencyModel = [LMCurrencyModel new];
             currencyModel.currency = (int)currency;
             currencyModel.category = category;
@@ -111,13 +110,13 @@ extern "C" {
             [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                 [realm addOrUpdateObject:currencyModel];
             }];
-            if (complete) {
-                complete(YES,nil);
-            }
+            //if (complete) {
+              //  complete(YES,nil);
+            //}
         }
     } fail:^(NSError *error) {
         if (complete) {
-           complete(NO,error);
+           complete(NO,[NSError errorWithDomain:@"" code:131 userInfo:nil]);
         }
     }];
 }

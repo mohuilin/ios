@@ -53,6 +53,8 @@
 @property(nonatomic, strong) RLMResults *currencyResults;
 @property(nonatomic, strong) RLMNotificationToken *totalAmountToken;
 
+
+
 @end
 
 @implementation MainWalletPage
@@ -60,16 +62,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.leftBarButtonItems = nil;
-    
+    [[MMAppSetting sharedSetting] isSyncData:YES];
     [self setupSubView];
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
     [self addNotification];
     
-    [self creatNewWallet];
+   
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    [self creatNewWallet];
+    [[MMAppSetting sharedSetting] isSyncData:NO];
     [LMWalletManager getWalletData:nil];
 }
 - (void)viewWillAppear:(BOOL)animated {
@@ -127,43 +131,19 @@
 #pragma mark action
 - (void)creatNewWallet{
     
-    if (![LMWalletManager sharedManager].isHaveWallet) {
+    if (![LMWalletManager sharedManager].isHaveWallet && [[MMAppSetting sharedSetting] getSyncData]) {
         //Synchronize wallet data and create wallet
         [LMWalletManager creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(BOOL isFinish,NSError *error) {
-            if (isFinish) {
-                [GCDQueue executeInMainQueue:^{
+            [GCDQueue executeInMainQueue:^{
+                if (isFinish) {
+                    [[MMAppSetting sharedSetting] isSyncData:NO];
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
-                }];
-            }else {
-                //
-                switch (error.code) {
-                    case 257:
-                    {
-                        [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
-                        }];
-                    }
-                        
-                        break;
-                    case 2500:
-                    {
-                        [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet The currency already exists", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
-                        }];
-                    }
-                        
-                        break;
-                        
-                    default:
-                    {
-                        [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeFail showInView:self.view complete:nil];
-                        }];
                     
-                    }
-                        break;
+                }else {
+                    [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeFail showInView:self.view complete:nil];
+                     [[MMAppSetting sharedSetting] isSyncData:YES];
                 }
-            }
+            }];
         }];
     }
 }

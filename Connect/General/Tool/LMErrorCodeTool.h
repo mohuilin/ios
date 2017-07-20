@@ -17,6 +17,11 @@ typedef NS_ENUM(NSUInteger,ToastErrorType)
 };
 typedef NS_ENUM(NSInteger,ErrorCodeType)
 {
+    ErrorCodeType131     =  131,
+    ErrorCodeType132     =  132,
+    ErrorCodeType133     =  133,
+    ErrorCodeType134     =  134,
+    ErrorCodeType135     =  135,
     ErrorCodeType1001    =  -1001,
     ErrorCodeType2001    =  2001,
     ErrorCodeType2002    =  2002,
