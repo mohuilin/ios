@@ -16,6 +16,7 @@
 #import "LMWalletManager.h"
 #import "LMCurrencyModel.h"
 #import "LMBtcAddressManager.h"
+#import "LMHistoryCacheManager.h"
 
 
 #ifdef __cplusplus
@@ -639,8 +640,14 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     return temArray.copy;
 }
 #pragma mark - water methods
-- (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(BOOL result,NSArray *transactions))complete {
+- (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(BOOL result,Transactions *transactions))complete {
     
+    if (page == 0) {
+        page = 1;
+    }
+    if (size == 0) {
+        size = 50;
+    }
     GetTx *requestTranslation = [GetTx new];
     requestTranslation.currency = (int)currency;
     requestTranslation.address = address;
@@ -659,8 +666,12 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
             NSData *data = [ConnectTool decodeHttpResponse:hRespone];
             if (data) {
                 Transactions *transations = [Transactions parseFromData:data error:nil];
-                
-                NSLog(@"asdasd");
+                if (page == 1) {
+                    [[LMHistoryCacheManager sharedManager] cacheTransferContacts:transations.data];
+                }
+                if (complete) {
+                    complete(YES,transations);
+                }
             }
         }
     } fail:^(NSError *error) {

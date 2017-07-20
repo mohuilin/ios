@@ -125,6 +125,7 @@
 - (void)leftButtonClick:(UIButton *)leftButton {
     LMTranHisViewController *HistoryVc = [[LMTranHisViewController alloc] init];
     HistoryVc.address = self.loginUser.address;
+    HistoryVc.currency = CurrencyTypeBTC;
     HistoryVc.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:HistoryVc animated:YES];
 }
