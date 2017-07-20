@@ -12,6 +12,7 @@
 #import "LMCurrencyAddress.h"
 
 @interface LMBaseCurrencyManager : NSObject
+#pragma mark - currency creat and get
 
 /**
  *  creat currency
@@ -30,6 +31,12 @@
  *
  */
 - (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(BOOL result))complte;
+/**
+ * decode encrypt value by password
+ * @param encryptValue
+ * @param password
+ */
+- (NSArray *)getCurrencyAddressList:(CurrencyType)currency;
 #pragma mark - encryption methods
 /**
  * address by privkey
@@ -80,13 +87,9 @@
  */
 
 - (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation currency:(CurrencyType)currency inputs:(NSArray *)inputs seed:(NSString *)seed;
-#pragma mark - other methods 
-/**
- * decode encrypt value by password
- * @param encryptValue
- * @param password
- */
-- (NSArray *)getCurrencyAddressList:(CurrencyType)currency;
+#pragma mark - water method
+- (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(BOOL result,NSArray *transactions))complete;
+
 
 
 

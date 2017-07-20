@@ -12,6 +12,7 @@
 #import "CommonClausePage.h"
 #import "UIScrollView+EmptyDataSet.h"
 #import "LMHistoryCacheManager.h"
+#import "LMBtcCurrencyManager.h"
 
 
 @interface LMTranHisViewController () <UITableViewDelegate, UITableViewDataSource, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
@@ -75,6 +76,16 @@
         NSString *recodsUrl = [NSString stringWithFormat:WalletAddressTransRecodsUrl, weakSelf.address, weakSelf.page, weakSelf.pagesize];
         [weakSelf getDataWithUrl:recodsUrl];
     }];
+    LMBaseCurrencyManager *baseCurrency = [[LMBtcCurrencyManager alloc] init];
+    [baseCurrency getWaterTransactions:CurrencyTypeBTC address:nil page:1 size:10 complete:^(BOOL result, NSArray *transactions) {
+        if (result) {
+            
+        }
+        
+    }];
+    
+    
+    
 }
 
 - (void)getDataWithUrl:(NSString *)recodsUrl {

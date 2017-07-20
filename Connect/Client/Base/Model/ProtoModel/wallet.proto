@@ -169,25 +169,6 @@ int32 page = 1;
 int32 size = 2;
 }
 
-message Transactions {
-repeated Transaction transactions = 1;
-}
-
-message Transaction {
-string hash = 1 ; //TXID
-uint64 block_height = 2; //块高度
-uint64 created_at = 3; //交易发生时间
-uint64 fee = 4; //手续费
-uint64 inputs_value = 5; //
-string category = 6; //交易类型
-int64 balance = 7; // 交易金额
-repeated UserInfoBalance userInfos = 8;
-repeated Input inputs = 9; // 总输入
-repeated Output outputs = 10; //总输出
-uint64 confirmations = 11; //确认数
-int32 tx_type = 12; //交易类型红包,转账...
-}
-
 message RequestUserInfo {
 string uid = 1;
 int32  currency = 2;

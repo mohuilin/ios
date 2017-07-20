@@ -421,6 +421,21 @@
    Protobuf file: IMRequest
  
  */
+#define GetWaterTransction  baseServer "/wallet/v2/coins/addresses/tx"
+
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /wallet/v1/currency
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ 
+ */
 #define GetUserStatus baseServer "/wallet/v2/service/user_status"
 
 /**
