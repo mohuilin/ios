@@ -274,7 +274,11 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                     baseCurency = [[LMBtcCurrencyManager alloc] init];
                     NSString *bSeedPrikey = [baseCurency getPrivkeyBySeed:BitSeed index:0];
                     NSString *masterAddress = [baseCurency getAddressByPrivKey:bSeedPrikey];
-                    NSString *payLoad = [baseCurency encodeValue:[LKUserCenter shareCenter].currentLoginUser.prikey password:password n:17];
+                    
+                    /// privkey hex
+                    NSString *priHex = [[LKUserCenter shareCenter].currentLoginUser.prikey hexString];
+                    
+                    NSString *payLoad = [baseCurency encodeValue:priHex password:password n:17];
                     [baseCurency createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeOldUser masterAddess:masterAddress payLoad:payLoad  complete:^(BOOL result,NSError *error) {
                         if (result) {
                             // tips
