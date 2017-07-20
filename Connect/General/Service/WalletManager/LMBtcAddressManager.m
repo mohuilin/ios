@@ -99,4 +99,45 @@
     }];
 }
 
+
+- (void)syncAddressListWithInputInputs:(NSArray *)inputs complete:(void (^)(NSError *error))complete{
+    
+    NSMutableString *mStr = [NSMutableString stringWithFormat:@"currency = %d and address in {",(int)CurrencyTypeBTC];
+    for (NSString *address in inputs) {
+        if ([address isEqualToString:[inputs lastObject]]) {
+            [mStr appendFormat:@"'%@'",address];
+        } else {
+            [mStr appendFormat:@"'%@',",address];
+        }
+    }
+    [mStr appendString:@"}"];
+    RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
+    //sync
+    if (results.count != inputs.count) {
+        [self getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
+            if (result) {
+                RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
+                if (results.count == inputs.count) {
+                    if (complete) {
+                        complete(nil);
+                    }
+                } else {
+                    if (complete) {
+                        complete([NSError errorWithDomain:@"sync error" code:-1 userInfo:nil]);
+                    }
+                }
+            } else {
+                if (complete) {
+                    complete([NSError errorWithDomain:@"sync error" code:-1 userInfo:nil]);
+                }
+            }
+        }];
+    } else {
+        if (complete) {
+            complete(nil);
+        }
+    }
+}
+
+
 @end

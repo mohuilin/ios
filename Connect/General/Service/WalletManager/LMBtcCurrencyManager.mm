@@ -573,16 +573,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     RLMResults *result = [LMCurrencyAddress objectsWhere:mStr];
     
     for (LMCurrencyAddress *currrencyAddress in result) {
-        LMBaseCurrencyManager *baseCurrency = nil;
-        switch (currency) {
-            case CurrencyTypeBTC:
-                baseCurrency = [[LMBtcCurrencyManager alloc] init];
-                break;
-                
-            default:
-                break;
-        }
-        NSString *inputsPrivkey = [baseCurrency getPrivkeyBySeed:seed index:currrencyAddress.index];
+        NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:currrencyAddress.index];
         if (inputsPrivkey) {
             [privkeyArray addObject:inputsPrivkey];
         }
@@ -595,7 +586,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
             for (NSString *inputAddress in inputs) {
                 for (CoinInfo *coinInfo in addressList) {
                     if ([coinInfo.address isEqualToString:inputAddress]) {
-                        NSString *inputsPrivkey = [baseCurrency getPrivkeyBySeed:seed index:coinInfo.index];
+                        NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:coinInfo.index];
                         [privkeyArray addObject:inputsPrivkey];
                         break;
                     }
