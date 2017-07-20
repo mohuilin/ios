@@ -366,8 +366,18 @@
 
     self.payPassView.hidden = NO;
     [self endEditing:YES];
+    LMBaseCurrencyManager *baseCurrency = nil;
+    switch (CurrencyTypeBTC) {
+        case CurrencyTypeBTC:
+            baseCurrency = [[LMBtcCurrencyManager alloc] init];
+            break;
+            
+        default:
+            break;
+    }
+    
     //verfiy pass
-    [LMBtcCurrencyManager decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
+    [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
         if (success) {
             [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
                 make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);

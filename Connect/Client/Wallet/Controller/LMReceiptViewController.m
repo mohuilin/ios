@@ -70,8 +70,17 @@
         default:
             break;
     }
-   
-    [LMBtcAddressManager getCurrencyAddressListWithCurrency:self.currency complete:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
+    LMBaseAddressManager *baseAddress = nil;
+    switch (self.currency) {
+        case CurrencyTypeBTC:
+            baseAddress = [[LMBtcAddressManager alloc] init];
+            break;
+            
+        default:
+            break;
+    }
+    
+    [baseAddress getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
         
         if (result) {
             if (addressList.count > 0) {

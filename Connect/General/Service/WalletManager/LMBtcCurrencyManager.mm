@@ -15,6 +15,7 @@
 #import "ConnectTool.h"
 #import "LMWalletManager.h"
 #import "LMCurrencyModel.h"
+#import "LMBtcAddressManager.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -63,9 +64,9 @@ extern "C" {
  *  creat currency
  *
  */
-+ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSError *error))complete {
+- (void)createCurrency:(CurrencyType)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSError *error))complete {
     
-    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",currency]] lastObject];
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)currency]] lastObject];
     if(currencyModel){
         if (complete) {
             complete(NO,[NSError errorWithDomain:@"" code:2500 userInfo:nil]);
@@ -76,7 +77,7 @@ extern "C" {
     CreateCoinRequest *currencyCoin = [CreateCoinRequest new];
     currencyCoin.category = category;
     currencyCoin.masterAddress = masterAddess;
-    currencyCoin.currency = currency;
+    currencyCoin.currency = (int)currency;
     currencyCoin.salt = salt;
     currencyCoin.payload = payLoad;
 
@@ -90,7 +91,7 @@ extern "C" {
             // save db
 
             LMCurrencyModel *currencyModel = [LMCurrencyModel new];
-            currencyModel.currency = currency;
+            currencyModel.currency = (int)currency;
             currencyModel.category = category;
             currencyModel.salt = salt;
             currencyModel.masterAddress = masterAddess;
@@ -104,7 +105,7 @@ extern "C" {
             addressModel.index = 0;
             addressModel.status = 1;
             addressModel.label = nil;
-            addressModel.currency = currency;
+            addressModel.currency = (int)currency;
             addressModel.balance = 0;
             [currencyModel.addressListArray addObject:addressModel];
             
@@ -125,7 +126,7 @@ extern "C" {
  *  get currrency list
  *
  */
-+ (void)getCurrencyList:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete{
+- (void)getCurrencyList:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete{
     
     [NetWorkOperationTool POSTWithUrlString:GetCurrencyList postProtoData:nil complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -154,7 +155,7 @@ extern "C" {
  *  set currency messageInfo
  *
  */
-+ (void)setCurrencyStatus:(int)status currency:(int)currency complete:(void (^)(BOOL result))complte{
+- (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(BOOL result))complte{
     
     Coin *coin = [Coin new];
     coin.currency = currency;
@@ -174,7 +175,7 @@ extern "C" {
     
 }
 #pragma mark - encryption methods
-+ (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index {
+- (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index {
     char myRand[129] = {0};
     char *randomC = (char *) [seed UTF8String];
     sprintf(myRand, "%s", randomC);
@@ -183,7 +184,7 @@ extern "C" {
     return [NSString stringWithFormat:@"%s", privKey];
 }
 
-+(NSString *)encodeValue:(NSString *)value password:(NSString *)password n:(int)n{
+-(NSString *)encodeValue:(NSString *)value password:(NSString *)password n:(int)n{
     if (n <= 0) {
         n = 17; //default
     }
@@ -193,7 +194,7 @@ extern "C" {
     return [NSString stringWithFormat:@"%s",retString.c_str()];
 }
 
-+(void)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password complete:(void (^)(NSString *decodeValue,BOOL success))complete{
+-(void)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password complete:(void (^)(NSString *decodeValue,BOOL success))complete{
     char value[256];
     char *ev = (char *)[encryptValue UTF8String];
     char *pass = (char *)[password UTF8String];
@@ -209,7 +210,7 @@ extern "C" {
     }
 }
 
-+ (BOOL)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password{
+- (BOOL)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password{
     char value[256];
     char *ev = (char *)[encryptValue UTF8String];
     char *pass = (char *)[password UTF8String];
@@ -398,7 +399,7 @@ int GetBTCAddrressFromPubKey(char *pubKey, char *address)
 }
 
 
-+ (NSString *)getAddressByPrivKey:(NSString *)prvkey{
+- (NSString *)getAddressByPrivKey:(NSString *)prvkey{
     char *cPrivkey = (char *)[prvkey UTF8String];
     char pubKey[128];
     GetBTCPubKeyFromPrivKey(cPrivkey, pubKey);
@@ -572,7 +573,16 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     RLMResults *result = [LMCurrencyAddress objectsWhere:mStr];
     
     for (LMCurrencyAddress *currrencyAddress in result) {
-        NSString *inputsPrivkey = [LMBaseCurrencyManager getPrivkeyBySeed:seed index:currrencyAddress.index];
+        LMBaseCurrencyManager *baseCurrency = nil;
+        switch (currency) {
+            case CurrencyTypeBTC:
+                baseCurrency = [[LMBtcCurrencyManager alloc] init];
+                break;
+                
+            default:
+                break;
+        }
+        NSString *inputsPrivkey = [baseCurrency getPrivkeyBySeed:seed index:currrencyAddress.index];
         if (inputsPrivkey) {
             [privkeyArray addObject:inputsPrivkey];
         }
@@ -580,6 +590,19 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     
     //sync
     if (privkeyArray.count != inputs.count) {
+        LMBaseAddressManager *addressManager = [[LMBtcAddressManager alloc] init];
+        [addressManager getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
+            for (NSString *inputAddress in inputs) {
+                for (CoinInfo *coinInfo in addressList) {
+                    if ([coinInfo.address isEqualToString:inputAddress]) {
+                        NSString *inputsPrivkey = [baseCurrency getPrivkeyBySeed:seed index:coinInfo.index];
+                        [privkeyArray addObject:inputsPrivkey];
+                        break;
+                    }
+                }
+            }
+        }];
+    } else {
         
     }
     
@@ -628,7 +651,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
  * @param encryptValue
  * @param password
  */
-+ (NSArray *)getCurrencyAddressList:(CurrencyType)currency {
+- (NSArray *)getCurrencyAddressList:(CurrencyType)currency {
     
    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",(int)currency]] lastObject];
     NSMutableArray *temArray = [NSMutableArray array];

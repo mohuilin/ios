@@ -21,6 +21,7 @@
 #import "LMCurrencyModel.h"
 
 
+
 @interface WalletItem : NSObject
 
 @property(nonatomic, copy) NSString *icon;
@@ -134,8 +135,34 @@
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
                 }];
             }else {
-                // 给出提示  错误吗的那种
-                
+                //
+                switch (error.code) {
+                    case 257:
+                    {
+                        [GCDQueue executeInMainQueue:^{
+                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
+                        }];
+                    }
+                        
+                        break;
+                    case 2500:
+                    {
+                        [GCDQueue executeInMainQueue:^{
+                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet The currency already exists", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
+                        }];
+                    }
+                        
+                        break;
+                        
+                    default:
+                    {
+                        [GCDQueue executeInMainQueue:^{
+                            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeSuccess showInView:self.view complete:nil];
+                        }];
+                    
+                    }
+                        break;
+                }
             }
         }];
     }

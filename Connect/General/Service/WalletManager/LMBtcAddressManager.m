@@ -19,10 +19,10 @@
  *  add currency address
  *
  */
-+ (void)addCurrencyAddressWithCurrency:(int)currency label:(NSString *)label index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete{
+- (void)addCurrencyAddressWithLabel:(NSString *)label index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete{
     
     CreateCoinAccount *coinAddress = [CreateCoinAccount new];
-    coinAddress.currency = currency;
+    coinAddress.currency = (int)CurrencyTypeBTC;
     coinAddress.label = label;
     coinAddress.index = index;
     coinAddress.address = address;
@@ -46,9 +46,9 @@
  *  get currency addresss list
  *
  */
-+ (void)getCurrencyAddressListWithCurrency:(int)currency complete:(void (^)(BOOL result,NSMutableArray<CoinInfo *> *addressList)) complte {
+- (void)getCurrencyAddressList:(void (^)(BOOL result,NSMutableArray<CoinInfo *> *addressList)) complte {
     Coin *coin = [Coin new];
-    coin.currency = currency;
+    coin.currency = (int)CurrencyTypeBTC;
     [NetWorkOperationTool POSTWithUrlString:GetCurrencyAddressList postProtoData:coin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
@@ -80,7 +80,7 @@
  * set currency address message
  *
  */
-+ (void)setCurrencyAddressMessageWithAddress:(NSString *)address lable:(NSString *)lable status:(int)status complete:(void (^)(BOOL result))complete {
+- (void)setCurrencyAddressMessageWithAddress:(NSString *)address lable:(NSString *)lable status:(int)status complete:(void (^)(BOOL result))complete {
     CoinInfo *coinInfo = [CoinInfo new];
     coinInfo.address = address;
     coinInfo.label = lable;

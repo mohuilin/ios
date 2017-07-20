@@ -17,26 +17,26 @@
  *  creat currency
  *
  */
-+ (void)createCurrency:(int)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSError *error))complete;
+- (void)createCurrency:(CurrencyType)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSError *error))complete;
 
 /**
  *  get currrency list
  *
  */
-+ (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete;
+- (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete;
 
 /**
  *  set currency messageInfo
  *
  */
-+ (void)setCurrencyStatus:(int)status currency:(int)currency complete:(void (^)(BOOL result))complte;
+- (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(BOOL result))complte;
 #pragma mark - encryption methods
 /**
  * address by privkey
  * @param prvkey
  * @return
  */
-+ (NSString *)getAddressByPrivKey:(NSString *)prvkey;
+- (NSString *)getAddressByPrivKey:(NSString *)prvkey;
 
 /**
  * get privkey from seed and index
@@ -44,7 +44,7 @@
  * @param index
  * @return
  */
-+ (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index;
+- (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index;
 
 /**
  * encode value by password  eg:privkey / seed, n default value is 17
@@ -53,7 +53,7 @@
  * @param n
  * @return
  */
-+ (NSString *)encodeValue:(NSString *)value password:(NSString *)password n:(int)n;
+- (NSString *)encodeValue:(NSString *)value password:(NSString *)password n:(int)n;
 
 /**
  * decode encrypt value by password
@@ -61,7 +61,7 @@
  * @param password
  * @param complete
  */
-+ (void)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password complete:(void (^)(NSString *decodeValue, BOOL success))complete;
+- (void)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password complete:(void (^)(NSString *decodeValue, BOOL success))complete;
 
 
 /**
@@ -69,7 +69,7 @@
  * @param encryptValue
  * @param password
  */
-+ (BOOL)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password;
+- (BOOL)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password;
 #pragma mark - sign
 /**
  * Signature trading
@@ -86,7 +86,10 @@
  * @param encryptValue
  * @param password
  */
-+ (NSArray *)getCurrencyAddressList:(CurrencyType)currency;
+- (NSArray *)getCurrencyAddressList:(CurrencyType)currency;
+
+
+
 
 
 

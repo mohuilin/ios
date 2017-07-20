@@ -212,7 +212,9 @@
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                 if ([LMWalletManager sharedManager].encryPtionSeed.length > 0) {
-                    [LMBtcCurrencyManager decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
+                    LMBaseCurrencyManager *baseCurrency = nil;
+                    baseCurrency = [[LMBtcCurrencyManager alloc] init];
+                    [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
                         if (!success) {
                             [weakPassView setTitleString:LMLocalizedString(@"Login Password incorrect", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                             firstPass = nil;

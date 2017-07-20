@@ -12,6 +12,7 @@
 #import "LMCurrencyAddress.h"
 #import "InputPayPassView.h"
 #import "LMBtcCurrencyManager.h"
+#import "LMBtcAddressManager.h"
 
 
 @implementation LMTransferManager
@@ -182,6 +183,18 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction transactionType:(TransactionType)transactionType currency:(CurrencyType)currency seed:(NSString *)seed complete:(CompleteWithDataBlock)complete{
 
+    LMBaseAddressManager *addressManager = [[LMBtcAddressManager alloc] init];
+    [addressManager getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
+        for (NSString *inputAddress in originalTransaction.addressesArray) {
+            for (CoinInfo *coinInfo in addressList) {
+                if ([coinInfo.address isEqualToString:inputAddress]) {
+                    
+                }
+            }
+        }
+    }];
+    
+    
     //1、define interface
     LMBaseCurrencyManager *currencyManager = nil;
     
