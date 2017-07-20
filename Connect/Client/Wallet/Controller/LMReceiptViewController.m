@@ -91,45 +91,19 @@
                 [self addQRcodeImageView];
                 // save defaultAddress
                 LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)weakSelf.currency]] firstObject];
+                RLMResults *currencyAddressList = [LMCurrencyAddress allObjects];
                 // save address db
-                NSMutableArray *saveArray = [NSMutableArray array];
-                for (CoinInfo *coinAddress in addressList) {
-                 LMCurrencyAddress *getAddress = [[LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"address = '%@' ",coinAddress.address]] lastObject];
-                    if (getAddress.address.length > 0) {
-                        [[LMRealmManager sharedManager]executeRealmWithBlock:^{
-                            getAddress.label = coinAddress.label;
-                            getAddress.status = coinAddress.status;
-                            getAddress.balance = coinAddress.balance;
-                            getAddress.index = coinAddress.index;
-                            getAddress.currency = weakSelf.currency;
-                            getAddress.amount = coinAddress.amount;
-                        }];
-                    }else {
-                        LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
-                        saveAddress.address = coinAddress.address;
-                        saveAddress.label = coinAddress.label;
-                        saveAddress.status = coinAddress.status;
-                        saveAddress.balance = coinAddress.balance;
-                        saveAddress.index = coinAddress.index;
-                        saveAddress.currency = weakSelf.currency;
-                        saveAddress.amount = coinAddress.amount;
-                        [saveArray addObject:saveAddress];
+                [[LMRealmManager sharedManager] executeRealmWithBlock:^{
+                    [currencyModel.addressListArray removeAllObjects];
+                    for (LMCurrencyAddress *addressModel in currencyAddressList) {
+                        [currencyModel.addressListArray addObject:addressModel];
                     }
-                }
-                [[LMRealmManager sharedManager]executeRealmWithBlock:^{
-                    [currencyModel.addressListArray addObjects:saveArray];
                     currencyModel.defaultAddress = address.address;
-                }];
-            }else {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Failed to get the list address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{
-                        [weakSelf.navigationController popViewControllerAnimated:YES];
-                    }];
                 }];
             }
         }else{
             [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Failed to get the list address", nil) withType:ToastTypeFail showInView:weakSelf.view complete:^{
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:ErrorCodeType134 withUrl:GetCurrencyAddressList] withType:ToastTypeFail showInView:weakSelf.view complete:^{
                     [weakSelf.navigationController popViewControllerAnimated:YES];
                 }];
             }];

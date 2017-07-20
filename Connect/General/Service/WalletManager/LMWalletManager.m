@@ -48,15 +48,16 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                complete(NO,[NSError errorWithDomain:hResponse.message code:133 userInfo:nil]);
             }
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
             if (data) {
                 RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-                if (syncWallet.coinsArray.count > 0) {                    
+                if (syncWallet.coinsArray.count > 0) {
                     // save data to db
                     [self syncWalletData:syncWallet];
+                    
                 }else {
                     [self creatWallet:controllerVc currency:currency complete:complete];
                 }
@@ -64,7 +65,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO,error);
+            complete(NO,[NSError errorWithDomain:@"" code:133 userInfo:nil]);
         }
     }];
 }
@@ -102,9 +103,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                     case CategoryTypeImport:
                     {
                         // creat import wallet
-                        [self creatImportWallet:0 complete:^(BOOL isFinish, NSError *error) {
-                            
-                        }];
+                        [self creatImportWallet:0 complete:complete];
                     }
                         break;
                     default:
@@ -184,39 +183,41 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  */
 + (void)getWalletData:(void(^)(BOOL result))complete {
     
-    // Synchronize wallet data and create wallet
-    [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(NO);
-            }
-        } else{
-            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-            if (data) {
-                RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-                if (syncWallet.coinsArray.count > 0) {
-                    // save data to db
-                    [self syncWalletData:syncWallet];
-                    if (complete) {
-                        complete(YES);
+    if ([LMWalletManager sharedManager].isHaveWallet) {
+        // Synchronize wallet data and create wallet
+        [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
+            HttpResponse *hResponse = (HttpResponse *)response;
+            if (hResponse.code != successCode) {
+                if (complete) {
+                    complete(NO);
+                }
+            } else{
+                NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
+                    if (syncWallet.coinsArray.count > 0) {
+                        // save data to db
+                        [self syncWalletData:syncWallet];
+                        if (complete) {
+                            complete(YES);
+                        }
+                    }else{
+                        if (complete) {
+                            complete(NO);
+                        }
                     }
-                }else{
+                }else {
                     if (complete) {
                         complete(NO);
                     }
                 }
-            }else {
-                if (complete) {
-                    complete(NO);
-                }
             }
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(NO);
-        }
-    }];
+        } fail:^(NSError *error) {
+            if (complete) {
+                complete(NO);
+            }
+        }];
+    }
 }
 
 /**
@@ -385,7 +386,11 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                if ([url isEqualToString:EncryptionBaseSeedUrl]) {
+                    complete(NO,[NSError errorWithDomain:hResponse.message code:132 userInfo:nil]);
+                }else {
+                    complete(NO,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                }
             }
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
@@ -413,7 +418,11 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO,error);
+            if ([url isEqualToString:EncryptionBaseSeedUrl]) {
+                complete(NO,[NSError errorWithDomain:@"" code:132 userInfo:nil]);
+            }else {
+                complete(NO,error);
+            }
         }
     }];
 }

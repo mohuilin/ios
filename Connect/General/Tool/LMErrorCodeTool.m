@@ -11,6 +11,11 @@
 
 #define UnKnownError  @"Link Unknown error"
 
+#define CREAR_CURRENCY_FAILED_131         LMLocalizedString(@"Wallet create currency failed", nil)
+#define CREAR_WALLET_FAILED_132           LMLocalizedString(@"Wallet Create wallet failed", nil)
+#define SYNC_DATA_FAILED_133              LMLocalizedString(@"Wallet synchronization data failed", nil)
+#define GET_ADDRESSLIST_FAILED_134        LMLocalizedString(@"Wallet Failed to get the list address", nil)
+#define CURRENCY_ISEXIST_135              LMLocalizedString(@"Wallet The currency already exists", nil)
 #define NO_TRANSATION_HISTORY_1001        LMLocalizedString(@"Set No transaction history", nil)
 #define SALT_UNAVAILABLE_2001             LMLocalizedString(@"ErrorCode salt failure or gcm decryption failed", nil)
 #define ECDH_CREAT_FAILURE_2002           LMLocalizedString(@"ErrorCode Ecdh generation failed", nil)
@@ -540,6 +545,36 @@
 {
     
     switch (errorCodeType) {
+        case ErrorCodeType131:
+        {
+            return CREAR_CURRENCY_FAILED_131;
+            
+        }
+            break;
+        case ErrorCodeType132:
+        {
+            return CREAR_WALLET_FAILED_132;
+            
+        }
+            break;
+        case ErrorCodeType133:
+        {
+            return SYNC_DATA_FAILED_133;
+            
+        }
+            break;
+        case ErrorCodeType134:
+        {
+            return GET_ADDRESSLIST_FAILED_134;
+            
+        }
+            break;
+        case ErrorCodeType135:
+        {
+            return CURRENCY_ISEXIST_135;
+            
+        }
+            break;
         case ErrorCodeType1001:
         {
             return NO_TRANSATION_HISTORY_1001;

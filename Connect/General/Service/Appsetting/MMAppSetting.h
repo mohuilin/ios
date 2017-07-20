@@ -205,5 +205,8 @@
 
 - (void)setAutoCalculateTransactionFee:(BOOL)autoCalculate;
 - (BOOL)canAutoCalculateTransactionFee;
+#pragma mark - syncData
+- (void)isSyncData:(BOOL)flag;
+- (BOOL)getSyncData;
 
 @end

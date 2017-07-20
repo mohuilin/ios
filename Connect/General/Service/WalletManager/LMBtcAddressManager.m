@@ -33,7 +33,7 @@
             
             
         }else {
-            NSLog(@"asdasd");
+            DDLogInfo(@"asdasd");
             // save db
         }
     } fail:^(NSError *error) {
@@ -60,6 +60,9 @@
             if (data) {
                 CoinsDetail *coinDetail = [CoinsDetail parseFromData:data error:nil];
                 NSMutableArray *coinDetailArray = coinDetail.coinInfosArray;
+                // save defaultAddress
+                LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)CurrencyTypeBTC]] lastObject];
+                // save address db
                 if (coinDetailArray.count > 0) {
                     // save address db
                     NSMutableArray *saveArray = [NSMutableArray array];
@@ -73,12 +76,10 @@
                         saveAddress.currency = (int)CurrencyTypeBTC;
                         saveAddress.amount = coinAddress.amount;
                         [saveArray addObject:saveAddress];
-                        
                     }
-                    [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
-                        for (LMCurrencyAddress *saveAddress in saveArray) {
-                            [realm addOrUpdateObject:saveAddress];
-                        }
+                    [[LMRealmManager sharedManager] executeRealmWithBlock:^{
+                        [currencyModel.addressListArray removeAllObjects];
+                        [currencyModel.addressListArray addObjects:saveArray];
                     }];
                     if (complte) {
                         complte(YES,coinDetailArray);
@@ -116,7 +117,7 @@
             
             
         }else {
-            NSLog(@"asdasd");
+            DDLogInfo(@"asdasd");
             // save db
         }
     } fail:^(NSError *error) {
