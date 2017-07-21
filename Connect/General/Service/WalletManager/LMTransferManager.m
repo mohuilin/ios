@@ -323,14 +323,14 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     
     [UIAlertController showAlertInViewController:controller withTitle:LMLocalizedString(@"Set tip title", nil) message:tips cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common Cancel", nil), LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex) {
         switch (buttonIndex) {
-            case 0:
+            case 2:
             {
                 if (complete) {
                     complete(nil,[NSError errorWithDomain:@"cancel" code:TransactionPackageErrorTypeCancel userInfo:nil]);
                 }
             }
                 break;
-            case 2:
+            case 3:
             {
                 [self verfiyWithOriginTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
             }
@@ -354,6 +354,16 @@ CREATE_SHARED_MANAGER(LMTransferManager)
                     complete(data,signError);
                 }
             }];
+        }
+    } forgetPassBlock:^{
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"cancel" code:TransactionPackageErrorTypeCancel userInfo:nil]);
+        }
+        UIViewController *controller = [UIViewController currentViewController];
+        [UIAlertController showAlertInViewController:controller withTitle:LMLocalizedString(@"Set tip title", nil) message:@"如果你忘记你的密码，我们也没有办法。。。" cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex){         }];
+    } closeBlock:^{
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"cancel" code:TransactionPackageErrorTypeCancel userInfo:nil]);
         }
     }];
 }

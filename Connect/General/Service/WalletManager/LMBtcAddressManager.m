@@ -129,7 +129,7 @@
 - (void)syncAddressListWithInputInputs:(NSArray *)inputs complete:(void (^)(NSError *error))complete{
     
     /// test
-//    inputs = @[@"1D3DoqYq5CYV6TXGXmyuSBq4EK6MwTYupx"];
+    inputs = @[@"1D3DoqYq5CYV6TXGXmyuSBq4EK6MwTYupx"];
     NSMutableString *mStr = [NSMutableString stringWithFormat:@"currency = %d AND address IN {",(int)CurrencyTypeBTC];
     for (NSString *address in inputs) {
         if ([address isEqualToString:[inputs lastObject]]) {

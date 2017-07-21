@@ -14,7 +14,7 @@
 #import "LMBtcCurrencyManager.h"
 #import "LMWalletManager.h"
 
-@interface InputPayPassView () <PassInputFieldViewDelegate, WJTouchIDDelegate>
+@interface InputPayPassView () <PassInputFieldViewDelegate>
 @property(strong, nonatomic) UIView *contentView;
 @property(strong, nonatomic) UILabel *titleLabel;
 @property(strong, nonatomic) UIView *lineView;
@@ -52,13 +52,12 @@
 
 - (IBAction)closeView:(id)sender {
     self.backgroundColor = [UIColor clearColor];
-    [UIView animateWithDuration:0.3 animations:^{
-        
+    if (self.closeBlock) {
+        self.closeBlock();
+    }
+    [UIView animateWithDuration:0.25 animations:^{
         self.top = DEVICE_SIZE.height;
     }                completion:^(BOOL finished) {
-        if (self.closeBlock) {
-            self.closeBlock();
-        }
         [self removeFromSuperview];
     }];
 }
@@ -103,28 +102,7 @@
     }];
 }
 
-+ (InputPayPassView *)showInputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, BOOL result))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock {
-    
-    InputPayPassView *passView = [[InputPayPassView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // The verification password is 4 digits long
-    if ([[MMAppSetting sharedSetting] getPayPass].length == MAX_PASS_LEN) {
-        passView.style = InputPayPassViewVerfyPass;
-        __weak __typeof(&*passView) weakSelf = passView;
-        passView.requestCallBack = ^(NSError *error) {
-            [weakSelf showResultStatusWithError:error];
-        };
-    } else {
-        passView.style = InputPayPassViewSetPass;
-    }
-    passView.completeBlock = complete;
-    passView.forgetPassBlock = forgetPassBlock;
-    passView.closeBlock = closeBlock;
-    passView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
-    UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    [window addSubview:passView];
-    return passView;
-}
-+ (InputPayPassView *)inputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete{
++ (InputPayPassView *)inputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock{
     InputPayPassView *passView = [[InputPayPassView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     passView.style = InputPayPassViewVerfyPass;
     __weak __typeof(&*passView) weakSelf = passView;
@@ -132,6 +110,8 @@
         [weakSelf showResultStatusWithError:error];
     };
     passView.payCompleteBlock = complete;
+    passView.forgetPassBlock = forgetPassBlock;
+    passView.closeBlock = closeBlock;
     passView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [window addSubview:passView];
