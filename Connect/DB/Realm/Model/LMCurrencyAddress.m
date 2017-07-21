@@ -7,16 +7,15 @@
 //
 
 #import "LMCurrencyAddress.h"
+#import "LMCurrencyModel.h"
 
 @implementation LMCurrencyAddress
 + (NSString *)primaryKey {
  return @"address";
 }
-/*
-+ (NSDictionary *)linkingObjectsProperties {
++ (NSDictionary<NSString *, RLMPropertyDescriptor *> *)linkingObjectsProperties {
     return @{
-             @"owners": [RLMPropertyDescriptor descriptorWithClass:LMCurrencyModel.class propertyName:@"addressListArray"],
+             @"addressOwer": [RLMPropertyDescriptor descriptorWithClass:LMCurrencyModel.class propertyName:@"addressListArray"],
              };
 }
-*/
 @end

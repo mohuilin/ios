@@ -21,9 +21,9 @@
 @property(nonatomic, strong) NSMutableArray *dataArr;
 @property(nonatomic, strong) UITableView *tableView;
 // page
-@property(nonatomic, assign) NSInteger page;
+@property(nonatomic, assign) int page;
 // pagesize
-@property(nonatomic, assign) NSInteger pagesize;
+@property(nonatomic, assign) int pagesize;
 // downPages
 @property(nonatomic, strong) NSMutableArray *downPages;
 
@@ -46,9 +46,8 @@
     Transactions *address = [Transactions parseFromData:data error:nil];
     [self successAction:address withFlag:YES];
     __weak __typeof(&*self) weakSelf = self;
-    NSString *recodsUrl = [NSString stringWithFormat:WalletAddressTransRecodsUrl, self.address, self.page, self.pagesize];
     MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [weakSelf getDataWithUrl:recodsUrl];
+        [weakSelf getData];
     }];
 
     // set title
@@ -73,52 +72,48 @@
     self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
         // get address records
         weakSelf.page += 1;
-        NSString *recodsUrl = [NSString stringWithFormat:WalletAddressTransRecodsUrl, weakSelf.address, weakSelf.page, weakSelf.pagesize];
-        [weakSelf getDataWithUrl:recodsUrl];
+        [weakSelf getData];
     }];
-    LMBaseCurrencyManager *baseCurrency = [[LMBtcCurrencyManager alloc] init];
-    [baseCurrency getWaterTransactions:CurrencyTypeBTC address:nil page:1 size:10 complete:^(BOOL result, NSArray *transactions) {
-        if (result) {
-            
-        }
-        
-    }];
-    
-    
-    
+   
 }
+- (void)getData {
 
-- (void)getDataWithUrl:(NSString *)recodsUrl {
     if ([self.downPages containsObject:@(self.page)]) {
         [GCDQueue executeInMainQueue:^{
             [self.tableView.mj_header endRefreshing];
             [self.tableView.mj_footer endRefreshing];
-
+            
             [self.tableView reloadData];
         }];
         return;
     }
-    [NetWorkOperationTool GETWithUrlString:recodsUrl complete:^(id response) {
-        HttpNotSignResponse *httpNoSignResponse = (HttpNotSignResponse *) response;
-        if (httpNoSignResponse.code != successCode) {
-            return;
-        }
-        Transactions *address = [Transactions parseFromData:httpNoSignResponse.body error:nil];
-        if (self.page == 1) {
-            [[LMHistoryCacheManager sharedManager] cacheTransferContacts:address.data];
-            // clear
-            [self.dataArr removeAllObjects];
-        }
-        [self.downPages objectAddObject:@(self.page)];
-        [self successAction:address withFlag:NO];
-    } fail:^(NSError *error) {
-        [GCDQueue executeInMainQueue:^{
-            [self.tableView.mj_header endRefreshing];
-            [self.tableView.mj_footer endRefreshing];
-            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:recodsUrl] withType:ToastTypeFail showInView:self.view complete:^{
-                [self.tableView reloadData];
+    
+    LMBaseCurrencyManager *baseCurrency = nil;
+    switch (self.currency) {
+        case CurrencyTypeBTC:
+            baseCurrency = [[LMBtcCurrencyManager alloc] init];
+            break;
+        default:
+            break;
+    }
+    
+    [baseCurrency getWaterTransactions:CurrencyTypeBTC address:nil page:self.page size:self.pagesize complete:^(BOOL result, Transactions *transactions) {
+        if (result) {
+            if (self.page == 1) {
+                [self.dataArr removeAllObjects];
+            }
+            [self.downPages objectAddObject:@(self.page)];
+            [self successAction:transactions withFlag:NO];
+            
+        }else {
+            [GCDQueue executeInMainQueue:^{
+                [self.tableView.mj_header endRefreshing];
+                [self.tableView.mj_footer endRefreshing];
+                [MBProgressHUD showToastwithText:nil withType:ToastTypeFail showInView:self.view complete:^{
+                    [self.tableView reloadData];
+                }];
             }];
-        }];
+        }
     }];
 }
 - (void)successAction:(Transactions *)address withFlag:(BOOL)flag{

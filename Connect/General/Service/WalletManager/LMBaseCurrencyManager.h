@@ -89,7 +89,7 @@
 - (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation inputs:(NSArray *)inputs seed:(NSString *)seed;
 
 #pragma mark - water method
-- (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(BOOL result,NSArray *transactions))complete;
+- (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(BOOL result,Transactions *transactions))complete;
 
 
 @end

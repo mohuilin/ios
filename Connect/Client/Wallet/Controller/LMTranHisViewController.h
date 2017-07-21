@@ -12,4 +12,6 @@
 
 @property(nonatomic, copy) NSString *address;
 
+@property(nonatomic, assign) CurrencyType currency;
+
 @end
