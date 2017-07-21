@@ -71,7 +71,7 @@ extern "C" {
     LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)currency]] lastObject];
     if(currencyModel){
         if (complete) {
-            complete(NO,[NSError errorWithDomain:@"" code:135 userInfo:nil]);
+            complete(NO,[NSError errorWithDomain:@"" code:CURRENCY_ISEXIST_135 userInfo:nil]);
         }
         return;
     }
@@ -87,7 +87,7 @@ extern "C" {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,[NSError errorWithDomain:hResponse.message code:131 userInfo:nil]);
+                complete(NO,[NSError errorWithDomain:hResponse.message code:CREAR_CURRENCY_FAILED_131 userInfo:nil]);
             }
         }else {
             // save db
@@ -113,13 +113,13 @@ extern "C" {
             [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
                 [realm addOrUpdateObject:currencyModel];
             }];
-            //if (complete) {
-              //  complete(YES,nil);
-            //}
+            if (complete) {
+                complete(YES,nil);
+            }
         }
     } fail:^(NSError *error) {
         if (complete) {
-           complete(NO,[NSError errorWithDomain:@"" code:131 userInfo:nil]);
+           complete(NO,[NSError errorWithDomain:@"" code:CREAR_CURRENCY_FAILED_131 userInfo:nil]);
         }
     }];
 }
@@ -159,7 +159,7 @@ extern "C" {
 - (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(BOOL result))complte{
     
     Coin *coin = [Coin new];
-    coin.currency = currency;
+    coin.currency = (int)currency;
     coin.status = status;
     [NetWorkOperationTool POSTWithUrlString:SetCurrencyInfo postProtoData:coin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -571,17 +571,6 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     [mStr appendString:@"}"];
     
     NSMutableArray *privkeyArray = [NSMutableArray array];
-    RLMResults *result = [LMCurrencyAddress objectsWhere:mStr];
-    
-    /**
-    for (LMCurrencyAddress *currrencyAddress in result) {
-        NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:currrencyAddress.index];
-        if (inputsPrivkey) {
-            [privkeyArray addObject:inputsPrivkey];
-        }
-    }
-     */
-    
     //TEST
     NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:0];
     [privkeyArray addObject:inputsPrivkey];
@@ -640,13 +629,13 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     return temArray.copy;
 }
 #pragma mark - water methods
-- (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(BOOL result,Transactions *transactions))complete {
+- (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(Transactions *transactions,NSError *error))complete {
     
     if (page == 0) {
         page = 1;
     }
     if (size == 0) {
-        size = 50;
+        size = 10;
     }
     GetTx *requestTranslation = [GetTx new];
     requestTranslation.currency = (int)currency;
@@ -660,7 +649,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
         HttpResponse *hRespone = (HttpResponse *)response;
         if (hRespone.code != successCode) {
             if(complete){
-                complete(NO,nil);
+                complete(nil,nil);
             }
         }else{
             NSData *data = [ConnectTool decodeHttpResponse:hRespone];
@@ -670,13 +659,13 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
                     [[LMHistoryCacheManager sharedManager] cacheTransferContacts:transations.data];
                 }
                 if (complete) {
-                    complete(YES,transations);
+                    complete(transations,nil);
                 }
             }
         }
     } fail:^(NSError *error) {
         if(complete){
-            complete(NO,nil);
+            complete(nil,nil);
         }
     }];
 

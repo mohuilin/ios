@@ -48,7 +48,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,[NSError errorWithDomain:hResponse.message code:133 userInfo:nil]);
+                complete(NO,[NSError errorWithDomain:hResponse.message code:SYNC_DATA_FAILED_133 userInfo:nil]);
             }
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
@@ -65,7 +65,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO,[NSError errorWithDomain:@"" code:133 userInfo:nil]);
+            complete(NO,[NSError errorWithDomain:@"" code:SYNC_DATA_FAILED_133 userInfo:nil]);
         }
     }];
 }
@@ -391,7 +391,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         if (hResponse.code != successCode) {
             if (complete) {
                 if ([url isEqualToString:EncryptionBaseSeedUrl]) {
-                    complete(NO,[NSError errorWithDomain:hResponse.message code:132 userInfo:nil]);
+                    complete(NO,[NSError errorWithDomain:hResponse.message code:CREAR_WALLET_FAILED_132 userInfo:nil]);
                 }else {
                     complete(NO,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
                 }
@@ -423,7 +423,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     } fail:^(NSError *error) {
         if (complete) {
             if ([url isEqualToString:EncryptionBaseSeedUrl]) {
-                complete(NO,[NSError errorWithDomain:@"" code:132 userInfo:nil]);
+                complete(NO,[NSError errorWithDomain:@"" code:CREAR_WALLET_FAILED_132 userInfo:nil]);
             }else {
                 complete(NO,error);
             }

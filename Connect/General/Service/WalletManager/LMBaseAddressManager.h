@@ -21,14 +21,22 @@
  *  get currency addresss list
  *
  */
-- (void)getCurrencyAddressList:(void (^)(BOOL result,NSMutableArray<CoinInfo *> *addressList)) complte;
+- (void)getCurrencyAddressList:(void (^)(NSMutableArray<CoinInfo *> *addressList,NSError *error))complete;
 
 /**
  * set currency address message
  *
  */
 - (void)setCurrencyAddressMessageWithAddress:(NSString *)address lable:(NSString *)lable status:(int)status complete:(void (^)(BOOL result))complete;
-
+/**
+ *  ListWithInputInputs
+ *
+ */
 - (void)syncAddressListWithInputInputs:(NSArray *)inputs complete:(void (^)(NSError *error))complete;
+/**
+ *  ListWithInputInputs
+ *
+ */
+- (void)getAddress:(void (^)(CoinInfo *address,NSError *error))complete;
 
 @end

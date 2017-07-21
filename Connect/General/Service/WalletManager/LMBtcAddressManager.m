@@ -46,14 +46,14 @@
  *  get currency addresss list
  *
  */
-- (void)getCurrencyAddressList:(void (^)(BOOL result,NSMutableArray<CoinInfo *> *addressList)) complte {
+- (void)getCurrencyAddressList:(void (^)(NSMutableArray<CoinInfo *> *addressList,NSError *error))complete {
     Coin *coin = [Coin new];
     coin.currency = (int)CurrencyTypeBTC;
     [NetWorkOperationTool POSTWithUrlString:GetCurrencyAddressList postProtoData:coin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
-            if (complte) {
-                complte(NO,nil);
+            if (complete) {
+                complete(nil,[NSError errorWithDomain:hResponse.message code:GET_ADDRESSLIST_FAILED_134 userInfo:nil]);
             }
         }else {
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
@@ -84,18 +84,14 @@
                         }
                     }
                 }];
-                if (complte) {
-                    complte(YES,coinDetailArray);
-                }
-            }else {
-                if (complte) {
-                    complte(NO,nil);
+                if (complete) {
+                    complete(coinDetailArray,nil);
                 }
             }
         }
     } fail:^(NSError *error) {
-        if (complte) {
-            complte(NO,nil);
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"" code:GET_ADDRESSLIST_FAILED_134 userInfo:nil]);
         }
     }];
 }
@@ -140,8 +136,8 @@
     RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
     //sync
     if (YES) {
-        [self getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
-            if (result) {
+        [self getCurrencyAddressList:^(NSMutableArray<CoinInfo *> *addressList,NSError *error) {
+            if (!error) {
                 RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
                 if (results.count == inputs.count) {
                     if (complete) {
@@ -164,6 +160,29 @@
         }
     }
 }
+/**
+ *  ListWithInputInputs
+ *
+ */
+- (void)getAddress:(void (^)(CoinInfo *address,NSError *error))complete {
 
+  [self getCurrencyAddressList:^(NSMutableArray<CoinInfo *> *addressList, NSError *error) {
+      if (!error) {
+          if (addressList.count > 0) {
+              CoinInfo *address = [addressList firstObject];
+              if (complete) {
+                  complete(address,nil);
+              }
+          }
+      }else {
+          if (complete) {
+              complete(nil,[NSError errorWithDomain:@"" code:GET_ADDRESSLIST_FAILED_134 userInfo:nil]);
+          }
+       
+      }
+      
+      
+  }];
+}
 
 @end

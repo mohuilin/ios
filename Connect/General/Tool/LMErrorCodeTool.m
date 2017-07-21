@@ -11,11 +11,6 @@
 
 #define UnKnownError  @"Link Unknown error"
 
-#define CREAR_CURRENCY_FAILED_131         LMLocalizedString(@"Wallet create currency failed", nil)
-#define CREAR_WALLET_FAILED_132           LMLocalizedString(@"Wallet Create wallet failed", nil)
-#define SYNC_DATA_FAILED_133              LMLocalizedString(@"Wallet synchronization data failed", nil)
-#define GET_ADDRESSLIST_FAILED_134        LMLocalizedString(@"Wallet Failed to get the list address", nil)
-#define CURRENCY_ISEXIST_135              LMLocalizedString(@"Wallet The currency already exists", nil)
 #define NO_TRANSATION_HISTORY_1001        LMLocalizedString(@"Set No transaction history", nil)
 #define SALT_UNAVAILABLE_2001             LMLocalizedString(@"ErrorCode salt failure or gcm decryption failed", nil)
 #define ECDH_CREAT_FAILURE_2002           LMLocalizedString(@"ErrorCode Ecdh generation failed", nil)
@@ -543,35 +538,33 @@
 #pragma mark  -  Wallet type error message display
 +(NSString*)showWalletErrorStringWithCode:(ErrorCodeType)errorCodeType withUrl:(NSString*)url
 {
-    
     switch (errorCodeType) {
-        case ErrorCodeType131:
+        case CREAR_CURRENCY_FAILED_131:
         {
-            return CREAR_CURRENCY_FAILED_131;
+            return LMLocalizedString(@"Wallet create currency failed", nil);
+        }
+            break;
+        case CREAR_WALLET_FAILED_132:
+        {
+            return LMLocalizedString(@"Wallet Create wallet failed", nil);
             
         }
             break;
-        case ErrorCodeType132:
+        case SYNC_DATA_FAILED_133:
         {
-            return CREAR_WALLET_FAILED_132;
+            return LMLocalizedString(@"Wallet synchronization data failed", nil);
             
         }
             break;
-        case ErrorCodeType133:
+        case GET_ADDRESSLIST_FAILED_134:
         {
-            return SYNC_DATA_FAILED_133;
+            return LMLocalizedString(@"Wallet Failed to get the list address", nil);
             
         }
             break;
-        case ErrorCodeType134:
+        case CURRENCY_ISEXIST_135:
         {
-            return GET_ADDRESSLIST_FAILED_134;
-            
-        }
-            break;
-        case ErrorCodeType135:
-        {
-            return CURRENCY_ISEXIST_135;
+            return LMLocalizedString(@"Wallet The currency already exists", nil);
             
         }
             break;
