@@ -3032,6 +3032,8 @@ typedef GPB_ENUM(RedPackage_FieldNumber) {
   RedPackage_FieldNumber_Typ = 15,
   RedPackage_FieldNumber_CreatedAt = 16,
   RedPackage_FieldNumber_System = 17,
+  RedPackage_FieldNumber_Pause = 18,
+  RedPackage_FieldNumber_Currency = 19,
 };
 
 @interface RedPackage : GPBMessage
@@ -3069,6 +3071,10 @@ typedef GPB_ENUM(RedPackage_FieldNumber) {
 @property(nonatomic, readwrite) int64_t createdAt;
 
 @property(nonatomic, readwrite) BOOL system;
+
+@property(nonatomic, readwrite) BOOL pause;
+
+@property(nonatomic, readwrite) int32_t currency;
 
 @end
 
@@ -3569,6 +3575,7 @@ typedef GPB_ENUM(ExternalBillingInfo_FieldNumber) {
   ExternalBillingInfo_FieldNumber_ReceiverInfo = 14,
   ExternalBillingInfo_FieldNumber_Deadline = 15,
   ExternalBillingInfo_FieldNumber_Cancelled = 16,
+  ExternalBillingInfo_FieldNumber_Currency = 17,
 };
 
 @interface ExternalBillingInfo : GPBMessage
@@ -3606,6 +3613,8 @@ typedef GPB_ENUM(ExternalBillingInfo_FieldNumber) {
 @property(nonatomic, readwrite) int64_t deadline;
 
 @property(nonatomic, readwrite) BOOL cancelled;
+
+@property(nonatomic, readwrite) int32_t currency;
 
 @end
 

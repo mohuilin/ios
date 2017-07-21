@@ -941,6 +941,8 @@ int64 deadline = 14;
 int32 typ = 15;
 int64 created_at=16;
 bool  system = 17;
+bool pause = 18;
+int32 currency = 19;
 }
 
 message RedPackageInfo {
@@ -1112,6 +1114,7 @@ string url = 13;
 UserInfo receiverInfo = 14;
 int64 deadline = 15;
 bool cancelled = 16;
+int32 currency = 17;
 }
 
 

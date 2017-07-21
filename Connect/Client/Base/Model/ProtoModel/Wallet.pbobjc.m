@@ -1636,13 +1636,17 @@ typedef struct HashIdResp__storage_ {
 @dynamic addressesArray, addressesArray_Count;
 @dynamic estimateFee;
 @dynamic oddChange;
+@dynamic txOutsArray, txOutsArray_Count;
+@dynamic currency;
 
 typedef struct OriginalTransaction__storage_ {
   uint32_t _has_storage_[1];
+  int32_t currency;
   NSString *hashId;
   NSString *rawhex;
   NSString *vts;
   NSMutableArray *addressesArray;
+  NSMutableArray *txOutsArray;
   int64_t fee;
   int64_t estimateFee;
   int64_t oddChange;
@@ -1716,6 +1720,24 @@ typedef struct OriginalTransaction__storage_ {
         .offset = (uint32_t)offsetof(OriginalTransaction__storage_, oddChange),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
+      },
+      {
+        .name = "txOutsArray",
+        .dataTypeSpecific.className = GPBStringifySymbol(Txout),
+        .number = OriginalTransaction_FieldNumber_TxOutsArray,
+        .hasIndex = GPBNoHasBit,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, txOutsArray),
+        .flags = GPBFieldRepeated,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_Currency,
+        .hasIndex = 6,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =

@@ -281,6 +281,7 @@
 "Link Group is QR Code"="群二维码";
 "Link HASH match contact firends The server does not keep"="通过哈希算法匹配通讯录好友\n服务器不会保存联系人信息";
 "Link Hello"="你好";
+"Link Friend" = "好友";
 "Link Hello I am"="Hi, 我是 %@";
 "Link Input a tag"="输入标签";
 "Link Invite"="邀请";
@@ -601,6 +602,7 @@
 "Wallet Confirm PIN"="请再输入一次";
 "Wallet Confirm Payment password"="确认你的支付密码";
 "Wallet Confirm password"="确认密码";
+"Wallet Confirm transfer"="确认转账";
 "Wallet Confirmed"="已确认";
 "Wallet Congratulations"="恭喜你!";
 "Wallet Connect Pay"="Connect 支付";
@@ -724,5 +726,6 @@
 "Wallet synchronization data failed" = "同步数据失败";
 "Wallet Failed to get the list address" = "获取地址列表失败";
 "Wallet The currency already exists" = "币种已经存在";
+"Wallet Transfer details" = "转账详情";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

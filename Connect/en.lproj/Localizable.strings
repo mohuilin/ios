@@ -341,6 +341,7 @@
 "Link Unable to access permissom storage"="No access to memory, please authorize in the application access management";
 "Link Unable to get the camera data"="Unable to get the camera data, please open the camera permissions in the phone application rights management";
 "Link Unable to get the sms data"="No access to the sms, please enable the sms in the application access management on your phone";
+"Link Friend" = "Friend";
 "Link Unable to get the voice data"="No access to the audio, please enable the audio in the application access management on your phone";
 "Link Unknown error"="Unknown error";
 "Link Update Group Name Failed"="Update Group Name Failed";
@@ -716,6 +717,7 @@
 "Wallet send lucky packet via Connect"="Send lucky packet via Connect";
 "Wallet send lucky packet via Connect packets"="Send lucky packet via Connect \n%d packets";
 "Wallet transfer man"="Transfer (%d)";
+"Wallet Confirm transfer"="Confirm transfer";
 "Wallet transferOutVia return"="Refund the transfer";
 "Wallet transferOutVia return Success"="Refund successfully";
 "Wallet create currency failed" = "Create currency failed";
@@ -723,5 +725,6 @@
 "Wallet synchronization data failed" = "Synchronization data failed";
 "Wallet Failed to get the list address" = "Failed to get the list address";
 "Wallet The currency already exists" = "The currency already exists";
+"Wallet Transfer details" = "Transfer details";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

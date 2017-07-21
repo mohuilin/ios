@@ -10200,6 +10200,8 @@ typedef struct OrdinaryRedPackage__storage_ {
 @dynamic typ;
 @dynamic createdAt;
 @dynamic system;
+@dynamic pause;
+@dynamic currency;
 
 typedef struct RedPackage__storage_ {
   uint32_t _has_storage_[1];
@@ -10207,6 +10209,7 @@ typedef struct RedPackage__storage_ {
   int32_t size;
   int32_t status;
   int32_t typ;
+  int32_t currency;
   NSString *hashId;
   NSString *sendAddress;
   NSString *tips;
@@ -10377,6 +10380,24 @@ typedef struct RedPackage__storage_ {
         .offset = 19,  // Stored in _has_storage_ to save space.
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeBool,
+      },
+      {
+        .name = "pause",
+        .dataTypeSpecific.className = NULL,
+        .number = RedPackage_FieldNumber_Pause,
+        .hasIndex = 20,
+        .offset = 21,  // Stored in _has_storage_ to save space.
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeBool,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = RedPackage_FieldNumber_Currency,
+        .hasIndex = 22,
+        .offset = (uint32_t)offsetof(RedPackage__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -12102,10 +12123,12 @@ typedef struct ExternalBillingHistory__storage_ {
 @dynamic hasReceiverInfo, receiverInfo;
 @dynamic deadline;
 @dynamic cancelled;
+@dynamic currency;
 
 typedef struct ExternalBillingInfo__storage_ {
   uint32_t _has_storage_[1];
   int32_t status;
+  int32_t currency;
   NSString *hash_p;
   NSString *sender;
   NSString *receiver;
@@ -12267,6 +12290,15 @@ typedef struct ExternalBillingInfo__storage_ {
         .offset = 20,  // Stored in _has_storage_ to save space.
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeBool,
+      },
+      {
+        .name = "currency",
+        .dataTypeSpecific.className = NULL,
+        .number = ExternalBillingInfo_FieldNumber_Currency,
+        .hasIndex = 21,
+        .offset = (uint32_t)offsetof(ExternalBillingInfo__storage_, currency),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
       },
     };
     GPBDescriptor *localDescriptor =
