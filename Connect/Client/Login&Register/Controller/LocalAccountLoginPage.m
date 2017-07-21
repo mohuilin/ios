@@ -242,6 +242,9 @@
 - (void)tapLoginBtn {
     [MBProgressHUD showMessage:LMLocalizedString(@"Common Loading", nil) toView:self.view];
     __weak __typeof(&*self) weakSelf = self;
+    if (_passwordField.text.length <= 0) {
+       [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+    }
     [[LKUserCenter shareCenter] LoginUserWithAccountUser:_selectedAccount withPassword:_passwordField.text withComplete:^(NSString *privkey, NSError *error) {
         if (error) {
             [GCDQueue executeInMainQueue:^{
