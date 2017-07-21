@@ -875,24 +875,21 @@
             break;
         case ErrorCodeType2100:
         {
-            if ([url isEqualToString:LoginSignUpUrl]) {
-                return USERNAME_ERROR_2100;
-            }
+            
+            return USERNAME_ERROR_2100;
+            
         }
             break;
         case ErrorCodeType2101:
         {
-            if ([url isEqualToString:LoginSignUpUrl]) {
-                return USERAVATAR_ILLEGAL_2101;
-            }
+            return USERAVATAR_ILLEGAL_2101;
             
         }
             break;
         case ErrorCodeType2102:
         {
-            if ([url isEqualToString:LoginSignUpUrl]) {
-                return USERNAME_EXISTS_2102;
-            }
+            return USERNAME_EXISTS_2102;
+            
         }
             break;
         case ErrorCodeType2400:
