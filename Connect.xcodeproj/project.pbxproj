@@ -812,6 +812,7 @@
 		D97FDCBF1E86664800B161C8 /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D97FDCA71E86664800B161C8 /* YYTextView.m */; };
 		D97FDCC51E88FCC500B161C8 /* NSMutableArray+Check.m in Sources */ = {isa = PBXBuildFile; fileRef = D97FDCC41E88FCC500B161C8 /* NSMutableArray+Check.m */; };
 		D97FDCEE1E8B5EE200B161C8 /* LMMessageTool.m in Sources */ = {isa = PBXBuildFile; fileRef = D97FDCED1E8B5EE200B161C8 /* LMMessageTool.m */; };
+		D98FD2B71F20B9B10078250B /* TestString.m in Sources */ = {isa = PBXBuildFile; fileRef = D98FD2B61F20B9B10078250B /* TestString.m */; };
 		D98FD7DC1D264E1E0048E29E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7DB1D264E1E0048E29E /* CoreFoundation.framework */; };
 		D98FD7DE1D264E290048E29E /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7DD1D264E290048E29E /* CoreTelephony.framework */; };
 		D98FD7E01D264E340048E29E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7DF1D264E340048E29E /* SystemConfiguration.framework */; };
@@ -2554,6 +2555,7 @@
 		D97FDCC41E88FCC500B161C8 /* NSMutableArray+Check.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+Check.m"; sourceTree = "<group>"; };
 		D97FDCEC1E8B5EE200B161C8 /* LMMessageTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMMessageTool.h; sourceTree = "<group>"; };
 		D97FDCED1E8B5EE200B161C8 /* LMMessageTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMMessageTool.m; sourceTree = "<group>"; };
+		D98FD2B61F20B9B10078250B /* TestString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestString.m; sourceTree = "<group>"; };
 		D98FD7DB1D264E1E0048E29E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		D98FD7DD1D264E290048E29E /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		D98FD7DF1D264E340048E29E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -12695,6 +12697,7 @@
 			children = (
 				1921AF4D1E701DF60020C853 /* ConnectTests.m */,
 				1921AF4F1E701DF60020C853 /* Info.plist */,
+				D98FD2B61F20B9B10078250B /* TestString.m */,
 			);
 			path = ConnectTests;
 			sourceTree = "<group>";
@@ -32825,6 +32828,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D98FD2B71F20B9B10078250B /* TestString.m in Sources */,
 				1921AF4E1E701DF60020C853 /* ConnectTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

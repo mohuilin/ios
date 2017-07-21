@@ -17,4 +17,9 @@
 - (NSString *)hmacSHA1StringWithKey:(NSString *)key;
 - (NSString *)hmacSHA256StringWithKey:(NSString *)key;
 - (NSString *)hmacSHA512StringWithKey:(NSString *)key;
+
+
+- (NSString *)nomarlString;
+- (NSString *)hexString;
+
 @end
