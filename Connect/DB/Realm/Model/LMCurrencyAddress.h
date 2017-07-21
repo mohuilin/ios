@@ -17,6 +17,7 @@
 @property (nonatomic,copy)NSString *label;
 @property (nonatomic,assign)int status;
 
-@end
+@property(readonly) RLMLinkingObjects *addressOwer;
 
+@end
 RLM_ARRAY_TYPE(LMCurrencyAddress)

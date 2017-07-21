@@ -89,17 +89,6 @@
                 self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,address.address];
                 // qr code
                 [self addQRcodeImageView];
-                // save defaultAddress
-                LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)weakSelf.currency]] firstObject];
-                RLMResults *currencyAddressList = [LMCurrencyAddress allObjects];
-                // save address db
-                [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                    [currencyModel.addressListArray removeAllObjects];
-                    for (LMCurrencyAddress *addressModel in currencyAddressList) {
-                        [currencyModel.addressListArray addObject:addressModel];
-                    }
-                    currencyModel.defaultAddress = address.address;
-                }];
             }
         }else{
             [GCDQueue executeInMainQueue:^{

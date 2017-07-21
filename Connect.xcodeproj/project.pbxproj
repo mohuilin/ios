@@ -14,7 +14,6 @@
 		191B3E071E10CABF001F44C7 /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 191B3E061E10CABF001F44C7 /* LocalAuthentication.framework */; };
 		1921AF4E1E701DF60020C853 /* ConnectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF4D1E701DF60020C853 /* ConnectTests.m */; };
 		1921AF611E7027960020C853 /* ConnectUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF601E7027960020C853 /* ConnectUITests.m */; };
-		1921AF6A1E70294C0020C853 /* LMUITest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF691E70294C0020C853 /* LMUITest.m */; };
 		1921AF6E1E702C660020C853 /* Connect_IMUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1921AF6C1E702C660020C853 /* Connect_IMUITests.m */; };
 		19234F421E8113D60022D844 /* CaptureAvatarPage.m in Sources */ = {isa = PBXBuildFile; fileRef = 19234F291E8113D60022D844 /* CaptureAvatarPage.m */; };
 		19234F441E8113D60022D844 /* LMRandomSeedController.m in Sources */ = {isa = PBXBuildFile; fileRef = 19234F2D1E8113D60022D844 /* LMRandomSeedController.m */; };
@@ -812,7 +811,6 @@
 		D97FDCBF1E86664800B161C8 /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D97FDCA71E86664800B161C8 /* YYTextView.m */; };
 		D97FDCC51E88FCC500B161C8 /* NSMutableArray+Check.m in Sources */ = {isa = PBXBuildFile; fileRef = D97FDCC41E88FCC500B161C8 /* NSMutableArray+Check.m */; };
 		D97FDCEE1E8B5EE200B161C8 /* LMMessageTool.m in Sources */ = {isa = PBXBuildFile; fileRef = D97FDCED1E8B5EE200B161C8 /* LMMessageTool.m */; };
-		D98FD2B71F20B9B10078250B /* TestString.m in Sources */ = {isa = PBXBuildFile; fileRef = D98FD2B61F20B9B10078250B /* TestString.m */; };
 		D98FD7DC1D264E1E0048E29E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7DB1D264E1E0048E29E /* CoreFoundation.framework */; };
 		D98FD7DE1D264E290048E29E /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7DD1D264E290048E29E /* CoreTelephony.framework */; };
 		D98FD7E01D264E340048E29E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D98FD7DF1D264E340048E29E /* SystemConfiguration.framework */; };
@@ -1028,6 +1026,7 @@
 		F172A66F1EB8843C006E186C /* MMMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F172A66E1EB8843C006E186C /* MMMessage.m */; };
 		F17CBE2F1ED40C700067234D /* LMselectCountryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */; };
 		F17CBE321ED536920067234D /* LMDisplayProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE311ED536920067234D /* LMDisplayProgressView.m */; };
+		F19FC0571F21998C0037EE11 /* LMCurrencyMethodTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F19FC0561F21998C0037EE11 /* LMCurrencyMethodTest.m */; };
 		F1ADBAF01EF90C3500570DF6 /* LMRamGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */; };
 		F1B363D21E85255600B65086 /* LMSearchTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F1B363D11E85255600B65086 /* LMSearchTextField.m */; };
 		F1CC2E941E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2E931E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m */; };
@@ -1088,7 +1087,6 @@
 		1921AF5E1E7027960020C853 /* ConnectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConnectUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1921AF601E7027960020C853 /* ConnectUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConnectUITests.m; sourceTree = "<group>"; };
 		1921AF621E7027960020C853 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1921AF691E70294C0020C853 /* LMUITest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMUITest.m; sourceTree = "<group>"; };
 		1921AF6C1E702C660020C853 /* Connect_IMUITests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Connect_IMUITests.m; sourceTree = "<group>"; };
 		1921AF6D1E702C660020C853 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		19234F281E8113D60022D844 /* CaptureAvatarPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CaptureAvatarPage.h; sourceTree = "<group>"; };
@@ -2555,7 +2553,6 @@
 		D97FDCC41E88FCC500B161C8 /* NSMutableArray+Check.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+Check.m"; sourceTree = "<group>"; };
 		D97FDCEC1E8B5EE200B161C8 /* LMMessageTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMMessageTool.h; sourceTree = "<group>"; };
 		D97FDCED1E8B5EE200B161C8 /* LMMessageTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMMessageTool.m; sourceTree = "<group>"; };
-		D98FD2B61F20B9B10078250B /* TestString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestString.m; sourceTree = "<group>"; };
 		D98FD7DB1D264E1E0048E29E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		D98FD7DD1D264E290048E29E /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		D98FD7DF1D264E340048E29E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -12608,6 +12605,7 @@
 		F17CBE311ED536920067234D /* LMDisplayProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMDisplayProgressView.m; sourceTree = "<group>"; };
 		F198A98A1EAF6043008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F198A98B1EAF6048008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F19FC0561F21998C0037EE11 /* LMCurrencyMethodTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyMethodTest.m; sourceTree = "<group>"; };
 		F1ADBAEE1EF90C3500570DF6 /* LMRamGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamGroupInfo.h; sourceTree = "<group>"; };
 		F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamGroupInfo.m; sourceTree = "<group>"; };
 		F1B363D01E85255600B65086 /* LMSearchTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSearchTextField.h; sourceTree = "<group>"; };
@@ -12696,8 +12694,8 @@
 			isa = PBXGroup;
 			children = (
 				1921AF4D1E701DF60020C853 /* ConnectTests.m */,
+				F19FC0561F21998C0037EE11 /* LMCurrencyMethodTest.m */,
 				1921AF4F1E701DF60020C853 /* Info.plist */,
-				D98FD2B61F20B9B10078250B /* TestString.m */,
 			);
 			path = ConnectTests;
 			sourceTree = "<group>";
@@ -12706,7 +12704,6 @@
 			isa = PBXGroup;
 			children = (
 				1921AF601E7027960020C853 /* ConnectUITests.m */,
-				1921AF691E70294C0020C853 /* LMUITest.m */,
 				1921AF621E7027960020C853 /* Info.plist */,
 			);
 			path = ConnectUITests;
@@ -32828,7 +32825,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D98FD2B71F20B9B10078250B /* TestString.m in Sources */,
+				F19FC0571F21998C0037EE11 /* LMCurrencyMethodTest.m in Sources */,
 				1921AF4E1E701DF60020C853 /* ConnectTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -32837,7 +32834,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1921AF6A1E70294C0020C853 /* LMUITest.m in Sources */,
 				1921AF611E7027960020C853 /* ConnectUITests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
