@@ -63,31 +63,29 @@
                 // save defaultAddress
                 LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)CurrencyTypeBTC]] lastObject];
                 // save address db
-                if (coinDetailArray.count > 0) {
-                    // save address db
-                    NSMutableArray *saveArray = [NSMutableArray array];
+                [[LMRealmManager sharedManager] executeRealmWithBlock:^{
                     for (CoinInfo *coinAddress in coinDetailArray) {
-                        LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
-                        saveAddress.address = coinAddress.address;
-                        saveAddress.label = coinAddress.label;
-                        saveAddress.status = coinAddress.status;
-                        saveAddress.balance = coinAddress.balance;
-                        saveAddress.index = coinAddress.index;
-                        saveAddress.currency = (int)CurrencyTypeBTC;
-                        saveAddress.amount = coinAddress.amount;
-                        [saveArray addObject:saveAddress];
+                        LMCurrencyAddress *currencyAddress = [[LMCurrencyAddress objectsWhere:[NSString stringWithFormat:@"currency = %d and address = '%@'",(int)CurrencyTypeBTC,coinAddress.address]] lastObject];
+                        if (currencyAddress) {
+                            currencyAddress.label = coinAddress.label;
+                            currencyAddress.status = coinAddress.status;
+                            currencyAddress.balance = coinAddress.balance;
+                            currencyAddress.amount = coinAddress.amount;
+                        } else {
+                            LMCurrencyAddress *saveAddress = [LMCurrencyAddress new];
+                            saveAddress.address = coinAddress.address;
+                            saveAddress.label = coinAddress.label;
+                            saveAddress.status = coinAddress.status;
+                            saveAddress.balance = coinAddress.balance;
+                            saveAddress.index = coinAddress.index;
+                            saveAddress.currency = (int)CurrencyTypeBTC;
+                            saveAddress.amount = coinAddress.amount;
+                            [currencyModel.addressListArray addObject:saveAddress];
+                        }
                     }
-                    [[LMRealmManager sharedManager] executeRealmWithBlock:^{
-                        [currencyModel.addressListArray removeAllObjects];
-                        [currencyModel.addressListArray addObjects:saveArray];
-                    }];
-                    if (complte) {
-                        complte(YES,coinDetailArray);
-                    }
-                }else {
-                    if (complte) {
-                        complte(YES,nil);
-                    }
+                }];
+                if (complte) {
+                    complte(YES,coinDetailArray);
                 }
             }else {
                 if (complte) {
@@ -141,7 +139,7 @@
     [mStr appendString:@"}"];
     RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
     //sync
-    if (results.count != inputs.count) {
+    if (YES) {
         [self getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
             if (result) {
                 RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
