@@ -341,6 +341,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                                     }
                                     NSString *bSeedPrikey = [baseCurrency getPrivkeyBySeed:BitSeed index:0];
                                     NSString *masterAddress = [baseCurrency getAddressByPrivKey:bSeedPrikey];
+                                    
                                     [baseCurrency createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(BOOL result,NSError *error) {
                                         if (result) {
                                             // tips
