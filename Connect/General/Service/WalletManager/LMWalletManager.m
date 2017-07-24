@@ -311,6 +311,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     seedVc.seedSourceType = SeedSouceTypeWallet;
     seedVc.SeedBlock = ^(NSString *randomSeed) {
         if (!GJCFStringIsNull(randomSeed)) {
+            controllerVc.tabBarController.tabBar.hidden = NO;
             [LMWalletManager sharedManager].baseSeed = randomSeed;
             NSString __block *firstPass = nil;
             [GCDQueue executeInMainQueue:^{
@@ -378,7 +379,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  * update password
  *
  */
-+ (void)updatePassWord:(NSString *)payload checkSum:(NSString *)checkSum version:(int)version ver:(int)ver url:(NSString *)url payPass:(NSString *)payPass compete:(void(^)(BOOL result,NSError *error))complete{
+- (void)updatePassWord:(NSString *)payload checkSum:(NSString *)checkSum version:(int)version ver:(int)ver url:(NSString *)url payPass:(NSString *)payPass compete:(void(^)(BOOL result,NSError *error))complete{
     if (payPass.length <= 0) {
         return;
     }
@@ -436,7 +437,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  * set password method
  *
  */
-+ (void)setPassWord:(NSString *)passWord complete:(void(^)(BOOL result,NSError *error))complete {
+- (void)setPassWord:(NSString *)passWord complete:(void(^)(BOOL result,NSError *error))complete {
     if (passWord == nil) {
         passWord = @"";
         return;
@@ -478,7 +479,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *  reset password methods
  *
  */
-+ (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(BOOL result,NSError *error))complete {
+- (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(BOOL result,NSError *error))complete {
     if (passWord == nil) {
         passWord = @"";
     }

@@ -240,6 +240,7 @@
 }
 
 - (void)tapLoginBtn {
+    
     [MBProgressHUD showMessage:LMLocalizedString(@"Common Loading", nil) toView:self.view];
     __weak __typeof(&*self) weakSelf = self;
     if (_passwordField.text.length <= 0) {
