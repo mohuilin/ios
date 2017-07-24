@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Wallet.pbobjc.h"
 
 typedef NS_ENUM(NSInteger, InputPayPassViewStyle) {
     InputPayPassViewSetPass = 0,
@@ -19,6 +20,6 @@ typedef NS_ENUM(NSInteger, InputPayPassViewStyle) {
 
 @property(nonatomic, copy) void (^requestCallBack)(NSError *error);
 
-+ (InputPayPassView *)inputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock;
++ (InputPayPassView *)inputPayPassWithOrderDetail:(OriginalTransaction *)orderDetail complete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock;
 
 @end

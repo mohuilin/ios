@@ -13,8 +13,10 @@
 #import "WJTouchID.h"
 #import "LMBtcCurrencyManager.h"
 #import "LMWalletManager.h"
+#import "LMTransferOrderView.h"
 
-@interface InputPayPassView () <PassInputFieldViewDelegate>
+@interface InputPayPassView () <PassInputFieldViewDelegate,LMTransferOrderViewDelegate>
+
 @property(strong, nonatomic) UIView *contentView;
 @property(strong, nonatomic) UILabel *titleLabel;
 @property(strong, nonatomic) UIView *lineView;
@@ -29,9 +31,9 @@
 @property(nonatomic, copy) void (^closeBlock)();
 
 @property(strong, nonatomic) UIView *bottomView;
+@property(nonatomic, strong) LMTransferOrderView *orderContentView;
 @property(strong, nonatomic) UIView *passInputView;
 @property(strong, nonatomic) UILabel *passStatusLabel;
-
 
 @property(nonatomic, strong) UIView *animationContentView;
 @property(strong, nonatomic) JxbLoadingView *animationView;
@@ -46,6 +48,8 @@
 
 @property(assign, nonatomic) BOOL isPassTag;
 
+@property (nonatomic ,strong) OriginalTransaction *orderDetail;
+
 @end
 
 @implementation InputPayPassView
@@ -56,7 +60,8 @@
         self.closeBlock();
     }
     [UIView animateWithDuration:0.25 animations:^{
-        self.top = DEVICE_SIZE.height;
+        self.backgroundColor = [UIColor clearColor];
+        self.contentView.top = DEVICE_SIZE.height;
     }                completion:^(BOOL finished) {
         [self removeFromSuperview];
     }];
@@ -88,7 +93,6 @@
 }
 
 - (IBAction)forgetPass:(id)sender {
-    
     [UIView animateWithDuration:0.3 animations:^{
         self.top = DEVICE_SIZE.height;
         [MBProgressHUD hideHUDForView:[UIApplication sharedApplication].keyWindow];
@@ -102,7 +106,7 @@
     }];
 }
 
-+ (InputPayPassView *)inputPayPassWithComplete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock{
++ (InputPayPassView *)inputPayPassWithOrderDetail:(OriginalTransaction *)orderDetail complete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock{
     InputPayPassView *passView = [[InputPayPassView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     passView.style = InputPayPassViewVerfyPass;
     __weak __typeof(&*passView) weakSelf = passView;
@@ -112,11 +116,11 @@
     passView.payCompleteBlock = complete;
     passView.forgetPassBlock = forgetPassBlock;
     passView.closeBlock = closeBlock;
+    passView.orderDetail = orderDetail;
     passView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.5];
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [window addSubview:passView];
     return passView;
-
 }
 
 - (void)awakeFromNib {
@@ -131,12 +135,21 @@
     return self;
 }
 
+- (void)layoutSubviews{
+    [super layoutSubviews];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.contentView.bottom = DEVICE_SIZE.height;
+    }];
+}
+
 - (void)setupSubviews {
     self.contentView = [[UIView alloc] init];
     self.contentView.backgroundColor = [UIColor whiteColor];
     [self addSubview:self.contentView];
     [_contentView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.bottom.left.right.equalTo(self);
+        make.left.right.equalTo(self);
+        make.top.equalTo(self.mas_bottom);
         make.height.mas_equalTo(AUTO_HEIGHT(880));
     }];
 
@@ -151,7 +164,6 @@
     }];
 
     self.titleLabel = [[UILabel alloc] init];
-    self.titleLabel.text = LMLocalizedString(@"Set Payment Password", nil);
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     [self.contentView addSubview:self.titleLabel];
     [_titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -167,22 +179,31 @@
         make.left.right.equalTo(self.contentView);
         make.height.mas_equalTo(0.5);
     }];
-
+    self.orderContentView = [[[NSBundle mainBundle] loadNibNamed:@"LMTransferOrderView" owner:self options:nil] lastObject];
+    self.orderContentView.delegate = self;
+    
+    [self.contentView addSubview:self.orderContentView];
+    [_orderContentView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.lineView.mas_bottom);
+        make.left.bottom.equalTo(self.contentView);
+        make.width.mas_equalTo(DEVICE_SIZE.width);
+    }];
+    
     // enter password
     self.bottomView = [[UIView alloc] init];
     [self.contentView addSubview:self.bottomView];
     [_bottomView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self.lineView.mas_bottom);
-        make.left.equalTo(self.contentView);
+        make.left.equalTo(self.orderContentView.mas_right);
         make.width.mas_equalTo(DEVICE_SIZE.width);
         make.bottom.equalTo(self.contentView);
     }];
-
+    
     self.passInputView = [[UIView alloc] init];
     [self.bottomView addSubview:self.passInputView];
     [_passInputView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self.bottomView.mas_top).offset(AUTO_HEIGHT(147));
-        make.left.equalTo(self.bottomView.mas_left);
+        make.left.equalTo(self.orderContentView.mas_right);
         make.height.mas_equalTo(AUTO_HEIGHT(80));
         make.width.mas_equalTo(DEVICE_SIZE.width);
     }];
@@ -269,7 +290,7 @@
 
     self.style = InputPayPassViewVerfyPass;
     self.contentView.alpha = 0.98;
-    self.titleLabel.text = LMLocalizedString(@"Set Payment Password", nil);
+    self.titleLabel.text = LMLocalizedString(@"Wallet Transfer details", nil);
     self.titleLabel.font = [UIFont systemFontOfSize:FONT_SIZE(36)];
     self.titleLabel.textColor = GJCFQuickHexColor(@"161A21");
     self.statusLabel.font = [UIFont systemFontOfSize:FONT_SIZE(28)];
@@ -330,16 +351,32 @@
 
 - (void)setStyle:(InputPayPassViewStyle)style {
     _style = style;
-    switch (style) {
-        case InputPayPassViewVerfyPass:
-            [self verfyPass];
-            break;
-        default:
-            break;
-    }
+}
+
+- (void)setOrderDetail:(OriginalTransaction *)orderDetail{
+    _orderDetail = orderDetail;
+    //config data
+    [self.orderContentView comfigOrderDetail:self.orderDetail];
 }
 
 #pragma mark - passWordCompleteInput
+
+
+- (void)comfirm{
+    [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
+    }];
+    [UIView animateWithDuration:0.3 animations:^{
+        [self.contentView layoutIfNeeded];
+    }];
+    
+    //enter verfy pass
+    self.titleLabel.text = LMLocalizedString(@"Wallet Enter your PIN", nil);
+    [self verfyPass];
+    [self.payPassView clearAll];
+    [self.payPassView becomeFirstResponder];
+}
+
 
 - (void)passWordCompleteInput:(PassInputFieldView *)passWord {
     self.titleLabel.text = LMLocalizedString(@"Set Payment Password", nil);

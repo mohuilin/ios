@@ -31,6 +31,7 @@ typedef NS_ENUM(NSInteger ,CurrencyType) {
 
 
 typedef NS_ENUM(NSInteger ,TransactionPackageErrorType) {
+    TransactionPackageErrorSuccess = 0,
     TransactionPackageErrorTypeFeeSamll = 3000,
     TransactionPackageErrorTypeFeeEmpty = 3001,
     TransactionPackageErrorTypeUnspentTooLarge = 3002,

@@ -247,69 +247,72 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     /// send luckypackage
     [NetWorkOperationTool POSTWithUrlString:url postProtoData:postData complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
-        switch (hResponse.code) {
-            case TransactionPackageErrorTypeFeeEmpty:
-            case TransactionPackageErrorTypeUnspentTooLarge:
-            case TransactionPackageErrorTypeUnspentError:
-            case TransactionPackageErrorTypeUnspentNotEnough:
-            case TransactionPackageErrorTypeOutDust:
-            {
-                if (complete) {
-                    complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-                }
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
             }
-                break;
-            case successCode:
-            {
-                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
-                if (data) {
-                    NSError *error = nil;
-                    OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
-                    if (!error) {
-                        [self verfiyWithOriginTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
-                    } else {
-                        if (complete) {
-                            complete(nil,error);
+        } else {
+            NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                NSError *error = nil;
+                OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
+                if (!error) {
+                    switch (oriTransactionResp.code) {
+                        case TransactionPackageErrorSuccess:{
+                            [self verfiyWithOriginTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
                         }
+                            break;
+                        case TransactionPackageErrorTypeFeeEmpty:
+                        case TransactionPackageErrorTypeUnspentTooLarge:
+                        case TransactionPackageErrorTypeUnspentError:
+                        case TransactionPackageErrorTypeUnspentNotEnough:
+                        case TransactionPackageErrorTypeOutDust:{
+                            if (complete) {
+                                complete(nil,[NSError errorWithDomain:oriTransactionResp.message code:oriTransactionResp.code userInfo:nil]);
+                            }
+                        }
+                            break;
+                        case TransactionPackageErrorTypeFeeToolarge:{
+                            NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                            if (data) {
+                                NSError *error = nil;
+                                OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
+                                NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Auto fees is greater than the maximum set maximum and continue", nil),
+                                                  [PayTool getBtcStringWithAmount:oriTransactionResp.data_p.estimateFee]];
+                                [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
+                            }
+                        }
+                            break;
+                        case TransactionPackageErrorTypeFeeSamll:{
+                            NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                            if (data) {
+                                NSError *error = nil;
+                                OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
+                                NSString *tips = LMLocalizedString(@"Wallet Transaction fee too low Continue", nil);
+                                [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
+                            }
+                        }
+                            break;
+                        case TransactionPackageErrorTypeChangeDust:{
+                            NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                            if (data) {
+                                NSError *error = nil;
+                                OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
+                                NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
+                                                  [PayTool getBtcStringWithAmount:oriTransactionResp.data_p.oddChange]];
+                                [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
+                            }
+                        }
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    if (complete) {
+                        complete(nil,error);
                     }
                 }
             }
-                break;
-            case TransactionPackageErrorTypeFeeToolarge:{
-                
-                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
-                if (data) {
-                    NSError *error = nil;
-                    OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
-                    NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Auto fees is greater than the maximum set maximum and continue", nil),
-                                      [PayTool getBtcStringWithAmount:oriTransactionResp.data_p.estimateFee]];
-                    [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
-                }
-            }
-                break;
-            case TransactionPackageErrorTypeFeeSamll:{
-                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
-                if (data) {
-                    NSError *error = nil;
-                    OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
-                    NSString *tips = LMLocalizedString(@"Wallet Transaction fee too low Continue", nil);
-                    [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
-                }
-            }
-                break;
-            case TransactionPackageErrorTypeChangeDust:{
-                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
-                if (data) {
-                    NSError *error = nil;
-                    OriginalTransactionResponse *oriTransactionResp = [OriginalTransactionResponse parseFromData:data error:&error];
-                    NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Wallet Charge small calculate to the poundage", nil),
-                                      [PayTool getBtcStringWithAmount:oriTransactionResp.data_p.oddChange]];
-                    [self askUserNeedContinueTransferWithTips:tips originTransactionResp:oriTransactionResp type:type currency:currency complete:complete];
-                }
-            }
-                break;
-            default:
-                break;
         }
     } fail:^(NSError *error) {
         if (complete) {
@@ -343,7 +346,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)verfiyWithOriginTransactionResp:(OriginalTransactionResponse *)oriTransactionResp type:(TransactionType)type currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     /// password verfiy --- encrypt seed
-    [InputPayPassView inputPayPassWithComplete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
+    [InputPayPassView inputPayPassWithOrderDetail:oriTransactionResp.data_p complete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
         if (baseSeed) {
             /// sign and publish
             [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransactionResp.data_p transactionType:type currency:currency seed:baseSeed complete:^(id data, NSError *signError) {

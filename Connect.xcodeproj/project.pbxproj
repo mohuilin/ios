@@ -640,6 +640,10 @@
 		D943CD831EB0870600BE94EF /* GJGCChatSystemNotiBaseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D943CD821EB0870600BE94EF /* GJGCChatSystemNotiBaseCell.m */; };
 		D943CD861EB1A5BB00BE94EF /* GJGCChatFriendSnapChatTipCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D943CD851EB1A5BB00BE94EF /* GJGCChatFriendSnapChatTipCell.m */; };
 		D943CD891EB1AB5000BE94EF /* GJGCChatSystemNotiConstans.m in Sources */ = {isa = PBXBuildFile; fileRef = D943CD881EB1AB5000BE94EF /* GJGCChatSystemNotiConstans.m */; };
+		D9453E631F21E743007DC3A7 /* LMTransferOrderView.m in Sources */ = {isa = PBXBuildFile; fileRef = D9453E621F21E743007DC3A7 /* LMTransferOrderView.m */; };
+		D9453E651F21E769007DC3A7 /* LMTransferOrderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9453E641F21E769007DC3A7 /* LMTransferOrderView.xib */; };
+		D9453E681F21EDF4007DC3A7 /* LMTransferOrderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D9453E671F21EDF4007DC3A7 /* LMTransferOrderCell.m */; };
+		D9453E6A1F21EE0F007DC3A7 /* LMTransferOrderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9453E691F21EE0F007DC3A7 /* LMTransferOrderCell.xib */; };
 		D94BE0581EBC7252008BEB0B /* LMNotificationDefine.m in Sources */ = {isa = PBXBuildFile; fileRef = D94BE0561EBC7252008BEB0B /* LMNotificationDefine.m */; };
 		D95488FF1E9DC89100F200DF /* LMDBUpdataController.m in Sources */ = {isa = PBXBuildFile; fileRef = D95488FD1E9DC89100F200DF /* LMDBUpdataController.m */; };
 		D95489001E9DC89100F200DF /* LMDBUpdataController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D95488FE1E9DC89100F200DF /* LMDBUpdataController.xib */; };
@@ -2206,6 +2210,12 @@
 		D943CD851EB1A5BB00BE94EF /* GJGCChatFriendSnapChatTipCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GJGCChatFriendSnapChatTipCell.m; sourceTree = "<group>"; };
 		D943CD871EB1AB5000BE94EF /* GJGCChatSystemNotiConstans.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJGCChatSystemNotiConstans.h; sourceTree = "<group>"; };
 		D943CD881EB1AB5000BE94EF /* GJGCChatSystemNotiConstans.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GJGCChatSystemNotiConstans.m; sourceTree = "<group>"; };
+		D9453E611F21E743007DC3A7 /* LMTransferOrderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransferOrderView.h; sourceTree = "<group>"; };
+		D9453E621F21E743007DC3A7 /* LMTransferOrderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransferOrderView.m; sourceTree = "<group>"; };
+		D9453E641F21E769007DC3A7 /* LMTransferOrderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LMTransferOrderView.xib; sourceTree = "<group>"; };
+		D9453E661F21EDF4007DC3A7 /* LMTransferOrderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransferOrderCell.h; sourceTree = "<group>"; };
+		D9453E671F21EDF4007DC3A7 /* LMTransferOrderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransferOrderCell.m; sourceTree = "<group>"; };
+		D9453E691F21EE0F007DC3A7 /* LMTransferOrderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LMTransferOrderCell.xib; sourceTree = "<group>"; };
 		D94BE0541EBC7252008BEB0B /* Define.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Define.h; sourceTree = "<group>"; };
 		D94BE0551EBC7252008BEB0B /* LMNotificationDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMNotificationDefine.h; sourceTree = "<group>"; };
 		D94BE0561EBC7252008BEB0B /* LMNotificationDefine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMNotificationDefine.m; sourceTree = "<group>"; };
@@ -14900,6 +14910,12 @@
 				192350E11E8121CB0022D844 /* CollectionReusableView.m */,
 				192350E21E8121CB0022D844 /* InputPayPassView.h */,
 				192350E31E8121CB0022D844 /* InputPayPassView.m */,
+				D9453E611F21E743007DC3A7 /* LMTransferOrderView.h */,
+				D9453E621F21E743007DC3A7 /* LMTransferOrderView.m */,
+				D9453E641F21E769007DC3A7 /* LMTransferOrderView.xib */,
+				D9453E661F21EDF4007DC3A7 /* LMTransferOrderCell.h */,
+				D9453E671F21EDF4007DC3A7 /* LMTransferOrderCell.m */,
+				D9453E691F21EE0F007DC3A7 /* LMTransferOrderCell.xib */,
 				192350E41E8121CB0022D844 /* JxbLoadingView.h */,
 				192350E51E8121CB0022D844 /* JxbLoadingView.m */,
 				192350E61E8121CB0022D844 /* LMaddTableViewCell.h */,
@@ -32404,6 +32420,7 @@
 				D92230691E822A3100D67110 /* chatkeyborad_btn_click@2x.png in Resources */,
 				F16FD7E31EC3205C002F9395 /* cerrno in Resources */,
 				D922304E1E822A3100D67110 /* sleep@3x.png in Resources */,
+				D9453E651F21E769007DC3A7 /* LMTransferOrderView.xib in Resources */,
 				D922305F1E822A3100D67110 /* chat_icon_video2_green@2x.png in Resources */,
 				D9222F6A1E822A3000D67110 /* emoji.plist in Resources */,
 				F16FD8301EC3205F002F9395 /* streambuf.SUNWCCh in Resources */,
@@ -32576,6 +32593,7 @@
 				F16FD7E71EC3205C002F9395 /* cmath in Resources */,
 				F16FD7F41EC3205F002F9395 /* bitset in Resources */,
 				D922305B1E822A3100D67110 /* delete_emoji@3x.png in Resources */,
+				D9453E6A1F21EE0F007DC3A7 /* LMTransferOrderCell.xib in Resources */,
 				D92230191E822A3100D67110 /* big_smile@3x.png in Resources */,
 				F16FD7F11EC3205C002F9395 /* cwctype in Resources */,
 				D92230361E822A3100D67110 /* kiss@3x.png in Resources */,
@@ -33155,6 +33173,7 @@
 				F16FD7CF1EC3205B002F9395 /* fix_error.c in Sources */,
 				D97FDCAC1E86664800B161C8 /* YYTextKeyboardManager.m in Sources */,
 				F16FD7C01EC3205B002F9395 /* bip32.c in Sources */,
+				D9453E631F21E743007DC3A7 /* LMTransferOrderView.m in Sources */,
 				19234FF11E811C7A0022D844 /* CountryView.m in Sources */,
 				D92232831E822BF800D67110 /* NSString+Base64.m in Sources */,
 				D9222F9B1E822A3000D67110 /* MSSBrowseLoadingImageView.m in Sources */,
@@ -33335,6 +33354,7 @@
 				D92232971E822BF800D67110 /* UIScrollView+EmptyDataSet.m in Sources */,
 				192352A01E81275B0022D844 /* LMRedLuckyShowView.m in Sources */,
 				D9B084BE1E810DDC0067EC4A /* GestureSetPage.m in Sources */,
+				D9453E681F21EDF4007DC3A7 /* LMTransferOrderCell.m in Sources */,
 				D92232571E822BF800D67110 /* BEMCheckBox.m in Sources */,
 				D95C043F1E810902006C5C8A /* ChatMapCell.m in Sources */,
 				192351251E8121CB0022D844 /* CollectionReusableView.m in Sources */,

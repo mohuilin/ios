@@ -258,6 +258,7 @@
 "Link Find me by bitcoin address"="Найти меня по биткоин адресу";
 "Link Find me by phone number"="Найти меня по номеру телефона";
 "Link Friend Recommendation"="Рекомендация друга";
+"Link Friend" = "друзья";
 "Link From"="От";
 "Link From Contact Match"="Через совпадения записей  контактов";
 "Link From Group"="От группы";
@@ -723,5 +724,7 @@
 "Wallet synchronization data failed" = "Синхронные данные не удалось";
 "Wallet Failed to get the list address" = "Не удалось получить список адресов";
 "Wallet The currency already exists" = "Валюта уже существует";
+"Wallet Transfer details" = "Передача детали";
+"Wallet Confirm transfer"="Подтверждение передачи";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

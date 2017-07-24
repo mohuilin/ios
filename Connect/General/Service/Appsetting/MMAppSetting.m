@@ -648,6 +648,9 @@ char* printEnv(void)
     [self removeObjectForKey:@"transferfee"];
 }
 - (long long)getTranferFee{
+    if ([self canAutoCalculateTransactionFee]) {
+        return 0;
+    }
     double fee = [[self getValue:@"transferfee"] doubleValue];
     if (fee <= 0) {
         [self setValue:MINNER_FEE forKey:@"transferfee"];
