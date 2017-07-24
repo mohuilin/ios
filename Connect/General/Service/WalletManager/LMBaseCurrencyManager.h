@@ -9,10 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "LMSeedModel.h"
 #import "LMCurrencyAddress.h"
-#import "EnumDefine.h"
-
-@class Coin;
-@class Transactions;
+#import "Wallet.pbobjc.h"
 
 @interface LMBaseCurrencyManager : NSObject
 #pragma mark - currency creat and get

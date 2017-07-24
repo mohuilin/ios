@@ -66,6 +66,7 @@
             errorMessage = LMLocalizedString(@"Wallet Amount is too small", nil);
             break;
             
+        case TransactionPackageErrorTypeUnspentError:
         case TransactionPackageErrorTypeUnspentNotEnough:
             errorMessage = LMLocalizedString(@"Wallet Insufficient balance", nil);
             break;

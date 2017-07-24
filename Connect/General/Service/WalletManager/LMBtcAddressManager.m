@@ -123,7 +123,6 @@
 - (void)syncAddressListWithInputInputs:(NSArray *)inputs complete:(void (^)(NSError *error))complete{
     
     /// test
-    inputs = @[@"1D3DoqYq5CYV6TXGXmyuSBq4EK6MwTYupx"];
     NSMutableString *mStr = [NSMutableString stringWithFormat:@"currency = %d AND address IN {",(int)CurrencyTypeBTC];
     for (NSString *address in inputs) {
         if ([address isEqualToString:[inputs lastObject]]) {
@@ -136,7 +135,7 @@
     RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
     //sync
     /// test
-    if (YES) {
+    if (results.count != inputs.count) {
         [self getCurrencyAddressList:^(NSMutableArray<CoinInfo *> *addressList,NSError *error) {
             if (!error) {
                 RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
@@ -151,7 +150,7 @@
                 }
             } else {
                 if (complete) {
-                    complete([NSError errorWithDomain:@"sync error" code:TransactionPackageErrorTypeAddressSyncFail userInfo:nil]);
+                    complete(error);
                 }
             }
         }];

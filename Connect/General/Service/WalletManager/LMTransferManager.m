@@ -15,6 +15,9 @@
 #import "LMBtcAddressManager.h"
 #import "UIAlertController+Blocks.h"
 #import "UIViewController+CurrencyVC.h"
+#import "LMWalletManager.h"
+#import "StringTool.h"
+#import "LMCurrencyModel.h"
 
 
 @implementation LMTransferManager
@@ -151,6 +154,26 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.fee = fee;
     request.tips = tips;
     
+    LMBaseCurrencyManager *baseCurrency = nil;
+    switch (CurrencyTypeBTC) {
+        case CurrencyTypeBTC:
+            baseCurrency = [[LMBtcCurrencyManager alloc] init];
+            break;
+            
+        default:
+            break;
+    }
+    
+    [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:@"1234" complete:^(NSString *decodeValue, BOOL success) {
+
+        LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",currency]] lastObject];
+        NSString *btcSeed = [StringTool pinxCreator:decodeValue withPinv:currencyModel.salt];
+        
+        NSString *privkey = [baseCurrency getPrivkeyBySeed:btcSeed index:0];
+        NSString *address = [baseCurrency getAddressByPrivKey:privkey];
+        
+        DDLogInfo(@"");
+    }];
 
     //request and sign、 publish
     [self basePostDataWithData:request.data url:WalletServiceTransferToAddress type:TransactionTypeBill currency:currency complete:complete];
