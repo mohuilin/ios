@@ -323,9 +323,10 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                     } else {
                         if ([firstPass isEqualToString:password]) {
                             [weakPassView dismissWithClosed:YES];
-                            [LMWalletManager setPassWord:password complete:^(BOOL result,NSError *error) {
+                            __weak typeof(self)weakSelf = self;
+                            [self setPassWord:password complete:^(BOOL result,NSError *error) {
                                 if (result) {
-                                    [LMWalletManager sharedManager].baseSeed = randomSeed;
+                                    weakSelf.baseSeed = randomSeed;
                                     NSData *saltData = [LMIMHelper createRandom512bits];
                                     NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
                                     NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:randomSeed];
