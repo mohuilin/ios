@@ -82,6 +82,14 @@
         case TransactionPackageErrorTypeSyncAddress_InputsAddress_NotMatch:
             errorMessage = @"数据不匹配！！！";
             break;
+        case 400:
+            errorMessage = LMLocalizedString(@"Chat Network connection failed please check network", nil);
+            break;
+            
+        case 404:
+            errorMessage = LMLocalizedString(@"Chat Resource loading failed. Please try again later", nil);
+            break;
+            
         default:
             break;
     }

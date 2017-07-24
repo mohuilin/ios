@@ -31,6 +31,7 @@
 "Chat Create a new chat"="Create a new chat";
 "Chat Creating group"="Creating group...";
 "Chat Crowd founding in progress"="Crowd-founding in progress";
+"Chat Resource loading failed. Please try again later" = "Resource loading failed. Please try again later";
 "Chat Crowd funding"="Crowd-funding";
 "Chat Crowd funding by who"="By %@";
 "Chat Crowdfoundind History"="History";

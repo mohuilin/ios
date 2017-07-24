@@ -74,6 +74,7 @@
 "Chat My Photo Stream"="我的照片流";
 "Chat Name Card"="名片";
 "Chat Network connection failed please check network"="网络连接失败，请检查网络";
+"Chat Resource loading failed. Please try again later" = "资源加载失败，请稍后再试";
 "Chat New application"="新申请";
 "Chat New message notification"="新消息通知";
 "Chat No Pictures"="没有图片";

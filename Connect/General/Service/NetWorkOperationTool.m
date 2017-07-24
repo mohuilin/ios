@@ -61,6 +61,7 @@
 + (void)POSTWithUrlString:(NSString *)url noSignProtoData:(NSData *)protoData complete:(NetWorkOperationSuccess)success fail:(NetWorkOperationFail)fail{
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+    request.timeoutInterval = 20;
     
     [request setHTTPBody:protoData];
     [request setHTTPMethod:@"POST"];
@@ -81,7 +82,8 @@
                 if (error) {
                     DDLogInfo(@"error :%@",error);
                     if (fail) {
-                        fail(error);
+                        NSHTTPURLResponse *httpUrlResp = (NSHTTPURLResponse *)response;
+                        fail([NSError errorWithDomain:error.domain code:httpUrlResp.statusCode userInfo:error.userInfo]);
                     }
                 } else{
                     if (success) {
@@ -98,6 +100,8 @@
 + (NSURLSessionUploadTask *)POSTWithUrlString:(NSString *)url postData:(NSData *)postData UploadProgressBlock:(void (^)(NSProgress *uploadProgress))uploadProgressBlock complete:(NetWorkOperationSuccess)success fail:(NetWorkOperationFail)fail{
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+    request.timeoutInterval = 20;
+    
     [request setHTTPBody:postData];
     [request setHTTPMethod:@"POST"];
     NSURLSessionUploadTask *task;
@@ -109,7 +113,8 @@
                 if ([data isKindOfClass:[NSData class]]) {
                     if (error || data.length <= 0) {
                         if (fail) {
-                            fail(error);
+                            NSHTTPURLResponse *httpUrlResp = (NSHTTPURLResponse *)response;
+                            fail([NSError errorWithDomain:error.domain code:httpUrlResp.statusCode userInfo:error.userInfo]);
                         }
                     } else{
                         if (success) {
@@ -153,6 +158,7 @@
 + (void)POSTWithUrlString:(NSString *)url postData:(NSData *)postData complete:(NetWorkOperationSuccess)success fail:(NetWorkOperationFail)fail{
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+    request.timeoutInterval = 20;
     
     [request setHTTPBody:postData];
     [request setHTTPMethod:@"POST"];
@@ -170,9 +176,9 @@
                        progress:nil
                        completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
                            if (error) {
-                               DDLogInfo(@"error :%@",error);
+                               NSHTTPURLResponse *httpUrlResp = (NSHTTPURLResponse *)response;
                                if (fail) {
-                                   fail(error);
+                                   fail([NSError errorWithDomain:error.domain code:httpUrlResp.statusCode userInfo:error.userInfo]);
                                }
                            } else{
                                HttpServerResponse *hResponse = [HttpServerResponse parseFromData:responseObject error:nil];
@@ -207,6 +213,7 @@
 + (void)POSTWithUrlString:(NSString *)url postData:(NSData *)postData NotSignComplete:(NetWorkOperationSuccess)success fail:(NetWorkOperationFail)fail{
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+    request.timeoutInterval = 20;
     
     [request setHTTPBody:postData];
     [request setHTTPMethod:@"POST"];
@@ -237,6 +244,7 @@
 + (void)POSTWithUrlString:(NSString *)url postData:(NSData *)postData complete:(NetWorkOperationSuccess)success fail:(NetWorkOperationFail)fail needSign:(BOOL)needSign neesDecode:(BOOL)decode{
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+    request.timeoutInterval = 20;
     
     [request setHTTPBody:postData];
     [request setHTTPMethod:@"POST"];

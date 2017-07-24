@@ -139,6 +139,7 @@
     [mStr appendString:@"}"];
     RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
     //sync
+    /// test
     if (YES) {
         [self getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
             if (result) {

@@ -46,6 +46,8 @@
 @property(strong, nonatomic) UIButton *retryBtn;
 @property(strong, nonatomic) UIButton *retryNewBtn;
 
+@property (nonatomic ,strong) UIButton *actionBtn;
+
 @property(assign, nonatomic) BOOL isPassTag;
 
 @property (nonatomic ,strong) OriginalTransaction *orderDetail;
@@ -54,42 +56,60 @@
 
 @implementation InputPayPassView
 
-- (IBAction)closeView:(id)sender {
-    self.backgroundColor = [UIColor clearColor];
-    if (self.closeBlock) {
-        self.closeBlock();
+- (IBAction)viewAction:(UIButton *)sender {
+    
+    switch (sender.tag) {
+        case 0:
+        {
+            self.backgroundColor = [UIColor clearColor];
+            if (self.closeBlock) {
+                self.closeBlock();
+            }
+            [UIView animateWithDuration:0.25 animations:^{
+                self.backgroundColor = [UIColor clearColor];
+                self.contentView.top = DEVICE_SIZE.height;
+            }                completion:^(BOOL finished) {
+                [self removeFromSuperview];
+            }];
+        }
+            break;
+        case 1:
+        {
+            self.titleLabel.text = LMLocalizedString(@"Wallet Transfer details", nil);
+            [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.left.equalTo(self.contentView);
+            }];
+            [UIView animateWithDuration:0.3 animations:^{
+                [self.contentView layoutIfNeeded];
+            }];
+            
+            //update ui
+            [self.actionBtn setImage:[UIImage imageNamed:@"cancel_grey"] forState:UIControlStateNormal];
+            self.actionBtn.tag = 0;
+            
+            [self.payPassView clearAll];
+            [self endEditing:YES];
+        }
+            break;
+        default:
+            break;
     }
-    [UIView animateWithDuration:0.25 animations:^{
-        self.backgroundColor = [UIColor clearColor];
-        self.contentView.top = DEVICE_SIZE.height;
-    }                completion:^(BOOL finished) {
-        [self removeFromSuperview];
-    }];
 }
 
 - (IBAction)retry:(id)sender {
     
+    [self.actionBtn setImage:[UIImage imageNamed:@"grey_back"] forState:UIControlStateNormal];
+    self.actionBtn.tag = 1;
+    
     self.titleLabel.text = LMLocalizedString(@"Wallet Enter your PIN", nil);
-    [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(self.contentView.mas_left);
+    [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
     }];
     [UIView animateWithDuration:0.3 animations:^{
         [self.contentView layoutIfNeeded];
     }];
     [self.payPassView clearAll];
     [self.payPassView becomeFirstResponder];
-}
-
-- (IBAction)NewRetry:(id)sender {
-    
-    [self.retryNewBtn removeFromSuperview];
-    self.retryBtn = nil;
-    [self.displayLbale removeFromSuperview];
-    self.displayLbale = nil;
-    self.titleLabel.text = LMLocalizedString(@"Wallet Enter your PIN", nil);
-    self.statusLabel.text = LMLocalizedString(@"Set Set Payment Password", nil);
-    self.style = InputPayPassViewSetPass;
-
 }
 
 - (IBAction)forgetPass:(id)sender {
@@ -153,11 +173,11 @@
         make.height.mas_equalTo(AUTO_HEIGHT(880));
     }];
 
-    UIButton *closeBtn = [[UIButton alloc] init];
-    [closeBtn addTarget:self action:@selector(closeView:) forControlEvents:UIControlEventTouchUpInside];
-    [closeBtn setImage:[UIImage imageNamed:@"cancel_grey"] forState:UIControlStateNormal];
-    [self.contentView addSubview:closeBtn];
-    [closeBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+    self.actionBtn = [[UIButton alloc] init];
+    [self.actionBtn addTarget:self action:@selector(viewAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.actionBtn setImage:[UIImage imageNamed:@"cancel_grey"] forState:UIControlStateNormal];
+    [self.contentView addSubview:self.actionBtn];
+    [self.actionBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.contentView).offset(AUTO_WIDTH(20));
         make.top.equalTo(self.contentView).offset(AUTO_HEIGHT(10));
         make.size.mas_equalTo(CGSizeMake(AUTO_WIDTH(88), AUTO_HEIGHT(88)));
@@ -167,7 +187,7 @@
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     [self.contentView addSubview:self.titleLabel];
     [_titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerY.equalTo(closeBtn);
+        make.centerY.equalTo(self.actionBtn);
         make.centerX.equalTo(self.contentView);
     }];
 
@@ -175,7 +195,7 @@
     self.lineView.backgroundColor = LMBasicLineViewColor;
     [self.contentView addSubview:self.lineView];
     [_lineView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(closeBtn.mas_bottom).offset(AUTO_HEIGHT(10));
+        make.top.equalTo(self.actionBtn.mas_bottom).offset(AUTO_HEIGHT(10));
         make.left.right.equalTo(self.contentView);
         make.height.mas_equalTo(0.5);
     }];
@@ -274,6 +294,9 @@
     self.forgetPassBtn.titleLabel.textAlignment = NSTextAlignmentCenter;
     [self.forgetPassBtn addTarget:self action:@selector(forgetPass:) forControlEvents:UIControlEventTouchUpInside];
     [self.passErrorContentView addSubview:self.forgetPassBtn];
+    
+    self.forgetPassBtn.hidden = YES;
+    
     [_forgetPassBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self.passErrorTipLabel.mas_bottom).offset(AUTO_HEIGHT(20));
         make.centerX.equalTo(self.passErrorContentView);
@@ -307,23 +330,21 @@
 }
 
 - (void)showResultStatusWithError:(NSError *)error {
-    __weak typeof(self) weakSelf = self;
     [GCDQueue executeInMainQueue:^{
         if (error) {
-            weakSelf.titleLabel.text = LMLocalizedString(@"Wallet Pay Faied", nil);
+            self.titleLabel.text = LMLocalizedString(@"Wallet Pay Faied", nil);
             _walletLayer.speed = 0;
             [_walletLayer removeFromSuperlayer];
-            weakSelf.statusLabel.hidden = NO;
-            weakSelf.statusLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Error code Domain Pelese try later", nil), (int) error.code, [LMErrorCodeTool messageWithErrorCode:error.code]];
-            [weakSelf.animationView finishFailure:nil];
+            self.statusLabel.hidden = NO;
+            self.statusLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Error code Domain Pelese try later", nil), (int) error.code, [LMErrorCodeTool messageWithErrorCode:error.code]];
+            [self.animationView finishFailure:nil];
         } else {
-            weakSelf.statusLabel.text = LMLocalizedString(@"Wallet Payment Successful", nil);
-            weakSelf.titleLabel.text = LMLocalizedString(@"Wallet Payment Successful", nil);
-            [weakSelf.animationView finishSuccess:nil];
+            self.statusLabel.text = LMLocalizedString(@"Wallet Payment Successful", nil);
+            self.titleLabel.text = LMLocalizedString(@"Wallet Payment Successful", nil);
+            [self.animationView finishSuccess:nil];
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-
                 [GCDQueue executeInMainQueue:^{
-                    [self closeView:nil];
+                    [self viewAction:nil];
                 }             afterDelaySecs:1.f];
 
             });
@@ -369,7 +390,8 @@
     [UIView animateWithDuration:0.3 animations:^{
         [self.contentView layoutIfNeeded];
     }];
-    
+    [self.actionBtn setImage:[UIImage imageNamed:@"grey_back"] forState:UIControlStateNormal];
+    self.actionBtn.tag = 1;
     //enter verfy pass
     self.titleLabel.text = LMLocalizedString(@"Wallet Enter your PIN", nil);
     [self verfyPass];
@@ -393,11 +415,15 @@
             break;
     }
     
+    // close btn
+    [self.actionBtn setImage:[UIImage imageNamed:@"cancel_grey"] forState:UIControlStateNormal];
+    self.actionBtn.tag = 0;
+    
     //verfiy pass
     [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
         if (success) {
-            [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
+            [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
             }];
             self.passErrorContentView.hidden = YES;
             self.animationContentView.hidden = NO;
@@ -413,8 +439,8 @@
                 }
             });
         } else {
-            [self.bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width);
+            [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
             }];
             self.passErrorContentView.hidden = NO;
             self.animationContentView.hidden = YES;

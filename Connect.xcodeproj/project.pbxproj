@@ -868,6 +868,8 @@
 		D9CF8C5A1DFE35010035CA25 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D9CF8C5C1DFE35010035CA25 /* InfoPlist.strings */; };
 		D9E857051D48A3D7001C35A2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857041D48A3D7001C35A2 /* CoreLocation.framework */; };
 		D9E857071D48A3E0001C35A2 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E857061D48A3E0001C35A2 /* MapKit.framework */; };
+		D9EBCC011F25A1EC006203BD /* LMCurrencyMethodTest.m in Sources */ = {isa = PBXBuildFile; fileRef = D9EBCC001F25A1EC006203BD /* LMCurrencyMethodTest.m */; };
+		D9EBCC031F25C6E9006203BD /* TestString.m in Sources */ = {isa = PBXBuildFile; fileRef = D9EBCC021F25C6E9006203BD /* TestString.m */; };
 		E39C2CB69BB018BF89D2831C /* libPods-ConnectTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA05F3C052536B3AAD8C0B5 /* libPods-ConnectTests.a */; };
 		F100BC6A1F1638D800F95A1D /* wallet.proto in Resources */ = {isa = PBXBuildFile; fileRef = F100BC691F1638D800F95A1D /* wallet.proto */; };
 		F10F2C701EFCC0D20017C32C /* LMFriendRecommandInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F10F2C6F1EFCC0D20017C32C /* LMFriendRecommandInfo.m */; };
@@ -1030,7 +1032,6 @@
 		F172A66F1EB8843C006E186C /* MMMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F172A66E1EB8843C006E186C /* MMMessage.m */; };
 		F17CBE2F1ED40C700067234D /* LMselectCountryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */; };
 		F17CBE321ED536920067234D /* LMDisplayProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE311ED536920067234D /* LMDisplayProgressView.m */; };
-		F19FC0571F21998C0037EE11 /* LMCurrencyMethodTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F19FC0561F21998C0037EE11 /* LMCurrencyMethodTest.m */; };
 		F1ADBAF01EF90C3500570DF6 /* LMRamGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */; };
 		F1B363D21E85255600B65086 /* LMSearchTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F1B363D11E85255600B65086 /* LMSearchTextField.m */; };
 		F1CC2E941E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2E931E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m */; };
@@ -2655,6 +2656,8 @@
 		D9CF8C5D1DFE350F0035CA25 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		D9E857041D48A3D7001C35A2 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		D9E857061D48A3E0001C35A2 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		D9EBCC001F25A1EC006203BD /* LMCurrencyMethodTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyMethodTest.m; sourceTree = "<group>"; };
+		D9EBCC021F25C6E9006203BD /* TestString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestString.m; sourceTree = "<group>"; };
 		D9F86ED21E6CF5E700398C66 /* Connect.IMUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Connect.IMUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB39D5B93F12A5570FB2900B /* Pods-ConnectTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConnectTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ConnectTests/Pods-ConnectTests.release.xcconfig"; sourceTree = "<group>"; };
 		F100BC691F1638D800F95A1D /* wallet.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = wallet.proto; sourceTree = "<group>"; };
@@ -12615,7 +12618,6 @@
 		F17CBE311ED536920067234D /* LMDisplayProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMDisplayProgressView.m; sourceTree = "<group>"; };
 		F198A98A1EAF6043008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F198A98B1EAF6048008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		F19FC0561F21998C0037EE11 /* LMCurrencyMethodTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMCurrencyMethodTest.m; sourceTree = "<group>"; };
 		F1ADBAEE1EF90C3500570DF6 /* LMRamGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamGroupInfo.h; sourceTree = "<group>"; };
 		F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamGroupInfo.m; sourceTree = "<group>"; };
 		F1B363D01E85255600B65086 /* LMSearchTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSearchTextField.h; sourceTree = "<group>"; };
@@ -12703,9 +12705,10 @@
 		1921AF4C1E701DF50020C853 /* ConnectTests */ = {
 			isa = PBXGroup;
 			children = (
+				D9EBCC021F25C6E9006203BD /* TestString.m */,
 				1921AF4D1E701DF60020C853 /* ConnectTests.m */,
-				F19FC0561F21998C0037EE11 /* LMCurrencyMethodTest.m */,
 				1921AF4F1E701DF60020C853 /* Info.plist */,
+				D9EBCC001F25A1EC006203BD /* LMCurrencyMethodTest.m */,
 			);
 			path = ConnectTests;
 			sourceTree = "<group>";
@@ -32843,7 +32846,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F19FC0571F21998C0037EE11 /* LMCurrencyMethodTest.m in Sources */,
+				D9EBCC011F25A1EC006203BD /* LMCurrencyMethodTest.m in Sources */,
+				D9EBCC031F25C6E9006203BD /* TestString.m in Sources */,
 				1921AF4E1E701DF60020C853 /* ConnectTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

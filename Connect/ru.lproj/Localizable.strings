@@ -37,6 +37,7 @@
 "Chat Crowdfunding"="Краудфандинг";
 "Chat Crowfunding"="Инициировать  краудфандинг";
 "Chat Disable self destruct"="После выхода из режима чтения самоуничтожние";
+"Chat Resource loading failed. Please try again later" = " Ошибка загрузки ресурсов,попробуйте позже";
 "Chat Draft"="[Черновик]";
 "Chat Enable Self destruct Mode"="После активации чтения самоуничтожение";
 "Chat Encrypted"="Кодирование";

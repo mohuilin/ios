@@ -7,9 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Wallet.pbobjc.h"
 #import "LMSeedModel.h"
 #import "LMCurrencyAddress.h"
+#import "EnumDefine.h"
+
+@class Coin;
+@class Transactions;
 
 @interface LMBaseCurrencyManager : NSObject
 #pragma mark - currency creat and get
@@ -44,6 +47,8 @@
  * @return
  */
 - (NSString *)getAddressByPrivKey:(NSString *)prvkey;
+
++ (BOOL)checkAddress:(NSString *)address;
 
 /**
  * get privkey from seed and index

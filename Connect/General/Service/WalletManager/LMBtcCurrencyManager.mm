@@ -409,15 +409,35 @@ int GetBTCAddrressFromPubKey(char *pubKey, char *address)
     return [NSString stringWithFormat:@"%s",address];
 }
 
+int CheckBtcAddress(char *addr)
+{
+    CBitcoinAddress address(addr);
+    if (!address.IsValid())
+    {
+        return -1;
+    }
+    return 0;
+}
+
+
++(BOOL) checkAddress:(NSString *)address{
+    // Adapt the btc.com sweep results
+    address = [address stringByReplacingOccurrencesOfString:@"bitcoin:" withString:@""];
+    if(address.length == 0){
+        return NO;
+    }
+    char *cAddress = (char *)[address UTF8String];
+    int result = CheckBtcAddress(cAddress);
+    return result == 0?YES:NO;
+}
+
 
 // use hex string to encrypt wallet
 std::string connectWalletEncrypt(char *wallet_HexString, char *pwd, int n, int ver)
 {
     std::vector<unsigned char> wallet = ParseHex(wallet_HexString);
-    
     if (wallet.size() == 0)
         return "error wallet lenght";
-    
     //  below is the process of E1
     unsigned char h[64];
     unsigned char chk[2];

@@ -28,11 +28,6 @@
 
 /**
  *
- * sync datat to db
- */
-+ (void)syncWalletData:(RespSyncWallet *)syncWallet;
-/**
- *
  * get data from server
  */
 + (void)getWalletData:(void(^)(BOOL result))complete;

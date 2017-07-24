@@ -41,7 +41,7 @@
     // Looks a bit nicer if we make it square.
     hud.square = YES;               
     hud.margin = 0;
-    [hud hide:YES afterDelay:10.f];
+    [hud hide:YES afterDelay:20.f];
     return hud;
 }
 
