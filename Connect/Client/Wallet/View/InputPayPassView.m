@@ -421,8 +421,8 @@
     
     //sync
     if (![LMWalletManager sharedManager].encryPtionSeed) {
-        [LMWalletManager getWalletData:^(BOOL result) {
-            if (result) {
+        [[LMWalletManager sharedManager] getWalletData:^(NSError *error) {
+            if (!error) {
                 //verfiy pass
                 [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
                     if (success) {

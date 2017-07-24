@@ -74,7 +74,7 @@
     [super viewDidAppear:animated];
     [self creatNewWallet];
     [[MMAppSetting sharedSetting] isSyncData:NO];
-    [LMWalletManager getWalletData:nil];
+    [[LMWalletManager sharedManager] getWalletData:nil];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -134,9 +134,9 @@
     
     if (![LMWalletManager sharedManager].isHaveWallet && [[MMAppSetting sharedSetting] getSyncData]) {
         //Synchronize wallet data and create wallet
-        [LMWalletManager creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(BOOL isFinish,NSError *error) {
+        [[LMWalletManager sharedManager] creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(NSError *error) {
             [GCDQueue executeInMainQueue:^{
-                if (isFinish) {
+                if (!error) {
                     [[MMAppSetting sharedSetting] isSyncData:NO];
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
                     

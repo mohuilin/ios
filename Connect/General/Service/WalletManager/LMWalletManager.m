@@ -41,14 +41,14 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  * @param contacts
  * @param complete
  */
-+ (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(BOOL isFinish,NSError *error))complete{
+- (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
     
     // Synchronize wallet data and create wallet
     [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,[NSError errorWithDomain:hResponse.message code:SYNC_DATA_FAILED_133 userInfo:nil]);
+                complete([NSError errorWithDomain:hResponse.message code:SYNC_DATA_FAILED_133 userInfo:nil]);
             }
         } else{
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
@@ -65,7 +65,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         }
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO,[NSError errorWithDomain:@"" code:SYNC_DATA_FAILED_133 userInfo:nil]);
+            complete([NSError errorWithDomain:@"" code:SYNC_DATA_FAILED_133 userInfo:nil]);
         }
     }];
 }
@@ -73,7 +73,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *
  * creatWallet
  */
-+ (void)creatWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(BOOL isFinish,NSError *error))complete{
+- (void)creatWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
     
     RequestUserInfo *userInfo = [RequestUserInfo new];
     userInfo.uid = [LKUserCenter shareCenter].currentLoginUser.pub_key;
@@ -83,7 +83,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         HttpResponse *hRespon = (HttpResponse*)response;
         if (hRespon.code != successCode) {
             if (complete) {
-                complete(NO,[NSError errorWithDomain:hRespon.message code:hRespon.code userInfo:nil]);
+                complete([NSError errorWithDomain:hRespon.message code:hRespon.code userInfo:nil]);
             }
         }else{
             NSData *data = [ConnectTool decodeHttpResponse:hRespon];
@@ -92,12 +92,12 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                 switch (coinDetail.coin.category) {
                     case CategoryTypeOldUser:
                     {
-                        [LMWalletManager creatOldWallet:controllerVc complete:complete];
+                        [self creatOldWallet:controllerVc complete:complete];
                     }
                         break;
                     case CategoryTypeNewUser:
                     {
-                        [LMWalletManager creatNewWallet:controllerVc currency:currency complete:complete];
+                        [self creatNewWallet:controllerVc currency:currency complete:complete];
                     }
                         break;
                     case CategoryTypeImport:
@@ -110,14 +110,14 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                         break;
                 }
                 if (complete) {
-                    complete(YES,nil);
+                    complete(nil);
                 }
             }
         }
         
     } fail:^(NSError *error) {
         if (complete) {
-            complete(NO,error);
+            complete(error);
         }
     }];
 }
@@ -125,7 +125,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *
  * sync datat to db
  */
-+ (void)syncWalletData:(RespSyncWallet *)syncWallet {
+- (void)syncWalletData:(RespSyncWallet *)syncWallet {
     //check
     NSString *checkStr = [NSString stringWithFormat:@"%d%@",syncWallet.wallet.ver,syncWallet.wallet.payLoad];
     NSString *checkSum = [checkStr sha256String];
@@ -181,15 +181,15 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *
  * get data from server
  */
-+ (void)getWalletData:(void(^)(BOOL result))complete {
+- (void)getWalletData:(void(^)(NSError *error))complete {
     
-    if ([LMWalletManager sharedManager].isHaveWallet) {
+    if (self.isHaveWallet) {
         // Synchronize wallet data and create wallet
         [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
             if (hResponse.code != successCode) {
                 if (complete) {
-                    complete(NO);
+                    complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
                 }
             } else{
                 NSData *data = [ConnectTool decodeHttpResponse:hResponse];
@@ -199,22 +199,22 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                         // save data to db
                         [self syncWalletData:syncWallet];
                         if (complete) {
-                            complete(YES);
+                            complete(nil);
                         }
                     }else{
                         if (complete) {
-                            complete(NO);
+                            complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
                         }
                     }
                 }else {
                     if (complete) {
-                        complete(NO);
+                        complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
                     }
                 }
             }
         } fail:^(NSError *error) {
             if (complete) {
-                complete(NO);
+                complete(error);
             }
         }];
     }
@@ -224,7 +224,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  * creat import wallet
  *
  */
-+ (void)creatImportWallet:(CurrencyType)currency complete:(void (^)(BOOL isFinish,NSError *error))complete{
+- (void)creatImportWallet:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
     
     LMBaseCurrencyManager *baseCurrency = nil;
     switch (currency) {
@@ -239,11 +239,11 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     [baseCurrency createCurrency:0 salt:nil category:CurrencyTypeBTC masterAddess:nil payLoad:nil complete:^(BOOL result,NSError *error) {
         if (result) {
             if (complete) {
-                complete(YES,nil);
+                complete(nil);
             }
         }else{
             if (complete) {
-                complete(NO,nil);
+                complete(error);
             }
             
         }
@@ -254,7 +254,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *
  * create old wallet
  */
-+ (void)creatOldWallet:(UIViewController *)controllerVc complete:(void (^)(BOOL isFinish,NSError * error))complete{
+- (void)creatOldWallet:(UIViewController *)controllerVc complete:(void (^)(NSError * error))complete{
     NSString __block *firstPass = nil;
     [LMWalletManager sharedManager].baseSeed = [LKUserCenter shareCenter].currentLoginUser.prikey;
     [GCDQueue executeInMainQueue:^{
@@ -283,18 +283,18 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                         if (result) {
                             // tips
                                 if (complete) {
-                                    complete(YES,nil);
+                                    complete(nil);
                                 }
                             }else{
                             // tips
                                 if (complete) {
-                                    complete(NO,error);
+                                    complete(error);
                                 }
                         }
                     }];
                 } else {
                     if (complete) {
-                        complete(NO,[NSError errorWithDomain:@"" code:255 userInfo:nil]);
+                        complete([NSError errorWithDomain:@"" code:PASSWPRD_ERROR_136 userInfo:nil]);
                     }
                 }
             }
@@ -306,7 +306,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *
  *  create new wallet
  */
-+ (void)creatNewWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(BOOL isFinish,NSError *error))complete{
+- (void)creatNewWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
     LMRandomSeedController *seedVc = [[LMRandomSeedController alloc] init];
     seedVc.seedSourceType = SeedSouceTypeWallet;
     seedVc.SeedBlock = ^(NSString *randomSeed) {
@@ -344,24 +344,24 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                                         if (result) {
                                             // tips
                                             if (complete) {
-                                                complete(YES,nil);
+                                                complete(nil);
                                             }
                                         }else{
                                             // tips
                                             if (complete) {
-                                                complete(NO,error);
+                                                complete(error);
                                             }
                                         }
                                     }];
                                 }else {
                                     if (complete) {
-                                        complete(NO,error);
+                                        complete(error);
                                     }
                                 }
                             }];
                         } else {
                             if (complete) {
-                                complete(NO,[NSError errorWithDomain:@"" code:257 userInfo:nil]);
+                                complete([NSError errorWithDomain:@"" code:PASSWPRD_ERROR_136 userInfo:nil]);
                             }
                         }
                     }

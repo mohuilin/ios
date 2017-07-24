@@ -24,22 +24,22 @@
  * @param contacts
  * @param complete
  */
-+ (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(BOOL isFinish,NSError *error))complete;
+- (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete;
 
 /**
  *
  * get data from server
  */
-+ (void)getWalletData:(void(^)(BOOL result))complete;
+- (void)getWalletData:(void(^)(NSError *error))complete;
 
 /**
  * set password method
  *
  */
-+ (void)setPassWord:(NSString *)passWord complete:(void(^)(BOOL result,NSError *error))complete;
+- (void)setPassWord:(NSString *)passWord complete:(void(^)(BOOL result,NSError *error))complete;
 /**
  *  reset password methods
  *
  */
-+ (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(BOOL result,NSError *error))complete;
+- (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(BOOL result,NSError *error))complete;
 @end

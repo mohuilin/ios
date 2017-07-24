@@ -55,7 +55,7 @@
 @implementation LMErrorCodeTool
 
 
-+(NSString*)messageWithErrorCode:(TransactionPackageErrorType)errorCodeType{
++(NSString*)messageWithErrorCode:(ErrorCodeType)errorCodeType{
     NSString *errorMessage = LMLocalizedString(@"Chat Network connection failed please check network", nil);
     switch (errorCodeType) {
         case TransactionPackageErrorTypeUnspentTooLarge:
@@ -70,18 +70,18 @@
             errorMessage = LMLocalizedString(@"Wallet Insufficient balance", nil);
             break;
             
-        case TransactionPackageErrorTypeAddressSyncFail:
+        case GET_ADDRESSLIST_FAILED_134:
             errorMessage = @"同步地址失败";
             break;
             
         case TransactionPackageErrorTypeSyncAddress_InputsAddress_NotMatch:
             errorMessage = @"数据不匹配！！！";
             break;
-        case 400:
+        case NETWORK_FAILED_400:
             errorMessage = LMLocalizedString(@"Chat Network connection failed please check network", nil);
             break;
             
-        case 404:
+        case SOURCE_FAILED_404:
             errorMessage = LMLocalizedString(@"Chat Resource loading failed. Please try again later", nil);
             break;
             

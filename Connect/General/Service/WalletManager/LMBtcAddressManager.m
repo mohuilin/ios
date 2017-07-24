@@ -151,7 +151,7 @@
                 }
             } else {
                 if (complete) {
-                    complete([NSError errorWithDomain:@"sync error" code:TransactionPackageErrorTypeAddressSyncFail userInfo:nil]);
+                    complete([NSError errorWithDomain:@"sync error" code:GET_ADDRESSLIST_FAILED_134 userInfo:nil]);
                 }
             }
         }];
