@@ -419,37 +419,88 @@
     [self.actionBtn setImage:[UIImage imageNamed:@"cancel_grey"] forState:UIControlStateNormal];
     self.actionBtn.tag = 0;
     
-    //verfiy pass
-    [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
-        if (success) {
-            [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
-            }];
-            self.passErrorContentView.hidden = YES;
-            self.animationContentView.hidden = NO;
-            [UIView animateWithDuration:0.2 animations:^{
-                [self.contentView layoutIfNeeded];
-            }];
-            
-            self.statusLabel.text = LMLocalizedString(@"Wallet Verifying", nil);
-            [self.animationView startLoading];
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                if (self.payCompleteBlock) {
-                    self.payCompleteBlock(self,nil,decodeValue);
-                }
-            });
-        } else {
-            [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
-            }];
-            self.passErrorContentView.hidden = NO;
-            self.animationContentView.hidden = YES;
-            self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
-            [UIView animateWithDuration:0.3 animations:^{
-                [self.contentView layoutIfNeeded];
-            }];
-            [self.animationView finishFailure:nil];
-        }
-    }];
+    //sync
+    if (![LMWalletManager sharedManager].encryPtionSeed) {
+        [LMWalletManager getWalletData:^(BOOL result) {
+            if (result) {
+                //verfiy pass
+                [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
+                    if (success) {
+                        [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                            make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
+                        }];
+                        self.passErrorContentView.hidden = YES;
+                        self.animationContentView.hidden = NO;
+                        [UIView animateWithDuration:0.2 animations:^{
+                            [self.contentView layoutIfNeeded];
+                        }];
+                        
+                        self.statusLabel.text = LMLocalizedString(@"Wallet Verifying", nil);
+                        [self.animationView startLoading];
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            if (self.payCompleteBlock) {
+                                self.payCompleteBlock(self,nil,decodeValue);
+                            }
+                        });
+                    } else {
+                        [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                            make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
+                        }];
+                        self.passErrorContentView.hidden = NO;
+                        self.animationContentView.hidden = YES;
+                        self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
+                        [UIView animateWithDuration:0.3 animations:^{
+                            [self.contentView layoutIfNeeded];
+                        }];
+                        [self.animationView finishFailure:nil];
+                    }
+                }];
+            } else {
+                [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                    make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
+                }];
+                self.passErrorContentView.hidden = NO;
+                self.animationContentView.hidden = YES;
+                self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
+                [UIView animateWithDuration:0.3 animations:^{
+                    [self.contentView layoutIfNeeded];
+                }];
+                [self.animationView finishFailure:nil];
+            }
+        }];
+    } else {
+        //verfiy pass
+        [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
+            if (success) {
+                [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                    make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
+                }];
+                self.passErrorContentView.hidden = YES;
+                self.animationContentView.hidden = NO;
+                [UIView animateWithDuration:0.2 animations:^{
+                    [self.contentView layoutIfNeeded];
+                }];
+                
+                self.statusLabel.text = LMLocalizedString(@"Wallet Verifying", nil);
+                [self.animationView startLoading];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    if (self.payCompleteBlock) {
+                        self.payCompleteBlock(self,nil,decodeValue);
+                    }
+                });
+            } else {
+                [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                    make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
+                }];
+                self.passErrorContentView.hidden = NO;
+                self.animationContentView.hidden = YES;
+                self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
+                [UIView animateWithDuration:0.3 animations:^{
+                    [self.contentView layoutIfNeeded];
+                }];
+                [self.animationView finishFailure:nil];
+            }
+        }];
+    }
 }
 @end
