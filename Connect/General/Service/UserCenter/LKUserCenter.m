@@ -210,7 +210,6 @@ static LKUserCenter *center = nil;
     [[IMService instance] quitUser];
     self.loginUser = nil;
     [[MMAppSetting sharedSetting]  deleteLoginUser];
-    [[MMAppSetting sharedSetting]  cancelGestursPass];
     [MMAppSetting sharedSetting].privkey = nil;
     // Empty a single column object
     [UserDBManager tearDown];
