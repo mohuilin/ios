@@ -328,7 +328,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                                     [LMWalletManager sharedManager].baseSeed = randomSeed;
                                     NSData *saltData = [LMIMHelper createRandom512bits];
                                     NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
-                                    NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:[LMWalletManager sharedManager].encryPtionSeed];
+                                    NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:randomSeed];
                                     LMBaseCurrencyManager *baseCurrency = nil;
                                     switch (currency) {
                                         case CurrencyTypeBTC:
