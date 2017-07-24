@@ -97,8 +97,8 @@
             break;
     }
     
-    [baseCurrency getWaterTransactions:CurrencyTypeBTC address:nil page:self.page size:self.pagesize complete:^(BOOL result, Transactions *transactions) {
-        if (result) {
+    [baseCurrency getWaterTransactions:CurrencyTypeBTC address:nil page:self.page size:self.pagesize complete:^(Transactions *transactions,NSError *error) {
+        if (!error) {
             if (self.page == 1) {
                 [self.dataArr removeAllObjects];
             }

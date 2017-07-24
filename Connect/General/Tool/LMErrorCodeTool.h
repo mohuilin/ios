@@ -17,11 +17,11 @@ typedef NS_ENUM(NSUInteger,ToastErrorType)
 };
 typedef NS_ENUM(NSInteger,ErrorCodeType)
 {
-    ErrorCodeType131     =  131,
-    ErrorCodeType132     =  132,
-    ErrorCodeType133     =  133,
-    ErrorCodeType134     =  134,
-    ErrorCodeType135     =  135,
+    CREAR_CURRENCY_FAILED_131      = 131,
+    CREAR_WALLET_FAILED_132        = 132,
+    SYNC_DATA_FAILED_133           = 133,
+    GET_ADDRESSLIST_FAILED_134     = 134,
+    CURRENCY_ISEXIST_135           = 135,
     ErrorCodeType1001    =  -1001,
     ErrorCodeType2001    =  2001,
     ErrorCodeType2002    =  2002,

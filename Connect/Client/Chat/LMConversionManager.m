@@ -398,7 +398,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     }
     message.message_id =  [ConnectTool generateMessageId];
     message.content = !GJCFStringIsNull(chatUser.message)?chatUser.message:[NSString stringWithFormat:LMLocalizedString(@"Link Hello I am", nil),chatUser.username];
-    message.publicKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
+    message.publicKey = chatUser.pub_key;
     message.user_id = [[LKUserCenter shareCenter] currentLoginUser].address;
     message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];

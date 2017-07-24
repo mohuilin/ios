@@ -79,20 +79,15 @@
         default:
             break;
     }
-    
-    [baseAddress getCurrencyAddressList:^(BOOL result, NSMutableArray<CoinInfo *> *addressList) {
-        
-        if (result) {
-            if (addressList.count > 0) {
-                CoinInfo *address = [addressList firstObject];
-                // get usermessage
-                self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,address.address];
-                // qr code
-                [self addQRcodeImageView];
-            }
-        }else{
+    [baseAddress getAddress:^(CoinInfo *address, NSError *error) {
+        if (!error) {
+            // get usermessage
+            self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,address.address];
+            // qr code
+            [self addQRcodeImageView];
+        }else {
             [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:ErrorCodeType134 withUrl:GetCurrencyAddressList] withType:ToastTypeFail showInView:weakSelf.view complete:^{
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:GET_ADDRESSLIST_FAILED_134 withUrl:GetCurrencyAddressList] withType:ToastTypeFail showInView:weakSelf.view complete:^{
                     [weakSelf.navigationController popViewControllerAnimated:YES];
                 }];
             }];

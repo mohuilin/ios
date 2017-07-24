@@ -34,7 +34,6 @@
 - (void)configTableView {
 
     self.tableView.separatorColor = self.tableView.backgroundColor;
-
     [self.tableView registerClass:[TextFieldRoundCell class] forCellReuseIdentifier:@"TextFieldRoundCellID"];
 }
 
@@ -61,11 +60,9 @@
     [[LKUserCenter shareCenter] updateUserInfo:[[LKUserCenter shareCenter] currentLoginUser]];
     [NetWorkOperationTool POSTWithUrlString:SetUpdataUserInfo postProtoData:updateUser.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *) response;
-
         if (hResponse.code != successCode) {
-            DDLogInfo(@"Server error");
             [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:hResponse.message withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeSet withErrorCode:hResponse.code withUrl:SetUpdataUserInfo] withType:ToastTypeFail showInView:weakSelf.view complete:nil];
             }];
             return;
         }
