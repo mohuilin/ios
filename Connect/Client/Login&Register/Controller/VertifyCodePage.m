@@ -397,6 +397,7 @@ typedef NS_ENUM(NSUInteger,SendType) {
         [[MMAppSetting sharedSetting] saveUserToKeyChain:user];
         // skip login
         LocalAccountLoginPage *page = [[LocalAccountLoginPage alloc] initWithUser:user];
+        page.localSourceType = SourTypeEncryPri;
         [self.navigationController pushViewController:page animated:YES];
     }];
 

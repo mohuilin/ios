@@ -46,7 +46,6 @@
        
         UIView *bottomLine = [UIView new];
         bottomLine.backgroundColor = LMBasicLineViewColor;
-//        bottomLine.alpha = 0.5;
         [self addSubview:bottomLine];
         [bottomLine mas_makeConstraints:^(MASConstraintMaker *make) {
             make.right.left.bottom.equalTo(self);
