@@ -183,41 +183,40 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  */
 - (void)getWalletData:(void(^)(NSError *error))complete {
     
-    if (self.isHaveWallet) {
-        // Synchronize wallet data and create wallet
-        [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
-            HttpResponse *hResponse = (HttpResponse *)response;
-            if (hResponse.code != successCode) {
-                if (complete) {
-                    complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-                }
-            } else{
-                NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-                if (data) {
-                    RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-                    if (syncWallet.coinsArray.count > 0) {
-                        // save data to db
-                        [self syncWalletData:syncWallet];
-                        if (complete) {
-                            complete(nil);
-                        }
-                    }else{
-                        if (complete) {
-                            complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-                        }
+    // Synchronize wallet data and create wallet
+    [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+            }
+        } else{
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
+                if (syncWallet.coinsArray.count > 0) {
+                    // save data to db
+                    [self syncWalletData:syncWallet];
+                    if (complete) {
+                        complete(nil);
                     }
-                }else {
+                }else{
                     if (complete) {
                         complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
                     }
                 }
+            }else {
+                if (complete) {
+                    complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                }
             }
-        } fail:^(NSError *error) {
-            if (complete) {
-                complete(error);
-            }
-        }];
-    }
+        }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(error);
+        }
+    }];
+    
 }
 
 /**
