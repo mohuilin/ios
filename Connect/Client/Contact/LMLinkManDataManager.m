@@ -58,11 +58,32 @@
 
 @end
 
-
+static LMLinkManDataManager *manager = nil;
 @implementation LMLinkManDataManager
 
-CREATE_SHARED_MANAGER(LMLinkManDataManager)
++ (LMLinkManDataManager *)sharedManager {
+    @synchronized (self) {
+        if (manager == nil) {
+            manager = [[[self class] alloc] init];
+        }
+    }
+    return manager;
+}
 
++ (void)tearDown {
+    manager = nil;
+}
+
++ (id)allocWithZone:(NSZone *)zone {
+    @synchronized (self) {
+        if (manager == nil) {
+            manager = [super allocWithZone:zone];
+            return manager;
+        }
+    }
+    return nil;
+}
+#pragma mark - setup
 - (instancetype)init {
     if (self = [super init]) {
         [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
@@ -448,6 +469,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
 #pragma mark - notification method
 
 - (void)addNotification {
+    
     RegisterNotify(ConnnectUserAddressChangeNotification, @selector(AddressBookChange:));
     CFErrorRef *error = nil;
     ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(nil, error);
@@ -627,10 +649,7 @@ CREATE_SHARED_MANAGER(LMLinkManDataManager)
         !self.commonGroupResults||!self.allNewFriendRequest) {
         self.contactResults = [[UserDBManager sharedManager] getRealmUsers];
         self.commonGroupResults = [[GroupDBManager sharedManager] realmCommonGroupList];
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-          self.allNewFriendRequest = [[UserDBManager sharedManager] getAllNewFriendResults];
-        });
+        self.allNewFriendRequest = [[UserDBManager sharedManager] getAllNewFriendResults];
         __weak __typeof(&*self)weakSelf = self;
         //register notification
         self.contactResultsToken = [self.contactResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {

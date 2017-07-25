@@ -133,7 +133,6 @@
 - (void)creatNewWallet{
     
     if (![LMWalletManager sharedManager].isHaveWallet && [[MMAppSetting sharedSetting] getSyncData]) {
-        self.hidesBottomBarWhenPushed = YES;
         //Synchronize wallet data and create wallet
         [[LMWalletManager sharedManager] creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(NSError *error) {
             [GCDQueue executeInMainQueue:^{

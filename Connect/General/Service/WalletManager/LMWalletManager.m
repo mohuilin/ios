@@ -59,6 +59,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                     [self syncWalletData:syncWallet];
                     
                 }else {
+                    controllerVc.tabBarController.tabBar.hidden = YES;
                     [self creatWallet:controllerVc currency:currency complete:complete];
                 }
             }
@@ -218,7 +219,6 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     }];
     
 }
-
 /**
  * creat import wallet
  *
