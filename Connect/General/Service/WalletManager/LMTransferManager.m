@@ -154,27 +154,6 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.fee = fee;
     request.tips = tips;
     
-    LMBaseCurrencyManager *baseCurrency = nil;
-    switch (CurrencyTypeBTC) {
-        case CurrencyTypeBTC:
-            baseCurrency = [[LMBtcCurrencyManager alloc] init];
-            break;
-            
-        default:
-            break;
-    }
-    
-    [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:@"1234" complete:^(NSString *decodeValue, BOOL success) {
-
-        LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",currency]] lastObject];
-        NSString *btcSeed = [StringTool pinxCreator:decodeValue withPinv:currencyModel.salt];
-        
-        NSString *privkey = [baseCurrency getPrivkeyBySeed:btcSeed index:0];
-        NSString *address = [baseCurrency getAddressByPrivKey:privkey];
-        
-        DDLogInfo(@"");
-    }];
-
     //request and sign、 publish
     [self basePostDataWithData:request.data url:WalletServiceTransferToAddress type:TransactionTypeBill currency:currency complete:complete];
 }
@@ -245,6 +224,11 @@ CREATE_SHARED_MANAGER(LMTransferManager)
             publish.transactionType = transactionType;
             publish.currency = currency;
             
+            DDLogInfo(@"%@",publish);
+            if (complete) {
+                complete(nil,[NSError errorWithDomain:@"签名完成" code:successCode userInfo:nil]);
+            }
+            return ;
             /// publish
             [NetWorkOperationTool POSTWithUrlString:WalletServicePublish postProtoData:publish.data complete:^(id response) {
                 HttpResponse *hResponse = (HttpResponse *)response;

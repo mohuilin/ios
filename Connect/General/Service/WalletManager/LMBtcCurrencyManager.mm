@@ -17,6 +17,7 @@
 #import "LMCurrencyModel.h"
 #import "LMBtcAddressManager.h"
 #import "LMHistoryCacheManager.h"
+#import "StringTool.h"
 
 
 #ifdef __cplusplus
@@ -175,6 +176,7 @@ extern "C" {
     }];
     
 }
+
 #pragma mark - encryption methods
 - (NSString *)getPrivkeyBySeed:(NSString *)seed index:(int)index {
     char myRand[129] = {0};
@@ -578,6 +580,16 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     return 1;
 }
 
+- (NSString *)getCurrencySeedWithBaseSeed:(NSString *)baseSeed{
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",(int)CurrencyTypeBTC]] lastObject];
+    
+    /// when create baseSeed ,baseSeed is uppercaseString !!!!
+    NSString *btcSeed = [StringTool pinxCreator:baseSeed.uppercaseString withPinv:currencyModel.salt];
+    
+    return btcSeed;
+}
+
+
 - (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation inputs:(NSArray *)inputs seed:(NSString *)seed{
     
     NSMutableString *mStr = [NSMutableString stringWithFormat:@"currency = %d and address in {",(int)CurrencyTypeBTC];
@@ -591,8 +603,8 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
     [mStr appendString:@"}"];
     
     NSMutableArray *privkeyArray = [NSMutableArray array];
-    //TEST
-    NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:0];
+    
+    NSString *inputsPrivkey = [self getPrivkeyBySeed:[self getCurrencySeedWithBaseSeed:seed] index:0];
     [privkeyArray addObject:inputsPrivkey];
     
     NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:privkeyArray rawTranscation:rawTranscation];
