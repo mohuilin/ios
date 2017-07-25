@@ -181,7 +181,6 @@ typedef NS_ENUM(NSInteger, GetGroupInfoType) {
         default:
             break;
     }
-    [self.applyToJoinGroupBtn addTarget:self action:@selector(applyToGroup:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 
