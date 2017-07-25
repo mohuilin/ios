@@ -216,7 +216,6 @@ static MMAppSetting *manager = nil;
 
 - (void)saveLoginUserPrivkey:(NSString *)privkey{
     
-//    [[FXKeychain defaultKeychain] setObject:user forKey:@"im.conect.loginuserkey"];
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:privkey forKey:@"im.conect.loginuserkey"];
     [userDefaults synchronize];
@@ -549,9 +548,11 @@ static MMAppSetting *manager = nil;
     
 }
 - (BOOL)haveGesturePass{
+    
     return [[self getValue:@"im.connect.gesturepass"] boolValue];
 }
 - (void)cancelGestursPass{
+    
     [self removeObjectForKey:@"im.connect.gesturepass"];
     NSString *privkey = [[LKUserCenter shareCenter] currentLoginUser].prikey;
     [self saveLoginUserPrivkey:privkey];

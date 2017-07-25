@@ -144,11 +144,11 @@
 }
 
 - (void)logOut {
+     [[MMAppSetting sharedSetting]  cancelGestursPass];
 #if (TARGET_IPHONE_SIMULATOR)
     // in the case of simulator
     [[LKUserCenter shareCenter] loginOutByServerWithInfo:nil];
 #else
-    __weak typeof(self)weakSelf = self;
     [MBProgressHUD showMessage:LMLocalizedString(@"Set Logging out", nil) toView:self.view];
     [[IMService instance] unBindDeviceTokenWithDeviceToken:[IMService instance].deviceToken complete:^(NSError *error, id data) {
         [GCDQueue executeInMainQueue:^{

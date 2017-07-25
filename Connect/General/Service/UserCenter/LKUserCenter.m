@@ -187,11 +187,11 @@ static LKUserCenter *center = nil;
             }
             
             // Initialize the purse balance
-            [WallteNetWorkTool queryAmountByAddress:loginUser.address complete:^(NSError *erro, long long amount, NSString *errorMsg) {
-                if (GJCFStringIsNull(errorMsg)) {
-                    [[MMAppSetting sharedSetting] saveBalance:amount];
-                }
-            }];
+//            [WallteNetWorkTool queryAmountByAddress:loginUser.address complete:^(NSError *erro, long long amount, NSString *errorMsg) {
+//                if (GJCFStringIsNull(errorMsg)) {
+//                    [[MMAppSetting sharedSetting] saveBalance:amount];
+//                }
+//            }];
             
         }
     } else{
@@ -210,7 +210,6 @@ static LKUserCenter *center = nil;
     [[IMService instance] quitUser];
     self.loginUser = nil;
     [[MMAppSetting sharedSetting]  deleteLoginUser];
-    [[MMAppSetting sharedSetting]  cancelGestursPass];
     [MMAppSetting sharedSetting].privkey = nil;
     // Empty a single column object
     [UserDBManager tearDown];

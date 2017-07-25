@@ -53,26 +53,26 @@
         }];
         return;
     }
-    [[LKUserCenter shareCenter] currentLoginUser].username = self.updataName;
+    
     SettingUserInfo *updateUser = [[SettingUserInfo alloc] init];
     updateUser.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-    updateUser.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-    [[LKUserCenter shareCenter] updateUserInfo:[[LKUserCenter shareCenter] currentLoginUser]];
+    updateUser.username = self.updataName;
     [NetWorkOperationTool POSTWithUrlString:SetUpdataUserInfo postProtoData:updateUser.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *) response;
         if (hResponse.code != successCode) {
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeSet withErrorCode:hResponse.code withUrl:SetUpdataUserInfo] withType:ToastTypeFail showInView:weakSelf.view complete:nil];
             }];
-            return;
-        }
-
-        [weakSelf updateGroupMyNickName];
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Update successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
-                [weakSelf.navigationController popViewControllerAnimated:YES];
+        }else {
+            [[LKUserCenter shareCenter] currentLoginUser].username = self.updataName;
+            [[LKUserCenter shareCenter] updateUserInfo:[[LKUserCenter shareCenter] currentLoginUser]];
+            [weakSelf updateGroupMyNickName];
+            [GCDQueue executeInMainQueue:^{
+                [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Update successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
+                    [weakSelf.navigationController popViewControllerAnimated:YES];
+                }];
             }];
-        }];
+        }
     }                                  fail:^(NSError *error) {
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Updated failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];

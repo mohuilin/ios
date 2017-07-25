@@ -713,6 +713,7 @@ static dispatch_once_t onceToken;
     switch (msg.extension) {
         case BM_CUTOFFINE_CONNECT_EXT: {
             QuitMessage *quitMsg = msg.body;
+            [[MMAppSetting sharedSetting]  cancelGestursPass];
             [[LKUserCenter shareCenter] loginOutByServerWithInfo:quitMsg.deviceName];
         }
             break;

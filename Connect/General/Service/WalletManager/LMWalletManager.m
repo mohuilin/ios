@@ -180,41 +180,40 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  */
 - (void)getWalletData:(void(^)(NSError *error))complete {
     
-    if (self.isHaveWallet) {
-        // Synchronize wallet data and create wallet
-        [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
-            HttpResponse *hResponse = (HttpResponse *)response;
-            if (hResponse.code != successCode) {
-                if (complete) {
-                    complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-                }
-            } else{
-                NSData *data = [ConnectTool decodeHttpResponse:hResponse];
-                if (data) {
-                    RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-                    if (syncWallet.coinsArray.count > 0) {
-                        // save data to db
-                        [self syncWalletData:syncWallet];
-                        if (complete) {
-                            complete(nil);
-                        }
-                    }else{
-                        if (complete) {
-                            complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-                        }
+    // Synchronize wallet data and create wallet
+    [NetWorkOperationTool POSTWithUrlString:SyncWalletDataUrl postProtoData:nil complete:^(id response) {
+        HttpResponse *hResponse = (HttpResponse *)response;
+        if (hResponse.code != successCode) {
+            if (complete) {
+                complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+            }
+        } else{
+            NSData *data = [ConnectTool decodeHttpResponse:hResponse];
+            if (data) {
+                RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
+                if (syncWallet.coinsArray.count > 0) {
+                    // save data to db
+                    [self syncWalletData:syncWallet];
+                    if (complete) {
+                        complete(nil);
                     }
-                }else {
+                }else{
                     if (complete) {
                         complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
                     }
                 }
+            }else {
+                if (complete) {
+                    complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                }
             }
-        } fail:^(NSError *error) {
-            if (complete) {
-                complete(error);
-            }
-        }];
-    }
+        }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(error);
+        }
+    }];
+    
 }
 
 /**
@@ -308,6 +307,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     seedVc.seedSourceType = SeedSouceTypeWallet;
     seedVc.SeedBlock = ^(NSString *randomSeed) {
         if (!GJCFStringIsNull(randomSeed)) {
+            controllerVc.tabBarController.tabBar.hidden = NO;
             [LMWalletManager sharedManager].baseSeed = randomSeed;
             NSString __block *firstPass = nil;
             [GCDQueue executeInMainQueue:^{
@@ -338,6 +338,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                                     }
                                     NSString *bSeedPrikey = [baseCurrency getPrivkeyBySeed:BitSeed index:0];
                                     NSString *masterAddress = [baseCurrency getAddressByPrivKey:bSeedPrikey];
+                                    
                                     [baseCurrency createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(BOOL result,NSError *error) {
                                         if (result) {
                                             // tips
