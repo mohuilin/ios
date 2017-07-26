@@ -60,19 +60,29 @@
         default:
             break;
     }
-    self.feeLabel.text = [NSString stringWithFormat:@"%@:%@ %@",LMLocalizedString(@"Set Miner fee", nil),[PayTool getBtcStringWithAmount:orderDetail.fee?orderDetail.fee:orderDetail.estimateFee],self.currency];
-    Txout *formartTxout = [Txout new];
-    for (Txout *txout in orderDetail.txOutsArray) {
-        if ([orderDetail.addressesArray containsObject:txout.address]) {
-            continue;
-        }
-        AccountInfo *friend = [[UserDBManager sharedManager] getUserByAddress:txout.address];
-        if (friend) {
-            formartTxout.address = [NSString stringWithFormat:@"%@(%@)",friend.normalShowName,LMLocalizedString(@"Link Friend", nil)];
-            formartTxout.amount = txout.amount;
-            [self.txOuts addObject:formartTxout];
-        } else {
-            [self.txOuts addObject:txout];
+    if (orderDetail.fixedFee) {
+        int64_t fee = (orderDetail.fee?orderDetail.fee:orderDetail.estimateFee) + orderDetail.fixedFee;
+        self.feeLabel.text = [NSString stringWithFormat:@"%@:%@ %@",LMLocalizedString(@"Set Miner fee", nil),[PayTool getBtcStringWithAmount:fee],self.currency];
+        Txout *formartTxout = [Txout new];
+        Txout *txout = [orderDetail.txOutsArray firstObject];
+        formartTxout.amount = txout.amount - orderDetail.fixedFee;
+        formartTxout.address = @"Connect系统地址";
+        [self.txOuts addObject:formartTxout];
+    } else {
+        self.feeLabel.text = [NSString stringWithFormat:@"%@:%@ %@",LMLocalizedString(@"Set Miner fee", nil),[PayTool getBtcStringWithAmount:orderDetail.fee?orderDetail.fee:orderDetail.estimateFee],self.currency];
+        Txout *formartTxout = [Txout new];
+        for (Txout *txout in orderDetail.txOutsArray) {
+            if ([orderDetail.addressesArray containsObject:txout.address]) {
+                continue;
+            }
+            AccountInfo *friend = [[UserDBManager sharedManager] getUserByAddress:txout.address];
+            if (friend) {
+                formartTxout.address = [NSString stringWithFormat:@"%@(%@)",friend.normalShowName,LMLocalizedString(@"Link Friend", nil)];
+                formartTxout.amount = txout.amount;
+                [self.txOuts addObject:formartTxout];
+            } else {
+                [self.txOuts addObject:txout];
+            }
         }
     }
     

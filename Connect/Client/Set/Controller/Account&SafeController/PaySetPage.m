@@ -235,7 +235,7 @@
                     // save and upload
                     
                     [[LMWalletManager sharedManager] reSetPassWord:password baseSeed:baseSeedStr complete:^(NSError *error) {
-                        if (error) {
+                        if (!error) {
                             [GCDQueue executeInMainQueue:^{
                                 [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
                                     if (weakSelf.poptoRoot) {

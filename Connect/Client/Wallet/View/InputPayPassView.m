@@ -434,8 +434,7 @@
 
     //sync
     [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet,NSError *error) {
-        if (!error) {
-            
+        if (wallet && error.code == WALLET_ISEXIST) {
             NSString *decodeValue = nil;
             CategoryType category = CategoryTypeNewUser;
             for (Coin *coin in wallet.coinsArray) {
@@ -456,8 +455,6 @@
                     break;
                 }
             }
-            
-            /// decode
             //verfiy pass
             [baseCurrency decodeEncryptValue:decodeValue password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
                 if (success) {
@@ -478,16 +475,7 @@
                 }
             }];
         } else {
-            [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
-            }];
-            self.passErrorContentView.hidden = NO;
-            self.animationContentView.hidden = YES;
-            self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
-            [UIView animateWithDuration:0.3 animations:^{
-                [self.contentView layoutIfNeeded];
-            }];
-            [self.animationView finishFailure:nil];
+            [self showResultStatusWithError:error];
         }
     }];
 }
