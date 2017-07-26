@@ -15,6 +15,9 @@
 #import "LMBtcAddressManager.h"
 #import "UIAlertController+Blocks.h"
 #import "UIViewController+CurrencyVC.h"
+#import "LMWalletManager.h"
+#import "StringTool.h"
+#import "LMCurrencyModel.h"
 
 
 @implementation LMTransferManager
@@ -23,6 +26,13 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendLuckyPackageWithReciverIdentifier:(NSString *)identifier size:(int)size amount:(NSInteger)amount fee:(NSInteger)fee luckyPackageType:(int)type category:(LuckypackageTypeCategory)category tips:(NSString *)tips fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
 
+    if (![[MMAppSetting sharedSetting] walletExist]) {
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
+        }
+        return;
+    }
+    
     LuckyPackageRequest *request = [[LuckyPackageRequest alloc] init];
     request.size = size;
     request.amount = amount;
@@ -40,6 +50,13 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendUrlTransferFromAddresses:(NSArray *)fromAddresses tips:(NSString *)tips amount:(NSInteger)amount fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
+    if (![[MMAppSetting sharedSetting] walletExist]) {
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
+        }
+        return;
+    }
+    
     OutTransfer *request = [[OutTransfer alloc] init];
     request.fee = fee;
     request.amount = amount;
@@ -54,6 +71,13 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 
 - (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(Crowdfunding *crowdfunding,NSError *error))complete{
+    
+    if (![[MMAppSetting sharedSetting] walletExist]) {
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
+        }
+        return;
+    }
     
     /// send crowdfuning
     CrowdfundingRequest *request = [[CrowdfundingRequest alloc] init];
@@ -85,6 +109,13 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 }
 
 - (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(Bill *bill,NSError *error))complete{
+    
+    if (![[MMAppSetting sharedSetting] walletExist]) {
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
+        }
+        return;
+    }
     
     /// send crowdfuning
     ReceiveRequest *request = [[ReceiveRequest alloc] init];
@@ -122,6 +153,14 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 }
 
 - (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(TransactionType)type fromAddresses:(NSArray *)fromAddresses fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
+    
+    if (![[MMAppSetting sharedSetting] walletExist]) {
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
+        }
+        return;
+    }
+    
     /// pay crowdfuning
     Payment *request = [[Payment alloc] init];
     
@@ -135,6 +174,13 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 }
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
+    
+    if (![[MMAppSetting sharedSetting] walletExist]) {
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
+        }
+        return;
+    }
     
     TransferRequest *request = [[TransferRequest alloc] init];
     NSMutableArray *txoutPuts = [NSMutableArray array];
@@ -151,12 +197,18 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.fee = fee;
     request.tips = tips;
     
-
     //request and sign、 publish
     [self basePostDataWithData:request.data url:WalletServiceTransferToAddress type:TransactionTypeBill currency:currency complete:complete];
 }
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toConnectUserIds:(NSArray *)userIds perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
+    
+    if (![[MMAppSetting sharedSetting] walletExist]) {
+        if (complete) {
+            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
+        }
+        return;
+    }
     
     ConnectTransferRequest *request = [[ConnectTransferRequest alloc] init];
     NSMutableArray *txoutPuts = [NSMutableArray array];
@@ -190,7 +242,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     return spentCurrency;
 }
 
-- (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction transactionType:(TransactionType)transactionType currency:(CurrencyType)currency seed:(NSString *)seed complete:(CompleteWithDataBlock)complete{
+- (void)signRawTransactionAndPublishWihtOriginalTransaction:(OriginalTransaction *)originalTransaction transactionType:(TransactionType)transactionType currency:(CurrencyType)currency category:(CategoryType)category seed:(NSString *)seed complete:(CompleteWithDataBlock)complete{
 
     LMBaseAddressManager *addressManager = [[LMBtcAddressManager alloc] init];
     [addressManager syncAddressListWithInputInputs:originalTransaction.addressesArray complete:^(NSError *error) {
@@ -201,7 +253,6 @@ CREATE_SHARED_MANAGER(LMTransferManager)
         } else {
             //1、define interface
             LMBaseCurrencyManager *currencyManager = nil;
-            
             //2、create speacil manager
             switch (currency) {
                 case CurrencyTypeBTC:
@@ -210,10 +261,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
                 default:
                     break;
             }
-            
             //3、sign rawhex
-            NSString *signTransaction = [currencyManager signRawTranscationWithTvs:originalTransaction.vts rawTranscation:originalTransaction.rawhex inputs:originalTransaction.addressesArray seed:seed];
-            
+            NSString *signTransaction = [currencyManager signRawTranscationWithTvs:originalTransaction.vts category:category rawTranscation:originalTransaction.rawhex inputs:originalTransaction.addressesArray seed:seed];
             
             //publish
             PublishTransaction *publish = [[PublishTransaction alloc] init];
@@ -221,7 +270,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
             publish.hashId = originalTransaction.hashId;
             publish.transactionType = transactionType;
             publish.currency = currency;
-            
+
             /// publish
             [NetWorkOperationTool POSTWithUrlString:WalletServicePublish postProtoData:publish.data complete:^(id response) {
                 HttpResponse *hResponse = (HttpResponse *)response;
@@ -346,10 +395,10 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)verfiyWithOriginTransactionResp:(OriginalTransactionResponse *)oriTransactionResp type:(TransactionType)type currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     /// password verfiy --- encrypt seed
-    [InputPayPassView inputPayPassWithOrderDetail:oriTransactionResp.data_p complete:^(InputPayPassView *passView, NSError *error, NSString *baseSeed) {
-        if (baseSeed) {
+    [InputPayPassView inputPayPassWithOrderDetail:oriTransactionResp.data_p currency:currency complete:^(CategoryType category,NSString *decodeValue, InputPayPassView *passView) {
+        if (decodeValue) {
             /// sign and publish
-            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransactionResp.data_p transactionType:type currency:currency seed:baseSeed complete:^(id data, NSError *signError) {
+            [self signRawTransactionAndPublishWihtOriginalTransaction:oriTransactionResp.data_p transactionType:type currency:currency category:category seed:decodeValue complete:^(id data, NSError *signError) {
                 if (passView.requestCallBack) {
                     passView.requestCallBack(signError);
                 }
@@ -358,12 +407,6 @@ CREATE_SHARED_MANAGER(LMTransferManager)
                 }
             }];
         }
-    } forgetPassBlock:^{
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"cancel" code:TransactionPackageErrorTypeCancel userInfo:nil]);
-        }
-        UIViewController *controller = [UIViewController currentViewController];
-        [UIAlertController showAlertInViewController:controller withTitle:LMLocalizedString(@"Set tip title", nil) message:@"如果你忘记你的密码，我们也没有办法。。。" cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Common OK", nil)] tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex){         }];
     } closeBlock:^{
         if (complete) {
             complete(nil,[NSError errorWithDomain:@"cancel" code:TransactionPackageErrorTypeCancel userInfo:nil]);

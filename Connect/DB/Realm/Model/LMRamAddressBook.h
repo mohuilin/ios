@@ -10,9 +10,9 @@
 
 @interface LMRamAddressBook : LMBaseModel
 
-@property NSString *address;
-@property NSString *tag;
-@property NSDate *creatTime;
+@property (copy ,nonatomic) NSString *address;
+@property (copy ,nonatomic) NSString *tag;
+@property (strong ,nonatomic) NSDate *creatTime;
 
 
 @end

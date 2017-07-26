@@ -8,38 +8,32 @@
 
 #import <Foundation/Foundation.h>
 #import "LMTransferManager.h"
+#import "LMSeedModel.h"
+#import "LMCurrencyModel.h"
 
 @interface LMWalletManager : NSObject
 + (instancetype)sharedManager;
 
-@property (nonatomic, copy) NSString *baseSeed;
-@property (nonatomic, copy) NSString *encryPtionSeed;
-@property (nonatomic, assign) BOOL isHaveWallet;
+- (LMSeedModel *)baseModel;
+
+- (LMCurrencyModel *)currencyModelWith:(CurrencyType)currency;
 
 
-
-/**
- * creat new wallet
- *
- * @param contacts
- * @param complete
- */
-- (void)creatNewWalletWithController:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete;
+- (void)creatWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete;
 
 /**
  *
  * get data from server
  */
-- (void)getWalletData:(void(^)(NSError *error))complete;
+- (void)getWalletData:(void(^)(RespSyncWallet *wallet,NSError *error))complete;
 
-/**
- * set password method
- *
- */
-- (void)setPassWord:(NSString *)passWord complete:(void(^)(BOOL result,NSError *error))complete;
 /**
  *  reset password methods
  *
  */
-- (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(BOOL result,NSError *error))complete;
+- (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(NSError *error))complete;
+
+
+- (void)checkWalletExistAndCreateWallet;
+
 @end

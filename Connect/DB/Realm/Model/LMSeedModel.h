@@ -10,11 +10,8 @@
 
 @interface LMSeedModel : LMBaseModel
 
-@property NSString *encryptSeed;
-@property int version;
-@property int ver;
-@property NSString *checkSum;
-
-
+@property (nonatomic ,copy) NSString *encryptSeed;
+@property (nonatomic ,assign)int version;
+@property (nonatomic ,assign)int ver;
 
 @end

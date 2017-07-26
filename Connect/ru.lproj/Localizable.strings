@@ -727,5 +727,7 @@
 "Wallet The currency already exists" = "Валюта уже существует";
 "Wallet Transfer details" = "Передача детали";
 "Wallet Confirm transfer"="Подтверждение передачи";
+"Wallet Immediately create" = "Создать сейчас";
+"Wallet not create wallet" = "Вы не создали кошелек";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

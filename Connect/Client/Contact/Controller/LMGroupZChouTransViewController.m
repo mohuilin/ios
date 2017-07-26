@@ -144,7 +144,7 @@ static NSString *identifier = @"cellIdentifier";
             make.bottom.equalTo(self.view).offset(-AUTO_HEIGHT(25));
         }];
         self.userBalanceLabel = [[UILabel alloc] init];
-        self.amount = [[MMAppSetting sharedSetting] getAvaliableAmount];
+        self.amount = [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].amount;
         self.userBalanceLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Balance Credit", nil), [PayTool getBtcStringWithAmount:self.amount]];
         self.userBalanceLabel.textColor = [UIColor colorWithHexString:@"38425F"];
         self.userBalanceLabel.font = [UIFont systemFontOfSize:FONT_SIZE(28)];

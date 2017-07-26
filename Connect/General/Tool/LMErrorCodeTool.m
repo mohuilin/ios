@@ -66,12 +66,16 @@
             errorMessage = LMLocalizedString(@"Wallet Amount is too small", nil);
             break;
             
+        case TransactionPackageErrorTypeUnspentError:
         case TransactionPackageErrorTypeUnspentNotEnough:
             errorMessage = LMLocalizedString(@"Wallet Insufficient balance", nil);
             break;
             
         case GET_ADDRESSLIST_FAILED_134:
             errorMessage = @"同步地址失败";
+            break;
+        case WALLET_NOT_ISEXIST:
+            errorMessage = @"你还未创建钱包，请到钱包页面创建新的钱包";
             break;
             
         case TransactionPackageErrorTypeSyncAddress_InputsAddress_NotMatch:

@@ -206,7 +206,7 @@ static NSString *const identifier = @"cellIdentifier";
 
 - (void)initTabelViewCell {
     self.BalanceLabel = [[UILabel alloc] init];
-    self.BalanceLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Balance Credit", nil), [PayTool getBtcStringWithAmount:[[MMAppSetting sharedSetting] getAvaliableAmount]]];
+    self.BalanceLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Balance Credit", nil), [PayTool getBtcStringWithAmount:[[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].amount]];
     UITapGestureRecognizer *tapBalance = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapBalance)];
     [self.BalanceLabel addGestureRecognizer:tapBalance];
     self.BalanceLabel.userInteractionEnabled = YES;

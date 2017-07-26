@@ -10,8 +10,8 @@
 
 @interface LMRecentChatSetting : LMBaseModel
 
-@property NSString *identifier;
-@property BOOL notifyStatus;
-@property int snapChatDeleteTime;
+@property (copy ,nonatomic) NSString *identifier;
+@property (assign ,nonatomic) BOOL notifyStatus;
+@property (assign ,nonatomic) int snapChatDeleteTime;
 
 @end

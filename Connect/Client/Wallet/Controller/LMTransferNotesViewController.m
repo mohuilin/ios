@@ -247,7 +247,7 @@ typedef NS_ENUM(NSInteger, LMTransactionStatusType) {
         self.BalanceLabel.font = [UIFont systemFontOfSize:FONT_SIZE(28)];
         self.BalanceLabel.textColor = [UIColor blackColor];
         self.BalanceLabel.textAlignment = NSTextAlignmentCenter;
-        self.BalanceLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Balance Credit", nil), [PayTool getBtcStringWithAmount:[[MMAppSetting sharedSetting] getAvaliableAmount]]];
+        self.BalanceLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Balance Credit", nil), [PayTool getBtcStringWithAmount:[[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].amount]];
         self.BalanceLabel.textColor = [UIColor colorWithHexString:@"38425F"];
         [self.tableViewCell addSubview:self.BalanceLabel];
 

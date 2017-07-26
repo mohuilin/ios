@@ -20,6 +20,6 @@ typedef NS_ENUM(NSInteger, InputPayPassViewStyle) {
 
 @property(nonatomic, copy) void (^requestCallBack)(NSError *error);
 
-+ (InputPayPassView *)inputPayPassWithOrderDetail:(OriginalTransaction *)orderDetail complete:(void (^)(InputPayPassView *passView, NSError *error, NSString *baseSeed))complete forgetPassBlock:(void (^)())forgetPassBlock closeBlock:(void (^)())closeBlock;
++ (InputPayPassView *)inputPayPassWithOrderDetail:(OriginalTransaction *)orderDetail currency:(CurrencyType)currency complete:(void (^)(CategoryType category,NSString *decodeValue,InputPayPassView *passView))complete closeBlock:(void (^)())closeBlock;
 
 @end

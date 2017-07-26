@@ -130,14 +130,15 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
     if (self.seedSourceType == SeedSouceTypeWallet) {
         [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"top_background"] forBarMetrics:UIBarMetricsDefault];
     }else {
         [self.navigationController.navigationBar lt_reset];
     }
-    
 }
+
+
+
 /**
  *  power
  */
@@ -169,9 +170,11 @@
 #pragma mark - action
 
 - (void)doLeft:(id)sender {
-    if (self.seedSourceType != SeedSouceTypeWallet) {
-        [self stopLink];
+    [self stopLink];
+    if (self.seedSourceType == SeedSouceTypeWallet) {
         [self.navigationController popViewControllerAnimated:YES];
+    } else {
+        [super doLeft:sender];
     }
 }
 
@@ -386,7 +389,6 @@
             if (self.SeedBlock) {
                 self.SeedBlock(randomSeed);
             }
-            [self.navigationController popViewControllerAnimated:YES];
         }else {
             SetUserInfoPage *page = nil;
             NSData *data = [NSData dataWithContentsOfFile:self.recoderPath];

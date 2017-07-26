@@ -727,5 +727,7 @@
 "Wallet Failed to get the list address" = "Failed to get the list address";
 "Wallet The currency already exists" = "The currency already exists";
 "Wallet Transfer details" = "Transfer details";
+"Wallet Immediately create" = "Immediately create";
+"Wallet not create wallet" = "You haven't create the purse";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

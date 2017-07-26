@@ -10,10 +10,10 @@
 
 @interface LMFriendRecommandInfo : LMBaseModel
 
-@property NSString *address;
-@property NSString *pubKey;
-@property NSString *avatar;
-@property NSString *username;
-@property int status;
+@property (copy ,nonatomic) NSString *address;
+@property (copy ,nonatomic) NSString *pubKey;
+@property (copy ,nonatomic) NSString *avatar;
+@property (copy ,nonatomic) NSString *username;
+@property (assign ,nonatomic) int status;
 
 @end

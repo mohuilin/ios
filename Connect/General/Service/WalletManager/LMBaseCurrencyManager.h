@@ -9,10 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "LMSeedModel.h"
 #import "LMCurrencyAddress.h"
-#import "EnumDefine.h"
-
-@class Coin;
-@class Transactions;
+#import "Wallet.pbobjc.h"
+#import "LMCurrencyModel.h"
 
 @interface LMBaseCurrencyManager : NSObject
 #pragma mark - currency creat and get
@@ -21,19 +19,13 @@
  *  creat currency
  *
  */
-- (void)createCurrency:(CurrencyType)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSError *error))complete;
-
-/**
- *  get currrency list
- *
- */
-- (void)getCurrencyListWithWalletId:(NSString *)walletId complete:(void (^)(BOOL result,NSArray<Coin *> *coinList))complete;
+- (void)createCurrency:(CurrencyType)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(LMCurrencyModel *currencyModel,NSError *error))complete;
 
 /**
  *  set currency messageInfo
  *
  */
-- (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(BOOL result))complte;
+- (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete;
 /**
  * decode encrypt value by password
  * @param encryptValue
@@ -91,7 +83,7 @@
  * @return
  */
 
-- (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation inputs:(NSArray *)inputs seed:(NSString *)seed;
+- (NSString *)signRawTranscationWithTvs:(NSString *)tvs category:(CategoryType)category rawTranscation:(NSString *)rawTranscation inputs:(NSArray *)inputs seed:(NSString *)seed;
 
 #pragma mark - water method
 - (void)getWaterTransactions:(CurrencyType)currency address:(NSString *)address page:(int)page size:(int)size complete:(void (^)(Transactions *transactions,NSError *error))complete;

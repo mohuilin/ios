@@ -12,4 +12,6 @@
 
 + (instancetype)sharedManager;
 
+- (void)configRealm;
+
 @end

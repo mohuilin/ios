@@ -101,7 +101,7 @@ static MMAppSetting *manager = nil;
         [userSet setObject:@(NO) forKey:@"setAllowRecomand"];
         [userSet setObject:@(NO) forKey:@"setHideBalance"];
         [userSet setObject:@"" forKey:@"im.conect.contactversionkey"];
-        [userSet setObject:@(YES) forKey:@"isSyncData"];
+        [userSet setObject:@(NO) forKey:@"walletExist"];
       
         NSMutableString *currencySymbol = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencySymbol];
         if ([currencySymbol isEqualToString:@"￥"]) {
@@ -792,23 +792,6 @@ char* printEnv(void)
     return [[self getValue:@"vibratenoti"] boolValue];
 }
 
-#pragma mark - Wallet balance
-- (void)saveBalance:(long long int)balance{
-    [self setValue:[NSString stringWithFormat:@"%lld",balance] forKey:@"balance"];
-}
-- (long long int)getBalance{
-    return [[self getValue:@"balance"] integerValue];
-}
-
-- (void)saveAvaliableAmount:(NSString *)balance{
-    if (!GJCFStringIsNull(balance)) {
-        [self setValue:balance forKey:@"avaliableAmount"];
-    }
-}
-- (long long int)getAvaliableAmount{
-    return [[self getValue:@"avaliableAmount"] integerValue];
-}
-
 #pragma mark - rate
 - (void)saveRate:(float)rate{
     [self setValue:[NSString stringWithFormat:@"%f",rate] forKey:@"rate"];
@@ -839,13 +822,12 @@ char* printEnv(void)
 - (BOOL)needReCacheEstimatefee{
     return GJCFDateDaysAgo(GJCFUDFGetValue(@"getEstimatefeeDate")) >= 1;
 }
-#pragma mark - syncData
-- (void)isSyncData:(BOOL)flag{
-    [self setValue:@(flag) forKey:@"isSyncData"];
-}
-- (BOOL)getSyncData{
-    return [[self getValue:@"isSyncData"] boolValue];
-}
 
+- (void)setWalletExist:(BOOL)exist{
+    [self setValue:@(exist) forKey:@"walletExist"];
+}
+- (BOOL)walletExist{
+    return [[self getValue:@"walletExist"] boolValue];
+}
 
 @end

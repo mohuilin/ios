@@ -15,19 +15,19 @@
  *  add currency address
  *
  */
-- (void)addCurrencyAddressWithLabel:(NSString *)label index:(int)index address:(NSString *)address complete:(void (^)(BOOL result))complete;
+- (void)addCurrencyAddressWithLabel:(NSString *)label index:(int)index address:(NSString *)address complete:(void (^)(NSError *error))complete;
 
 /**
  *  get currency addresss list
  *
  */
-- (void)getCurrencyAddressList:(void (^)(NSMutableArray<CoinInfo *> *addressList,NSError *error))complete;
+- (void)getCurrencyAddressList:(void (^)(NSMutableArray<CoinInfo *> *coinInfos,NSError *error))complete;
 
 /**
  * set currency address message
  *
  */
-- (void)setCurrencyAddressMessageWithAddress:(NSString *)address lable:(NSString *)lable status:(int)status complete:(void (^)(BOOL result))complete;
+- (void)updateAddress:(NSString *)address label:(NSString *)label status:(int)status complete:(void (^)(NSError *error))complete;
 /**
  *  ListWithInputInputs
  *
@@ -37,6 +37,6 @@
  *  ListWithInputInputs
  *
  */
-- (void)getAddress:(void (^)(CoinInfo *address,NSError *error))complete;
+- (void)getReceiptAddress:(void (^)(NSString *address,NSError *error))complete;
 
 @end

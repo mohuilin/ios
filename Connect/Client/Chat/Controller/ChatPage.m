@@ -22,6 +22,8 @@
 #import "SystemTool.h"
 #import "LMRealmDBManager.h"
 #import "LMIMHelper.h"
+#import "LMCurrencyModel.h"
+#import "LMWalletManager.h"
 
 
 @interface ChatPage () <
@@ -159,6 +161,9 @@
     [LMConversionManager sharedManager].conversationListDelegate = self;
     [[LMConversionManager sharedManager] getAllConversationFromDB];
     
+    
+    /// check wallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
 }
 
 #pragma mark - LMConversionListChangeManagerDelegate
@@ -195,9 +200,12 @@
 }
 
 - (void)enterForeground {
+    
+    /// check version
     if ([SessionManager sharedManager].currentNewVersionInfo.force) {
         [self showUpdataAlertWithMessage:[SessionManager sharedManager].currentNewVersionInfo.remark force:YES];
     }
+    
 }
 
 - (void)socketDataVerifyFail {

@@ -18,11 +18,11 @@
 // group ecdhkey
 @property(copy, nonatomic) NSString *groupEcdhKey;
 // isCommonGroup
-@property BOOL isCommonGroup;
+@property (assign ,nonatomic) BOOL isCommonGroup;
 // isGroupVerify
-@property BOOL isGroupVerify;
+@property (assign ,nonatomic) BOOL isGroupVerify;
 // isPublic
-@property BOOL isPublic;
+@property (assign ,nonatomic) BOOL isPublic;
 // avatarUrl
 @property(copy, nonatomic) NSString *avatarUrl;
 // groupSummary

@@ -7,7 +7,6 @@
 //
 
 #import "LMBaseCurrencyManager.h"
-#import "Wallet.pbobjc.h"
 
 @interface LMBtcCurrencyManager : LMBaseCurrencyManager
 

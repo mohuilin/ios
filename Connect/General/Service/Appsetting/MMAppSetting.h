@@ -189,12 +189,6 @@
 #pragma mark - currency
 - (void)setcurrency:(NSString *)currency;
 - (NSString *)getcurrency;
-#pragma mark - money blance
-- (void)saveBalance:(long long int)balance;
-- (long long int)getBalance;
-
-- (void)saveAvaliableAmount:(NSString *)balance;
-- (long long int)getAvaliableAmount;
 
 #pragma mark - rate
 - (void)saveRate:(float)rate;
@@ -205,8 +199,10 @@
 
 - (void)setAutoCalculateTransactionFee:(BOOL)autoCalculate;
 - (BOOL)canAutoCalculateTransactionFee;
-#pragma mark - syncData
-- (void)isSyncData:(BOOL)flag;
-- (BOOL)getSyncData;
+
+
+#pragma mark - currency
+- (void)setWalletExist:(BOOL)exist;
+- (BOOL)walletExist;
 
 @end

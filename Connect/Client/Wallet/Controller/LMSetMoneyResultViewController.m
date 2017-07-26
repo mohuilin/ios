@@ -84,7 +84,7 @@
 - (void)initTabelViewCell {
 
     self.BalanceLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(self.rateChangeButton.frame) + AUTO_HEIGHT(30), VSIZE.width, AUTO_HEIGHT(100))];
-    self.BalanceLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Balance Credit", nil), [PayTool getBtcStringWithAmount:[[MMAppSetting sharedSetting] getAvaliableAmount]]];
+    self.BalanceLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Balance Credit", nil), [PayTool getBtcStringWithAmount:[[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].amount]];
     self.BalanceLabel.font = [UIFont systemFontOfSize:FONT_SIZE(30)];
     self.BalanceLabel.textColor = [UIColor blackColor];
     self.BalanceLabel.textAlignment = NSTextAlignmentCenter;

@@ -9,6 +9,7 @@
 #import "LMBaseModel.h"
 
 @interface LMCurrencyAddress : LMBaseModel
+
 @property (nonatomic,assign) int currency;
 @property (nonatomic,assign)int index;
 @property (nonatomic,copy)NSString *address;

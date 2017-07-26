@@ -25,10 +25,4 @@
  */
 - (id)normalInfo;
 
-/**
- * get normarl info eg:Accountinfo
- * @return
- */
-+ (void)setDefaultRealm;
-
 @end

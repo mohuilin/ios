@@ -97,7 +97,7 @@
 
 
     self.userBalanceLabel = [[UILabel alloc] init];
-    self.amount = [[NSDecimalNumber alloc] initWithLong:[[MMAppSetting sharedSetting] getAvaliableAmount]];
+    self.amount = [[NSDecimalNumber alloc] initWithLong:[[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].amount];
     self.userBalanceLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Balance Credit", nil), [PayTool getBtcStringWithAmount:[self.amount integerValue]]];
     self.userBalanceLabel.textColor = LMBasicBlanceBtnTitleColor;
     self.userBalanceLabel.font = [UIFont systemFontOfSize:FONT_SIZE(28)];
