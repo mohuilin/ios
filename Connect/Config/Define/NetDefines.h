@@ -377,24 +377,110 @@
 /**======================================================================================
  *                                wallet
  * ====================================================================================== */
-
-
-#define WalletServiceTransferToAddress @"http://192.168.40.4:18083/wallet/v2/service/transfer_to_address"
-
-#define WalletServiceTransferInConnect @"http://192.168.40.4:18083/wallet/v2/service/transfer"
-
-
-#define WalletServiceReceive @"http://192.168.40.4:18083/wallet/v2/service/receive"
-
-#define WalletServicePay @"http://192.168.40.4:18083/wallet/v2/service/payment"
-
-#define WalletServiceLuckpackage @"http://192.168.40.4:18083/wallet/v2/service/luckpackage"
-
-#define WalletServiceExternal @"http://192.168.40.4:18083/wallet/v2/service/external"
-
-#define WalletServiceCrowdfuning @"http://192.168.40.4:18083/wallet/v2/service/crowdfuning"
-
-#define WalletServicePublish @"http://192.168.40.4:18083/wallet/v2/service/publish"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /transfer_to_addres
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ */
+#define WalletServiceTransferToAddress  baseServer "/wallet/v2/service/transfer_to_address"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: /twallet/v2/service/transfers
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ */
+#define WalletServiceTransferInConnect baseServer "/wallet/v2/service/transfer"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: wallet/v2/service/receive
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ */
+#define WalletServiceReceive  baseServer "/wallet/v2/service/receive"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: service/payment
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ */
+#define WalletServicePay baseServer "/wallet/v2/service/payment"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: service/luckpackage
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ */
+#define WalletServiceLuckpackage baseServer "/wallet/v2/service/luckpackage"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: service/external
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ */
+#define WalletServiceExternal baseServer "/wallet/v2/service/external"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: service/crowdfuning
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ */
+#define WalletServiceCrowdfuning baseServer "/wallet/v2/service/crowdfuning"
+/**
+ Payment settings
+  
+   Interface description
+  
+   PATH: service/publish
+   METHOD: POST
+   Data Format: Protobuf
+   Request parameter
+  
+   Protobuf file: IMRequest
+ */
+#define WalletServicePublish baseServer "/wallet/v2/service/publish"
 
 /**
  Payment settings
