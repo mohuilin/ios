@@ -131,7 +131,6 @@
 		192351261E8121CB0022D844 /* InputPayPassView.m in Sources */ = {isa = PBXBuildFile; fileRef = 192350E31E8121CB0022D844 /* InputPayPassView.m */; };
 		192351271E8121CB0022D844 /* JxbLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 192350E51E8121CB0022D844 /* JxbLoadingView.m */; };
 		192351281E8121CB0022D844 /* LMaddTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 192350E71E8121CB0022D844 /* LMaddTableViewCell.m */; };
-		192351291E8121CB0022D844 /* LMaddTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 192350E81E8121CB0022D844 /* LMaddTableViewCell.xib */; };
 		1923512A1E8121CB0022D844 /* LMBitAddressTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 192350EA1E8121CB0022D844 /* LMBitAddressTableViewCell.m */; };
 		1923512B1E8121CB0022D844 /* LMBitAddressTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 192350EB1E8121CB0022D844 /* LMBitAddressTableViewCell.xib */; };
 		1923512C1E8121CB0022D844 /* LMDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 192350ED1E8121CB0022D844 /* LMDrawView.m */; };
@@ -1032,6 +1031,7 @@
 		F172A66F1EB8843C006E186C /* MMMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F172A66E1EB8843C006E186C /* MMMessage.m */; };
 		F17CBE2F1ED40C700067234D /* LMselectCountryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */; };
 		F17CBE321ED536920067234D /* LMDisplayProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE311ED536920067234D /* LMDisplayProgressView.m */; };
+		F18AD34A1F273FA70096C76E /* LMaddTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F18AD3491F273FA70096C76E /* LMaddTableViewCell.xib */; };
 		F1ADBAF01EF90C3500570DF6 /* LMRamGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = F1ADBAEF1EF90C3500570DF6 /* LMRamGroupInfo.m */; };
 		F1B363D21E85255600B65086 /* LMSearchTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = F1B363D11E85255600B65086 /* LMSearchTextField.m */; };
 		F1CC2E941E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = F1CC2E931E95E7F80045FBB7 /* NSMutableArray+LMSafeMethod.m */; };
@@ -1318,7 +1318,6 @@
 		192350E51E8121CB0022D844 /* JxbLoadingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JxbLoadingView.m; sourceTree = "<group>"; };
 		192350E61E8121CB0022D844 /* LMaddTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMaddTableViewCell.h; sourceTree = "<group>"; };
 		192350E71E8121CB0022D844 /* LMaddTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMaddTableViewCell.m; sourceTree = "<group>"; };
-		192350E81E8121CB0022D844 /* LMaddTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LMaddTableViewCell.xib; sourceTree = "<group>"; };
 		192350E91E8121CB0022D844 /* LMBitAddressTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMBitAddressTableViewCell.h; sourceTree = "<group>"; };
 		192350EA1E8121CB0022D844 /* LMBitAddressTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMBitAddressTableViewCell.m; sourceTree = "<group>"; };
 		192350EB1E8121CB0022D844 /* LMBitAddressTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LMBitAddressTableViewCell.xib; sourceTree = "<group>"; };
@@ -12616,6 +12615,7 @@
 		F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMselectCountryCell.m; sourceTree = "<group>"; };
 		F17CBE301ED536920067234D /* LMDisplayProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMDisplayProgressView.h; sourceTree = "<group>"; };
 		F17CBE311ED536920067234D /* LMDisplayProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMDisplayProgressView.m; sourceTree = "<group>"; };
+		F18AD3491F273FA70096C76E /* LMaddTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LMaddTableViewCell.xib; sourceTree = "<group>"; };
 		F198A98A1EAF6043008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F198A98B1EAF6048008D97E7 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F1ADBAEE1EF90C3500570DF6 /* LMRamGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamGroupInfo.h; sourceTree = "<group>"; };
@@ -14922,8 +14922,8 @@
 				192350E41E8121CB0022D844 /* JxbLoadingView.h */,
 				192350E51E8121CB0022D844 /* JxbLoadingView.m */,
 				192350E61E8121CB0022D844 /* LMaddTableViewCell.h */,
+				F18AD3491F273FA70096C76E /* LMaddTableViewCell.xib */,
 				192350E71E8121CB0022D844 /* LMaddTableViewCell.m */,
-				192350E81E8121CB0022D844 /* LMaddTableViewCell.xib */,
 				192350E91E8121CB0022D844 /* LMBitAddressTableViewCell.h */,
 				192350EA1E8121CB0022D844 /* LMBitAddressTableViewCell.m */,
 				192350EB1E8121CB0022D844 /* LMBitAddressTableViewCell.xib */,
@@ -32402,7 +32402,6 @@
 			files = (
 				1923504A1E811F520022D844 /* NCellValue1.xib in Resources */,
 				D92230291E822A3100D67110 /* eye_blink@3x.png in Resources */,
-				192351291E8121CB0022D844 /* LMaddTableViewCell.xib in Resources */,
 				1923504F1E811F520022D844 /* TitleSubTitleCell.xib in Resources */,
 				D92230211E822A3100D67110 /* dissapointment2.gif in Resources */,
 				F16FD80F1EC3205F002F9395 /* streambuf in Resources */,
@@ -32606,6 +32605,7 @@
 				F16FD7E11EC3205C002F9395 /* cassert in Resources */,
 				D922305D1E822A3100D67110 /* chat_icon_video_green@2x.png in Resources */,
 				D92230171E822A3100D67110 /* angry@3x.png in Resources */,
+				F18AD34A1F273FA70096C76E /* LMaddTableViewCell.xib in Resources */,
 				D95C036D1E8108D8006C5C8A /* LMGroupIntroductionViewController.xib in Resources */,
 				F16FD81F1EC3205F002F9395 /* istream.SUNWCCh in Resources */,
 				D92230341E822A3100D67110 /* holy_man@3x.png in Resources */,
