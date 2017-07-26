@@ -217,6 +217,8 @@ static LKUserCenter *center = nil;
     [RecentChatDBManager tearDown];
     [LMMessageExtendManager tearDown];
     [MessageDBManager tearDown];
+    [LMLinkManDataManager tearDown];
+    
     
     // Clear the single column object to clear the mainTabController
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
@@ -224,6 +226,8 @@ static LKUserCenter *center = nil;
     
     // Empty the session object
     [[LMConversionManager sharedManager] clearAllModel];
+    // Clear contact-related information
+    [[LMLinkManDataManager sharedManager] clearArrays];
     [GCDQueue executeInMainQueue:^{
         PhoneLoginPage *phonePage = [[PhoneLoginPage alloc] init];
         NSArray *users = [[MMAppSetting sharedSetting] getKeyChainUsers];
@@ -237,8 +241,7 @@ static LKUserCenter *center = nil;
             [page showLogoutTipWithInfo:info];
         }
     }];
-    // Clear contact-related information
-    [[LMLinkManDataManager sharedManager] clearArrays];
+   
 }
 
 

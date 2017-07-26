@@ -215,7 +215,6 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         }
     }];
 }
-
 /**
  * creat import wallet
  *
