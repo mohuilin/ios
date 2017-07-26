@@ -10,14 +10,14 @@
 
 @interface LMRamMemberInfo : LMBaseModel
 
-@property NSString *identifier;
-@property NSString *username;
-@property NSString *avatar;
-@property NSString *address;
-@property BOOL isGroupAdmin;
-@property NSString *groupNicksName;
-@property NSString *pubKey;
-@property NSString *univerStr;
+@property (copy ,nonatomic) NSString *identifier;
+@property (copy ,nonatomic) NSString *username;
+@property (copy ,nonatomic) NSString *avatar;
+@property (copy ,nonatomic) NSString *address;
+@property (assign ,nonatomic) BOOL isGroupAdmin;
+@property (copy ,nonatomic) NSString *groupNicksName;
+@property (copy ,nonatomic) NSString *pubKey;
+@property (copy ,nonatomic) NSString *univerStr;
 
 @property(readonly) RLMLinkingObjects *group;
 

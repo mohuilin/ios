@@ -11,14 +11,14 @@
 
 @interface LMContactAccountInfo : LMBaseModel
 
-@property NSString *address;
-@property NSString *pub_key;
-@property NSString *avatar;
-@property NSString *username;
-@property NSString *remarks;
-@property int source;
-@property BOOL isBlackMan;
-@property BOOL isOffenContact;
+@property (copy ,nonatomic) NSString *address;
+@property (copy ,nonatomic) NSString *pub_key;
+@property (copy ,nonatomic) NSString *avatar;
+@property (copy ,nonatomic) NSString *username;
+@property (copy ,nonatomic) NSString *remarks;
+@property (assign ,nonatomic) int source;
+@property (assign ,nonatomic) BOOL isBlackMan;
+@property (assign ,nonatomic) BOOL isOffenContact;
 
 @property RLMArray<LMTag *> <LMTag> *tags;
 
