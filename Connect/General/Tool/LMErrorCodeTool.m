@@ -74,6 +74,9 @@
         case GET_ADDRESSLIST_FAILED_134:
             errorMessage = @"同步地址失败";
             break;
+        case WALLET_NOT_ISEXIST:
+            errorMessage = @"你还未创建钱包，请到钱包页面创建新的钱包";
+            break;
             
         case TransactionPackageErrorTypeSyncAddress_InputsAddress_NotMatch:
             errorMessage = @"数据不匹配！！！";

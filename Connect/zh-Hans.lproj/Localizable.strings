@@ -728,5 +728,7 @@
 "Wallet Failed to get the list address" = "获取地址列表失败";
 "Wallet The currency already exists" = "币种已经存在";
 "Wallet Transfer details" = "转账详情";
+"Wallet Immediately create" = "立即创建";
+"Wallet not create wallet" = "你还没有创建钱包";
 "app name"="Connect";
 "app name im"="CONNECT.IM";
