@@ -34,6 +34,7 @@
 #import "GJGCChatGroupViewController.h"
 #import "NSMutableArray+MoveObject.h"
 #import "LMRealmDBManager.h"
+#import "LMRealmManager.h"
 
 @interface MainTabController (){
     dispatch_source_t _timer;
@@ -115,18 +116,22 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupAllChildViewControllers];
-    for (int i = 0; i < self.viewControllers.count; i ++) {
+    for (int i = 0; i < 2; i ++) {
         self.selectedIndex = i;
     }
     self.selectedIndex = 0;
     
+    /// config realm
+    [[LMRealmManager sharedManager] configRealm];
+    
+    /// migrate data
     [LMRealmDBManager dataMigrationWithComplete:^(CGFloat progress) {
         
     }];
-    //start imserver
+    
+    /// start imserver
     [[IMService instance] start];
     
-
     [self addNotification];
     
     //check salt expire

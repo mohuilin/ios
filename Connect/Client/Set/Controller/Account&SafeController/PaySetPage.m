@@ -107,22 +107,19 @@
 
     NSString *tip = LMLocalizedString(@"Wallet Reset password", nil);
     CellItem *payPass = nil;
-    if ([LMWalletManager sharedManager].isHaveWallet) {
+    if ([LMWalletManager sharedManager].baseModel) {
         payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
             [weakSelf resetPayPass];
         }];
+        group0.items = @[payPass];
     }else {
-        [[LMWalletManager sharedManager] getWalletData:^(NSError *error) {
+        [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
             if (!error) {
                 [weakSelf reload];
             }
         }];
     }
-    if ([LMWalletManager sharedManager].isHaveWallet) {
-      group0.items = @[payPass];
-    }
     [self.groups objectAddObject:group0];
-
 
     // second group
     CellGroup *group1 = [[CellGroup alloc] init];
@@ -211,10 +208,10 @@
             if (GJCFStringIsNull(firstPass)) {
                 firstPass = password;
                 [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                if ([LMWalletManager sharedManager].encryPtionSeed.length > 0) {
+                if ([LMWalletManager sharedManager].baseModel.encryptSeed.length > 0) {
                     LMBaseCurrencyManager *baseCurrency = nil;
                     baseCurrency = [[LMBtcCurrencyManager alloc] init];
-                    [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].encryPtionSeed password:password complete:^(NSString *decodeValue, BOOL success) {
+                    [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].baseModel.encryptSeed password:password complete:^(NSString *decodeValue, BOOL success) {
                         if (!success) {
                             [weakPassView setTitleString:LMLocalizedString(@"Login Password incorrect", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
                             firstPass = nil;
@@ -236,26 +233,24 @@
                 if ([secondPass isEqualToString:password]) {
                     [weakPassView dismissWithClosed:YES];
                     // save and upload
-                    [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                        [[LMWalletManager sharedManager] reSetPassWord:password baseSeed:baseSeedStr complete:^(BOOL result,NSError *error) {
-                            if (result) {
-                                // tips
-                                [GCDQueue executeInMainQueue:^{
-                                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
-                                        if (weakSelf.poptoRoot) {
-                                            [GCDQueue executeInMainQueue:^{
-                                                [weakSelf.navigationController popToRootViewControllerAnimated:YES];
-                                            }             afterDelaySecs:1.f];
-                                        }
-                                    }];
+                    
+                    [[LMWalletManager sharedManager] reSetPassWord:password baseSeed:baseSeedStr complete:^(NSError *error) {
+                        if (error) {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
+                                    if (weakSelf.poptoRoot) {
+                                        [GCDQueue executeInMainQueue:^{
+                                            [weakSelf.navigationController popToRootViewControllerAnimated:YES];
+                                        }             afterDelaySecs:1.f];
+                                    }
                                 }];
-                                [weakSelf reload];
-                            }else {
-                                [GCDQueue executeInMainQueue:^{
-                                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Set Save Failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                                }];
-                            }
-                        }];
+                            }];
+                            [weakSelf reload];
+                        } else {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Set Save Failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+                            }];
+                        }
                     }];
                 } else {
                     [GCDQueue executeInMainQueue:^{

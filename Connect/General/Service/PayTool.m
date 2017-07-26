@@ -11,6 +11,7 @@
 #import "WJTouchID.h"
 #import "NetWorkOperationTool.h"
 #import "NSString+DictionaryValue.h"
+#import "LMWalletManager.h"
 
 @interface PayTool()<WJTouchIDDelegate,KQXPasswordInputControllerDelegate>
 
@@ -101,31 +102,30 @@
 
 - (void)getBlanceWithComplete:(void (^)(NSString *blance,UnspentAmount *unspentAmount,NSError *error))complete {
     
-    [WallteNetWorkTool queryAmountByAddressV2:[[LKUserCenter shareCenter] currentLoginUser].address complete:^(NSError *erro, UnspentAmount *unspentAmount) {
-        if (complete) {
-            if (erro) {
-                // address is nil
-                if (erro.code == -1011) {
-                    return ;
+    [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
+        for (Coin *coin in wallet.coinsArray) {
+            if (coin.currency == CurrencyTypeBTC) {
+                if (complete) {
+                    if (error) {
+                        NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:[[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].amount];
+                        NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
+                        NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
+                        UnspentAmount *unspentAmount = [UnspentAmount new];
+                        unspentAmount.amount = coin.amount;
+                        unspentAmount.avaliableAmount = coin.balance;
+                        complete(blanceNum.stringValue,unspentAmount,error);
+                    } else{
+                        UnspentAmount *unspentAmount = [UnspentAmount new];
+                        unspentAmount.amount = coin.amount;
+                        unspentAmount.avaliableAmount = coin.balance;
+                        
+                        NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:unspentAmount.amount];
+                        NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
+                        NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
+                        complete(blanceNum.stringValue,unspentAmount,error);
+                    }
                 }
-                NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:[[MMAppSetting sharedSetting] getAvaliableAmount]];
-                NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
-                NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
-                unspentAmount = [UnspentAmount new];
-                unspentAmount.amount = deciNum.integerValue;
-                unspentAmount.avaliableAmount = deciNum.integerValue;
-                complete(blanceNum.stringValue,unspentAmount,erro);
-            } else{
-                NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:unspentAmount.amount];
-                NSDecimalNumber *avaliableAmount = [[NSDecimalNumber alloc] initWithLong:unspentAmount.avaliableAmount];
-                //save balance
-                [[MMAppSetting sharedSetting] saveBalance:deciNum.longLongValue];
-                
-                //save avaliableAmount
-                [[MMAppSetting sharedSetting] saveAvaliableAmount:avaliableAmount.stringValue];
-                NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
-                NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
-                complete(blanceNum.stringValue,unspentAmount,erro);
+                break;
             }
         }
     }];

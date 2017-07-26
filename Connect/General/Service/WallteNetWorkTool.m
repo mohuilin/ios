@@ -486,9 +486,6 @@ createRawTranscationComplete:(void (^)(NSArray *vtsArray, NSString *rawTransacti
             inValue += uns.value;
         }
         
-        // save
-        [[MMAppSetting sharedSetting] saveBalance:inValue];
-        
         if (complete) {
             complete(error,inValue,nil);
         }
@@ -529,8 +526,6 @@ createRawTranscationComplete:(void (^)(NSArray *vtsArray, NSString *rawTransacti
         if (error) {
             return;
         }
-        // save
-        [[MMAppSetting sharedSetting] saveBalance:unSpent.amount];
         
         if (complete) {
             complete(error,unSpent);
