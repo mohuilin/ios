@@ -20,6 +20,12 @@
 @implementation LMWalletManager
 CREATE_SHARED_MANAGER(LMWalletManager);
 
+- (instancetype)init{
+    if (self = [super init]) {
+        self.presentCurrency = CurrencyTypeBTC;
+    }
+    return self;
+}
 
 - (LMSeedModel *)baseModel{
     LMSeedModel *seedModel = [[LMSeedModel allObjects] firstObject];
@@ -114,6 +120,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         }
     }];
 }
+
 /**
  *
  * sync datat to db

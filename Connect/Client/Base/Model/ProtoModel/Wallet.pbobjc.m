@@ -1638,6 +1638,7 @@ typedef struct HashIdResp__storage_ {
 @dynamic oddChange;
 @dynamic txOutsArray, txOutsArray_Count;
 @dynamic currency;
+@dynamic fixedFee;
 
 typedef struct OriginalTransaction__storage_ {
   uint32_t _has_storage_[1];
@@ -1650,6 +1651,7 @@ typedef struct OriginalTransaction__storage_ {
   int64_t fee;
   int64_t estimateFee;
   int64_t oddChange;
+  int64_t fixedFee;
 } OriginalTransaction__storage_;
 
 // This method is threadsafe because it is initially called
@@ -1739,6 +1741,15 @@ typedef struct OriginalTransaction__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
+      {
+        .name = "fixedFee",
+        .dataTypeSpecific.className = NULL,
+        .number = OriginalTransaction_FieldNumber_FixedFee,
+        .hasIndex = 7,
+        .offset = (uint32_t)offsetof(OriginalTransaction__storage_, fixedFee),
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldTextFormatNameCustom),
+        .dataType = GPBDataTypeInt64,
+      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[OriginalTransaction class]
@@ -1748,6 +1759,11 @@ typedef struct OriginalTransaction__storage_ {
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(OriginalTransaction__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
+#if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
+    static const char *extraTextFormatInfo =
+        "\001\n\010\000";
+    [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
+#endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

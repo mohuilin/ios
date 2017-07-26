@@ -32,6 +32,10 @@
  * @param password
  */
 - (NSArray *)getCurrencyAddressList:(CurrencyType)currency;
+
+
+- (void)syncCurrencyDetailWithComplete:(void (^)(LMCurrencyModel *currencyModel,NSError *error))complete;
+
 #pragma mark - encryption methods
 /**
  * address by privkey

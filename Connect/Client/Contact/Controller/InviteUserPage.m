@@ -9,7 +9,7 @@
 #import "InviteUserPage.h"
 #import "UserDetailInfoCell.h"
 #import "IMService.h"
-#import "LMBitAddressViewController.h"
+#import "LMChatSingleTransferViewController.h"
 #import "UIView+Toast.h"
 #import "LMRecommandFriendManager.h"
 #import "StringTool.h"
@@ -163,9 +163,12 @@
 }
 
 - (void)transferToAddress:(AccountInfo *)userInfo {
-    LMBitAddressViewController *page = [[LMBitAddressViewController alloc] init];
-    page.address = userInfo.address;
-    [self.navigationController pushViewController:page animated:YES];
+    LMChatSingleTransferViewController *transferVc = [[LMChatSingleTransferViewController alloc] init];
+    transferVc.didGetTransferMoney = ^(NSString *money, NSString *hashId, NSString *notes) {
+    };
+    transferVc.info = userInfo;
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:transferVc];
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 

@@ -14,6 +14,8 @@
 @interface LMWalletManager : NSObject
 + (instancetype)sharedManager;
 
+@property (nonatomic ,assign) CurrencyType presentCurrency;
+
 - (LMSeedModel *)baseModel;
 
 - (LMCurrencyModel *)currencyModelWith:(CurrencyType)currency;

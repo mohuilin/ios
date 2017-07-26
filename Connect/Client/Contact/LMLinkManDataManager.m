@@ -24,6 +24,7 @@
 #import "LMFriendRequestInfo.h"
 #import "LMRamGroupInfo.h"
 #import "LMRamMemberInfo.h"
+#import "UIViewController+CurrencyVC.h"
 
 
 @interface LMLinkManDataManager ()
@@ -61,42 +62,12 @@
 static LMLinkManDataManager *manager = nil;
 @implementation LMLinkManDataManager
 
-+ (LMLinkManDataManager *)sharedManager {
-    @synchronized (self) {
-        if (manager == nil) {
-            manager = [[[self class] alloc] init];
-        }
-    }
-    return manager;
-}
 
-+ (void)tearDown {
-    manager = nil;
-}
+CREATE_SHARED_MANAGER(LMLinkManDataManager)
 
-+ (id)allocWithZone:(NSZone *)zone {
-    @synchronized (self) {
-        if (manager == nil) {
-            manager = [super allocWithZone:zone];
-            return manager;
-        }
-    }
-    return nil;
-}
 #pragma mark - setup
 - (instancetype)init {
     if (self = [super init]) {
-        [[GroupDBManager sharedManager] getCommonGroupListWithComplete:^(NSArray *groups) {
-            [GCDQueue executeInMainQueue:^{
-                [self.commonGroup removeAllObjects];
-                for (LMRamGroupInfo *group in groups) {
-                    if (![self.commonGroup containsObject:group]) {
-                        [self.commonGroup objectAddObject:group];
-                    }
-                }
-                [self formartFiendsGrouping];
-            }];
-        }];
         // regiser notification
         [self addNotification];
     }
@@ -408,23 +379,6 @@ static LMLinkManDataManager *manager = nil;
     }
 }
 
-- (void)clearArrays {
-
-    [self.friendsArr removeAllObjects];
-    self.friendsArr = nil;
-    [self.commonGroup removeAllObjects];
-    self.friendsArr = nil;
-    [self.indexs removeAllObjects];
-    self.indexs = nil;
-    [self.normalFriends removeAllObjects];
-    self.normalFriends = nil;
-    [self.offenFriends removeAllObjects];
-    self.offenFriends = nil;
-    [self.groupsFriend removeAllObjects];
-    self.groupsFriend = nil;
-
-    self.friendNewItem = nil;
-}
 /**
  *  detail user array
  */
@@ -492,11 +446,11 @@ static LMLinkManDataManager *manager = nil;
     [GCDQueue executeInGlobalQueue:^{
         [[KTSContactsManager sharedManager] importContacts:^(NSArray *contacts, BOOL reject) {
             if (reject) {
-                [GCDQueue executeInGlobalQueue:^{
+                [GCDQueue executeInMainQueue:^{
                     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:LMLocalizedString(@"Link Address Book Access Denied", nil) message:LMLocalizedString(@"Link access to your Address Book in Settings", nil) preferredStyle:UIAlertControllerStyleAlert];
                     UIAlertAction *okAction = [UIAlertAction actionWithTitle:LMLocalizedString(@"Common OK", nil) style:UIAlertActionStyleDefault handler:nil];
                     [alertController addAction:okAction];
-                    [[weakSelf getCurrentVC] presentViewController:alertController animated:YES completion:nil];
+                    [[UIViewController currentViewController] presentViewController:alertController animated:YES completion:nil];
                 }];
                 return;
             }
@@ -525,31 +479,6 @@ static LMLinkManDataManager *manager = nil;
             }];
         }];
     }];
-}
-
-- (UIViewController *)getCurrentVC {
-    UIViewController *result = nil;
-
-    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-    if (window.windowLevel != UIWindowLevelNormal) {
-        NSArray *windows = [[UIApplication sharedApplication] windows];
-        for (UIWindow *tmpWin in windows) {
-            if (tmpWin.windowLevel == UIWindowLevelNormal) {
-                window = tmpWin;
-                break;
-            }
-        }
-    }
-
-    UIView *frontView = [[window subviews] objectAtIndexCheck:0];
-    id nextResponder = [frontView nextResponder];
-
-    if ([nextResponder isKindOfClass:[UIViewController class]])
-        result = nextResponder;
-    else
-        result = window.rootViewController;
-
-    return result;
 }
 
 - (void)getRegisterUserByNet {
@@ -643,7 +572,7 @@ static LMLinkManDataManager *manager = nil;
     }];
 }
 
-- (void)formartFiendsGrouping {
+- (void)getContacts {
     
     if (!self.contactResults ||
         !self.commonGroupResults||!self.allNewFriendRequest) {
@@ -798,14 +727,22 @@ static LMLinkManDataManager *manager = nil;
     [self reloadBadgeValue];
 }
 
-- (void)dealloc {
-    RemoveNofify;
+- (void)stopRealmNotification{
     [self.commonGroupResultsToken stop];
+    self.commonGroupResultsToken = nil;
+    self.commonGroupResults = nil;
+    
     [self.contactResultsToken stop];
     self.contactResultsToken = nil;
-    self.commonGroupResultsToken = nil;
+    self.contactResults = nil;
+    
     [self.allNewFriendRequestTolen stop];
     self.allNewFriendRequestTolen = nil;
+    self.allNewFriendRequest = nil;
+}
+
+- (void)dealloc {
+    RemoveNofify;
 }
 
 @end

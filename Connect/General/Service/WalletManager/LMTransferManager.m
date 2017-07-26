@@ -270,7 +270,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
             publish.hashId = originalTransaction.hashId;
             publish.transactionType = transactionType;
             publish.currency = currency;
-
+            
             /// publish
             [NetWorkOperationTool POSTWithUrlString:WalletServicePublish postProtoData:publish.data complete:^(id response) {
                 HttpResponse *hResponse = (HttpResponse *)response;

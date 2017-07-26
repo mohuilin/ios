@@ -10,6 +10,4 @@
 
 @interface LMReceiptViewController : LMBaseViewController
 
-@property(nonatomic, assign) int currency;
-
 @end

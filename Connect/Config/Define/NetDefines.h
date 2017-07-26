@@ -441,6 +441,9 @@
  */
 #define GetUserStatus baseServer "/wallet/v2/service/user_status"
 
+
+#define WalletCoinsInfo baseServer "/wallet/v2/coins/info"
+
 /**
  Payment settings
   

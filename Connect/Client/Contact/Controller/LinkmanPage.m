@@ -54,7 +54,9 @@
     self.navigationItem.leftBarButtonItems = nil;
     self.navigationController.title = LMLocalizedString(@"Link Contacts", nil);
     [self setNavigationRight:@"add_white"];
-    [LMLinkManDataManager sharedManager].delegate = self; 
+    [LMLinkManDataManager sharedManager].delegate = self;
+    
+    [[LMLinkManDataManager sharedManager] getContacts];
     [self configTableView];
     // set left button
     [self setLeftButton];

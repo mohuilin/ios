@@ -21,7 +21,7 @@
 
 // set up
 + (instancetype)sharedManager;
-+ (void)tearDown;
+
 
 #pragma mark - The outside world needs the method, the contact is in use
 /**
@@ -49,12 +49,10 @@
  *
  */
 - (NSMutableArray *)getOffenFriend;
-/**
- *  clear all array
- *
- */
-- (void)clearArrays;
 
+- (void)getContacts;
+
+- (void)stopRealmNotification;
 
 /**
  *  clear unread bridge

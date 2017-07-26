@@ -89,7 +89,7 @@
     }
     
     LMBaseCurrencyManager *baseCurrency = nil;
-    switch (self.currency) {
+    switch ([LMWalletManager sharedManager].presentCurrency) {
         case CurrencyTypeBTC:
             baseCurrency = [[LMBtcCurrencyManager alloc] init];
             break;

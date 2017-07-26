@@ -18,6 +18,8 @@
 #import "LMWalletManager.h"
 #import "LMSeedModel.h"
 #import "LMTransferManager.h"
+#import "LMBaseCurrencyManager.h"
+#import "LMBtcCurrencyManager.h"
 
 
 @interface WalletItem : NSObject
@@ -62,6 +64,8 @@
     [super viewDidAppear:animated];
     
     [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
+    
+    [self queryBlance];
 }
 
 
@@ -172,7 +176,6 @@
         case 0: {
             LMReceiptViewController *bigReVc = [[LMReceiptViewController alloc] init];
             bigReVc.hidesBottomBarWhenPushed = YES;
-            bigReVc.currency = CurrencyTypeBTC;
             [self.navigationController pushViewController:bigReVc animated:YES];
         }
             break;
@@ -198,17 +201,32 @@
 
 - (void)currencyChange {
     [super currencyChange];
-    [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
-        if (!error) {
-            [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, rate.doubleValue * [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance * pow(10, -8)] forState:UIControlStateSelected];
-        }
-    }];
+    [self queryBlance];
 }
 
 - (void)queryBlance {
-    [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
+    /// blance
+    LMBaseCurrencyManager *currencyManager = nil;
+    switch ([LMWalletManager sharedManager].presentCurrency) {
+        case CurrencyTypeBTC:
+        {
+            currencyManager = [[LMBtcCurrencyManager alloc] init];
+        }
+            break;
+            
+        default:
+            break;
+    }
+    [currencyManager syncCurrencyDetailWithComplete:^(LMCurrencyModel *currencyModel, NSError *error) {
         if (!error) {
-            [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, rate.doubleValue * [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance * pow(10, -8)] forState:UIControlStateSelected];
+            NSDecimalNumber *blance  = [[NSDecimalNumber alloc] initWithLongLong:currencyModel.blance];
+            [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
+                if (!error) {
+                    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@"
+                                                       , [PayTool getBtcStringWithDecimalAmount:blance]] forState:UIControlStateNormal];
+                    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %@", self.symbol, [PayTool getBtcStringWithDecimalAmount:[rate decimalNumberByMultiplyingBy:blance]]] forState:UIControlStateSelected];
+                }
+            }];
         }
     }];
 }

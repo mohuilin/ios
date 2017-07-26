@@ -124,6 +124,69 @@ extern "C" {
         }
     }];
 }
+
+
+/**
+ *
+ * creatWallet
+ */
+- (void)syncCurrencyDetailWithComplete:(void (^)(LMCurrencyModel *currencyModel,NSError *error))complete{
+    
+    Coin *coin = [Coin new];
+    coin.currency = CurrencyTypeBTC;
+    
+    [NetWorkOperationTool POSTWithUrlString:WalletCoinsInfo postProtoData:coin.data complete:^(id response) {
+        HttpResponse *hRespon = (HttpResponse*)response;
+        if (hRespon.code != successCode) {
+            if (complete) {
+                complete(nil,[NSError errorWithDomain:hRespon.message code:hRespon.code userInfo:nil]);
+            }
+        }else{
+            NSData *data = [ConnectTool decodeHttpResponse:hRespon];
+            if (data) {
+                CoinsDetail *coinDetail = [CoinsDetail parseFromData:data error:nil];
+                // save db
+                LMCurrencyModel *currencyModel = [LMCurrencyModel new];
+                currencyModel.currency = coinDetail.coin.currency;
+                currencyModel.category = coinDetail.coin.category;
+                currencyModel.salt = coinDetail.coin.salt;
+                currencyModel.status = coinDetail.coin.status;
+                currencyModel.blance = coinDetail.coin.balance;
+                currencyModel.amount = coinDetail.coin.amount;
+                currencyModel.payload = coinDetail.coin.payload;
+                
+                for (CoinInfo *coinInfo in coinDetail.coinInfosArray) {
+                    if (coinInfo.index == 0) {
+                        currencyModel.masterAddress = coinInfo.address;
+                        currencyModel.defaultAddress = coinInfo.address;
+                    }
+                    LMCurrencyAddress *addressModel = [LMCurrencyAddress new];
+                    addressModel.address = coinInfo.address;
+                    addressModel.index = coinInfo.index;
+                    addressModel.status = coinInfo.status;
+                    addressModel.label = coinInfo.label;
+                    addressModel.currency = coinDetail.coin.currency;
+                    addressModel.balance = coinInfo.balance;
+                    addressModel.amount = coinInfo.amount;
+                    [currencyModel.addressListArray addObject:addressModel];
+                }
+                
+                [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                    [realm addOrUpdateObject:currencyModel];
+                }];
+                if (complete) {
+                    complete(currencyModel,nil);
+                }
+            }
+        }
+    } fail:^(NSError *error) {
+        if (complete) {
+            complete(nil,error);
+        }
+    }];
+}
+
+
 /**
  *  get currrency list
  *

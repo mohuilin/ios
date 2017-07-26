@@ -156,6 +156,7 @@ int64 estimate_fee = 6;
 int64 odd_change = 7;
 repeated Txout tx_outs = 8;
 int32 currency = 9;
+int64 fixedFee = 10;
 }
 
 message OriginalTransactionResponse {

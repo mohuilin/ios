@@ -452,12 +452,10 @@ static GroupDBManager *manager = nil;
  * @param nil
  */
 - (void)getCommonGroupListWithComplete:(void (^)(NSArray *CommonGroups))complete {
-    [GCDQueue executeInGlobalQueue:^{
-        NSArray *commonArray = [self commonGroupList];
-        if (complete) {
-            complete(commonArray);
-        }
-    }];
+    NSArray *commonArray = [self commonGroupList];
+    if (complete) {
+        complete(commonArray);
+    }
 }
 /**
  * updata group common status

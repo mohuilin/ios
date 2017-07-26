@@ -12,6 +12,8 @@
 #import "NetWorkOperationTool.h"
 #import "NSString+DictionaryValue.h"
 #import "LMWalletManager.h"
+#import "LMBaseCurrencyManager.h"
+#import "LMBtcCurrencyManager.h"
 
 @interface PayTool()<WJTouchIDDelegate,KQXPasswordInputControllerDelegate>
 
@@ -102,31 +104,48 @@
 
 - (void)getBlanceWithComplete:(void (^)(NSString *blance,UnspentAmount *unspentAmount,NSError *error))complete {
     
-    [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
-        for (Coin *coin in wallet.coinsArray) {
-            if (coin.currency == CurrencyTypeBTC) {
-                if (complete) {
-                    if (error) {
-                        NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:[[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].amount];
-                        NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
-                        NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
-                        UnspentAmount *unspentAmount = [UnspentAmount new];
-                        unspentAmount.amount = coin.amount;
-                        unspentAmount.avaliableAmount = coin.balance;
-                        complete(blanceNum.stringValue,unspentAmount,error);
-                    } else{
-                        UnspentAmount *unspentAmount = [UnspentAmount new];
-                        unspentAmount.amount = coin.amount;
-                        unspentAmount.avaliableAmount = coin.balance;
-                        
-                        NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:unspentAmount.amount];
-                        NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
-                        NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
-                        complete(blanceNum.stringValue,unspentAmount,error);
-                    }
+    
+    LMBaseCurrencyManager *currencyManager = nil;
+    switch ([LMWalletManager sharedManager].presentCurrency) {
+        case CurrencyTypeBTC:
+        {
+            currencyManager = [[LMBtcCurrencyManager alloc] init];
+        }
+            break;
+            
+        default:
+            break;
+    }
+    [currencyManager syncCurrencyDetailWithComplete:^(LMCurrencyModel *currencyModel, NSError *error) {
+        if (!error) {
+            [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
+                if (!error) {
+                    UnspentAmount *unspentAmount = [UnspentAmount new];
+                    unspentAmount.amount = currencyModel.amount;
+                    unspentAmount.avaliableAmount = currencyModel.blance;
+                    
+                    NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:unspentAmount.amount];
+                    NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
+                    NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
+                    complete(blanceNum.stringValue,unspentAmount,error);
+                } else {
+                    NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:[[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].amount];
+                    NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
+                    NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
+                    UnspentAmount *unspentAmount = [UnspentAmount new];
+                    unspentAmount.amount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].amount;
+                    unspentAmount.avaliableAmount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].blance;
+                    complete(blanceNum.stringValue,unspentAmount,error);
                 }
-                break;
-            }
+            }];
+        } else {
+            NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:[[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].amount];
+            NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
+            NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
+            UnspentAmount *unspentAmount = [UnspentAmount new];
+            unspentAmount.amount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].amount;
+            unspentAmount.avaliableAmount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].blance;
+            complete(blanceNum.stringValue,unspentAmount,error);
         }
     }];
 }

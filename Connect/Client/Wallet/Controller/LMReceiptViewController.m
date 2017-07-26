@@ -62,7 +62,7 @@
 }
 - (void)getAddress {
     NSString *currencyName = nil;
-    switch (self.currency) {
+    switch ([LMWalletManager sharedManager].presentCurrency) {
         case CurrencyTypeBTC:
             currencyName = @"bitcoin";
             break;
@@ -71,7 +71,7 @@
             break;
     }
     LMBaseAddressManager *baseAddress = nil;
-    switch (self.currency) {
+    switch ([LMWalletManager sharedManager].presentCurrency) {
         case CurrencyTypeBTC:
             baseAddress = [[LMBtcAddressManager alloc] init];
             break;
@@ -240,7 +240,7 @@
     if (self.rightBarBtn.enabled) {
         if (self.userNameAccoutInformation.length > 0) {
             NSString *currencyName = nil;
-            switch (self.currency) {
+            switch ([LMWalletManager sharedManager].presentCurrency) {
                 case CurrencyTypeBTC:
                 {
                     currencyName = @"bitcoin";

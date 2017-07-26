@@ -531,6 +531,7 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
   OriginalTransaction_FieldNumber_OddChange = 7,
   OriginalTransaction_FieldNumber_TxOutsArray = 8,
   OriginalTransaction_FieldNumber_Currency = 9,
+  OriginalTransaction_FieldNumber_FixedFee = 10,
 };
 
 @interface OriginalTransaction : GPBMessage
@@ -556,6 +557,8 @@ typedef GPB_ENUM(OriginalTransaction_FieldNumber) {
 @property(nonatomic, readonly) NSUInteger txOutsArray_Count;
 
 @property(nonatomic, readwrite) int32_t currency;
+
+@property(nonatomic, readwrite) int64_t fixedFee;
 
 @end
 
