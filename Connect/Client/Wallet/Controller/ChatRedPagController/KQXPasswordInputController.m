@@ -310,7 +310,6 @@
 
 - (IBAction)dismiss:(id)sender {
     [self dismissWithClosed:YES];
-    [[MMAppSetting sharedSetting] isSyncData:YES];
 }
 
 #pragma mark -- CAAnimationDelegate

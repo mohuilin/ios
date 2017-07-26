@@ -344,7 +344,7 @@
 
 - (long long)blance {
     if (_blance <= 0) {
-        _blance = [[MMAppSetting sharedSetting] getBalance];
+        _blance = [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance;
     }
     return _blance;
 }

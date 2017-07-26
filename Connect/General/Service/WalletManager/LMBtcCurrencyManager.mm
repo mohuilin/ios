@@ -67,12 +67,12 @@ extern "C" {
  *  creat currency
  *
  */
-- (void)createCurrency:(CurrencyType)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(BOOL result ,NSError *error))complete {
+- (void)createCurrency:(CurrencyType)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(LMCurrencyModel *currencyModel,NSError *error))complete {
     
     LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)currency]] lastObject];
     if(currencyModel){
         if (complete) {
-            complete(NO,[NSError errorWithDomain:@"" code:CURRENCY_ISEXIST_135 userInfo:nil]);
+            complete(nil,[NSError errorWithDomain:@"" code:CURRENCY_ISEXIST_135 userInfo:nil]);
         }
         return;
     }
@@ -88,7 +88,7 @@ extern "C" {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
             if (complete) {
-                complete(NO,[NSError errorWithDomain:hResponse.message code:CREAR_CURRENCY_FAILED_131 userInfo:nil]);
+                complete(nil,[NSError errorWithDomain:hResponse.message code:CREAR_CURRENCY_FAILED_131 userInfo:nil]);
             }
         }else {
             // save db
@@ -115,12 +115,12 @@ extern "C" {
                 [realm addOrUpdateObject:currencyModel];
             }];
             if (complete) {
-                complete(YES,nil);
+                complete(currencyModel,nil);
             }
         }
     } fail:^(NSError *error) {
         if (complete) {
-           complete(NO,[NSError errorWithDomain:@"" code:CREAR_CURRENCY_FAILED_131 userInfo:nil]);
+           complete(nil,[NSError errorWithDomain:@"" code:CREAR_CURRENCY_FAILED_131 userInfo:nil]);
         }
     }];
 }
@@ -157,24 +157,27 @@ extern "C" {
  *  set currency messageInfo
  *
  */
-- (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(BOOL result))complte{
-    
+- (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
     Coin *coin = [Coin new];
     coin.currency = (int)currency;
     coin.status = status;
+    
     [NetWorkOperationTool POSTWithUrlString:SetCurrencyInfo postProtoData:coin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
         if (hResponse.code != successCode) {
-            
-            
+            if (complete) {
+                complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+            }
         }else {
-            NSLog(@"asdasd");
-            // save db
+            if (complete) {
+                complete(nil);
+            }
         }
     } fail:^(NSError *error) {
-        
+        if (complete) {
+            complete(error);
+        }
     }];
-    
 }
 
 #pragma mark - encryption methods
@@ -590,25 +593,50 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
 }
 
 
-- (NSString *)signRawTranscationWithTvs:(NSString *)tvs rawTranscation:(NSString *)rawTranscation inputs:(NSArray *)inputs seed:(NSString *)seed{
-    
-    NSMutableString *mStr = [NSMutableString stringWithFormat:@"currency = %d and address in {",(int)CurrencyTypeBTC];
-    for (NSString *address in inputs) {
-        if ([address isEqualToString:[inputs lastObject]]) {
-            [mStr appendFormat:@"'%@'",address];
-        } else {
-            [mStr appendFormat:@"'%@',",address];
+- (NSString *)signRawTranscationWithTvs:(NSString *)tvs category:(CategoryType)category rawTranscation:(NSString *)rawTranscation inputs:(NSArray *)inputs seed:(NSString *)seed{
+    switch (category) {
+        case CategoryTypeNewUser:
+        {
+            NSMutableString *mStr = [NSMutableString stringWithFormat:@"currency = %d AND address IN {",(int)CurrencyTypeBTC];
+            for (NSString *address in inputs) {
+                if ([address isEqualToString:[inputs lastObject]]) {
+                    [mStr appendFormat:@"'%@'",address];
+                } else {
+                    [mStr appendFormat:@"'%@',",address];
+                }
+            }
+            [mStr appendString:@"}"];
+            RLMResults *results = [LMCurrencyAddress objectsWhere:mStr];
+            NSMutableArray *privkeyArray = [NSMutableArray array];
+            for (LMCurrencyAddress *model in results) {
+                NSString *inputsPrivkey = [self getPrivkeyBySeed:[self getCurrencySeedWithBaseSeed:seed] index:model.index];
+                [privkeyArray addObject:inputsPrivkey];
+            }
+            NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:privkeyArray rawTranscation:rawTranscation];
+            return signTransaction;
         }
+            break;
+        case CategoryTypeOldUser:
+        {
+            NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:@[seed] rawTranscation:rawTranscation];
+            return signTransaction;
+        }
+            break;
+            
+        case CategoryTypeImport:
+        {
+            NSString *inputsPrivkey = [self getPrivkeyBySeed:seed index:0];
+            NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:@[inputsPrivkey] rawTranscation:rawTranscation];
+            return signTransaction;
+        }
+            break;
+            
+        default:
+            return @"";
+            break;
     }
-    [mStr appendString:@"}"];
     
-    NSMutableArray *privkeyArray = [NSMutableArray array];
-    
-    NSString *inputsPrivkey = [self getPrivkeyBySeed:[self getCurrencySeedWithBaseSeed:seed] index:0];
-    [privkeyArray addObject:inputsPrivkey];
-    
-    NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:privkeyArray rawTranscation:rawTranscation];
-    return signTransaction;
+    return @"";
 }
 
 - (NSString *)signRawTranscationWithTvs:(NSString *)tvsJson privkeys:(NSArray *)privkeys rawTranscation:(NSString *)rawTranscation {

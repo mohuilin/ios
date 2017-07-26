@@ -44,6 +44,8 @@
 
 @property(nonatomic, strong) UIView *leftView;
 
+@property (nonatomic ,copy) NSString *receiptAddress;
+
 @end
 
 @implementation LMReceiptViewController
@@ -59,9 +61,7 @@
     
 }
 - (void)getAddress {
-    __weak typeof(self)weakSelf = self;
     NSString *currencyName = nil;
-    
     switch (self.currency) {
         case CurrencyTypeBTC:
             currencyName = @"bitcoin";
@@ -79,17 +79,16 @@
         default:
             break;
     }
-    [baseAddress getAddress:^(CoinInfo *address, NSError *error) {
+    [baseAddress getReceiptAddress:^(NSString *address, NSError *error) {
         if (!error) {
             // get usermessage
-            self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,address.address];
+            self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,address];
+            self.receiptAddress = address;
             // qr code
             [self addQRcodeImageView];
         }else {
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:GET_ADDRESSLIST_FAILED_134 withUrl:GetCurrencyAddressList] withType:ToastTypeFail showInView:weakSelf.view complete:^{
-                    [weakSelf.navigationController popViewControllerAnimated:YES];
-                }];
+            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:GetCurrencyAddressList] withType:ToastTypeFail showInView:self.view complete:^{
+                [self.navigationController popViewControllerAnimated:YES];
             }];
         }
     }];
@@ -149,7 +148,7 @@
 
 
     self.titleLabel = [[UILabel alloc] init];
-    NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), [[LKUserCenter shareCenter] currentLoginUser].address];
+    NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), self.receiptAddress];
     self.titleLabel.numberOfLines = 0;
     self.titleLabel.text = title;
     self.titleLabel.font = [UIFont boldSystemFontOfSize:FONT_SIZE(25)];

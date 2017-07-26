@@ -18,8 +18,6 @@
 #import "LMWalletManager.h"
 #import "LMSeedModel.h"
 #import "LMTransferManager.h"
-#import "LMCurrencyModel.h"
-
 
 
 @interface WalletItem : NSObject
@@ -40,20 +38,13 @@
 @property(nonatomic, strong) LMCustomBtn *transferBtn;
 @property(nonatomic, strong) LMCustomBtn *historyBtn;
 @property(nonatomic, strong) UIButton *walletBlanceButton;
-
 @property(nonatomic, strong) AccountInfo *loginUser;
-
 @property(nonatomic, strong) UICollectionView *collectionView;
 @property(nonatomic, strong) UIView *headerView;
 @property(nonatomic, assign) CGFloat headerHeight;
-
 @property(nonatomic, strong) NSMutableArray *walletItems;
 @property(nonatomic, copy) NSString *resultContent;
 @property(nonatomic, strong) NSDecimalNumber *money;
-@property(nonatomic, strong) RLMResults *currencyResults;
-@property(nonatomic, strong) RLMNotificationToken *totalAmountToken;
-
-
 
 @end
 
@@ -62,25 +53,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.leftBarButtonItems = nil;
-    [[MMAppSetting sharedSetting] isSyncData:YES];
     [self setupSubView];
     [self addRightBarButtonItem];
     [self addLeftBarButtonItem];
-    [self addNotification];
-    
-   
 }
-- (void)viewDidAppear:(BOOL)animated {
+
+- (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    [self creatNewWallet];
-    [[MMAppSetting sharedSetting] isSyncData:NO];
-    [[LMWalletManager sharedManager] getWalletData:nil];
-}
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self queryBlance];
     
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
 }
+
 
 #pragma lazy
 - (AccountInfo *)loginUser {
@@ -129,53 +112,7 @@
     HistoryVc.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:HistoryVc animated:YES];
 }
-#pragma mark action
-- (void)creatNewWallet{
-    
-    if (![LMWalletManager sharedManager].isHaveWallet && [[MMAppSetting sharedSetting] getSyncData]) {
-        self.hidesBottomBarWhenPushed = YES;
-        //Synchronize wallet data and create wallet
-        [[LMWalletManager sharedManager] creatNewWalletWithController:self currency:CurrencyTypeBTC complete:^(NSError *error) {
-            [GCDQueue executeInMainQueue:^{
-                if (!error) {
-                    [[MMAppSetting sharedSetting] isSyncData:NO];
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
-                    
-                }else {
-                    [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeFail showInView:self.view complete:nil];
-                     [[MMAppSetting sharedSetting] isSyncData:YES];
-                }
-            }];
-        }];
-    }
-}
-- (void)addNotification {
-    if (!self.currencyResults) {
-        [LMCurrencyModel setDefaultRealm];
-        self.currencyResults = [LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)CurrencyTypeBTC]];
-    }
-    __weak typeof(self)weakSelf = self;
-    self.totalAmountToken = [self.currencyResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        if (!error) {
-            for (LMCurrencyModel *currentModel in results) {
-                [[MMAppSetting sharedSetting] saveBalance:currentModel.blance];
-                [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %0.8f", [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateNormal];
-                break;
-            }
-        }
-    }];
-}
-- (void)currencyChange {
-    [super currencyChange];
-    __weak __typeof(&*self) weakSelf = self;
-    [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
-        if (!error) {
-            [GCDQueue executeInMainQueue:^{
-                [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", weakSelf.symbol, rate.doubleValue * [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateSelected];
-            }];
-        }
-    }];
-}
+
 - (void)setupSubView {
 
     self.view.backgroundColor = LMBasicBackgroudGray;
@@ -210,8 +147,8 @@
         make.centerX.equalTo(self.headerView);
     }];
     [self.walletBlanceButton setTitleColor:LMBasicBlanceBtnTitleColor forState:UIControlStateNormal];
-    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@", [PayTool getBtcStringWithAmount:[[MMAppSetting sharedSetting] getBalance]]] forState:UIControlStateNormal];
-    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, [[MMAppSetting sharedSetting] getBalance] * pow(10, -8) * [[MMAppSetting sharedSetting] getRate]] forState:UIControlStateSelected];
+    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@", [PayTool getBtcStringWithAmount:[[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance]] forState:UIControlStateNormal];
+    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance * pow(10, -8) * [[MMAppSetting sharedSetting] getRate]] forState:UIControlStateSelected];
 
     [self.headerView layoutIfNeeded];
     self.headerHeight = self.walletBlanceButton.bottom;
@@ -259,11 +196,19 @@
     self.walletBlanceButton.selected = !self.walletBlanceButton.selected;
 }
 
-- (void)queryBlance {
-    __weak __typeof(&*self) weakSelf = self;
+- (void)currencyChange {
+    [super currencyChange];
     [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
         if (!error) {
-            [weakSelf.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", weakSelf.symbol, rate.doubleValue * [[MMAppSetting sharedSetting] getBalance] * pow(10, -8)] forState:UIControlStateSelected];
+            [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, rate.doubleValue * [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance * pow(10, -8)] forState:UIControlStateSelected];
+        }
+    }];
+}
+
+- (void)queryBlance {
+    [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
+        if (!error) {
+            [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, rate.doubleValue * [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance * pow(10, -8)] forState:UIControlStateSelected];
         }
     }];
 }
@@ -307,8 +252,6 @@
 
 - (void)dealloc {
     RemoveNofify;
-    [self.totalAmountToken stop];
-    self.totalAmountToken = nil;
 }
 
 
@@ -333,18 +276,19 @@
     }
     return _collectionView;
 }
+
 -(BOOL)checkDevice:(NSString*)name
 {
     NSString* deviceType = [UIDevice currentDevice].model;
     NSRange range = [deviceType rangeOfString:name];
     return range.location != NSNotFound;
 }
+
 - (UIView *)headerView {
     if (!_headerView) {
         _headerView = [[UIView alloc] init];
         _headerView.frame = CGRectMake(0, 0, DEVICE_SIZE.width, self.headerHeight);
     }
-
 
     return _headerView;
 }
