@@ -21,6 +21,7 @@ typedef NS_ENUM(NSInteger ,TransactionType) {
     TransactionTypePayCrowding = 2,
     TransactionTypeLuckypackage = 3,
     TransactionTypeURLTransfer = 6,
+    TransactionTypeReceice = 8,
 };
 
 typedef NS_ENUM(NSInteger ,CurrencyType) {
@@ -91,6 +92,8 @@ typedef NS_ENUM(NSInteger,ErrorCodeType)
     ErrorCodeType2664    =  2664,
     ErrorCodeType2665    =  2665,
     ErrorCodeType2666    =  2666,
+    TransactionPackageErrorArguError            = 2500,
+    TransactionPackageErrorAmountNotMatchError  = 2400,
     TransactionPackageErrorTypeFeeSamll         = 3000,
     TransactionPackageErrorTypeFeeEmpty         = 3001,
     TransactionPackageErrorTypeUnspentTooLarge  = 3002,

@@ -203,39 +203,20 @@
     } else {
         [MBProgressHUD showTransferLoadingViewtoView:self.view];
         [self.view endEditing:YES];
-        /// check is friend
-        AccountInfo *friend = [[UserDBManager sharedManager] getUserByAddress:self.addressTextField.text];
-        if (friend) {
-            [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:[[MMAppSetting sharedSetting] getTranferFee] toConnectUserIds:@[friend.pub_key] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
-                self.comfrimButton.enabled = YES;
-                if (error) {
-                    if (error.code != TransactionPackageErrorTypeCancel) {
-                        [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
-                    } else {
-                        [MBProgressHUD hideHUDForView:self.view];
-                    }
+        [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:[[MMAppSetting sharedSetting] getTranferFee] toAddresses:@[self.addressTextField.text] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
+            self.comfrimButton.enabled = YES;
+            if (error) {
+                if (error.code != TransactionPackageErrorTypeCancel) {
+                    [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
                 } else {
                     [MBProgressHUD hideHUDForView:self.view];
-                    [self createChatWithHashId:data address:self.addressTextField.text Amount:money.stringValue];
-                    [self.navigationController popToRootViewControllerAnimated:YES];
                 }
-            }];
-        } else {
-            [[LMTransferManager sharedManager] transferFromAddresses:nil currency:CurrencyTypeBTC fee:[[MMAppSetting sharedSetting] getTranferFee] toAddresses:@[self.addressTextField.text] perAddressAmount:[PayTool getPOW8Amount:money] tips:note complete:^(id data, NSError *error) {
-                self.comfrimButton.enabled = YES;
-                if (error) {
-                    if (error.code != TransactionPackageErrorTypeCancel) {
-                        [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
-                    } else {
-                        [MBProgressHUD hideHUDForView:self.view];
-                    }
-                } else {
-                    [MBProgressHUD hideHUDForView:self.view];
-                    [self createChatWithHashId:data address:self.addressTextField.text Amount:money.stringValue];
-                    [self.navigationController popToRootViewControllerAnimated:YES];
-                }
-            }];
-        }
+            } else {
+                [MBProgressHUD hideHUDForView:self.view];
+                [self createChatWithHashId:data address:self.addressTextField.text Amount:money.stringValue];
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }
+        }];
     }
 }
 

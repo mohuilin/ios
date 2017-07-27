@@ -97,10 +97,10 @@
 
     NSString *lang = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
     NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Wallet request for payment", nil), [[LKUserCenter shareCenter] currentLoginUser].username, self.bitTextField.text];
-    NSString *link = [NSString stringWithFormat:@"%@?address=%@&locale=%@&amount=0", H5PayServerUrl, [[LKUserCenter shareCenter] currentLoginUser].address, lang];
+    NSString *link = [NSString stringWithFormat:@"%@?address=%@&locale=%@&amount=0", H5PayServerUrl, self.receiptAddress, lang];
     if (!GJCFStringIsNull(self.bitTextField.text)) {
         title = [NSString stringWithFormat:LMLocalizedString(@"Wallet request for payment BTC", nil), [[LKUserCenter shareCenter] currentLoginUser].username, self.bitTextField.text];
-        link = [NSString stringWithFormat:@"%@?address=%@&amount=%@&locale=%@", H5PayServerUrl, [[LKUserCenter shareCenter] currentLoginUser].address, self.bitTextField.text, lang];
+        link = [NSString stringWithFormat:@"%@?address=%@&amount=%@&locale=%@", H5PayServerUrl, self.receiptAddress, self.bitTextField.text, lang];
     }
 
     UIImage *avatar = [[YYImageCache sharedCache] getImageForKey:[[LKUserCenter shareCenter] currentLoginUser].avatar];
@@ -289,7 +289,7 @@
             self.errorTipLabel.bottom = 64;
         }];
         self.rightBarBtn.enabled = YES;
-        self.titleLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), [[LKUserCenter shareCenter] currentLoginUser].address];
+        self.titleLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), self.receiptAddress];
         self.bitTextField.text = nil;
         [self.bitTextField mas_updateConstraints:^(MASConstraintMaker *make) {
             make.height.mas_equalTo(AUTO_HEIGHT(0));
@@ -305,7 +305,7 @@
 
 - (void)tapAddress {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    pasteboard.string = [[LKUserCenter shareCenter] currentLoginUser].address;
+    pasteboard.string = self.receiptAddress;
     [self.view makeToast:LMLocalizedString(@"Set Copied", nil) duration:0.8 position:CSToastPositionCenter];
 }
 

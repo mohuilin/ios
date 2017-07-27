@@ -219,12 +219,12 @@
     }
     [currencyManager syncCurrencyDetailWithComplete:^(LMCurrencyModel *currencyModel, NSError *error) {
         if (!error) {
-            NSDecimalNumber *blance  = [[NSDecimalNumber alloc] initWithLongLong:currencyModel.blance];
             [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
                 if (!error) {
                     [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@"
-                                                       , [PayTool getBtcStringWithDecimalAmount:blance]] forState:UIControlStateNormal];
-                    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %@", self.symbol, [PayTool getBtcStringWithDecimalAmount:[rate decimalNumberByMultiplyingBy:blance]]] forState:UIControlStateSelected];
+                                                       , [PayTool getBtcStringWithAmount:currencyModel.blance]] forState:UIControlStateNormal];
+                    NSDecimalNumber *blance  = [[NSDecimalNumber alloc] initWithLongLong:currencyModel.blance];
+                    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, [[rate decimalNumberByMultiplyingBy:blance] decimalNumberByDividingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].doubleValue] forState:UIControlStateSelected];
                 }
             }];
         }

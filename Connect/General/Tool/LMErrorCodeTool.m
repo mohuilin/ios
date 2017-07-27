@@ -68,9 +68,12 @@
             
         case TransactionPackageErrorTypeUnspentError:
         case TransactionPackageErrorTypeUnspentNotEnough:
+        case TransactionPackageErrorAmountNotMatchError:
             errorMessage = LMLocalizedString(@"Wallet Insufficient balance", nil);
             break;
-            
+        case TransactionPackageErrorArguError:
+            errorMessage = @"请求参数错误";
+            break;
         case GET_ADDRESSLIST_FAILED_134:
             errorMessage = @"同步地址失败";
             break;

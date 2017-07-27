@@ -11,8 +11,6 @@
 
 @interface LMRecipFriendsViewController : LMBaseViewController
 
-@property(nonatomic, strong) AccountInfo *info;
-
-@property(nonatomic, copy) void (^didGetMoneyAndWithAccountID)(NSDecimalNumber *money, NSString *hashId, NSString *note);
+- (instancetype)initWithChatUser:(AccountInfo *)chatUser callBack:(void (^)(NSDecimalNumber *money, NSString *hashId, NSString *note))callBack;
 
 @end

@@ -18,11 +18,20 @@
 @property(nonatomic, strong) UIImageView *userImageView;
 @property(nonatomic, strong) UILabel *usernameLabel;
 @property(nonatomic, strong) TransferInputView *inputAmountView;
+@property(nonatomic, copy) void (^didGetMoneyAndWithAccountID)(NSDecimalNumber *money, NSString *hashId, NSString *note);
+@property (nonatomic ,strong) AccountInfo *chatUser;
 
 @end
 
 @implementation LMRecipFriendsViewController
 
+- (instancetype)initWithChatUser:(AccountInfo *)chatUser callBack:(void (^)(NSDecimalNumber *, NSString *, NSString *))callBack{
+    if (self = [super init]) {
+        self.chatUser = chatUser;
+        self.didGetMoneyAndWithAccountID = callBack;
+    }
+    return self;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -91,13 +100,13 @@
 
 - (void)initUserInfomation {
     self.userImageView = [[UIImageView alloc] initWithFrame:CGRectMake(AUTO_WIDTH(319), AUTO_HEIGHT(30) + 64, AUTO_WIDTH(112), AUTO_WIDTH(112))];
-    [self.userImageView setPlaceholderImageWithAvatarUrl:self.info.avatar];
+    [self.userImageView setPlaceholderImageWithAvatarUrl:self.chatUser.avatar];
     self.userImageView.layer.cornerRadius = 5;
     self.userImageView.layer.masksToBounds = YES;
     [self.view addSubview:self.userImageView];
 
     self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(AUTO_WIDTH(50), CGRectGetMaxY(self.userImageView.frame) + AUTO_HEIGHT(10), VSIZE.width - AUTO_WIDTH(100), AUTO_HEIGHT(40))];
-    self.usernameLabel.text = _info.username;
+    self.usernameLabel.text = self.chatUser.username;
     self.usernameLabel.textAlignment = NSTextAlignmentCenter;
     self.usernameLabel.font = [UIFont systemFontOfSize:FONT_SIZE(28)];
     self.usernameLabel.textColor = [UIColor blackColor];
@@ -120,7 +129,7 @@
     NSDecimalNumber *amount = [money decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLong:pow(10, 8)]];
     [self.view endEditing:YES];
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    [[LMTransferManager sharedManager] sendReceiptToPayer:self.info.pub_key amount:[PayTool getPOW8Amount:money] tips:note complete:^(Bill *bill, NSError *error) {
+    [[LMTransferManager sharedManager] sendReceiptToPayer:self.chatUser.pub_key amount:[PayTool getPOW8Amount:money] tips:note complete:^(Bill *bill, NSError *error) {
         if (error) {
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Transfer failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {

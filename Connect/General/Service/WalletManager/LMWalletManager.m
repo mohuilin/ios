@@ -92,6 +92,11 @@ CREATE_SHARED_MANAGER(LMWalletManager);
             NSData *data = [ConnectTool decodeHttpResponse:hRespon];
             if (data) {
                 CoinsDetail *coinDetail = [CoinsDetail parseFromData:data error:nil];
+                
+                /// test
+                coinDetail.coin.category = CategoryTypeOldUser;
+                /// test
+                
                 switch (coinDetail.coin.category) {
                     case CategoryTypeOldUser:
                     {

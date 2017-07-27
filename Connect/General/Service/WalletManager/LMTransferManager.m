@@ -26,12 +26,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendLuckyPackageWithReciverIdentifier:(NSString *)identifier size:(int)size amount:(NSInteger)amount fee:(NSInteger)fee luckyPackageType:(int)type category:(LuckypackageTypeCategory)category tips:(NSString *)tips fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
 
-    if (![[MMAppSetting sharedSetting] walletExist]) {
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
-        }
-        return;
-    }
+    /// check or ceateWallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
     
     LuckyPackageRequest *request = [[LuckyPackageRequest alloc] init];
     request.size = size;
@@ -40,6 +36,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     request.tips = tips;
     request.typ = type;
     request.category =category;
+    request.receiverIdentifier = identifier;
 
     request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
     
@@ -50,12 +47,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendUrlTransferFromAddresses:(NSArray *)fromAddresses tips:(NSString *)tips amount:(NSInteger)amount fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
-    if (![[MMAppSetting sharedSetting] walletExist]) {
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
-        }
-        return;
-    }
+    /// check or ceateWallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
     
     OutTransfer *request = [[OutTransfer alloc] init];
     request.fee = fee;
@@ -72,12 +65,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(Crowdfunding *crowdfunding,NSError *error))complete{
     
-    if (![[MMAppSetting sharedSetting] walletExist]) {
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
-        }
-        return;
-    }
+    /// check or ceateWallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
     
     /// send crowdfuning
     CrowdfundingRequest *request = [[CrowdfundingRequest alloc] init];
@@ -109,13 +98,9 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 }
 
 - (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(Bill *bill,NSError *error))complete{
-    
-    if (![[MMAppSetting sharedSetting] walletExist]) {
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
-        }
-        return;
-    }
+
+    /// check or ceateWallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
     
     /// send crowdfuning
     ReceiveRequest *request = [[ReceiveRequest alloc] init];
@@ -154,12 +139,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(TransactionType)type fromAddresses:(NSArray *)fromAddresses fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
-    if (![[MMAppSetting sharedSetting] walletExist]) {
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
-        }
-        return;
-    }
+    /// check or ceateWallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
     
     /// pay crowdfuning
     Payment *request = [[Payment alloc] init];
@@ -175,12 +156,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
     
-    if (![[MMAppSetting sharedSetting] walletExist]) {
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
-        }
-        return;
-    }
+    /// check or ceateWallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
     
     TransferRequest *request = [[TransferRequest alloc] init];
     NSMutableArray *txoutPuts = [NSMutableArray array];
@@ -203,12 +180,8 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toConnectUserIds:(NSArray *)userIds perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
     
-    if (![[MMAppSetting sharedSetting] walletExist]) {
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"wallet is not exist" code:WALLET_NOT_ISEXIST userInfo:nil]);
-        }
-        return;
-    }
+    /// check or ceateWallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
     
     ConnectTransferRequest *request = [[ConnectTransferRequest alloc] init];
     NSMutableArray *txoutPuts = [NSMutableArray array];

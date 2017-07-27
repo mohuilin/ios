@@ -278,7 +278,7 @@ typedef NS_ENUM(NSInteger, LMTransactionStatusType) {
     self.comfrimButton.enabled = NO;
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
     [self.view endEditing:YES];
-    [[LMTransferManager sharedManager] payCrowdfuningReceiptWithHashId:self.bill.hash_p type:TransactionTypeBill fromAddresses:nil fee:0 currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
+    [[LMTransferManager sharedManager] payCrowdfuningReceiptWithHashId:self.bill.hash_p type:TransactionTypeReceice fromAddresses:nil fee:[[MMAppSetting sharedSetting] getTranferFee] currency:CurrencyTypeBTC complete:^(id data, NSError *error) {
         self.comfrimButton.enabled = YES;
         if (error) {
             if (error.code != TransactionPackageErrorTypeCancel) {

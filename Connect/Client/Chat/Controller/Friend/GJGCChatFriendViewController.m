@@ -2377,7 +2377,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
 - (void)showCreateRedPage {
     LuckypackageTypeCategory category = LuckypackageTypeCategorySingle;
-    NSString *reciverIdentifier = self.taklInfo.chatUser.address;
+    NSString *reciverIdentifier = self.taklInfo.chatUser.pub_key;
     if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
         category = LuckypackageTypeCategoryGroup;
         reciverIdentifier = self.taklInfo.chatIdendifier;
@@ -2469,12 +2469,9 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:groupRecipVc];
         [self presentViewController:nav animated:YES completion:nil];
     } else {
-        LMRecipFriendsViewController *recipVc = [[LMRecipFriendsViewController alloc] init];
-        recipVc.didGetMoneyAndWithAccountID = ^(NSDecimalNumber *money, NSString *hashId, NSString *note) {
+        LMRecipFriendsViewController *recipVc = [[LMRecipFriendsViewController alloc] initWithChatUser:self.taklInfo.chatUser callBack:^(NSDecimalNumber *money, NSString *hashId, NSString *note) {
             [weakSelf sendFriendRceiptMessageWithAmount:money transactionID:hashId totalMember:1 isCrowdfundRceipt:NO note:note];
-        };
-        AccountInfo *info = [[UserDBManager sharedManager] getUserByPublickey:self.taklInfo.chatIdendifier];
-        recipVc.info = info;
+        }];
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:recipVc];
         [self presentViewController:nav animated:YES completion:nil];
     }
