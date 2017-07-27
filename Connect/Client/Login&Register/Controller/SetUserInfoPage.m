@@ -16,6 +16,7 @@
 #import "UIImage+YYAdd.h"
 #import "CameraTool.h"
 #import "CaptureAvatarPage.h"
+#import "LocalAccountLoginPage.h"
 
 
 #define MAX_TIP_LENGTH 10
@@ -49,6 +50,8 @@
 @property(nonatomic, strong) GJCFCoreTextContentView *passTipTextView;
 // weather is upload avatar
 @property(nonatomic, assign) BOOL uploadingAvataring;
+// judge is from randomSeed
+@property(nonatomic, assign) BOOL isFromRand;
 
 @end
 
@@ -72,6 +75,7 @@
         self.randomStrBySound = dataStr;
         self.avatar = DefaultHeadUrl;
         self.avatarView.image = self.clipImage;
+        self.isFromRand = YES;
     }
     return self;
 }
@@ -92,6 +96,7 @@
         self.token = token;
         self.avatar = DefaultHeadUrl;
         self.avatarView.image = self.clipImage;
+        self.isFromRand = YES;
     }
     return self;
 }
@@ -487,10 +492,23 @@
     _completeBtn.enabled = nickLegal;
 }
 
-#pragma mark - getter setter
-
+#pragma mark - other something
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [self.view endEditing:YES];
 }
+- (IBAction)doLeft:(id)sender {
+    LocalAccountLoginPage *localVc = [[LocalAccountLoginPage alloc] init];
+    if (self.isFromRand) {
+        for (UIViewController *controllerVc in self.navigationController.viewControllers) {
+            if ([controllerVc isKindOfClass:[LocalAccountLoginPage class]]) {
+                localVc = (LocalAccountLoginPage *)controllerVc;
+                break;
+            }
+        }
+        [self.navigationController popToViewController:localVc animated:YES];
+    }else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 
+}
 @end
