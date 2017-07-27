@@ -15,7 +15,7 @@
 #define baseServer  @"http://192.168.40.4:10086"
 #define ServerPublickey @"03d307e51af08983cc0c13bb11d3619758e7b0b8a374e610de3503fc4ebeedfe96"
 #define SOCKET_PORT 19090
-#define DefaultHeadUrl @"https://short.connect.im/avatar/v1/b040e0a970bc6d80b675586c5a55f9e9109168ba.png"
+#define DefaultHeadUrl @"http://cd.snowball.io:18081/avatar/v1/6d77c742505a3623e10eb7aafd191eff42580416.jpg"
 
 #define nationalAppDownloadUrl @"itms-services://?action=download-manifest&url=https://connect.im/app/download/manifest.plist"
 #define appstoreAppDownloadUrl @"https://itunes.apple.com/app/connect-p2p-encrypted-instant/id1181365735"
