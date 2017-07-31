@@ -729,5 +729,7 @@
 "Wallet Confirm transfer"="Подтверждение передачи";
 "Wallet Immediately create" = "Создать сейчас";
 "Wallet not create wallet" = "Вы не создали кошелек";
+"Wallet The Connect system address" = "Подключите системный адрес";
+"Wallet An error occurred while packing the transaction Please check whether the amount is correct" = "Упаковать сделки возникает ошибка, проверьте, правильно ли сумму";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

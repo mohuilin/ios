@@ -94,7 +94,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                 CoinsDetail *coinDetail = [CoinsDetail parseFromData:data error:nil];
                 
                 /// test
-                coinDetail.coin.category = CategoryTypeOldUser;
+//                coinDetail.coin.category = CategoryTypeOldUser;
                 /// test
                 
                 switch (coinDetail.coin.category) {
@@ -461,16 +461,22 @@ CREATE_SHARED_MANAGER(LMWalletManager);
 }
 
 
-- (void)checkWalletExistAndCreateWallet{
+- (void)checkWalletExistAndCreateWalletWithBlock:(void (^)(BOOL existWallet))block{
     /// check wallet
     if (![[MMAppSetting sharedSetting] walletExist]) {
         [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
             switch (error.code) {
                 case WALLET_ISEXIST:
+                    if (block) {
+                        block(YES);
+                    }
                     [[MMAppSetting sharedSetting] setWalletExist:YES];
                     break;
                 case WALLET_NOT_ISEXIST:
                 {
+                    if (block) {
+                        block(NO);
+                    }
                     UIViewController *currentController = [UIViewController currentViewController];
                     [UIAlertController showAlertInViewController:currentController withTitle:LMLocalizedString(@"Set tip title", nil) message:LMLocalizedString(@"Wallet not create wallet", nil) cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Wallet Immediately create", nil)] tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex) {
                         if (buttonIndex == 2) {
@@ -491,7 +497,41 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                     break;
             }
         }];
+    } else {
+        if (block) {
+            block(YES);
+        }
     }
+}
+
+- (void)checkWalletExistWithBlock:(void (^)(BOOL existWallet))block{
+    /// check wallet
+    if (![[MMAppSetting sharedSetting] walletExist]) {
+        [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
+            switch (error.code) {
+                case WALLET_ISEXIST:
+                    if (block) {
+                        block(YES);
+                    }
+                    [[MMAppSetting sharedSetting] setWalletExist:YES];
+                    break;
+                case WALLET_NOT_ISEXIST:
+                {
+                    if (block) {
+                        block(NO);
+                    }
+                }
+                    break;
+                default:
+                    break;
+            }
+        }];
+    } else {
+        if (block) {
+            block(YES);
+        }
+    }
+    
 }
 
 

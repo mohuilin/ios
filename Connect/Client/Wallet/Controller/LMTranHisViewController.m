@@ -118,34 +118,32 @@
 }
 - (void)successAction:(Transactions *)address withFlag:(BOOL)flag{
     for (int i = 0; i < address.transactionsArray.count; i++) {
-        
         LMUserInfo *info = [[LMUserInfo alloc] init];
         Transaction *trans = [address.transactionsArray objectAtIndexCheck:i];
         info.hashId = trans.hash_p;
         info.txType = trans.txType;
         UserInfoBalance *infoBalance = nil;
         NSMutableArray *headersUrls = [NSMutableArray array];
-        for (UserInfoBalance *temInfoBalance in trans.userInfosArray) {
-            if (!GJCFStringIsNull(temInfoBalance.avatar)) {
-                if (!infoBalance) {
-                    infoBalance = temInfoBalance;
-                }
-                NSString *avatar = temInfoBalance.avatar;
-                if (headersUrls.count < 9) {
-                    [headersUrls objectAddObject:avatar];
+        if (trans.userInfosArray.count > 1) {
+            for (UserInfoBalance *temInfoBalance in trans.userInfosArray) {
+                if (!GJCFStringIsNull(temInfoBalance.avatar)) {
+                    if (headersUrls.count < 9) {
+                        [headersUrls objectAddObject:temInfoBalance.avatar];
+                    }
                 }
             }
-        }
-        info.userName = infoBalance.username;
-        NSString *avatar = infoBalance.avatar;
-        info.imageUrl = avatar;
-        if (headersUrls.count > 1) {
             info.userName = LMLocalizedString(@"Wallet Multiple transfers", nil);
             info.imageUrls = headersUrls;
-        }
-        if (!infoBalance && GJCFStringIsNull(infoBalance.avatar)) {
-            info.imageUrl = @"default_user_avatar";
-            info.userName = [trans.userInfosArray firstObject].address;
+        } else if (trans.userInfosArray.count == 1) {
+            infoBalance = [trans.userInfosArray firstObject];
+            info.userName = infoBalance.username;
+            info.imageUrl = infoBalance.avatar;
+        } else {
+            if (trans.balance < 0) {
+                info.userName = [[[trans.outputsArray firstObject] addressesArray] firstObject];
+            } else {
+                info.userName = [[[trans.inputsArray firstObject] prevAddressesArray] firstObject];
+            }
         }
         info.balance = trans.balance;
         info.createdAt = [NSString stringWithFormat:@"%llu", trans.createdAt];

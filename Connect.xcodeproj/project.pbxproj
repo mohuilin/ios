@@ -211,6 +211,7 @@
 		2C65A2F77344813C490750ED /* libPods-Connect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D7FC9FA4528B022EBC0831 /* libPods-Connect.a */; };
 		71C3EDF9126EE9B5FCB64F2F /* libPods-ConnectUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */; };
 		D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D912C0201F2B1D1E00A97E1A /* LMNoteCreateWalletView.m in Sources */ = {isa = PBXBuildFile; fileRef = D912C01F1F2B1D1E00A97E1A /* LMNoteCreateWalletView.m */; };
 		D912F5511CEB8DA6008E04D0 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D912F54F1CEB8DA6008E04D0 /* Localizable.strings */; };
 		D91529EA1F2098BA0067C475 /* UIViewController+CurrencyVC.m in Sources */ = {isa = PBXBuildFile; fileRef = D91529E91F2098BA0067C475 /* UIViewController+CurrencyVC.m */; };
 		D91DBB701E08F4F20096E6DC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D91DBB6F1E08F4F20096E6DC /* libc++.tbd */; };
@@ -1457,6 +1458,8 @@
 		BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ConnectUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D90E0F851F164701007D0C4F /* Wallet.pbobjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wallet.pbobjc.h; sourceTree = "<group>"; };
 		D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wallet.pbobjc.m; sourceTree = "<group>"; };
+		D912C01E1F2B1D1E00A97E1A /* LMNoteCreateWalletView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMNoteCreateWalletView.h; sourceTree = "<group>"; };
+		D912C01F1F2B1D1E00A97E1A /* LMNoteCreateWalletView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMNoteCreateWalletView.m; sourceTree = "<group>"; };
 		D912F5501CEB8DA6008E04D0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D912F5521CEB8DB6008E04D0 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		D912F5531CEB8DB6008E04D0 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
@@ -14982,6 +14985,8 @@
 				192351221E8121CB0022D844 /* XWTableViewCell.h */,
 				192351231E8121CB0022D844 /* XWTableViewCell.m */,
 				192351241E8121CB0022D844 /* XWTableViewCell.xib */,
+				D912C01E1F2B1D1E00A97E1A /* LMNoteCreateWalletView.h */,
+				D912C01F1F2B1D1E00A97E1A /* LMNoteCreateWalletView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -33567,6 +33572,7 @@
 				D92233261E824A0200D67110 /* NSArray+Util.m in Sources */,
 				D95C03731E8108D8006C5C8A /* LMPhotoViewController.m in Sources */,
 				D9222FCB1E822A3100D67110 /* UIBezierPath+YYAdd.m in Sources */,
+				D912C0201F2B1D1E00A97E1A /* LMNoteCreateWalletView.m in Sources */,
 				D95C04431E810902006C5C8A /* ChatStatusTipCell.m in Sources */,
 				D92232D91E822BF900D67110 /* GJCFAlbums.m in Sources */,
 				D95C03601E8108D8006C5C8A /* ChatGroupSetGroupNameViewController.m in Sources */,

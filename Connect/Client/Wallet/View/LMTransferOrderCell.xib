@@ -16,11 +16,11 @@
             <rect key="frame" x="0.0" y="0.0" width="426" height="44"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="uGu-0R-fUd" id="bG5-1S-k5b">
-                <rect key="frame" x="0.0" y="0.0" width="426" height="43.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="426" height="44"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3NA8hsjfdgVkmmVS9moHmkZsVCoLxUkvvv" textAlignment="natural" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ERx-3B-M4W">
-                        <rect key="frame" x="-2" y="13" width="308" height="18"/>
+                        <rect key="frame" x="1" y="13" width="305" height="18"/>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -33,7 +33,7 @@
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="ERx-3B-M4W" firstAttribute="leading" secondItem="bG5-1S-k5b" secondAttribute="leadingMargin" constant="-10" id="0ug-YY-VgL"/>
+                    <constraint firstItem="ERx-3B-M4W" firstAttribute="leading" secondItem="bG5-1S-k5b" secondAttribute="leadingMargin" constant="-7" id="0ug-YY-VgL"/>
                     <constraint firstItem="qj8-qR-97G" firstAttribute="leading" secondItem="ERx-3B-M4W" secondAttribute="trailing" constant="10" id="1Rc-3X-deR"/>
                     <constraint firstItem="ERx-3B-M4W" firstAttribute="centerY" secondItem="bG5-1S-k5b" secondAttribute="centerY" id="HM2-6x-62g"/>
                     <constraint firstAttribute="trailingMargin" secondItem="qj8-qR-97G" secondAttribute="trailing" id="Q1G-CL-Jdn"/>

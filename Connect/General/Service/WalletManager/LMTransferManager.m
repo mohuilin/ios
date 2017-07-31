@@ -25,181 +25,180 @@
 CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendLuckyPackageWithReciverIdentifier:(NSString *)identifier size:(int)size amount:(NSInteger)amount fee:(NSInteger)fee luckyPackageType:(int)type category:(LuckypackageTypeCategory)category tips:(NSString *)tips fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
-
-    /// check or ceateWallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
     
-    LuckyPackageRequest *request = [[LuckyPackageRequest alloc] init];
-    request.size = size;
-    request.amount = amount;
-    request.fee = fee;
-    request.tips = tips;
-    request.typ = type;
-    request.category =category;
-    request.receiverIdentifier = identifier;
-
-    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
+    [self checkWalletAndExcuteBlock:^{
+        LuckyPackageRequest *request = [[LuckyPackageRequest alloc] init];
+        request.size = size;
+        request.amount = amount;
+        request.fee = fee;
+        request.tips = tips;
+        request.typ = type;
+        request.category =category;
+        request.receiverIdentifier = identifier;
+        
+        request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
+        
+        //request and sign、 publish
+        [self basePostDataWithData:request.data url:WalletServiceLuckpackage type:TransactionTypeLuckypackage currency:currency complete:complete];
+    } complete:complete];
     
-    //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServiceLuckpackage type:TransactionTypeLuckypackage currency:currency complete:complete];
 }
 
 
 - (void)sendUrlTransferFromAddresses:(NSArray *)fromAddresses tips:(NSString *)tips amount:(NSInteger)amount fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
-    /// check or ceateWallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
-    
-    OutTransfer *request = [[OutTransfer alloc] init];
-    request.fee = fee;
-    request.amount = amount;
-    request.tips = tips;
-    
-    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
-
-    //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServiceExternal type:TransactionTypeURLTransfer currency:currency complete:complete];
+    [self checkWalletAndExcuteBlock:^{
+        OutTransfer *request = [[OutTransfer alloc] init];
+        request.fee = fee;
+        request.amount = amount;
+        request.tips = tips;
+        
+        request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
+        
+        //request and sign、 publish
+        [self basePostDataWithData:request.data url:WalletServiceExternal type:TransactionTypeURLTransfer currency:currency complete:complete];
+    } complete:complete];
     
 }
 
 
 - (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(Crowdfunding *crowdfunding,NSError *error))complete{
     
-    /// check or ceateWallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
-    
-    /// send crowdfuning
-    CrowdfundingRequest *request = [[CrowdfundingRequest alloc] init];
-    request.groupIdentifier = groupIdentifier;
-    request.amount = amount;
-    request.size = size;
-    request.tips = tips;
-    
-    [NetWorkOperationTool POSTWithUrlString:WalletServiceCrowdfuning postProtoData:request.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-            }
-        } else {
-            NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
-            if (data) {
-                Crowdfunding *crowdfunding = [Crowdfunding parseFromData:data error:nil];
+    [self checkWalletAndExcuteBlock:^{
+        /// send crowdfuning
+        CrowdfundingRequest *request = [[CrowdfundingRequest alloc] init];
+        request.groupIdentifier = groupIdentifier;
+        request.amount = amount;
+        request.size = size;
+        request.tips = tips;
+        
+        [NetWorkOperationTool POSTWithUrlString:WalletServiceCrowdfuning postProtoData:request.data complete:^(id response) {
+            HttpResponse *hResponse = (HttpResponse *)response;
+            if (hResponse.code != successCode) {
                 if (complete) {
-                    complete(crowdfunding,nil);
+                    complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                }
+            } else {
+                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    Crowdfunding *crowdfunding = [Crowdfunding parseFromData:data error:nil];
+                    if (complete) {
+                        complete(crowdfunding,nil);
+                    }
                 }
             }
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(nil,error);
-        }
-    }];
+        } fail:^(NSError *error) {
+            if (complete) {
+                complete(nil,error);
+            }
+        }];
+    } complete:complete];
+    
 }
 
 - (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(Bill *bill,NSError *error))complete{
 
-    /// check or ceateWallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
-    
-    /// send crowdfuning
-    ReceiveRequest *request = [[ReceiveRequest alloc] init];
-    request.sender = payer;
-    request.amount = amount;
-    request.tips = tips;
-    
-    [NetWorkOperationTool POSTWithUrlString:WalletServiceReceive postProtoData:request.data complete:^(id response) {
-        HttpResponse *hResponse = (HttpResponse *)response;
-        if (hResponse.code != successCode) {
-            if (complete) {
-                complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
-            }
-        } else {
-            NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
-            if (data) {
-                NSError *error = nil;
-                Bill *bill = [Bill parseFromData:data error:&error];
-                if (error || !bill) {
-                    if (complete) {
-                        complete(nil,error);
-                    }
-                } else {
-                    if (complete) {
-                        complete(bill,nil);
+    [self checkWalletAndExcuteBlock:^{
+        /// send crowdfuning
+        ReceiveRequest *request = [[ReceiveRequest alloc] init];
+        request.sender = payer;
+        request.amount = amount;
+        request.tips = tips;
+        
+        [NetWorkOperationTool POSTWithUrlString:WalletServiceReceive postProtoData:request.data complete:^(id response) {
+            HttpResponse *hResponse = (HttpResponse *)response;
+            if (hResponse.code != successCode) {
+                if (complete) {
+                    complete(nil,[NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
+                }
+            } else {
+                NSData* data =  [ConnectTool decodeHttpResponse:hResponse];
+                if (data) {
+                    NSError *error = nil;
+                    Bill *bill = [Bill parseFromData:data error:&error];
+                    if (error || !bill) {
+                        if (complete) {
+                            complete(nil,error);
+                        }
+                    } else {
+                        if (complete) {
+                            complete(bill,nil);
+                        }
                     }
                 }
             }
-        }
-    } fail:^(NSError *error) {
-        if (complete) {
-            complete(nil,error);
-        }
-    }];
+        } fail:^(NSError *error) {
+            if (complete) {
+                complete(nil,error);
+            }
+        }];
+    } complete:complete];
+    
 }
 
 - (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(TransactionType)type fromAddresses:(NSArray *)fromAddresses fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
-    /// check or ceateWallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
+    [self checkWalletAndExcuteBlock:^{
+        /// pay crowdfuning
+        Payment *request = [[Payment alloc] init];
+        
+        request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
+        request.payType = type;
+        request.hashId = hashId;
+        request.fee = fee;
+        
+        //request and sign、 publish
+        [self basePostDataWithData:request.data url:WalletServicePay type:type currency:currency complete:complete];
+    } complete:complete];
     
-    /// pay crowdfuning
-    Payment *request = [[Payment alloc] init];
-    
-    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
-    request.payType = type;
-    request.hashId = hashId;
-    request.fee = fee;
-
-    //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServicePay type:type currency:currency complete:complete];
 }
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
     
-    /// check or ceateWallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
+    [self checkWalletAndExcuteBlock:^{
+        TransferRequest *request = [[TransferRequest alloc] init];
+        NSMutableArray *txoutPuts = [NSMutableArray array];
+        for (NSString *address in toAddresses) {
+            Txout *txOut = [Txout new];
+            txOut.address = address;
+            txOut.amount = perAddressAmount;
+            [txoutPuts addObject:txOut];
+        }
+        
+        request.txOutArray = txoutPuts;
+        request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
+        
+        request.fee = fee;
+        request.tips = tips;
+        
+        //request and sign、 publish
+        [self basePostDataWithData:request.data url:WalletServiceTransferToAddress type:TransactionTypeBill currency:currency complete:complete];
+    } complete:complete];
     
-    TransferRequest *request = [[TransferRequest alloc] init];
-    NSMutableArray *txoutPuts = [NSMutableArray array];
-    for (NSString *address in toAddresses) {
-        Txout *txOut = [Txout new];
-        txOut.address = address;
-        txOut.amount = perAddressAmount;
-        [txoutPuts addObject:txOut];
-    }
-    
-    request.txOutArray = txoutPuts;
-    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
-    
-    request.fee = fee;
-    request.tips = tips;
-    
-    //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServiceTransferToAddress type:TransactionTypeBill currency:currency complete:complete];
 }
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toConnectUserIds:(NSArray *)userIds perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
     
-    /// check or ceateWallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
-    
-    ConnectTransferRequest *request = [[ConnectTransferRequest alloc] init];
-    NSMutableArray *txoutPuts = [NSMutableArray array];
-    for (NSString *uid in userIds) {
-        ConnectTxout *txOut = [ConnectTxout new];
-        txOut.uid = uid;
-        txOut.amount = perAddressAmount;
-        [txoutPuts addObject:txOut];
-    }
-    
-    request.txOutArray = txoutPuts;
-    request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
-    
-    request.fee = fee;
-    request.tips = tips;
-    
-    //request and sign、 publish
-    [self basePostDataWithData:request.data url:WalletServiceTransferInConnect type:TransactionTypeBill currency:currency complete:complete];
+    [self checkWalletAndExcuteBlock:^{
+        ConnectTransferRequest *request = [[ConnectTransferRequest alloc] init];
+        NSMutableArray *txoutPuts = [NSMutableArray array];
+        for (NSString *uid in userIds) {
+            ConnectTxout *txOut = [ConnectTxout new];
+            txOut.uid = uid;
+            txOut.amount = perAddressAmount;
+            [txoutPuts addObject:txOut];
+        }
+        
+        request.txOutArray = txoutPuts;
+        request.spentCurrency = [self packageCurrencyTxinWithCurrency:currency fromAddresses:fromAddresses];
+        
+        request.fee = fee;
+        request.tips = tips;
+        
+        //request and sign、 publish
+        [self basePostDataWithData:request.data url:WalletServiceTransferInConnect type:TransactionTypeBill currency:currency complete:complete];
+    } complete:complete];
+
 }
 
 #pragma mark - private
@@ -236,7 +235,12 @@ CREATE_SHARED_MANAGER(LMTransferManager)
             }
             //3、sign rawhex
             NSString *signTransaction = [currencyManager signRawTranscationWithTvs:originalTransaction.vts category:category rawTranscation:originalTransaction.rawhex inputs:originalTransaction.addressesArray seed:seed];
-            
+            if (GJCFStringIsNull(originalTransaction.hashId)) {
+                if (complete) {
+                    complete(nil,[NSError errorWithDomain:@"argu error" code:TransactionPackageErrorArguError userInfo:nil]);
+                }
+                return ;
+            }
             //publish
             PublishTransaction *publish = [[PublishTransaction alloc] init];
             publish.txHex = signTransaction;
@@ -383,6 +387,21 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     } closeBlock:^{
         if (complete) {
             complete(nil,[NSError errorWithDomain:@"cancel" code:TransactionPackageErrorTypeCancel userInfo:nil]);
+        }
+    }];
+}
+
+- (void)checkWalletAndExcuteBlock:(void(^)())excuteBlock complete:(CompleteWithDataBlock)complete{
+    /// check or ceateWallet
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletWithBlock:^(BOOL existWallet) {
+        if (existWallet) {
+            if (excuteBlock) {
+                excuteBlock();
+            }
+        } else {
+            if (complete) {
+                complete(nil,[NSError errorWithDomain:@"cancel" code:TransactionPackageErrorTypeCancel userInfo:nil]);
+            }
         }
     }];
 }

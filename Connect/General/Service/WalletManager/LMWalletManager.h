@@ -36,6 +36,7 @@
 - (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(NSError *error))complete;
 
 
-- (void)checkWalletExistAndCreateWallet;
+- (void)checkWalletExistAndCreateWalletWithBlock:(void (^)(BOOL existWallet))block;
+- (void)checkWalletExistWithBlock:(void (^)(BOOL existWallet))block;
 
 @end

@@ -730,5 +730,7 @@
 "Wallet Transfer details" = "转账详情";
 "Wallet Immediately create" = "立即创建";
 "Wallet not create wallet" = "你还没有创建钱包";
+"Wallet The Connect system address" = "Connect系统地址";
+"Wallet An error occurred while packing the transaction Please check whether the amount is correct" = "打包交易时发生错误，请检查金额是否正确";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

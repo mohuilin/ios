@@ -18,6 +18,7 @@
 #import "LMBtcAddressManager.h"
 #import "LMHistoryCacheManager.h"
 #import "StringTool.h"
+#import "NSString+Hash.h"
 
 
 #ifdef __cplusplus
@@ -681,7 +682,8 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
             break;
         case CategoryTypeOldUser:
         {
-            NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:@[seed] rawTranscation:rawTranscation];
+            NSString *privkey = [seed nomarlString];
+            NSString *signTransaction = [self signRawTranscationWithTvs:tvs privkeys:@[privkey] rawTranscation:rawTranscation];
             return signTransaction;
         }
             break;

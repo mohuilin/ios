@@ -66,7 +66,7 @@
         Txout *formartTxout = [Txout new];
         Txout *txout = [orderDetail.txOutsArray firstObject];
         formartTxout.amount = txout.amount - orderDetail.fixedFee;
-        formartTxout.address = @"Connect系统地址";
+        formartTxout.address = LMLocalizedString(@"Wallet The Connect system address", nil);
         [self.txOuts addObject:formartTxout];
     } else {
         self.feeLabel.text = [NSString stringWithFormat:@"%@:%@ %@",LMLocalizedString(@"Set Miner fee", nil),[PayTool getBtcStringWithAmount:orderDetail.fee?orderDetail.fee:orderDetail.estimateFee],self.currency];

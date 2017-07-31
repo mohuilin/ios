@@ -56,6 +56,9 @@
     self.title = LMLocalizedString(@"Wallet Receipt", nil);
     self.view.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.errorTipLabel];
+
+    // qr code
+    [self addQRcodeImageView];
     
     [self getAddress];
     
@@ -79,41 +82,48 @@
         default:
             break;
     }
+    
+    [MBProgressHUD showLoadingMessageToView:self.view];
     [baseAddress getReceiptAddress:^(NSString *address, NSError *error) {
         if (!error) {
+            [MBProgressHUD hideHUDForView:self.view];
             // get usermessage
             self.userNameAccoutInformation = [NSString stringWithFormat:@"%@:%@",currencyName,address];
             self.receiptAddress = address;
-            // qr code
-            [self addQRcodeImageView];
+            
+            self.titleLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), self.receiptAddress];
+            self.imageView.contentMode = UIViewContentModeScaleToFill;
+            self.imageView.image = [BarCodeTool barCodeImageWithString:self.userNameAccoutInformation withSize:self.imageView.width];
         }else {
             [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:GetCurrencyAddressList] withType:ToastTypeFail showInView:self.view complete:^{
                 [self.navigationController popViewControllerAnimated:YES];
             }];
         }
     }];
+    
 }
 - (void)doRight:(id)sender {
-
-    NSString *lang = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
-    NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Wallet request for payment", nil), [[LKUserCenter shareCenter] currentLoginUser].username, self.bitTextField.text];
-    NSString *link = [NSString stringWithFormat:@"%@?address=%@&locale=%@&amount=0", H5PayServerUrl, self.receiptAddress, lang];
-    if (!GJCFStringIsNull(self.bitTextField.text)) {
-        title = [NSString stringWithFormat:LMLocalizedString(@"Wallet request for payment BTC", nil), [[LKUserCenter shareCenter] currentLoginUser].username, self.bitTextField.text];
-        link = [NSString stringWithFormat:@"%@?address=%@&amount=%@&locale=%@", H5PayServerUrl, self.receiptAddress, self.bitTextField.text, lang];
+    if (self.receiptAddress) {
+        NSString *lang = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
+        NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Wallet request for payment", nil), [[LKUserCenter shareCenter] currentLoginUser].username, self.bitTextField.text];
+        NSString *link = [NSString stringWithFormat:@"%@?address=%@&locale=%@&amount=0", H5PayServerUrl, self.receiptAddress, lang];
+        if (!GJCFStringIsNull(self.bitTextField.text)) {
+            title = [NSString stringWithFormat:LMLocalizedString(@"Wallet request for payment BTC", nil), [[LKUserCenter shareCenter] currentLoginUser].username, self.bitTextField.text];
+            link = [NSString stringWithFormat:@"%@?address=%@&amount=%@&locale=%@", H5PayServerUrl, self.receiptAddress, self.bitTextField.text, lang];
+        }
+        
+        UIImage *avatar = [[YYImageCache sharedCache] getImageForKey:[[LKUserCenter shareCenter] currentLoginUser].avatar];
+        if (!avatar) {
+            avatar = [UIImage imageNamed:@"default_user_avatar"];
+        }
+        UIActivityViewController *activeViewController = [[UIActivityViewController alloc] initWithActivityItems:@[title, [NSURL URLWithString:link], avatar] applicationActivities:nil];
+        activeViewController.excludedActivityTypes = @[UIActivityTypeAirDrop, UIActivityTypeCopyToPasteboard, UIActivityTypeAddToReadingList];
+        [self presentViewController:activeViewController animated:YES completion:nil];
+        UIActivityViewControllerCompletionWithItemsHandler myblock = ^(NSString *__nullable activityType, BOOL completed, NSArray *__nullable returnedItems, NSError *__nullable activityError) {
+            NSLog(@"%d %@", completed, activityType);
+        };
+        activeViewController.completionWithItemsHandler = myblock;
     }
-
-    UIImage *avatar = [[YYImageCache sharedCache] getImageForKey:[[LKUserCenter shareCenter] currentLoginUser].avatar];
-    if (!avatar) {
-        avatar = [UIImage imageNamed:@"default_user_avatar"];
-    }
-    UIActivityViewController *activeViewController = [[UIActivityViewController alloc] initWithActivityItems:@[title, [NSURL URLWithString:link], avatar] applicationActivities:nil];
-    activeViewController.excludedActivityTypes = @[UIActivityTypeAirDrop, UIActivityTypeCopyToPasteboard, UIActivityTypeAddToReadingList];
-    [self presentViewController:activeViewController animated:YES completion:nil];
-    UIActivityViewControllerCompletionWithItemsHandler myblock = ^(NSString *__nullable activityType, BOOL completed, NSArray *__nullable returnedItems, NSError *__nullable activityError) {
-        NSLog(@"%d %@", completed, activityType);
-    };
-    activeViewController.completionWithItemsHandler = myblock;
 }
 
 - (void)addQRcodeImageView {
@@ -148,9 +158,8 @@
 
 
     self.titleLabel = [[UILabel alloc] init];
-    NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), self.receiptAddress];
     self.titleLabel.numberOfLines = 0;
-    self.titleLabel.text = title;
+    self.titleLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), self.receiptAddress];
     self.titleLabel.font = [UIFont boldSystemFontOfSize:FONT_SIZE(25)];
     self.titleLabel.textColor = LMBasicBlack;
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -210,7 +219,8 @@
 
     _imageView = [[UIImageView alloc] init];
     _imageView.backgroundColor = [UIColor whiteColor];
-    _imageView.image = [BarCodeTool barCodeImageWithString:self.userNameAccoutInformation withSize:400];
+    _imageView.image = [UIImage imageNamed:@"loading_qr"];
+    _imageView.contentMode = UIViewContentModeCenter;
     [backGrounView addSubview:_imageView];
 
     [_imageView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -259,7 +269,7 @@
             NSString *address = [self.userNameAccoutInformation stringByReplacingOccurrencesOfString:currency withString:@""];
             NSString *moneyAddress = [NSString stringWithFormat:@"%@%@?amount=%@", currency,address, self.bitTextField.text];
             self.payRequestUrl = moneyAddress;
-            _imageView.image = [BarCodeTool barCodeImageWithString:moneyAddress withSize:400];
+            _imageView.image = [BarCodeTool barCodeImageWithString:moneyAddress withSize:self.imageView.width];
         }
     }
 }
@@ -298,7 +308,7 @@
             [self.view layoutIfNeeded];
         }];
         self.lineImageView.hidden = YES;
-        _imageView.image = [BarCodeTool barCodeImageWithString:self.userNameAccoutInformation withSize:400];
+        _imageView.image = [BarCodeTool barCodeImageWithString:self.userNameAccoutInformation withSize:self.imageView.width];
         [self.bitTextField resignFirstResponder];
     }
 }

@@ -68,9 +68,13 @@
             
         case TransactionPackageErrorTypeUnspentError:
         case TransactionPackageErrorTypeUnspentNotEnough:
-        case TransactionPackageErrorAmountNotMatchError:
             errorMessage = LMLocalizedString(@"Wallet Insufficient balance", nil);
             break;
+            
+        case TransactionPackageErrorAmountNotMatchError:
+            errorMessage = LMLocalizedString(@"Wallet An error occurred while packing the transaction Please check whether the amount is correct", nil);
+            break;
+
         case TransactionPackageErrorArguError:
             errorMessage = @"请求参数错误";
             break;
@@ -78,7 +82,7 @@
             errorMessage = @"同步地址失败";
             break;
         case WALLET_NOT_ISEXIST:
-            errorMessage = @"你还未创建钱包，请到钱包页面创建新的钱包";
+            errorMessage = LMLocalizedString(@"Wallet not create wallet", nil);
             break;
             
         case TransactionPackageErrorTypeSyncAddress_InputsAddress_NotMatch:

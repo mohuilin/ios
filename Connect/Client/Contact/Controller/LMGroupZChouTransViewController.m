@@ -218,19 +218,20 @@ static NSString *identifier = @"cellIdentifier";
             }
         } else {
             [MBProgressHUD hideHUDForView:self.view];
-            Crowdfunding *crowdInfo = (Crowdfunding *)data;
-            [[LMMessageExtendManager sharedManager]updateMessageExtendPayCount:(int)(crowdInfo.size - crowdInfo.remainSize)status:(int)crowdInfo.status withHashId:crowdInfo.hashId];
-            if (!error) {
-                self.crowdfundingInfo = crowdInfo;
-                //refresh list
-                [self reloadView];
-                if (self.PaySuccessCallBack) {
-                    self.PaySuccessCallBack(crowdInfo);
+            [WallteNetWorkTool crowdfuningInfoWithHashID:self.crowdfundingInfo.hashId complete:^(NSError *error, Crowdfunding *crowdInfo) {
+                if (!error) {
+                    [[LMMessageExtendManager sharedManager]updateMessageExtendPayCount:(int)(crowdInfo.size - crowdInfo.remainSize)status:(int)crowdInfo.status withHashId:crowdInfo.hashId];
+                    [self reloadView];
+                    self.crowdfundingInfo = crowdInfo;
+                    //refresh list
+                    [self reloadView];
+                    if (self.PaySuccessCallBack) {
+                        self.PaySuccessCallBack(crowdInfo);
+                    }
                 }
-            }
+            }];
         }
     }];
-    
 }
 
 

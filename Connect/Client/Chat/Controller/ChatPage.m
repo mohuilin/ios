@@ -161,9 +161,6 @@
     [LMConversionManager sharedManager].conversationListDelegate = self;
     [[LMConversionManager sharedManager] getAllConversationFromDB];
     
-    
-    /// check wallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWallet];
 }
 
 #pragma mark - LMConversionListChangeManagerDelegate

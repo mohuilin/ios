@@ -729,5 +729,7 @@
 "Wallet Transfer details" = "Transfer details";
 "Wallet Immediately create" = "Immediately create";
 "Wallet not create wallet" = "You haven't create the purse";
+"Wallet The Connect system address" = "The Connect system address";
+"Wallet An error occurred while packing the transaction Please check whether the amount is correct" = "An error occurred while packing the transaction. Please check whether the amount is correct";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

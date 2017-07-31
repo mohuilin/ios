@@ -59,8 +59,20 @@
 - (void)setUserInfo:(LMUserInfo *)model {
     if (model) {
         switch (model.txType) {
-            case 1: // Ordinary transfer receipt
-            case 2: // All the chips
+            case 0:
+            case 6:
+            {
+                if (model.imageUrl) {
+                    [self.iconImageView setPlaceholderImageWithAvatarUrl:model.imageUrl];
+                } else {
+                    self.iconImageView.image = [UIImage imageNamed:@"bitcoin_luckybag"];
+                }
+                self.nameLabel.text = model.userName;
+            }
+                break;
+            case 1:
+            case 2:
+            case 8:
             {
                 if (model.imageUrls.count > 1) {
                     UIImageView *canvasView = [[UIImageView alloc] init];
@@ -80,32 +92,30 @@
                 } else {
                     [self.iconImageView setPlaceholderImageWithAvatarUrl:model.imageUrl];
                 }
-                [self.iconImageView setPlaceholderImageWithAvatarUrl:model.imageUrl];
+                self.nameLabel.text = model.userName;
             }
                 break;
+                
             case 3:
             case 4:
-            case 5: {
+            case 5:
+            {
                 self.iconImageView.image = [UIImage imageNamed:@"luckpacket_record"];
+                self.nameLabel.text = model.userName;
             }
                 break;
-            case 6: {
-                self.iconImageView.image = [UIImage imageNamed:@"bitcoin_luckybag"];
-            }
-                break;
-            case 7: // System red envelopes
+            case 7:
             {
                 self.iconImageView.image = [UIImage imageNamed:@"luckpacket_record"];
                 self.nameLabel.text = LMLocalizedString(@"Wallet From Connect team", nil);
             }
                 break;
+                
             default:
-                [self.iconImageView setPlaceholderImageWithAvatarUrl:model.imageUrl];
+                
                 break;
         }
-        if (model.txType != 7) {
-            self.nameLabel.text = model.userName;
-        }
+        
         self.sureLabel.text = model.confirmation ? LMLocalizedString(@"Wallet Confirmed", nil) : LMLocalizedString(@"Wallet Unconfirmed", nil);
 
         if (model.confirmation) {
