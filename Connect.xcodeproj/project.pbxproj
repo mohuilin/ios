@@ -212,6 +212,9 @@
 		71C3EDF9126EE9B5FCB64F2F /* libPods-ConnectUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */; };
 		D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		D912C0201F2B1D1E00A97E1A /* LMNoteCreateWalletView.m in Sources */ = {isa = PBXBuildFile; fileRef = D912C01F1F2B1D1E00A97E1A /* LMNoteCreateWalletView.m */; };
+		D912C0221F2ED9A000A97E1A /* TestCryptographic.m in Sources */ = {isa = PBXBuildFile; fileRef = D912C0211F2ED9A000A97E1A /* TestCryptographic.m */; };
+		D912C0241F2EDBCA00A97E1A /* LMBaseCurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D95509531F1DE09C000D2B2B /* LMBaseCurrencyManager.m */; };
+		D912C0261F2EDBCA00A97E1A /* LMBtcCurrencyManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = F13514061F1DE96F0011A96A /* LMBtcCurrencyManager.mm */; };
 		D912F5511CEB8DA6008E04D0 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D912F54F1CEB8DA6008E04D0 /* Localizable.strings */; };
 		D91529EA1F2098BA0067C475 /* UIViewController+CurrencyVC.m in Sources */ = {isa = PBXBuildFile; fileRef = D91529E91F2098BA0067C475 /* UIViewController+CurrencyVC.m */; };
 		D91DBB701E08F4F20096E6DC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D91DBB6F1E08F4F20096E6DC /* libc++.tbd */; };
@@ -1460,6 +1463,7 @@
 		D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wallet.pbobjc.m; sourceTree = "<group>"; };
 		D912C01E1F2B1D1E00A97E1A /* LMNoteCreateWalletView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMNoteCreateWalletView.h; sourceTree = "<group>"; };
 		D912C01F1F2B1D1E00A97E1A /* LMNoteCreateWalletView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMNoteCreateWalletView.m; sourceTree = "<group>"; };
+		D912C0211F2ED9A000A97E1A /* TestCryptographic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestCryptographic.m; sourceTree = "<group>"; };
 		D912F5501CEB8DA6008E04D0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D912F5521CEB8DB6008E04D0 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		D912F5531CEB8DB6008E04D0 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
@@ -12712,6 +12716,7 @@
 				1921AF4D1E701DF60020C853 /* ConnectTests.m */,
 				1921AF4F1E701DF60020C853 /* Info.plist */,
 				D9EBCC001F25A1EC006203BD /* LMCurrencyMethodTest.m */,
+				D912C0211F2ED9A000A97E1A /* TestCryptographic.m */,
 			);
 			path = ConnectTests;
 			sourceTree = "<group>";
@@ -32851,7 +32856,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D912C0241F2EDBCA00A97E1A /* LMBaseCurrencyManager.m in Sources */,
+				D912C0261F2EDBCA00A97E1A /* LMBtcCurrencyManager.mm in Sources */,
 				D9EBCC011F25A1EC006203BD /* LMCurrencyMethodTest.m in Sources */,
+				D912C0221F2ED9A000A97E1A /* TestCryptographic.m in Sources */,
 				D9EBCC031F25C6E9006203BD /* TestString.m in Sources */,
 				1921AF4E1E701DF60020C853 /* ConnectTests.m in Sources */,
 			);
@@ -33661,6 +33669,23 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/Connect/Config/Define/EnumDefine.h";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"\"${PODS_ROOT}/Headers/Public/AFNetworking\"",
+					"\"${PODS_ROOT}/Headers/Public/Bugly\"",
+					"\"${PODS_ROOT}/Headers/Public/CocoaLumberjack\"",
+					"\"${PODS_ROOT}/Headers/Public/FMDB\"",
+					"\"${PODS_ROOT}/Headers/Public/KSCrash\"",
+					"\"${PODS_ROOT}/Headers/Public/MBProgressHUD\"",
+					"\"${PODS_ROOT}/Headers/Public/MJRefresh\"",
+					"\"${PODS_ROOT}/Headers/Public/PLeakSniffer\"",
+					"${SRCROOT}/**",
+					"\"${PODS_ROOT}/Headers/Public/Protobuf\"",
+					"\"${PODS_ROOT}/Headers/Public/Realm\"",
+					"\"${PODS_ROOT}/Headers/Public/libPhoneNumber-iOS\"",
+				);
 				INFOPLIST_FILE = ConnectTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -33678,6 +33703,23 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				GCC_PREFIX_HEADER = "$(SRCROOT)/Connect/Config/Define/EnumDefine.h";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"\"${PODS_ROOT}/Headers/Public/AFNetworking\"",
+					"\"${PODS_ROOT}/Headers/Public/Bugly\"",
+					"\"${PODS_ROOT}/Headers/Public/CocoaLumberjack\"",
+					"\"${PODS_ROOT}/Headers/Public/FMDB\"",
+					"\"${PODS_ROOT}/Headers/Public/KSCrash\"",
+					"\"${PODS_ROOT}/Headers/Public/MBProgressHUD\"",
+					"\"${PODS_ROOT}/Headers/Public/MJRefresh\"",
+					"\"${PODS_ROOT}/Headers/Public/PLeakSniffer\"",
+					"${SRCROOT}/**",
+					"\"${PODS_ROOT}/Headers/Public/Protobuf\"",
+					"\"${PODS_ROOT}/Headers/Public/Realm\"",
+					"\"${PODS_ROOT}/Headers/Public/libPhoneNumber-iOS\"",
+				);
 				INFOPLIST_FILE = ConnectTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

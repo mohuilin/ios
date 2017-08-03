@@ -74,7 +74,10 @@
         case TransactionPackageErrorAmountNotMatchError:
             errorMessage = LMLocalizedString(@"Wallet An error occurred while packing the transaction Please check whether the amount is correct", nil);
             break;
-
+        case TransactionPackageErrorFriendNotInitWallet:
+            errorMessage = LMLocalizedString(@"Wallet not initialized the wallet and can not trade", nil);
+            break;
+            
         case TransactionPackageErrorArguError:
             errorMessage = @"请求参数错误";
             break;

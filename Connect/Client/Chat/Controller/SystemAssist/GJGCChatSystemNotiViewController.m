@@ -113,101 +113,106 @@
 
 
 - (void)grabRedBagWithHashId:(NSString *)hashId senderName:(NSString *)senderName sendAddress:(NSString *)sendAddress {
-    [MBProgressHUD showLoadingMessageToView:self.view];
-    [RedBagNetWorkTool grabSystemRedBagWithHashId:hashId complete:^(GrabRedPackageResp *response, NSError *error) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:self.view];
-        }];
-        if (error) {
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"Network equest failed please try again later", nil) withType:ToastTypeFail showInView:self.view complete:nil];
-            }];
-        } else {
-            switch (response.status) {
-                case 0://failed
-                {
+    
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletWithBlock:^(BOOL existWallet) {
+        if (existWallet) {
+            [MBProgressHUD showLoadingMessageToView:self.view];
+            [RedBagNetWorkTool grabSystemRedBagWithHashId:hashId complete:^(GrabRedPackageResp *response, NSError *error) {
+                [GCDQueue executeInMainQueue:^{
+                    [MBProgressHUD hideHUDForView:self.view];
+                }];
+                if (error) {
                     [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"ErrorCode Error", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Network equest failed please try again later", nil) withType:ToastTypeFail showInView:self.view complete:nil];
                     }];
-                }
-                    break;
-                case 1://success
-                {
-                    //create tips message
-                    if (![senderName isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].normalShowName]) {
-                        NSString *operation = [NSString stringWithFormat:@"%@/%@", self.taklInfo.chatUser.address, [[LKUserCenter shareCenter] currentLoginUser].address];
-
-                        ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                        chatMessage.messageId = [ConnectTool generateMessageId];
-                        chatMessage.messageOwer = self.taklInfo.chatIdendifier;
-                        chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                        chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                        chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                        MMMessage *message = [[MMMessage alloc] init];
-                        message.type = GJGCChatFriendContentTypeStatusTip;
-                        message.content = operation;
-                        message.ext1 = @(2);
-                        message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                        message.message_id = chatMessage.messageId;
-                        message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                        chatMessage.message = message;
-                        [[MessageDBManager sharedManager] saveMessage:chatMessage];
-                        [self.dataSourceManager showGetRedBagMessageWithWithMessage:message];
+                } else {
+                    switch (response.status) {
+                        case 0://failed
+                        {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"ErrorCode Error", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                            }];
+                        }
+                            break;
+                        case 1://success
+                        {
+                            //create tips message
+                            if (![senderName isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].normalShowName]) {
+                                NSString *operation = [NSString stringWithFormat:@"%@/%@", self.taklInfo.chatUser.address, [[LKUserCenter shareCenter] currentLoginUser].address];
+                                
+                                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
+                                chatMessage.messageId = [ConnectTool generateMessageId];
+                                chatMessage.messageOwer = self.taklInfo.chatIdendifier;
+                                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
+                                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+                                chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
+                                MMMessage *message = [[MMMessage alloc] init];
+                                message.type = GJGCChatFriendContentTypeStatusTip;
+                                message.content = operation;
+                                message.ext1 = @(2);
+                                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
+                                message.message_id = chatMessage.messageId;
+                                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+                                chatMessage.message = message;
+                                [[MessageDBManager sharedManager] saveMessage:chatMessage];
+                                [self.dataSourceManager showGetRedBagMessageWithWithMessage:message];
+                            }
+                            
+                            LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
+                            redLuckyView.hashId = hashId;
+                            [redLuckyView setDelegate:self];
+                            [redLuckyView showRedLuckyViewIsGetARedLucky:YES];
+                        }
+                            break;
+                        case 2: //have garbed
+                        {
+                            [self getSystemRedBagDetailWithHashId:hashId];
+                        }
+                            break;
+                        case 4: //luckypackage is complete
+                        case 3: {//failed
+                            LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
+                            redLuckyView.hashId = hashId;
+                            [redLuckyView setDelegate:self];
+                            [redLuckyView showRedLuckyViewIsGetARedLucky:NO];
+                        }
+                            break;
+                        case 5://User does not bind phone number
+                        {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat Your account is not bound to the phone", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                            }];
+                        }
+                            break;
+                        case 6://A phone number can only grab once
+                        {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Set A phone number can only grab once", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                            }];
+                        }
+                            break;
+                        case 7://system luckypackage have been frozen
+                        {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat system luckypackage have been frozen", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                            }];
+                        }
+                            break;
+                        case 8://one device can only grab a luckypackage
+                        {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat one device can only grab a luckypackage", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                            }];
+                        }
+                            break;
+                        default:
+                            break;
                     }
-
-                    LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
-                    redLuckyView.hashId = hashId;
-                    [redLuckyView setDelegate:self];
-                    [redLuckyView showRedLuckyViewIsGetARedLucky:YES];
                 }
-                    break;
-                case 2: //have garbed
-                {
-                    [self getSystemRedBagDetailWithHashId:hashId];
-                }
-                    break;
-                case 4: //luckypackage is complete
-                case 3: {//failed
-                    LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
-                    redLuckyView.hashId = hashId;
-                    [redLuckyView setDelegate:self];
-                    [redLuckyView showRedLuckyViewIsGetARedLucky:NO];
-                }
-                    break;
-                case 5://User does not bind phone number
-                {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat Your account is not bound to the phone", nil) withType:ToastTypeFail showInView:self.view complete:nil];
-                    }];
-                }
-                    break;
-                case 6://A phone number can only grab once
-                {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Set A phone number can only grab once", nil) withType:ToastTypeFail showInView:self.view complete:nil];
-                    }];
-                }
-                    break;
-                case 7://system luckypackage have been frozen
-                {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat system luckypackage have been frozen", nil) withType:ToastTypeFail showInView:self.view complete:nil];
-                    }];
-                }
-                    break;
-                case 8://one device can only grab a luckypackage
-                {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat one device can only grab a luckypackage", nil) withType:ToastTypeFail showInView:self.view complete:nil];
-                    }];
-                }
-                    break;
-                default:
-                    break;
-            }
+            }];
         }
     }];
-
+    
 }
 
 

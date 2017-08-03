@@ -928,7 +928,6 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 - (void)redBagCellDidTap:(GJGCChatBaseCell *)tappedCell {
 
     __weak __typeof(&*self) weakSelf = self;
-    [MBProgressHUD showLoadingMessageToView:self.view];
     NSIndexPath *tapIndexPath = [self.chatListTable indexPathForCell:tappedCell];
     GJGCChatFriendContentModel *chatContentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
     if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
@@ -937,6 +936,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
         if (!chatContentModel.isFromSelf) {
             [self grabRedBagWithHashId:chatContentModel.hashID senderName:chatContentModel.senderName sendAddress:chatContentModel.senderAddress];
         } else {
+            [MBProgressHUD showLoadingMessageToView:self.view];
             [RedBagNetWorkTool getRedBagDetailWithHashId:chatContentModel.hashID complete:^(RedPackageInfo *bagInfo, NSError *error) {
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD hideHUDForView:weakSelf.view];
@@ -957,72 +957,79 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 }
 
 - (void)grabRedBagWithHashId:(NSString *)hashId senderName:(NSString *)senderName sendAddress:(NSString *)sendAddress {
-    [RedBagNetWorkTool grabRedBagWithHashId:hashId complete:^(GrabRedPackageResp *response, NSError *error) {
-        [GCDQueue executeInMainQueue:^{
-            [MBProgressHUD hideHUDForView:self.view];
-        }];
-        if (error) {
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat Network connection failed please check network", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletWithBlock:^(BOOL existWallet) {
+        if (existWallet) {
+            [RedBagNetWorkTool grabRedBagWithHashId:hashId complete:^(GrabRedPackageResp *response, NSError *error) {
+                [GCDQueue executeInMainQueue:^{
+                    [MBProgressHUD hideHUDForView:self.view];
+                }];
+                if (error) {
+                    [GCDQueue executeInMainQueue:^{
+                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Chat Network connection failed please check network", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                    }];
+                } else {
+                    switch (response.status) {
+                        case 0://fail
+                        {
+                            [GCDQueue executeInMainQueue:^{
+                                [MBProgressHUD showToastwithText:LMLocalizedString(@"ErrorCode Error", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                            }];
+                        }
+                            break;
+                        case 1://success
+                        {
+                            if (![senderName isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].normalShowName]) {
+                                NSString *operation = [NSString stringWithFormat:@"%@/%@", self.taklInfo.chatUser.address, [[LKUserCenter shareCenter] currentLoginUser].address];
+                                if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
+                                    operation = [NSString stringWithFormat:@"%@/%@", sendAddress, [[LKUserCenter shareCenter] currentLoginUser].address];
+                                }
+                                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
+                                chatMessage.messageId = [ConnectTool generateMessageId];
+                                chatMessage.messageOwer = self.taklInfo.chatIdendifier;
+                                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
+                                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+                                chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
+                                MMMessage *message = [[MMMessage alloc] init];
+                                message.type = GJGCChatFriendContentTypeStatusTip;
+                                message.content = operation;
+                                message.ext1 = @(2);
+                                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
+                                message.message_id = chatMessage.messageId;
+                                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+                                chatMessage.message = message;
+                                [[MessageDBManager sharedManager] saveMessage:chatMessage];
+                                [self.dataSourceManager showGetRedBagMessageWithWithMessage:message];
+                            }
+                            
+                            LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
+                            redLuckyView.hashId = hashId;
+                            [redLuckyView setDelegate:self];
+                            [redLuckyView showRedLuckyViewIsGetARedLucky:YES];
+                        }
+                            break;
+                        case 2: //garbed
+                        {
+                            [self showRedBagDetailWithHashId:hashId];
+                        }
+                            break;
+                        case 3: //fail
+                        case 4: {
+                            LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
+                            redLuckyView.hashId = hashId;
+                            [redLuckyView setDelegate:self];
+                            [redLuckyView showRedLuckyViewIsGetARedLucky:NO];
+                        }
+                        default:
+                            break;
+                    }
+                }
             }];
         } else {
-            switch (response.status) {
-                case 0://fail
-                {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"ErrorCode Error", nil) withType:ToastTypeFail showInView:self.view complete:nil];
-                    }];
-                }
-                    break;
-                case 1://success
-                {
-                    if (![senderName isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].normalShowName]) {
-                        NSString *operation = [NSString stringWithFormat:@"%@/%@", self.taklInfo.chatUser.address, [[LKUserCenter shareCenter] currentLoginUser].address];
-                        if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-                            operation = [NSString stringWithFormat:@"%@/%@", sendAddress, [[LKUserCenter shareCenter] currentLoginUser].address];
-                        }
-                        ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                        chatMessage.messageId = [ConnectTool generateMessageId];
-                        chatMessage.messageOwer = self.taklInfo.chatIdendifier;
-                        chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                        chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                        chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                        MMMessage *message = [[MMMessage alloc] init];
-                        message.type = GJGCChatFriendContentTypeStatusTip;
-                        message.content = operation;
-                        message.ext1 = @(2);
-                        message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                        message.message_id = chatMessage.messageId;
-                        message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                        chatMessage.message = message;
-                        [[MessageDBManager sharedManager] saveMessage:chatMessage];
-                        [self.dataSourceManager showGetRedBagMessageWithWithMessage:message];
-                    }
-
-                    LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
-                    redLuckyView.hashId = hashId;
-                    [redLuckyView setDelegate:self];
-                    [redLuckyView showRedLuckyViewIsGetARedLucky:YES];
-                }
-                    break;
-                case 2: //garbed
-                {
-                    [self showRedBagDetailWithHashId:hashId];
-                }
-                    break;
-                case 3: //fail
-                case 4: {
-                    LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
-                    redLuckyView.hashId = hashId;
-                    [redLuckyView setDelegate:self];
-                    [redLuckyView showRedLuckyViewIsGetARedLucky:NO];
-                }
-                default:
-                    break;
-            }
+            
         }
     }];
-
+    
 }
 
 - (void)getSystemRedBagDetailWithHashId:(NSString *)hashId {

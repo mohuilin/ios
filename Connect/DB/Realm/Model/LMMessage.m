@@ -17,7 +17,7 @@
 
 - (LMBaseModel *)initWithNormalInfo:(id)info {
     if (self = [super init]) {
-        if ([info isKindOfClass:[info class]]) {
+        if ([info isKindOfClass:[ChatMessageInfo class]]) {
             ChatMessageInfo *chatMessage = (ChatMessageInfo *) info;
             self.messageId = chatMessage.messageId;
             self.messageOwer = chatMessage.messageOwer;

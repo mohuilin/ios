@@ -93,6 +93,7 @@ typedef NS_ENUM(NSInteger,ErrorCodeType)
     ErrorCodeType2665    =  2665,
     ErrorCodeType2666    =  2666,
     TransactionPackageErrorArguError            = 2500,
+    TransactionPackageErrorFriendNotInitWallet            = 2600,
     TransactionPackageErrorAmountNotMatchError  = 2400,
     TransactionPackageErrorTypeFeeSamll         = 3000,
     TransactionPackageErrorTypeFeeEmpty         = 3001,

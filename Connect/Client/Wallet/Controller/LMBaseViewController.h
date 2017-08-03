@@ -86,10 +86,6 @@ typedef void (^trasferComplete)();
  */
 - (void)showWithLoadingLabelText:(NSString *)text andSelTask:(SEL)sel;
 
-- (void)transferToAddress:(NSString *)address decimalMoney:(NSDecimalNumber *)money tips:(NSString *)tips complete:(void (^)(NSString *hashId, NSError *error))complete;
-
-- (void)paymentToAddress:(NSString *)address decimalMoney:(NSDecimalNumber *)money hashID:(NSString *)hashID complete:(void (^)(NSString *hashId, NSError *error))complete;
-
 - (void)createChatWithHashId:(NSString *)hashId address:(NSString *)address Amount:(NSString *)amount;
 
 @end

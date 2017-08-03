@@ -88,7 +88,7 @@
 }
 
 + (void)grabRedBagWithHashId:(NSString *)hashId complete:(void (^)(GrabRedPackageResp *response,NSError *error))complete{
-    
+
     if (GJCFStringIsNull(hashId)) {
         if (complete) {
             complete(nil,[NSError errorWithDomain:@"hashid is null" code:-1 userInfo:nil]);

@@ -121,8 +121,8 @@
             [[PayTool sharedInstance] getRateComplete:^(NSDecimalNumber *rate, NSError *error) {
                 if (!error) {
                     UnspentAmount *unspentAmount = [UnspentAmount new];
-                    unspentAmount.amount = currencyModel.amount;
-                    unspentAmount.avaliableAmount = currencyModel.blance;
+                    unspentAmount.amount = currencyModel.blance;
+                    unspentAmount.avaliableAmount = currencyModel.amount;
                     
                     NSDecimalNumber *deciNum = [[NSDecimalNumber alloc] initWithLong:unspentAmount.amount];
                     NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
@@ -133,8 +133,8 @@
                     NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
                     NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
                     UnspentAmount *unspentAmount = [UnspentAmount new];
-                    unspentAmount.amount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].amount;
-                    unspentAmount.avaliableAmount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].blance;
+                    unspentAmount.amount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].blance;
+                    unspentAmount.avaliableAmount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].amount;
                     complete(blanceNum.stringValue,unspentAmount,error);
                 }
             }];
@@ -143,8 +143,8 @@
             NSDecimalNumber *change = [[NSDecimalNumber alloc] initWithLong:pow(10, 8)];
             NSDecimalNumber *blanceNum = [deciNum decimalNumberByDividingBy:change];
             UnspentAmount *unspentAmount = [UnspentAmount new];
-            unspentAmount.amount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].amount;
-            unspentAmount.avaliableAmount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].blance;
+            unspentAmount.amount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].blance;
+            unspentAmount.avaliableAmount = [[LMWalletManager sharedManager] currencyModelWith:[LMWalletManager sharedManager].presentCurrency].amount;
             complete(blanceNum.stringValue,unspentAmount,error);
         }
     }];

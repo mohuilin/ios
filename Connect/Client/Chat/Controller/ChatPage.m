@@ -155,7 +155,7 @@
     self.navigationItem.titleView = self.titleView;
     [self onConnectState:0];
 
-    [self showFristRegisterBackupTipView];
+//    [self showFristRegisterBackupTipView];
 
     //conversion  monitor
     [LMConversionManager sharedManager].conversationListDelegate = self;

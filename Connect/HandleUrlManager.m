@@ -190,18 +190,22 @@
                 break;
             case UrlTypeTransfer: {
                 
-                NSString *token = [parms valueForKey:@"token"];
-                [GCDQueue executeInMainQueue:^{
-                    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-                    window.userInteractionEnabled = NO;
-                    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:window animated:YES];
-                    hud.labelText = LMLocalizedString(@"Common Loading", nil);
+                [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletWithBlock:^(BOOL existWallet) {
+                    if (existWallet) {
+                        NSString *token = [parms valueForKey:@"token"];
+                        [GCDQueue executeInMainQueue:^{
+                            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+                            window.userInteractionEnabled = NO;
+                            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:window animated:YES];
+                            hud.labelText = LMLocalizedString(@"Common Loading", nil);
+                        }];
+                        if (!GJCFStringIsNull(token)) {
+                            [[IMService instance] reciveMoneyWihtToken:token complete:^(NSError *erro, id data) {
+                                
+                            }];
+                        }
+                    }
                 }];
-                if (!GJCFStringIsNull(token)) {
-                    [[IMService instance] reciveMoneyWihtToken:token complete:^(NSError *erro, id data) {
-
-                    }];
-                }
             }
                 break;
             case UrlTypePacket: {
