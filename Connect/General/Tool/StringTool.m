@@ -78,36 +78,29 @@ unsigned char strToChar (char a, char b)
     {
         return nil;
     }
-    
-    const char *panchar = [pan UTF8String];
-    const char *pinvchar = [pinv UTF8String];
-    
-    
-    NSString *temp = [[NSString alloc] init];
-    
-    for (int i = 0; i < pan.length; i++)
+    NSMutableArray *hexArray1 = [self splitStringIntoChars:pan];
+    NSMutableArray *hexArray2 = [self splitStringIntoChars:pinv];
+    NSMutableString *str = [NSMutableString new];
+    for (int i=0; i<[hexArray1 count]; i++ )
     {
-        int panValue = [self charToint:panchar[i]];
-        int pinvValue = [self charToint:pinvchar[i]];
-        
-        temp = [temp stringByAppendingString:[NSString stringWithFormat:@"%X",panValue^pinvValue]];
+        /*Convert to base 16*/
+        int a=(unsigned char)strtol([[hexArray1 objectAtIndex:i] UTF8String], NULL, 16);
+        int b=(unsigned char)strtol([[hexArray2 objectAtIndex:i] UTF8String], NULL, 16);
+        char encrypted = a ^ b;
+        [str appendFormat:@"%x",encrypted];
     }
-    return temp;
-    
+    return str;
 }
 
-+ (int)charToint:(char)tempChar
-{
-    if (tempChar >= '0' && tempChar <='9')
++ (NSMutableArray*)splitStringIntoChars:(NSString*)argStr{
+    NSMutableArray *characters = [[NSMutableArray alloc]
+                                  initWithCapacity:[argStr length]];
+    for (int i=0; i < [argStr length]; i++)
     {
-        return tempChar - '0';
+        NSString *ichar = [NSString stringWithFormat:@"%c", [argStr characterAtIndex:i ]];
+        [characters addObject:ichar];
     }
-    else if (tempChar >= 'A' && tempChar <= 'F')
-    {
-        return tempChar - 'A' + 10;
-    }
-    
-    return 0;
+    return characters;
 }
 /**
  *  Return to the page to determine the regular expression of the test string
