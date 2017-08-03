@@ -582,7 +582,7 @@
 "Wallet Amount BTC"="Amount(BTC)";
 "Wallet Amount Each"="Amount Each";
 "Wallet Amount Symbol"="Amount(%@)";
-"Wallet Amount is too small"="Amount is too small!";
+"Wallet Amount is too small"="When packing a transaction, an error occurs and the amount is too small";
 "Wallet Amount must be greater than"="Amount must be more than %f";
 "Wallet Amount must be less than"="Amount must be less than %f";
 "Wallet Amount of member"="Amount of member";
@@ -609,7 +609,7 @@
 "Wallet Could not get himself sent money transfer"="Can't get the transfer from yourself";
 "Wallet Detail"="detail";
 "Wallet Each"="Each";
-"Wallet Enter 4 Digits"="Enter 4 Digits";
+"Wallet Enter 4 Digits"="Enter 4 Digits password";
 "Wallet Enter again"="Enter again";
 "Wallet Enter number"="Enter number of members";
 "Wallet Enter your PIN"="Enter your PIN";
@@ -731,5 +731,10 @@
 "Wallet not create wallet" = "You haven't create the purse";
 "Wallet The Connect system address" = "The Connect system address";
 "Wallet An error occurred while packing the transaction Please check whether the amount is correct" = "An error occurred while packing the transaction. Please check whether the amount is correct";
+"Wallet Verify password" = "Verify password";
+"Wallet Set the password" = "Set the password";
+"Wallet The two passwords are not consistent please input again" = "The two passwords are not consistent, please input again";
+"Wallet Please enter the four digit Numbers again" = "Please enter the four digit Numbers again";
+"Wallet not initialized the wallet and can not trade" = "The other party has not initialized the wallet and can not trade";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

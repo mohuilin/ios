@@ -582,7 +582,7 @@
 "Wallet Amount BTC"="Денежная сумма (BTC)";
 "Wallet Amount Each"="Денежная сумма денежного подарка";
 "Wallet Amount Symbol"="Денежная сумма (%@)";
-"Wallet Amount is too small"="Денежная сумма слишком маленькая!";
+"Wallet Amount is too small"="Упаковать сделки возникает ошибка, наработать сумма слишком мал";
 "Wallet Amount must be greater than"="Денежная сумма должна бытьбольше, чем %f";
 "Wallet Amount must be less than"="Денежная сумма должна быть меньше, чем %f";
 "Wallet Amount of member"="Количество людей краудфандинга";
@@ -609,7 +609,7 @@
 "Wallet Could not get himself sent money transfer"="Нельзя сделать денежный перевод самому себе";
 "Wallet Detail"="Подробности";
 "Wallet Each"="Каждый человек  ";
-"Wallet Enter 4 Digits"="Просьба ввести 4 цифры";
+"Wallet Enter 4 Digits"="Просьба ввести 4 цифры пароль";
 "Wallet Enter again"="Повторите ввод";
 "Wallet Enter number"="Вести количество людей";
 "Wallet Enter your PIN"="Вести платежный пароль";
@@ -731,5 +731,10 @@
 "Wallet not create wallet" = "Вы не создали кошелек";
 "Wallet The Connect system address" = "Подключите системный адрес";
 "Wallet An error occurred while packing the transaction Please check whether the amount is correct" = "Упаковать сделки возникает ошибка, проверьте, правильно ли сумму";
+"Wallet Verify password" = "Проверка пароля";
+"Wallet Set the password" = "Установить пароль";
+"Wallet The two passwords are not consistent please input again" = "Дважды пароль не равномерно, пожалуйста введите сердечники";
+"Wallet Please enter the four digit Numbers again" = "Опять же, введите пароль 4 цифры";
+"Wallet not initialized the wallet and can not trade" = "Другая сторона не была инициализирована бумажник, а не торговля";
 "app name"="Connect";
 "app name im"="CONNECT.IM";
