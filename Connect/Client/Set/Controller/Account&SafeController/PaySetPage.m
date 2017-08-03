@@ -59,7 +59,6 @@
         }];
     }
 
-
     if (self.poptoRoot) {
         [GCDQueue executeInMainQueue:^{
             [self resetPayPass];
@@ -107,7 +106,7 @@
 
     NSString *tip = LMLocalizedString(@"Wallet Reset password", nil);
     CellItem *payPass = nil;
-    if ([LMWalletManager sharedManager].baseModel) {
+    if ([[MMAppSetting sharedSetting] walletExist]) {
         payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
             [weakSelf resetPayPass];
         }];
@@ -195,73 +194,74 @@
 }
 
 - (void)resetPayPass {
-
-    __weak __typeof(&*self) weakSelf = self;
-    NSString __block *firstPass = nil;
-    NSString __block *secondPass = nil;
-    [GCDQueue executeInMainQueue:^{
-        KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
-        __weak __typeof(&*passView) weakPassView = passView;
-        [weakPassView setTitleString:LMLocalizedString(@"Set please enter the original password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-        NSString __block *baseSeedStr = nil;
-        passView.fillCompleteBlock = ^(NSString *password) {
-            if (GJCFStringIsNull(firstPass)) {
-                firstPass = password;
-                [weakPassView setTitleString:LMLocalizedString(@"Set Set Payment Password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                if ([LMWalletManager sharedManager].baseModel.encryptSeed.length > 0) {
-                    LMBaseCurrencyManager *baseCurrency = nil;
-                    baseCurrency = [[LMBtcCurrencyManager alloc] init];
-                    [baseCurrency decodeEncryptValue:[LMWalletManager sharedManager].baseModel.encryptSeed password:password complete:^(NSString *decodeValue, BOOL success) {
-                        if (!success) {
-                            [weakPassView setTitleString:LMLocalizedString(@"Login Password incorrect", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                            firstPass = nil;
-                            return ;
-                        }else{
-                            baseSeedStr = decodeValue;
-                        }
-                    }];
-                }else {
-                    [weakPassView setTitleString:LMLocalizedString(@"ErrorCode data error", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                    firstPass = nil;
-                    return ;
-                }
-            }else if (GJCFStringIsNull(secondPass)){
-                secondPass = password;
-                [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm Payment password", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                return;
-            }else  {
-                if ([secondPass isEqualToString:password]) {
-                    [weakPassView dismissWithClosed:YES];
-                    // save and upload
-                    
-                    [[LMWalletManager sharedManager] reSetPassWord:password baseSeed:baseSeedStr complete:^(NSError *error) {
-                        if (!error) {
-                            [GCDQueue executeInMainQueue:^{
-                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:^{
-                                    if (weakSelf.poptoRoot) {
-                                        [GCDQueue executeInMainQueue:^{
-                                            [weakSelf.navigationController popToRootViewControllerAnimated:YES];
-                                        }             afterDelaySecs:1.f];
-                                    }
-                                }];
-                            }];
-                            [weakSelf reload];
-                        } else {
-                            [GCDQueue executeInMainQueue:^{
-                                [MBProgressHUD showToastwithText:LMLocalizedString(@"Set Save Failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                            }];
-                        }
-                    }];
-                } else {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Password incorrect", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                    }];
+    //sync
+    [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet,NSError *error) {
+        if (wallet && error.code == WALLET_ISEXIST) {
+            NSString *decodeValue = nil;
+            CategoryType category = CategoryTypeNewUser;
+            for (Coin *coin in wallet.coinsArray) {
+                if (coin.currency == [LMWalletManager sharedManager].presentCurrency) {
+                    category = coin.category;
+                    switch (category) {
+                        case CategoryTypeImport:
+                        case CategoryTypeOldUser:
+                            decodeValue = coin.payload;
+                            break;
+                            
+                        case CategoryTypeNewUser:
+                            decodeValue = [LMWalletManager sharedManager].baseModel.encryptSeed;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 }
             }
-        };
-        [weakSelf presentViewController:passView animated:NO completion:nil];
+            KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategoryVerify complete:^(KQXPasswordInputController *inputPassVc, NSString *psw) {
+                LMBaseCurrencyManager *baseCurrency = nil;
+                baseCurrency = [[LMBtcCurrencyManager alloc] init];
+                [baseCurrency decodeEncryptValue:decodeValue password:psw complete:^(NSString *decodeValue, BOOL success) {
+                    [inputPassVc verfilySuccess:success];
+                    if (success) {
+                        [self updateEncryptValueWithDecodeValue:decodeValue withCategory:category];
+                    }
+                }];
+            }];
+            [self presentViewController:passView animated:NO completion:nil];
+        } else {
+            [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:self.view complete:nil];
+        }
     }];
+    
 }
+
+- (void)updateEncryptValueWithDecodeValue:(NSString *)decodeValue withCategory:(CategoryType)category{
+    
+    KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategorySet complete:^(KQXPasswordInputController *inputPassVc,NSString *password) {
+        
+        [[LMWalletManager sharedManager] reEncryptValue:decodeValue passWord:password category:category complete:^(NSError *error) {
+            if (!error) {
+                [GCDQueue executeInMainQueue:^{
+                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
+                        if (self.poptoRoot) {
+                            [GCDQueue executeInMainQueue:^{
+                                [self.navigationController popToRootViewControllerAnimated:YES];
+                            }             afterDelaySecs:1.f];
+                        }
+                    }];
+                }];
+                [self reload];
+            } else {
+                [GCDQueue executeInMainQueue:^{
+                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Set Save Failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                }];
+            }
+        }];
+        
+    }];
+    [self presentViewController:passView animated:NO completion:nil];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
 

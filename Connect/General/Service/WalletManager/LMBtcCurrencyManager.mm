@@ -221,10 +221,11 @@ extern "C" {
  *  set currency messageInfo
  *
  */
-- (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
+- (void)updateOldUserEncryptPrivatekey:(NSString *)decodePrivkey complete:(void (^)(NSError *error))complete{
+    
     Coin *coin = [Coin new];
-    coin.currency = (int)currency;
-    coin.status = status;
+    coin.currency = CurrencyTypeBTC;
+    coin.payload = decodePrivkey;
     
     [NetWorkOperationTool POSTWithUrlString:SetCurrencyInfo postProtoData:coin.data complete:^(id response) {
         HttpResponse *hResponse = (HttpResponse *)response;
@@ -233,6 +234,12 @@ extern "C" {
                 complete([NSError errorWithDomain:hResponse.message code:hResponse.code userInfo:nil]);
             }
         }else {
+            
+            /// update db
+            LMCurrencyModel *btcCurrency = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",(int)CurrencyTypeBTC]] lastObject];
+            [[LMRealmManager sharedManager] executeRealmWithBlock:^{
+                btcCurrency.payload = decodePrivkey;
+            }];
             if (complete) {
                 complete(nil);
             }
@@ -650,8 +657,7 @@ int connectWalletDecrypt(char *encryptedString, char *pwd, int ver, char *wallet
 - (NSString *)getCurrencySeedWithBaseSeed:(NSString *)baseSeed{
     LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",(int)CurrencyTypeBTC]] lastObject];
     
-    /// when create baseSeed ,baseSeed is uppercaseString !!!!
-    NSString *btcSeed = [StringTool pinxCreator:baseSeed.uppercaseString withPinv:currencyModel.salt];
+    NSString *btcSeed = [StringTool pinxCreator:baseSeed withPinv:currencyModel.salt];
     
     return btcSeed;
 }

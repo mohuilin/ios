@@ -167,7 +167,7 @@
     }];
     [self.walletBlanceButton setTitleColor:LMBasicBlanceBtnTitleColor forState:UIControlStateNormal];
     [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@", [PayTool getBtcStringWithAmount:[[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance]] forState:UIControlStateNormal];
-    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance * pow(10, -8) * [[MMAppSetting sharedSetting] getRate]] forState:UIControlStateSelected];
+    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ ≈ %.2f", self.symbol, [[LMWalletManager sharedManager] currencyModelWith:CurrencyTypeBTC].blance * pow(10, -8) * [[MMAppSetting sharedSetting] getRate]] forState:UIControlStateSelected];
 
     [self.headerView layoutIfNeeded];
     self.headerHeight = self.walletBlanceButton.bottom;
@@ -239,7 +239,7 @@
                     [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"฿ %@"
                                                        , [PayTool getBtcStringWithAmount:currencyModel.blance]] forState:UIControlStateNormal];
                     NSDecimalNumber *blance  = [[NSDecimalNumber alloc] initWithLongLong:currencyModel.blance];
-                    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ %.2f", self.symbol, [[rate decimalNumberByMultiplyingBy:blance] decimalNumberByDividingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].doubleValue] forState:UIControlStateSelected];
+                    [self.walletBlanceButton setTitle:[NSString stringWithFormat:@"%@ ≈ %.2f", self.symbol, [[rate decimalNumberByMultiplyingBy:blance] decimalNumberByDividingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]].doubleValue] forState:UIControlStateSelected];
                 }
             }];
         }

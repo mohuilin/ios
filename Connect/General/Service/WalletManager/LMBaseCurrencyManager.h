@@ -25,7 +25,7 @@
  *  set currency messageInfo
  *
  */
-- (void)setCurrencyStatus:(int)status currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete;
+- (void)updateOldUserEncryptPrivatekey:(NSString *)decodePrivkey complete:(void (^)(NSError *error))complete;
 /**
  * decode encrypt value by password
  * @param encryptValue

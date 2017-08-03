@@ -159,7 +159,7 @@
 
     self.titleLabel = [[UILabel alloc] init];
     self.titleLabel.numberOfLines = 0;
-    self.titleLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), self.receiptAddress];
+    self.titleLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Your Bitcoin Address", nil), @""];
     self.titleLabel.font = [UIFont boldSystemFontOfSize:FONT_SIZE(25)];
     self.titleLabel.textColor = LMBasicBlack;
     self.titleLabel.textAlignment = NSTextAlignmentCenter;

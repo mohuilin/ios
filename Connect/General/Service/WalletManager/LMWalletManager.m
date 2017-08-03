@@ -200,14 +200,17 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                     NSString *checkStr = [NSString stringWithFormat:@"%d%@",syncWallet.wallet.ver,syncWallet.wallet.payLoad];
                     NSString *checkSum = [checkStr sha256String];
                     if (![checkSum isEqualToString:syncWallet.wallet.checkSum]) {
+                        /// save db
+                        [self saveWallet:syncWallet];
                         if (complete) {
-                            complete(nil,[NSError errorWithDomain:@"wallet verfiy failed" code:WALLET_CHECK_SUM_FAILED userInfo:nil]);
+                            complete(syncWallet,[NSError errorWithDomain:@"wallet exist" code:WALLET_ISEXIST userInfo:nil]);
                         }
-                    }
-                    /// save db
-                    [self saveWallet:syncWallet];
-                    if (complete) {
-                        complete(syncWallet,[NSError errorWithDomain:@"wallet exist" code:WALLET_ISEXIST userInfo:nil]);
+                    } else {
+                        /// save db
+                        [self saveWallet:syncWallet];
+                        if (complete) {
+                            complete(syncWallet,[NSError errorWithDomain:@"wallet exist" code:WALLET_ISEXIST userInfo:nil]);
+                        }
                     }
                 } else {
                     if (complete) {
@@ -253,34 +256,19 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  * create old wallet
  */
 - (void)creatOldWallet:(UIViewController *)controllerVc complete:(void (^)(NSError * error))complete{
-    NSString __block *firstPass = nil;
     [GCDQueue executeInMainQueue:^{
-        KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
-        __weak __typeof(&*passView) weakPassView = passView;
-        passView.fillCompleteBlock = ^(NSString *password) {
-            if (GJCFStringIsNull(firstPass)) {
-                firstPass = password;
-                [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm PIN", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-            } else {
-                if ([firstPass isEqualToString:password]) {
-                    [weakPassView dismissWithClosed:YES];
-                    LMBaseCurrencyManager *baseCurency = nil;
-                    baseCurency = [[LMBtcCurrencyManager alloc] init];
-                    /// privkey hex
-                    NSString *priHex = [[LKUserCenter shareCenter].currentLoginUser.prikey hexString];
-                    NSString *payLoad = [baseCurency encodeValue:priHex password:password n:17];
-                    [baseCurency createCurrency:CurrencyTypeBTC salt:nil category:CategoryTypeOldUser masterAddess:[[LKUserCenter shareCenter] currentLoginUser].address payLoad:payLoad  complete:^(LMCurrencyModel *currencyModel,NSError *error) {
-                        if (complete) {
-                            complete(error);
-                        }
-                    }];
-                } else {
-                    if (complete) {
-                        complete([NSError errorWithDomain:@"" code:PASSWPRD_ERROR_136 userInfo:nil]);
-                    }
+        KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategorySet complete:^(KQXPasswordInputController *inputPassVc,NSString *password) {
+            LMBaseCurrencyManager *baseCurency = nil;
+            baseCurency = [[LMBtcCurrencyManager alloc] init];
+            /// privkey hex
+            NSString *priHex = [[LKUserCenter shareCenter].currentLoginUser.prikey hexString];
+            NSString *payLoad = [baseCurency encodeValue:priHex password:password n:17];
+            [baseCurency createCurrency:CurrencyTypeBTC salt:nil category:CategoryTypeOldUser masterAddess:[[LKUserCenter shareCenter] currentLoginUser].address payLoad:payLoad  complete:^(LMCurrencyModel *currencyModel,NSError *error) {
+                if (complete) {
+                    complete(error);
                 }
-            }
-        };
+            }];
+        }];
         [controllerVc presentViewController:passView animated:NO completion:nil];
     }];
 }
@@ -294,51 +282,36 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     seedVc.title = LMLocalizedString(@"", nil);
     seedVc.SeedBlock = ^(NSString *randomSeed) {
         if (!GJCFStringIsNull(randomSeed)) {
-            NSString __block *firstPass = nil;
             [GCDQueue executeInMainQueue:^{
-                KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordInputStyle:KQXPasswordInputStyleWithoutMoney];
-                __weak __typeof(&*passView) weakPassView = passView;
-                passView.fillCompleteBlock = ^(NSString *password) {
-                    if (GJCFStringIsNull(firstPass)) {
-                        firstPass = password;
-                        [weakPassView setTitleString:LMLocalizedString(@"Wallet Confirm PIN", nil) descriptionString:LMLocalizedString(@"Wallet Enter 4 Digits", nil) moneyString:nil];
-                    } else {
-                        if ([firstPass isEqualToString:password]) {
-                            [weakPassView dismissWithClosed:YES];
-                            [self encryptValue:randomSeed password:password complete:^(NSError *error) {
-                                if (!error) {
-                                    NSData *saltData = [LMIMHelper createRandom512bits];
-                                    NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
-                                    NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:randomSeed];
-                                    LMBaseCurrencyManager *baseCurrency = nil;
-                                    switch (currency) {
-                                        case CurrencyTypeBTC:
-                                            baseCurrency = [[LMBtcCurrencyManager alloc] init];
-                                            break;
-                                            
-                                        default:
-                                            break;
-                                    }
-                                    NSString *bSeedPrikey = [baseCurrency getPrivkeyBySeed:BitSeed index:0];
-                                    NSString *masterAddress = [baseCurrency getAddressByPrivKey:bSeedPrikey];
-                                    [baseCurrency createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(LMCurrencyModel *currencyModel,NSError *error) {
-                                        if (complete) {
-                                            complete(error);
-                                        }
-                                    }];
-                                }else {
-                                    if (complete) {
-                                        complete(error);
-                                    }
+                KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategorySet complete:^(KQXPasswordInputController *inputPassVc,NSString *password) {
+                    [self encryptValue:randomSeed password:password complete:^(NSError *error) {
+                        if (!error) {
+                            NSData *saltData = [LMIMHelper createRandom512bits];
+                            NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
+                            NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:randomSeed];
+                            LMBaseCurrencyManager *baseCurrency = nil;
+                            switch (currency) {
+                                case CurrencyTypeBTC:
+                                    baseCurrency = [[LMBtcCurrencyManager alloc] init];
+                                    break;
+                                    
+                                default:
+                                    break;
+                            }
+                            NSString *bSeedPrikey = [baseCurrency getPrivkeyBySeed:BitSeed index:0];
+                            NSString *masterAddress = [baseCurrency getAddressByPrivKey:bSeedPrikey];
+                            [baseCurrency createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(LMCurrencyModel *currencyModel,NSError *error) {
+                                if (complete) {
+                                    complete(error);
                                 }
                             }];
-                        } else {
+                        }else {
                             if (complete) {
-                                complete([NSError errorWithDomain:@"" code:PASSWPRD_ERROR_136 userInfo:nil]);
+                                complete(error);
                             }
                         }
-                    }
-                };
+                    }];
+                }];
                 [controllerVc presentViewController:passView animated:NO completion:nil];
             }];
         }
@@ -439,25 +412,46 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *  reset password methods
  *
  */
-- (void)reSetPassWord:(NSString *)passWord baseSeed:(NSString *)baseSeed complete:(void(^)(NSError *error))complete {
-    if (passWord == nil) {
-        passWord = @"";
-    }
-    RequestWalletInfo *creatWallet = [RequestWalletInfo new];
-    int ver = 1;
-    creatWallet.ver = ver;
-    LMBaseCurrencyManager *baseCurrency = [[LMBtcCurrencyManager alloc] init];
-    NSString *payLoad = [baseCurrency encodeValue:baseSeed password:passWord n:17];
-    NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
-    NSString *checkSum = [checkStr sha256String];
-    creatWallet.payload = payLoad;
-    creatWallet.checkSum = checkSum;
+- (void)reEncryptValue:(NSString *)value passWord:(NSString *)passWord category:(CategoryType)category complete:(void(^)(NSError *error))complete {
     
-    [self updatePassWord:payLoad checkSum:checkSum version:1 ver:ver url:UpdateBaseSeedUrl compete:^(NSError *error) {
-        if (complete) {
-            complete(error);
+    switch (category) {
+        case CategoryTypeImport:
+        {
+            
         }
-    }];
+            break;
+        case CategoryTypeOldUser:
+        {
+            LMBaseCurrencyManager *manager = [[LMBtcCurrencyManager alloc] init];
+            NSString *decodePrivkey = [manager encodeValue:value password:passWord n:17];
+            [manager updateOldUserEncryptPrivatekey:decodePrivkey complete:complete];
+        }
+            
+            break;
+            
+        case CategoryTypeNewUser:
+        {
+            RequestWalletInfo *creatWallet = [RequestWalletInfo new];
+            int ver = 1;
+            creatWallet.ver = ver;
+            LMBaseCurrencyManager *baseCurrency = [[LMBtcCurrencyManager alloc] init];
+            NSString *payLoad = [baseCurrency encodeValue:value password:passWord n:17];
+            NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
+            NSString *checkSum = [checkStr sha256String];
+            creatWallet.payload = payLoad;
+            creatWallet.checkSum = checkSum;
+            [self updatePassWord:payLoad checkSum:checkSum version:1 ver:ver url:UpdateBaseSeedUrl compete:^(NSError *error) {
+                if (complete) {
+                    complete(error);
+                }
+            }];
+        }
+            
+            break;
+        default:
+            break;
+    }
+    
 }
 
 
