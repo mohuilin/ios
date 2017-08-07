@@ -737,5 +737,6 @@
 "Wallet The two passwords are not consistent please input again" = "两次密码不一致，请从新输入";
 "Wallet Please enter the four digit Numbers again" = "请再次输入4位数字密码";
 "Wallet not initialized the wallet and can not trade" = "对方还没有初始化钱包,不能交易";
+"You have not initialized the currency wallet account" = "你还未初始化%@钱包账户";
 "app name"="Connect";
 "app name im"="CONNECT.IM";

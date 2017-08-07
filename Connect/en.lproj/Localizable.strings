@@ -736,5 +736,6 @@
 "Wallet The two passwords are not consistent please input again" = "The two passwords are not consistent, please input again";
 "Wallet Please enter the four digit Numbers again" = "Please enter the four digit Numbers again";
 "Wallet not initialized the wallet and can not trade" = "The other party has not initialized the wallet and can not trade";
+"You have not initialized the currency wallet account" = "You have not initialized the %@ wallet account";
 "app name"="Connect";
 "app name im"="CONNECT.IM";
