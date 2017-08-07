@@ -95,30 +95,19 @@
 
 - (void)setupCellData {
 
-
     [self.groups removeAllObjects];
-
     __weak __typeof(&*self) weakSelf = self;
-
-
-    // zero group
-    CellGroup *group0 = [[CellGroup alloc] init];
-
-    NSString *tip = LMLocalizedString(@"Wallet Reset password", nil);
-    CellItem *payPass = nil;
-    if ([[MMAppSetting sharedSetting] walletExist]) {
-        payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
-            [weakSelf resetPayPass];
-        }];
-        group0.items = @[payPass];
-    }else {
-        [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
-            if (!error) {
-                [weakSelf reload];
-            }
-        }];
-    }
-    [self.groups objectAddObject:group0];
+    [[LMWalletManager sharedManager] checkWalletExistWithBlock:^(BOOL existWallet) {
+        if (existWallet) {
+            CellGroup *group0 = [[CellGroup alloc] init];
+            NSString *tip = LMLocalizedString(@"Wallet Reset password", nil);
+            CellItem *payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
+                [weakSelf resetPayPass];
+            }];
+            group0.items = @[payPass];
+            [self.groups objectAddObject:group0];
+        }
+    }];
 
     // second group
     CellGroup *group1 = [[CellGroup alloc] init];
@@ -194,25 +183,21 @@
 }
 
 - (void)resetPayPass {
+    
+    [MBProgressHUD showLoadingMessageToView:self.view];
+    
     //sync
     [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet,NSError *error) {
-        if (wallet && error.code == WALLET_ISEXIST) {
-            NSString *decodeValue = nil;
+        if (wallet) {
+            [MBProgressHUD hideHUDForView:self.view];
+            NSString *encodeBaseSeed = [LMWalletManager sharedManager].baseModel.encryptSeed;
+            NSString *currencyPayload = nil;
             CategoryType category = CategoryTypeNewUser;
             for (Coin *coin in wallet.coinsArray) {
-                if (coin.currency == [LMWalletManager sharedManager].presentCurrency) {
+                if (coin.currency == CurrencyTypeBTC) { /// only btc have old account
                     category = coin.category;
-                    switch (category) {
-                        case CategoryTypeImport:
-                        case CategoryTypeOldUser:
-                            decodeValue = coin.payload;
-                            break;
-                            
-                        case CategoryTypeNewUser:
-                            decodeValue = [LMWalletManager sharedManager].baseModel.encryptSeed;
-                            break;
-                        default:
-                            break;
+                    if (category == CategoryTypeOldUser) {
+                        currencyPayload = coin.payload;
                     }
                     break;
                 }
@@ -220,12 +205,40 @@
             KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategoryVerify complete:^(KQXPasswordInputController *inputPassVc, NSString *psw) {
                 LMBaseCurrencyManager *baseCurrency = nil;
                 baseCurrency = [[LMBtcCurrencyManager alloc] init];
-                [baseCurrency decodeEncryptValue:decodeValue password:psw complete:^(NSString *decodeValue, BOOL success) {
-                    [inputPassVc verfilySuccess:success];
-                    if (success) {
-                        [self updateEncryptValueWithDecodeValue:decodeValue withCategory:category];
+                
+                switch (category) {
+                    case CategoryTypeNewUser:
+                    {
+                        [baseCurrency decodeEncryptValue:encodeBaseSeed password:psw complete:^(NSString *decodeValue, BOOL success) {
+                            [inputPassVc verfilySuccess:success];
+                            if (success) {
+                                [self updateEncryptValueWithDecodeBaseSeed:decodeValue decodePriHex:nil withCategory:category];
+                            }
+                        }];
                     }
-                }];
+                        break;
+                        
+                    case CategoryTypeOldUser:
+                    {
+                        /// decode baseseed and decode hexpri
+                        [baseCurrency decodeEncryptValue:encodeBaseSeed password:psw complete:^(NSString *decodeBaseSeed, BOOL success) {
+                            if (success) {
+                                [baseCurrency decodeEncryptValue:currencyPayload password:psw complete:^(NSString *decodePrihex, BOOL success) {
+                                    [inputPassVc verfilySuccess:success];
+                                    if (success) {
+                                        [self updateEncryptValueWithDecodeBaseSeed:decodeBaseSeed decodePriHex:decodePrihex withCategory:category];
+                                    }
+                                }];
+                            } else {
+                                [inputPassVc verfilySuccess:success];
+                            }
+                        }];
+                    }
+                        break;
+                        
+                    default:
+                        break;
+                }
             }];
             [self presentViewController:passView animated:NO completion:nil];
         } else {
@@ -235,11 +248,10 @@
     
 }
 
-- (void)updateEncryptValueWithDecodeValue:(NSString *)decodeValue withCategory:(CategoryType)category{
+- (void)updateEncryptValueWithDecodeBaseSeed:(NSString *)decodeBaseseed decodePriHex:(NSString *)decodePriHex withCategory:(CategoryType)category{
     
     KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategorySet complete:^(KQXPasswordInputController *inputPassVc,NSString *password) {
-        
-        [[LMWalletManager sharedManager] reEncryptValue:decodeValue passWord:password category:category complete:^(NSError *error) {
+        [[LMWalletManager sharedManager] reEncryptBaseSeed:decodeBaseseed priHex:decodePriHex passWord:password category:category complete:^(NSError *error) {
             if (!error) {
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Save successful", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
