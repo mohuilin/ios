@@ -77,11 +77,13 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  * creatWallet
  */
 - (void)creatWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
+
+    [MBProgressHUD showLoadingMessageToView:controllerVc.view];
     
     RequestUserInfo *userInfo = [RequestUserInfo new];
     userInfo.uid = [LKUserCenter shareCenter].currentLoginUser.pub_key;
     userInfo.currency = currency;
-    
+
     [NetWorkOperationTool POSTWithUrlString:GetUserStatus postProtoData:userInfo.data complete:^(id response) {
         HttpResponse *hRespon = (HttpResponse*)response;
         if (hRespon.code != successCode) {
@@ -89,34 +91,12 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                 complete([NSError errorWithDomain:hRespon.message code:hRespon.code userInfo:nil]);
             }
         }else{
+            [MBProgressHUD hideHUDForView:controllerVc.view];
             NSData *data = [ConnectTool decodeHttpResponse:hRespon];
             if (data) {
                 CoinsDetail *coinDetail = [CoinsDetail parseFromData:data error:nil];
-                
-                /// test
-//                coinDetail.coin.category = CategoryTypeOldUser;
-                /// test
-                
-                switch (coinDetail.coin.category) {
-                    case CategoryTypeOldUser:
-                    {
-                        [self creatOldWallet:controllerVc complete:complete];
-                    }
-                        break;
-                    case CategoryTypeNewUser:
-                    {
-                        [self creatNewWallet:controllerVc currency:currency complete:complete];
-                    }
-                        break;
-                    case CategoryTypeImport:
-                    {
-                        // creat import wallet
-                        [self creatImportWallet:0 complete:complete];
-                    }
-                        break;
-                    default:
-                        break;
-                }
+                coinDetail.coin.category = CategoryTypeOldUser; /// test
+                [self creatNewWallet:controllerVc currency:currency category:coinDetail.coin.category complete:complete];
             }
         }
     } fail:^(NSError *error) {
@@ -176,7 +156,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
             [realm addOrUpdateObject:saveSeedModel];
         }
         if (addedCurrencyArray.count) {
-            [realm addObjects:addedCurrencyArray];
+            [realm addOrUpdateObjectsFromArray:addedCurrencyArray];
         }
     }];
 }
@@ -196,28 +176,20 @@ CREATE_SHARED_MANAGER(LMWalletManager);
             NSData *data = [ConnectTool decodeHttpResponse:hResponse];
             if (data) {
                 RespSyncWallet *syncWallet = [RespSyncWallet parseFromData:data error:nil];
-                if (syncWallet.coinsArray.count) {
-                    NSString *checkStr = [NSString stringWithFormat:@"%d%@",syncWallet.wallet.ver,syncWallet.wallet.payLoad];
-                    NSString *checkSum = [checkStr sha256String];
-                    if (![checkSum isEqualToString:syncWallet.wallet.checkSum]) {
-                        /// save db
-                        [self saveWallet:syncWallet];
-                        if (complete) {
-                            complete(syncWallet,[NSError errorWithDomain:@"wallet exist" code:WALLET_ISEXIST userInfo:nil]);
-                        }
-                    } else {
-                        /// save db
-                        [self saveWallet:syncWallet];
-                        if (complete) {
-                            complete(syncWallet,[NSError errorWithDomain:@"wallet exist" code:WALLET_ISEXIST userInfo:nil]);
-                        }
+                NSString *checkStr = [NSString stringWithFormat:@"%d%@",syncWallet.wallet.ver,syncWallet.wallet.payLoad];
+                NSString *checkSum = [checkStr sha256String];
+                if (syncWallet.wallet.payLoad.length &&
+                    ![checkSum isEqualToString:syncWallet.wallet.checkSum]) {
+                    if (complete) {
+                        complete(nil,[NSError errorWithDomain:@"wallet verfiy failed" code:WALLET_CHECK_SUM_FAILED userInfo:nil]);
                     }
                 } else {
+                    /// save db
+                    [self saveWallet:syncWallet];
                     if (complete) {
-                        complete(nil,[NSError errorWithDomain:@"wallet create failed" code:WALLET_NOT_ISEXIST userInfo:nil]);
+                        complete(syncWallet,nil);
                     }
                 }
-
             } else {
                 if (complete) {
                     complete(nil,[NSError errorWithDomain:hResponse.message code:Create_ProbufParse_FAILED userInfo:nil]);
@@ -251,32 +223,12 @@ CREATE_SHARED_MANAGER(LMWalletManager);
         }
     }];
 }
-/**
- *
- * create old wallet
- */
-- (void)creatOldWallet:(UIViewController *)controllerVc complete:(void (^)(NSError * error))complete{
-    [GCDQueue executeInMainQueue:^{
-        KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategorySet complete:^(KQXPasswordInputController *inputPassVc,NSString *password) {
-            LMBaseCurrencyManager *baseCurency = nil;
-            baseCurency = [[LMBtcCurrencyManager alloc] init];
-            /// privkey hex
-            NSString *priHex = [[LKUserCenter shareCenter].currentLoginUser.prikey hexString];
-            NSString *payLoad = [baseCurency encodeValue:priHex password:password n:17];
-            [baseCurency createCurrency:CurrencyTypeBTC salt:nil category:CategoryTypeOldUser masterAddess:[[LKUserCenter shareCenter] currentLoginUser].address payLoad:payLoad  complete:^(LMCurrencyModel *currencyModel,NSError *error) {
-                if (complete) {
-                    complete(error);
-                }
-            }];
-        }];
-        [controllerVc presentViewController:passView animated:NO completion:nil];
-    }];
-}
+
 /**
  *
  *  create new wallet
  */
-- (void)creatNewWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
+- (void)creatNewWallet:(UIViewController *)controllerVc currency:(CurrencyType)currency category:(CategoryType)category complete:(void (^)(NSError *error))complete{
     LMRandomSeedController *seedVc = [[LMRandomSeedController alloc] init];
     seedVc.seedSourceType = SeedSouceTypeWallet;
     seedVc.title = LMLocalizedString(@"", nil);
@@ -286,9 +238,6 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                 KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategorySet complete:^(KQXPasswordInputController *inputPassVc,NSString *password) {
                     [self encryptValue:randomSeed password:password complete:^(NSError *error) {
                         if (!error) {
-                            NSData *saltData = [LMIMHelper createRandom512bits];
-                            NSString *commonRandomStr = [StringTool hexStringFromData:saltData];
-                            NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:randomSeed];
                             LMBaseCurrencyManager *baseCurrency = nil;
                             switch (currency) {
                                 case CurrencyTypeBTC:
@@ -298,9 +247,31 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                                 default:
                                     break;
                             }
-                            NSString *bSeedPrikey = [baseCurrency getPrivkeyBySeed:BitSeed index:0];
-                            NSString *masterAddress = [baseCurrency getAddressByPrivKey:bSeedPrikey];
-                            [baseCurrency createCurrency:CurrencyTypeBTC salt:commonRandomStr category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(LMCurrencyModel *currencyModel,NSError *error) {
+                            NSString *masterAddress = nil;
+                            NSString *payLoad = nil;
+                            NSString *commonRandomStr = nil;
+                            switch (category) {
+                                case CategoryTypeNewUser:
+                                {
+                                    NSData *saltData = [LMIMHelper createRandom512bits];
+                                    commonRandomStr = [StringTool hexStringFromData:saltData];
+                                    NSString *BitSeed = [StringTool pinxCreator:commonRandomStr withPinv:randomSeed];
+                                    NSString *bSeedPrikey = [baseCurrency getPrivkeyBySeed:BitSeed index:0];
+                                    masterAddress = [baseCurrency getAddressByPrivKey:bSeedPrikey];
+                                }
+                                    break;
+                                case CategoryTypeOldUser:
+                                {
+                                    masterAddress = [[LKUserCenter shareCenter] currentLoginUser].address;
+                                    NSString *priHex = [[LKUserCenter shareCenter].currentLoginUser.prikey hexString];
+                                    payLoad = [baseCurrency encodeValue:priHex password:password n:17];
+                                }
+                                    break;
+                                    
+                                default:
+                                    break;
+                            }
+                            [baseCurrency createCurrency:currency salt:commonRandomStr category:category masterAddess:masterAddress payLoad:payLoad complete:^(LMCurrencyModel *currencyModel,NSError *error) {
                                 if (complete) {
                                     complete(error);
                                 }
@@ -412,19 +383,39 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  *  reset password methods
  *
  */
-- (void)reEncryptValue:(NSString *)value passWord:(NSString *)passWord category:(CategoryType)category complete:(void(^)(NSError *error))complete {
-    
+- (void)reEncryptBaseSeed:(NSString *)baseSeed priHex:(NSString *)priHex passWord:(NSString *)passWord category:(CategoryType)category complete:(void(^)(NSError *error))complete {
+
     switch (category) {
-        case CategoryTypeImport:
-        {
-            
-        }
-            break;
         case CategoryTypeOldUser:
         {
+            /// update currency payload
             LMBaseCurrencyManager *manager = [[LMBtcCurrencyManager alloc] init];
-            NSString *decodePrivkey = [manager encodeValue:value password:passWord n:17];
-            [manager updateOldUserEncryptPrivatekey:decodePrivkey complete:complete];
+            NSString *decodePrivkey = [manager encodeValue:priHex password:passWord n:17];
+            [manager updateOldUserEncryptPrivatekey:decodePrivkey complete:^(NSError *error) {
+                if (!error) {
+                    
+                    /// update wallet baseseed
+                    RequestWalletInfo *creatWallet = [RequestWalletInfo new];
+                    int ver = 1;
+                    creatWallet.ver = ver;
+                    LMBaseCurrencyManager *baseCurrency = [[LMBtcCurrencyManager alloc] init];
+                    NSString *payLoad = [baseCurrency encodeValue:baseSeed password:passWord n:17];
+                    NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
+                    NSString *checkSum = [checkStr sha256String];
+                    creatWallet.payload = payLoad;
+                    creatWallet.checkSum = checkSum;
+                    [self updatePassWord:payLoad checkSum:checkSum version:1 ver:ver url:UpdateBaseSeedUrl compete:^(NSError *error) {
+                        if (complete) {
+                            complete(error);
+                        }
+                    }];
+                    
+                } else {
+                    if (complete) {
+                        complete(error);
+                    }
+                }
+            }];
         }
             
             break;
@@ -435,7 +426,7 @@ CREATE_SHARED_MANAGER(LMWalletManager);
             int ver = 1;
             creatWallet.ver = ver;
             LMBaseCurrencyManager *baseCurrency = [[LMBtcCurrencyManager alloc] init];
-            NSString *payLoad = [baseCurrency encodeValue:value password:passWord n:17];
+            NSString *payLoad = [baseCurrency encodeValue:baseSeed password:passWord n:17];
             NSString *checkStr = [NSString stringWithFormat:@"%d%@",creatWallet.ver,payLoad];
             NSString *checkSum = [checkStr sha256String];
             creatWallet.payload = payLoad;
@@ -455,69 +446,110 @@ CREATE_SHARED_MANAGER(LMWalletManager);
 }
 
 
-- (void)checkWalletExistAndCreateWalletWithBlock:(void (^)(BOOL existWallet))block{
-    /// check wallet
-    if (![[MMAppSetting sharedSetting] walletExist]) {
-        [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
-            switch (error.code) {
-                case WALLET_ISEXIST:
-                    if (block) {
-                        block(YES);
-                    }
-                    [[MMAppSetting sharedSetting] setWalletExist:YES];
+- (void)checkWalletExistAndCreateWalletOrCurrencyWithCurrency:(CurrencyType)currency complete:(void (^)(NSError *error))complete{
+    
+    [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
+        if (error) {
+            if (complete) {
+                complete(error);
+            }
+            return ;
+        }
+        /// sync success
+        if (wallet.coinsArray.count) {
+            Coin *findCoin = nil;
+            for (Coin *coin in wallet.coinsArray) {
+                if (coin.currency == currency) {
+                    findCoin = coin;
                     break;
-                case WALLET_NOT_ISEXIST:
-                {
-                    if (block) {
-                        block(NO);
-                    }
-                    UIViewController *currentController = [UIViewController currentViewController];
-                    [UIAlertController showAlertInViewController:currentController withTitle:LMLocalizedString(@"Set tip title", nil) message:LMLocalizedString(@"Wallet not create wallet", nil) cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Wallet Immediately create", nil)] tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex) {
-                        if (buttonIndex == 2) {
-                            [self creatWallet:currentController currency:CurrencyTypeBTC complete:^(NSError *error) {
-                                /// back to root cv
-                                [currentController.navigationController popViewControllerAnimated:YES];
-                                if (error) {
-                                    [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeFail showInView:currentController.view complete:nil];
-                                } else {
-                                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:currentController .view complete:nil];
+                }
+            }
+            if (findCoin) {
+                if (complete) {
+                    complete(nil);
+                }
+            } else {
+                if (complete) {
+                    complete([NSError errorWithDomain:@"" code:CURRENCY_NOT_EXIST userInfo:nil]);
+                }
+                NSString *tip = [NSString stringWithFormat:LMLocalizedString(@"You have not initialized the currency wallet account", nil),[self getCurrencySymbol:currency]];
+                UIViewController *currentController = [UIViewController currentViewController];
+                [UIAlertController showAlertInViewController:currentController withTitle:LMLocalizedString(@"Set tip title", nil) message:tip cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Wallet Immediately create", nil)] tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex) {
+                    if (buttonIndex == 2) {
+                        KQXPasswordInputController *passView = [[KQXPasswordInputController alloc] initWithPasswordCategory:KQXPasswordCategoryVerify complete:^(KQXPasswordInputController *inputPassVc, NSString *psw) {
+                            
+                            LMBaseCurrencyManager *baseCurrency = nil;
+                            switch (currency) {
+                                case CurrencyTypeBTC:
+                                    baseCurrency = [[LMBtcCurrencyManager alloc] init];
+                                    break;
+                                    
+                                default:
+                                    break;
+                            }
+                            
+                            NSString *encodeBaseSeed = [LMWalletManager sharedManager].baseModel.encryptSeed;
+                            [[[LMBtcCurrencyManager alloc] init] decodeEncryptValue:encodeBaseSeed password:psw complete:^(NSString *decodeValue, BOOL success) {
+                                [inputPassVc verfilySuccess:success];
+                                if (success) {
+                                    NSData *saltData = [LMIMHelper createRandom512bits];
+                                    NSString *saltString = [StringTool hexStringFromData:saltData];
+                                    NSString *currencySeed = [StringTool pinxCreator:decodeValue withPinv:saltString];
+                                    NSString *prikey = [baseCurrency getPrivkeyBySeed:currencySeed index:0];
+                                    NSString *masterAddress = [baseCurrency getAddressByPrivKey:prikey];
+                                    [baseCurrency createCurrency:currency salt:saltString category:CategoryTypeNewUser masterAddess:masterAddress payLoad:nil complete:^(LMCurrencyModel *currencyModel,NSError *error) {
+                                        /// back to root cv
+                                        [currentController.navigationController popViewControllerAnimated:YES];
+                                        if (error) {
+                                            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeFail showInView:currentController.view complete:nil];
+                                        } else {
+                                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:currentController .view complete:nil];
+                                        }
+                                        
+                                    }];
                                 }
                             }];
+                            
+                        }];
+                        [currentController presentViewController:passView animated:NO completion:nil];
+                    }
+                }];
+            }
+        } else {
+            if (complete) {
+                complete([NSError errorWithDomain:@"" code:WALLET_NOT_ISEXIST userInfo:nil]);
+            }
+            UIViewController *currentController = [UIViewController currentViewController];
+            [UIAlertController showAlertInViewController:currentController withTitle:LMLocalizedString(@"Set tip title", nil) message:LMLocalizedString(@"Wallet not create wallet", nil) cancelButtonTitle:LMLocalizedString(@"Common Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:@[LMLocalizedString(@"Wallet Immediately create", nil)] tapBlock:^(UIAlertController * _Nonnull controller, UIAlertAction * _Nonnull action, NSInteger buttonIndex) {
+                if (buttonIndex == 2) {
+                    [self creatWallet:currentController currency:CurrencyTypeBTC complete:^(NSError *error) {
+                        /// back to root cv
+                        [currentController.navigationController popViewControllerAnimated:YES];
+                        if (error) {
+                            [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeFail showInView:currentController.view complete:nil];
+                        } else {
+                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:currentController .view complete:nil];
                         }
                     }];
                 }
-                    break;
-                default:
-                    break;
-            }
-        }];
-    } else {
-        if (block) {
-            block(YES);
+            }];
         }
-    }
+    }];
 }
 
 - (void)checkWalletExistWithBlock:(void (^)(BOOL existWallet))block{
+    RLMResults *results = [LMCurrencyModel allObjects];
     /// check wallet
-    if (![[MMAppSetting sharedSetting] walletExist]) {
+    if (results.count == 0) {
         [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
-            switch (error.code) {
-                case WALLET_ISEXIST:
-                    if (block) {
-                        block(YES);
-                    }
-                    [[MMAppSetting sharedSetting] setWalletExist:YES];
-                    break;
-                case WALLET_NOT_ISEXIST:
-                {
-                    if (block) {
-                        block(NO);
-                    }
+            if (wallet.coinsArray.count) {
+                if (block) {
+                    block(YES);
                 }
-                    break;
-                default:
-                    break;
+            } else {
+                if (block) {
+                    block(NO);
+                }
             }
         }];
     } else {
@@ -525,8 +557,24 @@ CREATE_SHARED_MANAGER(LMWalletManager);
             block(YES);
         }
     }
-    
 }
 
+
+- (NSString *)getCurrencySymbol:(CurrencyType)currency{
+    switch (currency) {
+        case CurrencyTypeBTC:
+            return @"BTC";
+            break;
+            
+        case CurrencyTypeETH:
+            return @"ETH";
+            break;
+            
+        default:
+            break;
+    }
+    
+    return nil;
+}
 
 @end

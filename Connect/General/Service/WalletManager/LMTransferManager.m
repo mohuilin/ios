@@ -26,7 +26,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendLuckyPackageWithReciverIdentifier:(NSString *)identifier size:(int)size amount:(NSInteger)amount fee:(NSInteger)fee luckyPackageType:(int)type category:(LuckypackageTypeCategory)category tips:(NSString *)tips fromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
-    [self checkWalletAndExcuteBlock:^{
+    [self checkWalletWichCurrency:currency andExcuteBlock:^{
         LuckyPackageRequest *request = [[LuckyPackageRequest alloc] init];
         request.size = size;
         request.amount = amount;
@@ -47,7 +47,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)sendUrlTransferFromAddresses:(NSArray *)fromAddresses tips:(NSString *)tips amount:(NSInteger)amount fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
-    [self checkWalletAndExcuteBlock:^{
+    [self checkWalletWichCurrency:currency andExcuteBlock:^{
         OutTransfer *request = [[OutTransfer alloc] init];
         request.fee = fee;
         request.amount = amount;
@@ -62,15 +62,16 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 }
 
 
-- (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier amount:(NSInteger)amount size:(int)size tips:(NSString *)tips complete:(void (^)(Crowdfunding *crowdfunding,NSError *error))complete{
+- (void)sendCrowdfuningToGroup:(NSString *)groupIdentifier amount:(NSInteger)amount size:(int)size tips:(NSString *)tips currency:(CurrencyType)currency complete:(void (^)(Crowdfunding *crowdfunding,NSError *error))complete{
     
-    [self checkWalletAndExcuteBlock:^{
+    [self checkWalletWichCurrency:currency andExcuteBlock:^{
         /// send crowdfuning
         CrowdfundingRequest *request = [[CrowdfundingRequest alloc] init];
         request.groupIdentifier = groupIdentifier;
         request.amount = amount;
         request.size = size;
         request.tips = tips;
+        request.currency = currency;
         
         [NetWorkOperationTool POSTWithUrlString:WalletServiceCrowdfuning postProtoData:request.data complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
@@ -96,14 +97,15 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     
 }
 
-- (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips complete:(void (^)(Bill *bill,NSError *error))complete{
+- (void)sendReceiptToPayer:(NSString *)payer amount:(NSInteger)amount tips:(NSString *)tips currency:(CurrencyType)currency complete:(void (^)(Bill *bill,NSError *error))complete{
 
-    [self checkWalletAndExcuteBlock:^{
+    [self checkWalletWichCurrency:currency andExcuteBlock:^{
         /// send crowdfuning
         ReceiveRequest *request = [[ReceiveRequest alloc] init];
         request.sender = payer;
         request.amount = amount;
         request.tips = tips;
+        request.currency = currency;
         
         [NetWorkOperationTool POSTWithUrlString:WalletServiceReceive postProtoData:request.data complete:^(id response) {
             HttpResponse *hResponse = (HttpResponse *)response;
@@ -138,7 +140,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)payCrowdfuningReceiptWithHashId:(NSString *)hashId type:(TransactionType)type fromAddresses:(NSArray *)fromAddresses fee:(NSInteger)fee currency:(CurrencyType)currency complete:(CompleteWithDataBlock)complete{
     
-    [self checkWalletAndExcuteBlock:^{
+    [self checkWalletWichCurrency:currency andExcuteBlock:^{
         /// pay crowdfuning
         Payment *request = [[Payment alloc] init];
         
@@ -155,7 +157,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toAddresses:(NSArray *)toAddresses perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
     
-    [self checkWalletAndExcuteBlock:^{
+    [self checkWalletWichCurrency:currency andExcuteBlock:^{
         TransferRequest *request = [[TransferRequest alloc] init];
         NSMutableArray *txoutPuts = [NSMutableArray array];
         for (NSString *address in toAddresses) {
@@ -179,7 +181,7 @@ CREATE_SHARED_MANAGER(LMTransferManager)
 
 - (void)transferFromAddresses:(NSArray *)fromAddresses currency:(CurrencyType)currency fee:(NSInteger)fee toConnectUserIds:(NSArray *)userIds perAddressAmount:(NSInteger)perAddressAmount tips:(NSString *)tips complete:(CompleteWithDataBlock)complete{
     
-    [self checkWalletAndExcuteBlock:^{
+    [self checkWalletWichCurrency:currency andExcuteBlock:^{
         ConnectTransferRequest *request = [[ConnectTransferRequest alloc] init];
         NSMutableArray *txoutPuts = [NSMutableArray array];
         for (NSString *uid in userIds) {
@@ -391,10 +393,11 @@ CREATE_SHARED_MANAGER(LMTransferManager)
     }];
 }
 
-- (void)checkWalletAndExcuteBlock:(void(^)())excuteBlock complete:(CompleteWithDataBlock)complete{
+- (void)checkWalletWichCurrency:(CurrencyType)currency andExcuteBlock:(void(^)())excuteBlock complete:(CompleteWithDataBlock)complete{
     /// check or ceateWallet
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletWithBlock:^(BOOL existWallet) {
-        if (existWallet) {
+    
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletOrCurrencyWithCurrency:currency complete:^(NSError *error) {
+        if (!error) {
             if (excuteBlock) {
                 excuteBlock();
             }

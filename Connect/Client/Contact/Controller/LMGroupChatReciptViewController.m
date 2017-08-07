@@ -227,7 +227,7 @@
     
     
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    [[LMTransferManager sharedManager] sendCrowdfuningToGroup:self.groupIdentifer amount:[totalMoney longLongValue] size:count tips:note complete:^(Crowdfunding *crowdfunding, NSError *error) {
+    [[LMTransferManager sharedManager] sendCrowdfuningToGroup:self.groupIdentifer amount:[totalMoney longLongValue] size:count tips:note currency:CurrencyTypeBTC complete:^(Crowdfunding *crowdfunding, NSError *error) {
         if (error) {
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Network equest failed please try again later", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {

@@ -190,8 +190,8 @@
                 break;
             case UrlTypeTransfer: {
                 
-                [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletWithBlock:^(BOOL existWallet) {
-                    if (existWallet) {
+                [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletOrCurrencyWithCurrency:CurrencyTypeBTC complete:^(NSError *error) {
+                    if (!error) {
                         NSString *token = [parms valueForKey:@"token"];
                         [GCDQueue executeInMainQueue:^{
                             UIWindow *window = [[UIApplication sharedApplication] keyWindow];

@@ -69,15 +69,7 @@ extern "C" {
  *
  */
 - (void)createCurrency:(CurrencyType)currency salt:(NSString *)salt category:(int)category masterAddess:(NSString *)masterAddess payLoad:(NSString *)payLoad complete:(void (^)(LMCurrencyModel *currencyModel,NSError *error))complete {
-    
-    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)currency]] lastObject];
-    if(currencyModel){
-        if (complete) {
-            complete(nil,[NSError errorWithDomain:@"" code:CURRENCY_ISEXIST_135 userInfo:nil]);
-        }
-        return;
-    }
-    
+
     CreateCoinRequest *currencyCoin = [CreateCoinRequest new];
     currencyCoin.category = category;
     currencyCoin.masterAddress = masterAddess;

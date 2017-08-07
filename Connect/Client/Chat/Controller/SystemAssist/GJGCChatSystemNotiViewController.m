@@ -114,8 +114,8 @@
 
 - (void)grabRedBagWithHashId:(NSString *)hashId senderName:(NSString *)senderName sendAddress:(NSString *)sendAddress {
     
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletWithBlock:^(BOOL existWallet) {
-        if (existWallet) {
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletOrCurrencyWithCurrency:CurrencyTypeBTC complete:^(NSError *error) {
+        if (!error) {
             [MBProgressHUD showLoadingMessageToView:self.view];
             [RedBagNetWorkTool grabSystemRedBagWithHashId:hashId complete:^(GrabRedPackageResp *response, NSError *error) {
                 [GCDQueue executeInMainQueue:^{

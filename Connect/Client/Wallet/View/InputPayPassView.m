@@ -431,52 +431,44 @@
     
     self.statusLabel.text = LMLocalizedString(@"Wallet Verifying", nil);
     [self.animationView startLoading];
+    
+    
+    CategoryType category = CategoryTypeNewUser;
+    NSString *decodeValue = [LMWalletManager sharedManager].baseModel.encryptSeed;
+    LMCurrencyModel *currencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d ",(int)CurrencyTypeBTC]] lastObject];
+    if (currencyModel &&
+        currencyModel.category == CategoryTypeOldUser) {
+        category = currencyModel.category;
+        decodeValue = currencyModel.payload;
+    }
 
-    //sync
-    [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet,NSError *error) {
-        if (wallet && error.code == WALLET_ISEXIST) {
-            NSString *decodeValue = nil;
-            CategoryType category = CategoryTypeNewUser;
-            for (Coin *coin in wallet.coinsArray) {
-                if (coin.currency == self.currency) {
-                    category = coin.category;
-                    switch (category) {
-                        case CategoryTypeImport:
-                        case CategoryTypeOldUser:
-                            decodeValue = coin.payload;
-                            break;
-                            
-                        case CategoryTypeNewUser:
-                            decodeValue = [LMWalletManager sharedManager].baseModel.encryptSeed;
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                }
+    //verfiy pass
+    [baseCurrency decodeEncryptValue:decodeValue password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
+        if (success) {
+            if (self.PayCompleteBlock) {
+                self.PayCompleteBlock(category,decodeValue,self);
             }
-            //verfiy pass
-            [baseCurrency decodeEncryptValue:decodeValue password:passWord.textStore complete:^(NSString *decodeValue, BOOL success) {
-                if (success) {
-                    if (self.PayCompleteBlock) {
-                        self.PayCompleteBlock(category,decodeValue,self);
-                    }
-                } else {
-                    [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
-                        make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
-                    }];
-                    self.passErrorContentView.hidden = NO;
-                    self.animationContentView.hidden = YES;
-                    self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
-                    [UIView animateWithDuration:0.3 animations:^{
-                        [self.contentView layoutIfNeeded];
-                    }];
-                    [self.animationView finishFailure:nil];
-                }
-            }];
         } else {
-            [self showResultStatusWithError:error];
+            [self.orderContentView mas_updateConstraints:^(MASConstraintMaker *make) {
+                make.left.equalTo(self.contentView.mas_left).offset(-DEVICE_SIZE.width * 2);
+            }];
+            self.passErrorContentView.hidden = NO;
+            self.animationContentView.hidden = YES;
+            self.titleLabel.text = LMLocalizedString(@"Set Verification Faied", nil);
+            [UIView animateWithDuration:0.3 animations:^{
+                [self.contentView layoutIfNeeded];
+            }];
+            [self.animationView finishFailure:nil];
         }
     }];
+
+    
+    //sync
+//    [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet,NSError *error) {
+//        if (wallet) {
+//                    } else {
+//            [self showResultStatusWithError:error];
+//        }
+//    }];
 }
 @end

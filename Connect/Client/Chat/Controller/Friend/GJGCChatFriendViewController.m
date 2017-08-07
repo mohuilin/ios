@@ -958,8 +958,8 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
 - (void)grabRedBagWithHashId:(NSString *)hashId senderName:(NSString *)senderName sendAddress:(NSString *)sendAddress {
 
-    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletWithBlock:^(BOOL existWallet) {
-        if (existWallet) {
+    [[LMWalletManager sharedManager] checkWalletExistAndCreateWalletOrCurrencyWithCurrency:CurrencyTypeBTC complete:^(NSError *error) {
+        if (!error) {
             [RedBagNetWorkTool grabRedBagWithHashId:hashId complete:^(GrabRedPackageResp *response, NSError *error) {
                 [GCDQueue executeInMainQueue:^{
                     [MBProgressHUD hideHUDForView:self.view];
@@ -1025,8 +1025,6 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                     }
                 }
             }];
-        } else {
-            
         }
     }];
     

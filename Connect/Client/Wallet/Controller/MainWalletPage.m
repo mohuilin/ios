@@ -65,24 +65,8 @@
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-
-    [[LMWalletManager sharedManager] checkWalletExistWithBlock:^(BOOL existWallet) {
-        if (!existWallet) {
-            if (!self.maskView) {
-                [GCDQueue executeInMainQueue:^{
-                    self.maskView = [[LMNoteCreateWalletView alloc] init];
-                    self.maskView.frame = self.view.bounds;
-                    self.maskView.delegate = self;
-                    [self.navigationController.view addSubview:self.maskView];
-                }];
-            }
-        } else {
-            [self queryBlance];
-        }
-    }];
-    
+    [self checkWalletExist];
 }
-
 
 #pragma lazy
 - (AccountInfo *)loginUser {
@@ -292,9 +276,27 @@
         /// back to root cv
         [self.navigationController popViewControllerAnimated:YES];
         if (error) {
+            [self checkWalletExist];
             [MBProgressHUD showToastwithText:[LMErrorCodeTool showToastErrorType:ToastErrorTypeWallet withErrorCode:error.code withUrl:SyncWalletDataUrl] withType:ToastTypeFail showInView:self.view complete:nil];
         } else {
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Generated Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
+        }
+    }];
+}
+
+- (void)checkWalletExist{
+    [[LMWalletManager sharedManager] checkWalletExistWithBlock:^(BOOL existWallet) {
+        if (!existWallet) {
+            if (!self.maskView) {
+                [GCDQueue executeInMainQueue:^{
+                    self.maskView = [[LMNoteCreateWalletView alloc] init];
+                    self.maskView.frame = self.view.bounds;
+                    self.maskView.delegate = self;
+                    [self.navigationController.view addSubview:self.maskView];
+                }];
+            }
+        } else {
+            [self queryBlance];
         }
     }];
 }

@@ -129,7 +129,7 @@
     NSDecimalNumber *amount = [money decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLong:pow(10, 8)]];
     [self.view endEditing:YES];
     [MBProgressHUD showTransferLoadingViewtoView:self.view];
-    [[LMTransferManager sharedManager] sendReceiptToPayer:self.chatUser.pub_key amount:[PayTool getPOW8Amount:money] tips:note complete:^(Bill *bill, NSError *error) {
+    [[LMTransferManager sharedManager] sendReceiptToPayer:self.chatUser.pub_key amount:[PayTool getPOW8Amount:money] tips:note currency:CurrencyTypeBTC complete:^(Bill *bill, NSError *error) {
         if (error) {
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Transfer failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         } else {

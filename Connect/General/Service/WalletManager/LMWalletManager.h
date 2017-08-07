@@ -33,10 +33,10 @@
  *  reset password methods
  *
  */
-- (void)reEncryptValue:(NSString *)value passWord:(NSString *)passWord category:(CategoryType)category complete:(void(^)(NSError *error))complete;
+- (void)reEncryptBaseSeed:(NSString *)baseSeed priHex:(NSString *)priHex passWord:(NSString *)passWord category:(CategoryType)category complete:(void(^)(NSError *error))complete;
 
 
-- (void)checkWalletExistAndCreateWalletWithBlock:(void (^)(BOOL existWallet))block;
+- (void)checkWalletExistAndCreateWalletOrCurrencyWithCurrency:(CurrencyType)currency complete:(void (^)(NSError *error))complete;
 - (void)checkWalletExistWithBlock:(void (^)(BOOL existWallet))block;
 
 @end
