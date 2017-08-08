@@ -13,7 +13,6 @@
 #import "OuterTransferHisPage.h"
 #import "NetWorkOperationTool.h"
 #import "NSString+Size.h"
-#import "LMPayCheck.h"
 
 @interface OuterTransferViewController ()
 

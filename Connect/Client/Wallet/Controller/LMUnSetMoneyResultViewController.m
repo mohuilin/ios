@@ -9,7 +9,6 @@
 #import "LMUnSetMoneyResultViewController.h"
 #import "WallteNetWorkTool.h"
 #import "TransferInputView.h"
-#import "LMPayCheck.h"
 
 @interface LMUnSetMoneyResultViewController ()
 

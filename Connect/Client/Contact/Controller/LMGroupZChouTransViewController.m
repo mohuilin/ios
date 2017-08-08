@@ -11,7 +11,6 @@
 #import "WallteNetWorkTool.h"
 #import "CommonClausePage.h"
 #import "NetWorkOperationTool.h"
-#import "LMPayCheck.h"
 #import "LMMessageExtendManager.h"
 
 @interface LMGroupZChouTransViewController () <UITableViewDelegate, UITableViewDataSource>

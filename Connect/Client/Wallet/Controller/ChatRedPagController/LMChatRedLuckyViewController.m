@@ -14,7 +14,6 @@
 #import "OuterRedbagDetailViewController.h"
 #import "OuterPacketHisPage.h"
 #import "NSString+Size.h"
-#import "LMPayCheck.h"
 
 @interface LMChatRedLuckyViewController () <UITextFieldDelegate>
 // User address or group ID
@@ -161,19 +160,7 @@
     view.topTipString = LMLocalizedString(@"Wallet Amount", nil);
     view.noteDefaultString = LMLocalizedString(@"Wallet Best wishes", nil);
     view.resultBlock = ^(NSDecimalNumber *btcMoney, NSString *note) {
-        if (weakSelf.category == LuckypackageTypeCategoryGroup || weakSelf.category == LuckypackageTypeCategoryOuterUrl) {
-            // Red packets are limited
-            if ([btcMoney decimalNumberByDividingBy:[NSDecimalNumber decimalNumberWithString:weakSelf.numField.text]].doubleValue < MIN_RED_PER) {
-                [GCDQueue executeInMainQueue:^{
-                    NSString *alertString = [NSString stringWithFormat:LMLocalizedString(@"Wallet error lucky packet amount too small", nil), MIN_RED_PER];
-                    [MBProgressHUD showToastwithText:alertString withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                }];
-            } else {
-                [weakSelf createTranscationWithMoney:btcMoney note:note];
-            }
-        } else {
-            [weakSelf createTranscationWithMoney:btcMoney note:note];
-        }
+        [weakSelf createTranscationWithMoney:btcMoney note:note];
     };
     view.lagelBlock = ^(BOOL enabled) {
         int size = [weakSelf.numField.text intValue];
@@ -357,7 +344,7 @@
     }
     int size = [self.numField.text intValue];
     NSString *numValue = self.inputAmountView.inputTextField.text;
-    self.comfrimButton.enabled = (size > 0 && [numValue floatValue] > MIN_TRANSFER_AMOUNT);
+    self.comfrimButton.enabled = (size > 0 && [numValue floatValue] > 0);
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {

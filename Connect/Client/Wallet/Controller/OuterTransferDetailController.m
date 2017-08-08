@@ -148,9 +148,9 @@
 
     NSString *str = [NSString stringWithFormat:LMLocalizedString(@"Wallet Send bitcoin BTC", nil), [PayTool getBtcStringWithAmount:self.billInfo.amount]];
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:str];
-    NSInteger len = LMLocalizedString(@"Wallet Send bitcoin", nil).length;
-    [attrStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:FONT_SIZE(24)] range:NSMakeRange(0, len)];
-    [attrStr addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:FONT_SIZE(30)] range:NSMakeRange(len, str.length - len)];
+    NSString *btc = @"BTC";
+    [attrStr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:FONT_SIZE(24)] range:NSMakeRange(0, str.length - btc.length)];
+    [attrStr addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:FONT_SIZE(30)] range:NSMakeRange(str.length - btc.length, btc.length)];
     UILabel *descLabel = [[UILabel alloc] init];
     descLabel.numberOfLines = 0;
     descLabel.attributedText = attrStr;

@@ -11,7 +11,6 @@
 #import "LMTransFriendsListCell.h"
 #import "WallteNetWorkTool.h"
 #import "TransferInputView.h"
-#import "LMPayCheck.h"
 
 static NSString *const identifier = @"cellIdentifier";
 

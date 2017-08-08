@@ -11,7 +11,6 @@
 #import "LMBitAddressBookViewController.h"
 #import "WallteNetWorkTool.h"
 #import "TransferInputView.h"
-#import "LMPayCheck.h"
 #import "LMIMHelper.h"
 #import "UserDBManager.h"
 
@@ -197,6 +196,7 @@
 
 - (void)createTranscationWithMoney:(NSDecimalNumber *)money note:(NSString *)note {
     self.comfrimButton.enabled = NO;
+    self.addressTextField.text = [self.addressTextField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
     if (![LMIMHelper checkAddress:self.addressTextField.text]) {
         [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Result is not a bitcoin address", nil) withType:ToastTypeFail showInView:self.view complete:nil];
         self.comfrimButton.enabled = YES;

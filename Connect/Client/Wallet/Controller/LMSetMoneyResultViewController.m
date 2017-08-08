@@ -10,7 +10,6 @@
 #import "WallteNetWorkTool.h"
 #import "NSString+Size.h"
 #import "MessageDBManager.h"
-#import "LMPayCheck.h"
 
 @interface LMSetMoneyResultViewController ()
 @property(nonatomic, strong) UIButton *rateChangeButton;

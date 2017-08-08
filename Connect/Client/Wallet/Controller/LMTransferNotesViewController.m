@@ -10,7 +10,6 @@
 #import "WallteNetWorkTool.h"
 #import "NSString+Size.h"
 #import "CommonClausePage.h"
-#import "LMPayCheck.h"
 #import "LMMessageExtendManager.h"
 
 typedef NS_ENUM(NSInteger, LMTransactionStatusType) {

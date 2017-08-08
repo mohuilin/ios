@@ -11,8 +11,8 @@
 #import "LMDrawView.h"
 #import "SetTransferFeePage.h"
 #import "StringTool.h"
-#import "LMPayCheck.h"
-#import "LMChatRedLuckyViewController.h"
+#import "UIViewController+CurrencyVC.h"
+
 
 #define MAX_STARWORDS_LENGTH 10
 
@@ -48,16 +48,6 @@
 
 @implementation TransferInputView
 
-- (UIViewController *)viewController {
-    for (UIView *next = [self superview]; next; next = next.superview) {
-        UIResponder *nextResponder = [next nextResponder];
-        if ([nextResponder isKindOfClass:[UIViewController class]]) {
-            return (UIViewController *) nextResponder;
-        }
-    }
-    return nil;
-}
-
 - (void)awakeFromNib {
     [super awakeFromNib];
     if (GJCFSystemiPhone5) {
@@ -74,7 +64,7 @@
 
 - (IBAction)addNote:(id)sender {
     
-    UIViewController *controller = [self viewController];
+    UIViewController *controller = [UIViewController currentViewController];
     if (!controller) {
         return;
     }
@@ -286,9 +276,7 @@
                 textField.text = [toBeString substringToIndex:MAX_STARWORDS_LENGTH];
             }
         }
-    }
-        // Chinese input method other than the statistical restrictions can be directly, regardless of other language situation
-    else {
+    } else { // Chinese input method other than the statistical restrictions can be directly, regardless of other language situation
         if (toBeString.length > MAX_STARWORDS_LENGTH) {
             NSRange rangeIndex = [toBeString rangeOfComposedCharacterSequenceAtIndex:MAX_STARWORDS_LENGTH];
             if (rangeIndex.length == 1) {
@@ -384,7 +372,7 @@
             weakSelf.feeLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Wallet Fee BTC", nil), [[MMAppSetting sharedSetting] getTranferFee] * pow(10, -8)];
         }
     }];
-    [[self viewController].navigationController pushViewController:page animated:YES];
+    [[UIViewController currentViewController].navigationController pushViewController:page animated:YES];
 }
 
 - (void)TextFieldEditValueChanged:(UITextField *)textField {
@@ -412,32 +400,13 @@
     if (self.valueChangeBlock) {
         self.valueChangeBlock(self.inputTextField.text, self.amount);
     }
-    if (self.amount.doubleValue == MAX_REDMIN_AMOUNT) { // Red envelopes amount
-        if (self.amount.doubleValue<MAX_REDMIN_AMOUNT || self.amount.doubleValue>MAX_REDBAG_AMOUNT) {
-            if (self.lagelBlock) {
-                self.lagelBlock(NO);
-            }
-        } else {
-            if (self.lagelBlock) {
-                self.lagelBlock(YES);
-            }
-        }
-    } else {
-        if (self.amount.doubleValue<MIN_TRANSFER_AMOUNT || self.amount.doubleValue>MAX_TRANSFER_AMOUNT) {
-            if (self.lagelBlock) {
-                self.lagelBlock(NO);
-            }
-        } else {
-            if (self.lagelBlock) {
-                self.lagelBlock(YES);
-            }
-        }
+    if (self.lagelBlock) {
+        self.lagelBlock(self.amount.doubleValue > 0);
     }
 }
 
 
 - (void)setIsHidenFee:(BOOL)isHidenFee {
-    
     _isHidenFee = isHidenFee;
     self.feeLabel.hidden = isHidenFee;
     [self setNeedsLayout];
@@ -445,36 +414,7 @@
 }
 
 - (void)executeBlock {
-    __weak typeof(self) weakSelf = self;
     if (self.resultBlock) {
-        if ([[self viewController] isKindOfClass:[LMChatRedLuckyViewController class]]) {
-            if ([LMPayCheck checkMoneyNumber:self.amount withTransfer:NO] == MoneyTypeRedSmall) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Amount is too small", nil) withType:ToastTypeCommon showInView:[weakSelf viewController].view complete:nil];
-                }];
-                return;
-            }
-            if ([LMPayCheck checkMoneyNumber:self.amount withTransfer:NO] == MoneyTypeRedBig) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Too much", nil) withType:ToastTypeCommon showInView:[weakSelf viewController].view complete:nil];
-                }];
-                return;
-            }
-
-        } else {
-            if ([LMPayCheck checkMoneyNumber:self.amount withTransfer:YES] == MoneyTypeTransferSmall) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Amount is too small", nil) withType:ToastTypeCommon showInView:[weakSelf viewController].view complete:nil];
-                }];
-                return;
-            }
-            if ([LMPayCheck checkMoneyNumber:self.amount withTransfer:YES] == MoneyTypeTransferBig) {
-                [GCDQueue executeInMainQueue:^{
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Too much", nil) withType:ToastTypeCommon showInView:[weakSelf viewController].view complete:nil];
-                }];
-                return;
-            }
-        }
         self.resultBlock(self.amount, [self.noteButton.titleLabel.text isEqualToString:self.noteDefaultString] ? nil : self.noteButton.titleLabel.text);
     }
 }
@@ -517,41 +457,6 @@
         return NO;
     }
     return YES;
-}
-
-- (void)textFieldDidEndEditing:(UITextField *)textField {
-    // Enter the amount of control
-    NSDecimalNumber *deAmount = [NSDecimalNumber decimalNumberWithString:textField.text];
-    double amount = [deAmount doubleValue];
-    if (self.amount.doubleValue == MAX_REDMIN_AMOUNT) {
-        if (amount < MAX_REDMIN_AMOUNT) {
-            textField.text = [NSString stringWithFormat:@"%f", MAX_REDMIN_AMOUNT];
-            BaseViewController *controller = (BaseViewController *) [self viewController];
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:[NSString stringWithFormat:LMLocalizedString(@"Wallet Amount must be greater than", nil), MAX_REDMIN_AMOUNT] withType:ToastTypeCommon showInView:controller.view complete:nil];
-            }];
-
-
-        } else if (amount > MAX_REDBAG_AMOUNT) {
-            textField.text = [NSString stringWithFormat:@"%f", MAX_REDBAG_AMOUNT];
-            BaseViewController *controller = (BaseViewController *) [self viewController];
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:[NSString stringWithFormat:LMLocalizedString(@"Wallet Amount must be less than", nil), MAX_REDBAG_AMOUNT] withType:ToastTypeCommon showInView:controller.view complete:nil];
-            }];
-        }
-    } else {
-        if (amount < MIN_TRANSFER_AMOUNT) {
-            textField.text = [NSString stringWithFormat:@"%f", MIN_TRANSFER_AMOUNT];
-            BaseViewController *controller = (BaseViewController *) [self viewController];
-            [GCDQueue executeInMainQueue:^{
-                [MBProgressHUD showToastwithText:[NSString stringWithFormat:LMLocalizedString(@"Wallet Amount must be greater than", nil), MIN_TRANSFER_AMOUNT] withType:ToastTypeCommon showInView:controller.view complete:nil];
-            }];
-        } else if (amount > MAX_TRANSFER_AMOUNT) {
-
-        }
-    }
-    // The amount of reset is issued
-    [self TextFieldEditValueChanged:textField];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {

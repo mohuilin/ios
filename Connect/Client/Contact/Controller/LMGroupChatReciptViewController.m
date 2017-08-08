@@ -70,7 +70,7 @@
     self.totalPeTextField = [[PaddingTextField alloc] initWithFrame:CGRectMake(20, AUTO_HEIGHT(60) + 64, DEVICE_SIZE.width - 40, AUTO_HEIGHT(96))];
     self.totalPeTextField.borderStyle = UITextBorderStyleRoundedRect;
 
-    self.totalPeTextField.text = [NSString stringWithFormat:@"%d", (int) self.groupMemberCount];
+    self.totalPeTextField.text = [NSString stringWithFormat:@"%d", (int) self.groupMemberCount - 1];
     self.totalPeTextField.textAlignment = NSTextAlignmentLeft;
     self.totalPeTextField.font = [UIFont boldSystemFontOfSize:FONT_SIZE(48)];
     self.totalPeTextField.tintColor = [UIColor blackColor];
