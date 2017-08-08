@@ -15,7 +15,9 @@ target 'Connect' do
 end
 target :'ConnectTests' do
     pod 'Realm/Headers'
+    pod 'Protobuf', '~> 3.1.0'
 end
 target :'ConnectUITests' do
   pod 'Realm/Headers'
+  pod 'Protobuf', '~> 3.1.0'
 end

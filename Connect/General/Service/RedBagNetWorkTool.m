@@ -13,7 +13,6 @@
 #import "WallteNetWorkTool.h"
 #import "UIAlertController+Blocks.h"
 #import "UIViewController+CurrencyVC.h"
-#import "LMPayCheck.h"
 
 
 @implementation RedBagNetWorkTool

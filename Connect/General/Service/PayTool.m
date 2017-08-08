@@ -221,12 +221,21 @@
     if (GJCFStringIsNull(amountText)) {
         return 0;
     }
-    NSDecimalNumber *numA = [NSDecimalNumber decimalNumberWithString:amountText];
-    return  [[numA decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]] longLongValue];
+    NSDecimalNumber *amount = [NSDecimalNumber decimalNumberWithString:amountText];
+    
+    if (amount.doubleValue > 21.47483647) {
+        return  [[amount decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]] longLongValue];
+    } else {
+        return  [[amount decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]] intValue];
+    }
 }
 
 + (long long)getPOW8Amount:(NSDecimalNumber *)amount{
-    return  [[amount decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]] longLongValue];
+    if (amount.doubleValue > 21.47483647) {
+        return  [[amount decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]] longLongValue];
+    } else {
+        return  [[amount decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLongLong:pow(10, 8)]] intValue];
+    }
 }
 
 + (float)getSmallAmount:(NSDecimalNumber *)amount{

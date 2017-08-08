@@ -10,6 +10,8 @@
 #import "PayHudView.h"
 #import "LMShowToastView.h"
 
+static PayHudView *payHud;
+
 @implementation MBProgressHUD (Loading)
 
 /**
@@ -31,13 +33,14 @@
     if ([MBProgressHUD allHUDsForView:view].count) {
         [MBProgressHUD hideAllHUDsForView:view animated:NO];
     }
-    
-    PayHudView *cus = [[[NSBundle mainBundle]loadNibNamed:@"PayHudView" owner:self options:nil]objectAtIndexCheck:0];
-    cus.size = CGSizeMake(AUTO_WIDTH(260),AUTO_WIDTH(260));
+    if (!payHud) {
+        payHud = [[[NSBundle mainBundle] loadNibNamed:@"PayHudView" owner:self options:nil] lastObject];
+        payHud.size = CGSizeMake(AUTO_WIDTH(260),AUTO_WIDTH(260));
+    }
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:view animated:YES];
     hud.mode = MBProgressHUDModeCustomView;
-    hud.customView = cus;
+    hud.customView = payHud;
     // Looks a bit nicer if we make it square.
     hud.square = YES;               
     hud.margin = 0;

@@ -47,7 +47,6 @@
 
 - (void)setupCellData {
 
-   
     __weak __typeof(&*self) weakSelf = self;
     [self.groups removeAllObjects];
     // zero group
@@ -94,6 +93,8 @@
         GestureOpneOrClosePage *page = [[GestureOpneOrClosePage alloc] init];
         [weakSelf hidenTabbarWhenPushController:page];
     }];
+    
+
     CellItem *paymentSetting = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment", nil) type:CellItemTypeArrow operation:^{
 
         PaySetPage *page = [[PaySetPage alloc] init];

@@ -8,13 +8,12 @@
 
 #import "PaySetPage.h"
 #import "SetTransferFeePage.h"
-#import "WJTouchID.h"
 #import "LMIMHelper.h"
 #import "LMSeedModel.h"
 #import "LMWalletManager.h"
 #import "LMBtcCurrencyManager.h"
 
-@interface PaySetPage () <WJTouchIDDelegate>
+@interface PaySetPage ()
 
 @property(nonatomic, weak) UITextField *passTextField;
 @property(nonatomic, assign) BOOL poptoRoot;
@@ -97,18 +96,15 @@
 
     [self.groups removeAllObjects];
     __weak __typeof(&*self) weakSelf = self;
-    [[LMWalletManager sharedManager] checkWalletExistWithBlock:^(BOOL existWallet) {
-        if (existWallet) {
-            CellGroup *group0 = [[CellGroup alloc] init];
-            NSString *tip = LMLocalizedString(@"Wallet Reset password", nil);
-            CellItem *payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
-                [weakSelf resetPayPass];
-            }];
-            group0.items = @[payPass];
-            [self.groups objectAddObject:group0];
-        }
+    
+    CellGroup *group0 = [[CellGroup alloc] init];
+    NSString *tip = LMLocalizedString(@"Wallet Reset password", nil);
+    CellItem *payPass = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment Password", nil) subTitle:tip type:CellItemTypeValue1 operation:^{
+        [weakSelf resetPayPass];
     }];
-
+    group0.items = @[payPass];
+    [self.groups objectAddObject:group0];
+    
     // second group
     CellGroup *group1 = [[CellGroup alloc] init];
     if ([[MMAppSetting sharedSetting] canAutoCalculateTransactionFee]) {
@@ -304,168 +300,5 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return AUTO_HEIGHT(111);
 }
-
-#pragma mark - WJTouchIDDelegate
-
-/**
- *  TouchID validation is successful
- *
- *  Authentication Successul  Authorize Success
- */
-- (void)WJTouchIDAuthorizeSuccess {
-    DDLogInfo(@"%@", WJNotice(@"TouchID验证成功", @"Authorize Success"));
-    self.whiteButton.enabled = YES;
-    BOOL fingerLock = [[MMAppSetting sharedSetting] needFingerPay];
-
-    if (fingerLock) {
-        [[MMAppSetting sharedSetting] cacelFingerPay];
-        return;
-    }
-
-    [[MMAppSetting sharedSetting] setFingerPay];
-}
-
-/**
- *  TouchID validation failed
- *
- *  Authentication Failure
- */
-- (void)WJTouchIDAuthorizeFailure {
-
-    self.whiteButton.enabled = YES;
-    DDLogInfo(@"%@", WJNotice(@"TouchID验证失败", @"Authorize Failure"));
-
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *   cancle touchID vertification
- *
- *  Authentication was canceled by user (e.g. tapped Cancel button).
- */
-- (void)WJTouchIDAuthorizeErrorUserCancel {
-    // all button can not click
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *  In the TouchID dialog box, click the Enter Password button
- *
- *  User tapped the fallback button
- */
-- (void)WJTouchIDAuthorizeErrorUserFallback {
-    // Let the return button all be able to click
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *  In the process of verifying the TouchID was canceled by the system, for example, suddenly call, press the Home button, lock screen .
- *
- *  Authentication was canceled by system (e.g. another application went to foreground).
- */
-- (void)WJTouchIDAuthorizeErrorSystemCancel {
-    // Let the return button all be able to click
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *  Can not enable TouchID, the device does not have a password set
- *
- *  Authentication could not start, because passcode is not set on the device.
- */
-- (void)WJTouchIDAuthorizeErrorPasscodeNotSet {
-    // Let the return button all be able to click
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *  The device does not have a TouchID entered, and TouchID can not be enabled
- *
- *  Authentication could not start, because Touch ID has no enrolled fingers
- */
-- (void)WJTouchIDAuthorizeErrorTouchIDNotEnrolled {
-    // Let the return button all be able to click
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *  The device's TouchID is invalid
- *
- *  Authentication could not start, because Touch ID is not available on the device.
- */
-- (void)WJTouchIDAuthorizeErrorTouchIDNotAvailable {
-    // Let the return button all be able to click
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- * Repeatedly used Touch ID failed, Touch ID is locked, requires the user to enter the password to unlock
- *
- *  Authentication was not successful, because there were too many failed Touch ID attempts and Touch ID is now locked. Passcode is required to unlock Touch ID, e.g. evaluating LAPolicyDeviceOwnerAuthenticationWithBiometrics will ask for passcode as a prerequisite.
- *
- */
-- (void)WJTouchIDAuthorizeLAErrorTouchIDLockout {
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *  The current software is suspended to cancel the authorization (such as a sudden call, the application into the front desk)
- *
- *  Authentication was canceled by application (e.g. invalidate was called while authentication was inprogress).
- *
- */
-- (void)WJTouchIDAuthorizeLAErrorAppCancel {
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *  The current software is suspended to cancel the authorization (the LAContext object was released during authorization)
- *
- *  LAContext passed to this call has been previously invalidated.
- */
-- (void)WJTouchIDAuthorizeLAErrorInvalidContext {
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-
-}
-
-/**
- *  The current device does not support fingerprint recognition
- *
- *  The current device does not support fingerprint identification
- */
-- (void)WJTouchIDIsNotSupport {
-    self.whiteButton.enabled = YES;
-    [self setupCellData];
-    [self.tableView reloadData];
-}
-
 
 @end
