@@ -73,6 +73,8 @@
     [self drawSpot];
     [self observerAdded];
 
+    self.descriptionLabel.numberOfLines = 0;
+    
     switch (self.category) {
         case KQXPasswordCategorySet:
         {
