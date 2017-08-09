@@ -29,9 +29,23 @@ static NSString *const identifier = @"cellIdentifier";
 @property(nonatomic, strong) NSMutableDictionary *addressDic;
 @property(nonatomic, strong) TransferInputView *inputAmountView;
 
+@property(nonatomic ,copy) void (^completeBlock)(NSString *hashId,NSString *tips);
+@property(nonatomic, strong) NSMutableArray *selectArr;
+@property(copy, nonatomic) changeListBlock changeListBlock;
+
 @end
 
 @implementation LMTransFriendsViewController
+
+- (instancetype)initWithSelectedMembers:(NSArray *)seletedMembers changeListBlock:(changeListBlock)changeListBlock complete:(void (^)(NSString *hashId,NSString *tips))complete{
+    if (self = [super init]) {
+        self.selectArr = (NSMutableArray *)seletedMembers;
+        self.changeListBlock = changeListBlock;
+        self.completeBlock = complete;
+    }
+    
+    return self;
+}
 
 - (NSMutableDictionary *)addressDic {
     if (!_addressDic) {
@@ -61,7 +75,7 @@ static NSString *const identifier = @"cellIdentifier";
         make.height.mas_equalTo(AUTO_HEIGHT(334));
         make.left.equalTo(self.view);
     }];
-    view.topTipString = LMLocalizedString(@"Wallet Amount Each", nil);
+    view.topTipString = LMLocalizedString(@"Wallet Amount", nil);           
     view.resultBlock = ^(NSDecimalNumber *btcMoney, NSString *note) {
         [weakSelf createTranscationWithMoney:btcMoney note:note];
     };
@@ -250,7 +264,6 @@ static NSString *const identifier = @"cellIdentifier";
 
 - (void)createTranscationWithMoney:(NSDecimalNumber *)money note:(NSString *)note {
     
-    
     // dictory array
     NSMutableArray *userIds = [NSMutableArray array];
     for (AccountInfo *info in self.selectArr) {
@@ -270,10 +283,9 @@ static NSString *const identifier = @"cellIdentifier";
                 [MBProgressHUD hideHUDForView:self.view];
             }
         } else {
-            MuiltSendBillResp *muiltBill = (MuiltSendBillResp *)data;
-            for (Bill *bill in muiltBill.billsArray) {
-                // send message
-                [self createChatWithHashId:bill.hash_p address:bill.receiver Amount:[NSString stringWithFormat:@"%@", [PayTool getBtcStringWithAmount:bill.amount]]];
+            NSString *hashId = (NSString *)data;
+            if (self.completeBlock) {
+                self.completeBlock(hashId, note);
             }
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];

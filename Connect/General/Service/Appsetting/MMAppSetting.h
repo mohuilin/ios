@@ -200,9 +200,4 @@
 - (void)setAutoCalculateTransactionFee:(BOOL)autoCalculate;
 - (BOOL)canAutoCalculateTransactionFee;
 
-
-#pragma mark - currency
-- (void)setWalletExist:(BOOL)exist;
-- (BOOL)walletExist;
-
 @end

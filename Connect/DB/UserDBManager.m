@@ -13,6 +13,7 @@
 #import "LMContactAccountInfo.h"
 #import "LMFriendRequestInfo.h"
 #import "LMIMHelper.h"
+#import "LMRecentChat.h"
 
 static UserDBManager *manager = nil;
 
@@ -106,23 +107,35 @@ static UserDBManager *manager = nil;
         return;
     }
     LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"pub_key = '%@'", user.pub_key]] firstObject];
+    
+    LMRecentChat *recent = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", user.pub_key]] firstObject];
+
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         realmUser.avatar = user.avatar;
         realmUser.username = user.username;
+        if (recent) {
+            recent.headUrl = user.avatar;
+            recent.name = user.username;
+        }
     }];
 }
 
 - (void)setUserCommonContact:(BOOL)commonContact AndSetNewRemark:(NSString *)remark withAddress:(NSString *)address {
-    if (GJCFStringIsNull(address)) {
+    if (GJCFStringIsNull(address) ||
+        GJCFStringIsNull(remark)) {
         return;
     }
-    if (!remark) {
-        remark = @"";
-    }
+    
     LMContactAccountInfo *realmUser = [[LMContactAccountInfo objectsWhere:[NSString stringWithFormat:@"address = '%@'", address]] firstObject];
+    
+    LMRecentChat *recent = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@'", realmUser.pub_key]] firstObject];
+    
     [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
         realmUser.remarks = remark;
         realmUser.isOffenContact = commonContact;
+        if (recent) {
+            recent.name = remark;
+        }
     }];
 }
 

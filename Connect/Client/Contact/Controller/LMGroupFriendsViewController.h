@@ -9,7 +9,7 @@
 #import "LMBaseViewController.h"
 
 @interface LMGroupFriendsViewController : LMBaseViewController
-// user group
-@property(nonatomic, strong) NSMutableArray *groupFriends;
+
+- (instancetype)initWithMembers:(NSArray *)member complete:(void (^)(NSString *hashId,NSString *tips))complete;
 
 @end

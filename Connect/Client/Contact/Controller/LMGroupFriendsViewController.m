@@ -19,6 +19,9 @@
 
 @property(nonatomic, strong) TransferButton *transferBtn;
 
+// user group
+@property(nonatomic, strong) NSMutableArray *members;
+@property (nonatomic ,copy) void (^completeBlock)(NSString *hashId,NSString *tips);
 
 @end
 
@@ -26,11 +29,21 @@ static NSString *friends = @"friends";
 
 @implementation LMGroupFriendsViewController
 
+
+- (instancetype)initWithMembers:(NSArray *)member complete:(void (^)(NSString *hashId,NSString *tips))complete {
+    if (self = [super init]) {
+        self.members = member.mutableCopy;
+        self.completeBlock = complete;
+    }
+    
+    return self;
+}
+
 - (void)viewDidLoad {
     self.title = LMLocalizedString(@"Chat Choose Members", nil);
-    for (AccountInfo *info in self.groupFriends) {
+    for (AccountInfo *info in self.members) {
         if ([info.address isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
-            [self.groupFriends removeObject:info];
+            [self.members removeObject:info];
             break;
         }
     }
@@ -94,7 +107,7 @@ static NSString *friends = @"friends";
 #pragma mark -- get friends
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.groupFriends.count;
+    return self.members.count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -104,7 +117,7 @@ static NSString *friends = @"friends";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     LMSelectTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
 
-    AccountInfo *info = self.groupFriends[indexPath.row];
+    AccountInfo *info = self.members[indexPath.row];
     info.isSelected = !info.isSelected;
     [cell.checkBox setOn:info.isSelected animated:YES];
     if (info.isSelected) {
@@ -124,7 +137,7 @@ static NSString *friends = @"friends";
     bgView.backgroundColor = [UIColor colorWithRed:236 / 255.0 green:236 / 255.0 blue:236 / 255.0 alpha:1.0];
     UILabel *titleOneLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, VSIZE.width - 20, AUTO_HEIGHT(40))];
     titleOneLabel.backgroundColor = [UIColor colorWithRed:236 / 255.0 green:236 / 255.0 blue:236 / 255.0 alpha:1.0];
-    titleOneLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Chat Group Members", nil), self.groupFriends.count];;
+    titleOneLabel.text = [NSString stringWithFormat:LMLocalizedString(@"Chat Group Members", nil), self.members.count];;
     titleOneLabel.font = [UIFont systemFontOfSize:FONT_SIZE(26)];
     titleOneLabel.textColor = [UIColor blackColor];
     titleOneLabel.textAlignment = NSTextAlignmentLeft;
@@ -139,7 +152,7 @@ static NSString *friends = @"friends";
         cell = [[[NSBundle mainBundle] loadNibNamed:@"LMSelectTableViewCell" owner:nil options:nil] lastObject];
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    AccountInfo *info = self.groupFriends[indexPath.row];
+    AccountInfo *info = self.members[indexPath.row];
     [cell setAccoutInfo:info];
     return cell;
 }
@@ -152,18 +165,10 @@ static NSString *friends = @"friends";
         }];
         return;
     }
-    LMTransFriendsViewController *transfer = [[LMTransFriendsViewController alloc] init];
-    transfer.selectArr = self.selectedList;
+    LMTransFriendsViewController *transfer = [[LMTransFriendsViewController alloc] initWithSelectedMembers:self.selectedList changeListBlock:^{
+        
+    } complete:self.completeBlock];
     [self.navigationController pushViewController:transfer animated:YES];
-}
-
-#pragma mark --lazy
-
-- (NSMutableArray *)groupFriends {
-    if (!_groupFriends) {
-        _groupFriends = [NSMutableArray array];
-    }
-    return _groupFriends;
 }
 
 - (NSMutableArray *)selectedList {

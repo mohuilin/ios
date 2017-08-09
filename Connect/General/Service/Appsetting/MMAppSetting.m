@@ -101,7 +101,6 @@ static MMAppSetting *manager = nil;
         [userSet setObject:@(NO) forKey:@"setAllowRecomand"];
         [userSet setObject:@(NO) forKey:@"setHideBalance"];
         [userSet setObject:@"" forKey:@"im.conect.contactversionkey"];
-        [userSet setObject:@(NO) forKey:@"walletExist"];
       
         NSMutableString *currencySymbol = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencySymbol];
         if ([currencySymbol isEqualToString:@"￥"]) {
@@ -821,13 +820,6 @@ char* printEnv(void)
 
 - (BOOL)needReCacheEstimatefee{
     return GJCFDateDaysAgo(GJCFUDFGetValue(@"getEstimatefeeDate")) >= 1;
-}
-
-- (void)setWalletExist:(BOOL)exist{
-    [self setValue:@(exist) forKey:@"walletExist"];
-}
-- (BOOL)walletExist{
-    return [[self getValue:@"walletExist"] boolValue];
 }
 
 @end

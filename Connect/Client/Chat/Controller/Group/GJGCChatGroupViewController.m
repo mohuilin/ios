@@ -100,11 +100,12 @@
         }
         LMGroupChooseNoteMemberlistPage *page = [[LMGroupChooseNoteMemberlistPage alloc] initWithMembers:temArray];
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:page];
-        page.ChooseGroupMemberCallBack = ^(LMRamMemberInfo *membser) {
-            if (membser) {
-                [weakSelf.inputPanel appendFocusOnOther:[NSString stringWithFormat:@"@%@ ", membser.username]];
-                if (![weakSelf.noteGroupMembers containsObject:membser]) {
-                    [weakSelf.noteGroupMembers objectAddObject:membser];
+        page.ChooseGroupMemberCallBack = ^(LMRamMemberInfo *realmMembser) {
+            AccountInfo *member = realmMembser.normalInfo;
+            if (member) {
+                [weakSelf.inputPanel appendFocusOnOther:[NSString stringWithFormat:@"@%@ ", member.username]];
+                if (![weakSelf.noteGroupMembers containsObject:member]) {
+                    [weakSelf.noteGroupMembers objectAddObject:member];
                 }
             } else {
                 [weakSelf.inputPanel appendFocusOnOther:@"@"];
@@ -119,10 +120,10 @@
 - (void)chatCellDidLongPressOnHeadView:(GJGCChatBaseCell *)tapedCell {
     NSIndexPath *tapIndexPath = [self.chatListTable indexPathForCell:tapedCell];
     GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
-    AccountInfo *member = [[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:contentModel.senderAddress];
+    LMRamMemberInfo *member = [[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:contentModel.senderAddress];
     if (member) {
-        if (![self.noteGroupMembers containsObject:member]) {
-            [self.noteGroupMembers objectAddObject:member];
+        if (![self.noteGroupMembers containsObject:member.normalInfo]) {
+            [self.noteGroupMembers objectAddObject:member.normalInfo];
         }
         [self.inputPanel appendFocusOnOther:[NSString stringWithFormat:@"@%@ ", contentModel.senderName]];
     }

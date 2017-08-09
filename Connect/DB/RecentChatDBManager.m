@@ -231,6 +231,12 @@ static RecentChatDBManager *manager = nil;
     [self executeRealmWithBlock:^{
         realmModel.draft = draft;
     }];
+    /*
+     @{@"identifier":_chatSession,
+     @"draft":draft})
+     */
+    SendNotify(SendDraftChangeNotification, (@{@"identifier":identifier,
+                                               @"draft":draft}));
 }
 
 - (void)removeDraftWithIdentifier:(NSString *)identifier {

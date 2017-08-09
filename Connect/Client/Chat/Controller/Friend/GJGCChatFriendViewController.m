@@ -2419,13 +2419,14 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 #pragma mark - send transfer message
 - (void)transfer {
     if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-        LMGroupFriendsViewController *page = [[LMGroupFriendsViewController alloc] init];
         NSMutableArray *memberInfoArray = [NSMutableArray array];
         for (LMRamMemberInfo *info in self.taklInfo.chatGroupInfo.membersArray) {
             AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
             [memberInfoArray addObject:accountInfo];
         }
-        page.groupFriends = memberInfoArray;
+        LMGroupFriendsViewController *page = [[LMGroupFriendsViewController alloc] initWithMembers:memberInfoArray complete:^(NSString *hashId, NSString *tips) {
+            
+        }];
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:page];
         [self presentViewController:nav animated:YES completion:nil];
 

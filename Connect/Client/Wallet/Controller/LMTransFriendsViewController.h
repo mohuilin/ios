@@ -12,7 +12,6 @@ typedef void (^changeListBlock)();
 
 @interface LMTransFriendsViewController : LMBaseViewController
 
-@property(nonatomic, strong) NSMutableArray *selectArr;
-@property(strong, nonatomic) changeListBlock changeListBlock;
+- (instancetype)initWithSelectedMembers:(NSArray *)seletedMembers changeListBlock:(changeListBlock)changeListBlock complete:(void (^)(NSString *hashId,NSString *tips))complete;
 
 @end

@@ -15,6 +15,7 @@
 #import "LMIMHelper.h"
 
 
+
 @interface AccountAndSafetyPage ()
 
 @property(nonatomic, strong) UITextField *passTextField;
@@ -94,12 +95,15 @@
         [weakSelf hidenTabbarWhenPushController:page];
     }];
     
-
     CellItem *paymentSetting = [CellItem itemWithTitle:LMLocalizedString(@"Set Payment", nil) type:CellItemTypeArrow operation:^{
-
-        PaySetPage *page = [[PaySetPage alloc] init];
-        [weakSelf hidenTabbarWhenPushController:page];
-
+        [[LMWalletManager sharedManager] checkWalletExistWithBlock:^(BOOL existWallet) {
+            if (existWallet) {
+                PaySetPage *page = [[PaySetPage alloc] init];
+                [weakSelf hidenTabbarWhenPushController:page];
+            } else {
+                [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet not create wallet", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+            }
+        }];
     }];
 
     group.items = @[phoneNum, loginPass, paymentSetting, lockGesture].copy;

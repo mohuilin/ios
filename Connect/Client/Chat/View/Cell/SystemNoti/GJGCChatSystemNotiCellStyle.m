@@ -343,9 +343,9 @@
 
 
 + (NSAttributedString *)formateNameCardSubTipsIsFromSelf:(BOOL)isFromSelf {
-    NSString *statusMessage = LMLocalizedString(@"Chat Contact card", nil);
+    NSString *statusMessage = LMLocalizedString(@"Chat Recommend your business card", nil);
     if (isFromSelf) {
-        statusMessage = LMLocalizedString(@"Chat Contact card", nil);
+        statusMessage = LMLocalizedString(@"Chat Recommend business CARDS to friends", nil);
     }
     NSMutableAttributedString *subMessageText = [[NSMutableAttributedString alloc] initWithString:statusMessage];
     [subMessageText addAttribute:NSFontAttributeName

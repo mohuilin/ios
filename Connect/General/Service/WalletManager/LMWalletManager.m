@@ -541,14 +541,15 @@ CREATE_SHARED_MANAGER(LMWalletManager);
     RLMResults *results = [LMCurrencyModel allObjects];
     /// check wallet
     if (results.count == 0) {
+        UIViewController *currentController = [UIViewController currentViewController];
+        [MBProgressHUD showLoadingMessageToView:currentController.view];
         [[LMWalletManager sharedManager] getWalletData:^(RespSyncWallet *wallet, NSError *error) {
-            if (wallet.coinsArray.count) {
-                if (block) {
-                    block(YES);
-                }
+            if (error) {
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:error.code] withType:ToastTypeFail showInView:currentController.view complete:nil];
             } else {
+                [MBProgressHUD hideHUDForView:currentController.view];
                 if (block) {
-                    block(NO);
+                    block(wallet.wallet.payLoad.length > 0);
                 }
             }
         }];

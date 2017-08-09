@@ -27,7 +27,9 @@
 "Chat Connect"="Connect - P2P Encrypted Instant Message";
 "Chat Connecting"="Соединение…";
 "Chat Connection protocol upgrades"="Обновление протокола соединения";
-"Chat Contact card"="Рекомендованные друзья для тебя";
+"Chat Contact card"="Визитная карточка";
+"Chat Recommend business CARDS to friends"="Друзьям рекомендуется визитная карточка";
+"Chat Recommend your business card" = "Вам рекомендовать визитная карточка";
 "Chat Create a new chat"="Создать новый чат";
 "Chat Creating group"="Создание группы";
 "Chat Crowd founding in progress"="Выполняется краудфандинг";

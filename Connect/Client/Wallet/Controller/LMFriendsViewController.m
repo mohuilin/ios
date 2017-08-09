@@ -215,17 +215,15 @@ static NSString *friends = @"friends";
         }];
         return;
     }
-    LMTransFriendsViewController *transfer = [[LMTransFriendsViewController alloc] init];
-    transfer.selectArr = self.selectedList;
-    transfer.changeListBlock = ^() {
+    LMTransFriendsViewController *transfer = [[LMTransFriendsViewController alloc] initWithSelectedMembers:self.selectedList changeListBlock:^{
         if (weakSelf.selectedList.count > 0) {
             [weakSelf setRightBarButtonItemWithEnable:YES withDispalyString:[NSString stringWithFormat:LMLocalizedString(@"Wallet transfer man", nil), (int) self.selectedList.count] withDisplayColor:LMBasicGreen];
             [weakSelf.tableView reloadData];
         } else {
             [weakSelf setRightBarButtonItemWithEnable:NO withDispalyString:LMLocalizedString(@"Wallet Transfer", nil) withDisplayColor:[UIColor colorWithWhite:1.0 alpha:0.5]];
-
+            
         }
-    };
+    } complete:nil];
     [self.navigationController pushViewController:transfer animated:YES];
 }
 -(void)dealloc {

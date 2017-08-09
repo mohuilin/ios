@@ -72,8 +72,6 @@
 		19234FF11E811C7A0022D844 /* CountryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 19234FF01E811C7A0022D844 /* CountryView.m */; };
 		19234FFF1E811CB20022D844 /* TagsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 19234FF91E811CB20022D844 /* TagsView.m */; };
 		192350001E811CB20022D844 /* TopImageBottomItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19234FFB1E811CB20022D844 /* TopImageBottomItem.m */; };
-		192350161E811D3E0022D844 /* AccountUserNameWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 192350101E811D3E0022D844 /* AccountUserNameWidget.m */; };
-		192350171E811D3E0022D844 /* BottomLineTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 192350121E811D3E0022D844 /* BottomLineTextField.m */; };
 		192350181E811D3E0022D844 /* CameraSessionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 192350141E811D3E0022D844 /* CameraSessionView.m */; };
 		1923503D1E811F520022D844 /* BaseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1923501B1E811F520022D844 /* BaseCell.m */; };
 		1923503E1E811F520022D844 /* BaseSwipeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1923501D1E811F520022D844 /* BaseSwipeCell.m */; };
@@ -156,7 +154,6 @@
 		1923515A1E81226C0022D844 /* protofile.proto in Resources */ = {isa = PBXBuildFile; fileRef = 192351571E81226C0022D844 /* protofile.proto */; };
 		1923515E1E8122F70022D844 /* BaseInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1923515D1E8122F70022D844 /* BaseInfo.m */; };
 		1923516C1E81237E0022D844 /* ServerInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351671E81237E0022D844 /* ServerInfo.m */; };
-		192351781E8123C60022D844 /* AddressBookInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1923516F1E8123C60022D844 /* AddressBookInfo.m */; };
 		1923517A1E8123C60022D844 /* LMOtherModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351731E8123C60022D844 /* LMOtherModel.m */; };
 		1923517B1E8123C60022D844 /* NewFriendItemModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351751E8123C60022D844 /* NewFriendItemModel.m */; };
 		1923517C1E8123C60022D844 /* PhoneContactInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 192351771E8123C60022D844 /* PhoneContactInfo.m */; };
@@ -193,6 +190,7 @@
 		192352A61E81275B0022D844 /* RedPacketHistoryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 192352541E81275B0022D844 /* RedPacketHistoryCell.xib */; };
 		2C65A2F77344813C490750ED /* libPods-Connect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D7FC9FA4528B022EBC0831 /* libPods-Connect.a */; };
 		71C3EDF9126EE9B5FCB64F2F /* libPods-ConnectUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */; };
+		D9065A2C1F39C09A00AEF314 /* BottomLineTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = D9065A2B1F39C09A00AEF314 /* BottomLineTextField.m */; };
 		D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		D912C0201F2B1D1E00A97E1A /* LMNoteCreateWalletView.m in Sources */ = {isa = PBXBuildFile; fileRef = D912C01F1F2B1D1E00A97E1A /* LMNoteCreateWalletView.m */; };
 		D912C0221F2ED9A000A97E1A /* TestCryptographic.m in Sources */ = {isa = PBXBuildFile; fileRef = D912C0211F2ED9A000A97E1A /* TestCryptographic.m */; };
@@ -219,7 +217,6 @@
 		D9222D941E822A1800D67110 /* RecentChatCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9222D871E822A1800D67110 /* RecentChatCell.xib */; };
 		D9222D951E822A1900D67110 /* SearchByNetCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9222D881E822A1800D67110 /* SearchByNetCell.xib */; };
 		D9222D961E822A1900D67110 /* SelectCountryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9222D891E822A1800D67110 /* SelectCountryCell.xib */; };
-		D9222F651E822A3000D67110 /* AccountSetInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9222D981E822A2F00D67110 /* AccountSetInfo.plist */; };
 		D9222F661E822A3000D67110 /* country.txt in Resources */ = {isa = PBXBuildFile; fileRef = D9222D9A1E822A2F00D67110 /* country.txt */; };
 		D9222F671E822A3000D67110 /* activities.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9222D9C1E822A2F00D67110 /* activities.plist */; };
 		D9222F681E822A3000D67110 /* activitiesName.plist in Resources */ = {isa = PBXBuildFile; fileRef = D9222D9D1E822A2F00D67110 /* activitiesName.plist */; };
@@ -1101,8 +1098,6 @@
 		19234F3F1E8113D60022D844 /* SetUserInfoPage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetUserInfoPage.m; sourceTree = "<group>"; };
 		19234F401E8113D60022D844 /* VertifyCodePage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VertifyCodePage.h; sourceTree = "<group>"; };
 		19234F411E8113D60022D844 /* VertifyCodePage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VertifyCodePage.m; sourceTree = "<group>"; };
-		19234F501E8114220022D844 /* BottomLineTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BottomLineTextField.h; sourceTree = "<group>"; };
-		19234F511E8114220022D844 /* BottomLineTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BottomLineTextField.m; sourceTree = "<group>"; };
 		19234F521E8114220022D844 /* LocalUserInfoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalUserInfoView.h; sourceTree = "<group>"; };
 		19234F531E8114220022D844 /* LocalUserInfoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalUserInfoView.m; sourceTree = "<group>"; };
 		19234F541E8114220022D844 /* SelectCountryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectCountryView.h; sourceTree = "<group>"; };
@@ -1188,10 +1183,6 @@
 		19234FF91E811CB20022D844 /* TagsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagsView.m; sourceTree = "<group>"; };
 		19234FFA1E811CB20022D844 /* TopImageBottomItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TopImageBottomItem.h; sourceTree = "<group>"; };
 		19234FFB1E811CB20022D844 /* TopImageBottomItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TopImageBottomItem.m; sourceTree = "<group>"; };
-		1923500F1E811D3E0022D844 /* AccountUserNameWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountUserNameWidget.h; sourceTree = "<group>"; };
-		192350101E811D3E0022D844 /* AccountUserNameWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountUserNameWidget.m; sourceTree = "<group>"; };
-		192350111E811D3E0022D844 /* BottomLineTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BottomLineTextField.h; sourceTree = "<group>"; };
-		192350121E811D3E0022D844 /* BottomLineTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BottomLineTextField.m; sourceTree = "<group>"; };
 		192350131E811D3E0022D844 /* CameraSessionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraSessionView.h; sourceTree = "<group>"; };
 		192350141E811D3E0022D844 /* CameraSessionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraSessionView.m; sourceTree = "<group>"; };
 		1923501A1E811F520022D844 /* BaseCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCell.h; sourceTree = "<group>"; };
@@ -1344,8 +1335,6 @@
 		1923515D1E8122F70022D844 /* BaseInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseInfo.m; sourceTree = "<group>"; };
 		192351661E81237E0022D844 /* ServerInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerInfo.h; sourceTree = "<group>"; };
 		192351671E81237E0022D844 /* ServerInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerInfo.m; sourceTree = "<group>"; };
-		1923516E1E8123C60022D844 /* AddressBookInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddressBookInfo.h; sourceTree = "<group>"; };
-		1923516F1E8123C60022D844 /* AddressBookInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddressBookInfo.m; sourceTree = "<group>"; };
 		192351721E8123C60022D844 /* LMOtherModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMOtherModel.h; sourceTree = "<group>"; };
 		192351731E8123C60022D844 /* LMOtherModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMOtherModel.m; sourceTree = "<group>"; };
 		192351741E8123C60022D844 /* NewFriendItemModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewFriendItemModel.h; sourceTree = "<group>"; };
@@ -1411,6 +1400,8 @@
 		8DFC756E4F3D5D6D353F8A2E /* Pods-ConnectUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConnectUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ConnectUITests/Pods-ConnectUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		AAB2668721BBB77729DB36E5 /* Pods-Connect.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Connect.release.xcconfig"; path = "Pods/Target Support Files/Pods-Connect/Pods-Connect.release.xcconfig"; sourceTree = "<group>"; };
 		BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ConnectUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9065A2A1F39C09A00AEF314 /* BottomLineTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BottomLineTextField.h; sourceTree = "<group>"; };
+		D9065A2B1F39C09A00AEF314 /* BottomLineTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BottomLineTextField.m; sourceTree = "<group>"; };
 		D90E0F851F164701007D0C4F /* Wallet.pbobjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wallet.pbobjc.h; sourceTree = "<group>"; };
 		D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wallet.pbobjc.m; sourceTree = "<group>"; };
 		D912C01E1F2B1D1E00A97E1A /* LMNoteCreateWalletView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMNoteCreateWalletView.h; sourceTree = "<group>"; };
@@ -1454,7 +1445,6 @@
 		D9222D871E822A1800D67110 /* RecentChatCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecentChatCell.xib; sourceTree = "<group>"; };
 		D9222D881E822A1800D67110 /* SearchByNetCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SearchByNetCell.xib; sourceTree = "<group>"; };
 		D9222D891E822A1800D67110 /* SelectCountryCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SelectCountryCell.xib; sourceTree = "<group>"; };
-		D9222D981E822A2F00D67110 /* AccountSetInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = AccountSetInfo.plist; sourceTree = "<group>"; };
 		D9222D991E822A2F00D67110 /* Connect.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Connect.entitlements; sourceTree = "<group>"; };
 		D9222D9A1E822A2F00D67110 /* country.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = country.txt; sourceTree = "<group>"; };
 		D9222D9C1E822A2F00D67110 /* activities.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = activities.plist; sourceTree = "<group>"; };
@@ -2622,7 +2612,6 @@
 		F10F2C711EFCC2A70017C32C /* LMRamMemberInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMRamMemberInfo.h; sourceTree = "<group>"; };
 		F10F2C721EFCC2A70017C32C /* LMRamMemberInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMRamMemberInfo.m; sourceTree = "<group>"; };
 		F114589F1F28967300A39A80 /* NCellValue1.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCellValue1.xib; sourceTree = "<group>"; };
-		F11615261F1CC5A500FC1E4B /* LMSerializeKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMSerializeKit.h; sourceTree = "<group>"; };
 		F116E95E1EA06AA500DCAED4 /* LMMessageExtendManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMMessageExtendManager.h; sourceTree = "<group>"; };
 		F116E95F1EA06AA500DCAED4 /* LMMessageExtendManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMMessageExtendManager.m; sourceTree = "<group>"; };
 		F11CF9A31EFA6CA400750437 /* LMContactAccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMContactAccountInfo.h; sourceTree = "<group>"; };
@@ -13005,7 +12994,6 @@
 				D94BE0531EBC7252008BEB0B /* Define */,
 				D92233291E83CAED00D67110 /* Colorconfig */,
 				D9222D9B1E822A2F00D67110 /* emoji */,
-				D9222D981E822A2F00D67110 /* AccountSetInfo.plist */,
 				D9222D991E822A2F00D67110 /* Connect.entitlements */,
 				D9222D9A1E822A2F00D67110 /* country.txt */,
 				D9B4365C1E8E5366006C816C /* LanguageConfig.plist */,
@@ -13837,7 +13825,6 @@
 				D92231781E822BF800D67110 /* UserCenter */,
 				D922311B1E822BF800D67110 /* AddressBookCallBack.h */,
 				D922311C1E822BF800D67110 /* AddressBookCallBack.m */,
-				F11615261F1CC5A500FC1E4B /* LMSerializeKit.h */,
 				D92231311E822BF800D67110 /* FXKeychain.h */,
 				D92231321E822BF800D67110 /* FXKeychain.m */,
 				D922315B1E822BF800D67110 /* Language.h */,
@@ -14636,8 +14623,6 @@
 			children = (
 				1923518C1E81247E0022D844 /* ShareMessageModel.h */,
 				1923518D1E81247E0022D844 /* ShareMessageModel.m */,
-				1923516E1E8123C60022D844 /* AddressBookInfo.h */,
-				1923516F1E8123C60022D844 /* AddressBookInfo.m */,
 				192351721E8123C60022D844 /* LMOtherModel.h */,
 				192351731E8123C60022D844 /* LMOtherModel.m */,
 				192351741E8123C60022D844 /* NewFriendItemModel.h */,
@@ -14748,22 +14733,18 @@
 		D95C02AF1E8101A6006C5C8A /* View */ = {
 			isa = PBXGroup;
 			children = (
+				D9065A2A1F39C09A00AEF314 /* BottomLineTextField.h */,
+				D9065A2B1F39C09A00AEF314 /* BottomLineTextField.m */,
 				F17CBE301ED536920067234D /* LMDisplayProgressView.h */,
 				F17CBE311ED536920067234D /* LMDisplayProgressView.m */,
 				F17CBE2D1ED40C700067234D /* LMselectCountryCell.h */,
 				F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */,
 				192350721E8120520022D844 /* PhoneRegisterCell.h */,
 				192350731E8120520022D844 /* PhoneRegisterCell.m */,
-				1923500F1E811D3E0022D844 /* AccountUserNameWidget.h */,
-				192350101E811D3E0022D844 /* AccountUserNameWidget.m */,
-				192350111E811D3E0022D844 /* BottomLineTextField.h */,
-				192350121E811D3E0022D844 /* BottomLineTextField.m */,
 				192350131E811D3E0022D844 /* CameraSessionView.h */,
 				192350141E811D3E0022D844 /* CameraSessionView.m */,
 				19234FEF1E811C7A0022D844 /* CountryView.h */,
 				19234FF01E811C7A0022D844 /* CountryView.m */,
-				19234F501E8114220022D844 /* BottomLineTextField.h */,
-				19234F511E8114220022D844 /* BottomLineTextField.m */,
 				19234F521E8114220022D844 /* LocalUserInfoView.h */,
 				19234F531E8114220022D844 /* LocalUserInfoView.m */,
 				19234F541E8114220022D844 /* SelectCountryView.h */,
@@ -32446,7 +32427,6 @@
 				D9B084EA1E810E5A0067EC4A /* SetAvatarCell.xib in Resources */,
 				D92230371E822A3100D67110 /* loud_crying.gif in Resources */,
 				D922304A1E822A3100D67110 /* shock@3x.png in Resources */,
-				D9222F651E822A3000D67110 /* AccountSetInfo.plist in Resources */,
 				D92230381E822A3100D67110 /* loud_crying@3x.png in Resources */,
 				F16FD7E61EC3205C002F9395 /* clocale in Resources */,
 				F16FD80D1EC3205F002F9395 /* stack in Resources */,
@@ -32790,6 +32770,7 @@
 				192350C71E81213F0022D844 /* OuterTransferViewController.m in Sources */,
 				D92232A21E822BF800D67110 /* GJCFFileUploadManager.m in Sources */,
 				D9222F8F1E822A3000D67110 /* MJPropertyType.m in Sources */,
+				D9065A2C1F39C09A00AEF314 /* BottomLineTextField.m in Sources */,
 				19234FA01E8117560022D844 /* UserDetailInfoCell.m in Sources */,
 				D97FDCA81E86664800B161C8 /* YYTextContainerView.m in Sources */,
 				D92232F31E822BF900D67110 /* GJCFQuickUIUitil.m in Sources */,
@@ -32875,7 +32856,6 @@
 				D9B084C41E810DDC0067EC4A /* BigAvatarViewController.m in Sources */,
 				D9222FD61E822A3100D67110 /* UIView+YYAdd.m in Sources */,
 				D9222F931E822A3000D67110 /* NSObject+MJProperty.m in Sources */,
-				192351781E8123C60022D844 /* AddressBookInfo.m in Sources */,
 				1923512C1E8121CB0022D844 /* LMDrawView.m in Sources */,
 				D95C044E1E810902006C5C8A /* GJGCChatFriendGifCell.m in Sources */,
 				D95C03551E8108D8006C5C8A /* BaseSetViewController.m in Sources */,
@@ -33138,7 +33118,6 @@
 				D961041D1EF7D5DF001A0998 /* LMRealmDBManager.m in Sources */,
 				F127E12A1F146AD8003E448F /* LMSeedModel.m in Sources */,
 				D95C04741E810902006C5C8A /* GJGCChatInputExpandMenuPanel.m in Sources */,
-				192350171E811D3E0022D844 /* BottomLineTextField.m in Sources */,
 				19234F801E8117020022D844 /* FriendTransactionHisPage.m in Sources */,
 				D92232871E822BF800D67110 /* NSString+Pinyin.m in Sources */,
 				D9222F7E1E822A3000D67110 /* GCDQueue.m in Sources */,
@@ -33348,7 +33327,6 @@
 				19234F9F1E8117560022D844 /* UserCommonInfoSetCell.m in Sources */,
 				192352991E81275B0022D844 /* LMChatRedLuckyDetailController.m in Sources */,
 				D97FDCBE1E86664800B161C8 /* YYLabel.m in Sources */,
-				192350161E811D3E0022D844 /* AccountUserNameWidget.m in Sources */,
 				192351511E8122130022D844 /* LMChatSingleTransferViewController.m in Sources */,
 				D95C04591E810902006C5C8A /* LMGroupVerifyOtherTableViewCell.m in Sources */,
 				D92232C01E822BF900D67110 /* LKUserCenter.m in Sources */,

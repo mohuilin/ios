@@ -27,7 +27,9 @@
 "Chat Connect"="Connect - P2P Encrypted Instant Message";
 "Chat Connecting"="连接中...";
 "Chat Connection protocol upgrades"="连接协议升级";
-"Chat Contact card"="向你推荐朋友";
+"Chat Contact card"="名片";
+"Chat Recommend business CARDS to friends"="向好友推荐名片";
+"Chat Recommend your business card" = "向你推荐名片";
 "Chat Create a new chat"="创建新的聊天";
 "Chat Creating group"="创建群组中...";
 "Chat Crowd founding in progress"="众筹进行中";
