@@ -137,9 +137,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 sendModel.callBack(sendModel.sendMsg, nil);
             }
             //updatea recent chat cell status
-            [GCDQueue executeInMainQueue:^{
-                SendNotify(ConnnectSendMessageSuccessNotification, messageOwer);
-            }];
+
         }
 
         [self.sendingMessages removeObjectForKey:messageId];

@@ -77,9 +77,6 @@
                 } else {
                     [[RecentChatDBManager sharedManager] removeMuteWithIdentifer:weakSelf.talkModel.chatUser.pub_key];
                 }
-                [GCDQueue executeInMainQueue:^{
-                    SendNotify(ConnnectMuteNotification, weakSelf.talkModel.chatUser.pub_key);
-                }];
             }
         }];
     };
@@ -118,7 +115,7 @@
     [[MessageDBManager sharedManager] deleteAllMessageByMessageOwer:self.talkModel.chatUser.pub_key];
     
     //delete recentchat last contetn
-    [[RecentChatDBManager sharedManager] removeDraftWithIdentifier:self.talkModel.chatIdendifier];
+    [[RecentChatDBManager sharedManager] removeLastContentWithIdentifier:self.talkModel.chatIdendifier];
     
     [GCDQueue executeInMainQueue:^{
         SendNotify(DeleteMessageHistoryNotification, self.talkModel.chatIdendifier);
@@ -167,10 +164,8 @@
         };
 
         memberCell.tapMemberHeaderBlock = ^(LMRamMemberInfo *tapInfo) {
-            AccountInfo *accountInfo = (AccountInfo *)tapInfo.normalInfo;
-            [weakSelf showUserDetailPageWithUser:accountInfo];
+            [weakSelf showUserDetailPageWithUser:(AccountInfo *)tapInfo];
         };
-
 
         return cell;
     } else if (item.type == CellItemTypeNone) {

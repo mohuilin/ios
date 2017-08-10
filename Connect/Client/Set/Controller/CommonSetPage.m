@@ -131,10 +131,8 @@
 
     [ChatMessageFileManager deleteAllMessageFile];
     [[MessageDBManager sharedManager] deleteAllMessages];
-
     //remeve all chat last message
     [[RecentChatDBManager sharedManager] removeAllLastContent];
-    
     [GCDQueue executeInMainQueue:^{
         SendNotify(DeleteMessageHistoryNotification, nil);
     }];

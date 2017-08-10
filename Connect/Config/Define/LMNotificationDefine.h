@@ -8,10 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-//消息发送成功的通知
-
-extern NSString *const ConnnectMuteNotification;
-
 // Download the completed notification
 
 extern NSString *const ConnnectDownAllCommonGroupCompleteNotification;
@@ -22,31 +18,11 @@ extern NSString *const ConnnectGroupDismissNotification;
 
 // Message sent a successful notification
 
-extern NSString *const ConnnectSendMessageSuccessNotification;
-
-// Message sent a successful notification
-
 extern NSString *const ConnnectUploadFileFailNotification;
-
-// The conversation changed
-
-extern NSString *const ConnnectRecentChatChangeNotification;
-
-// new session
-
-extern NSString *const ConnnectNewChatChangeNotification;
 
 // Global notification contact information is best to bring out publickey or address
 
 extern NSString *const ConnnectContactDidChangeNotification;
-
-//delete contacts
-
-extern NSString *const ConnnectContactDidChangeDeleteUserNotification;
-
-// quit group
-
-extern NSString *const ConnnectQuitGroupNotification;
 
 // user address change
 
@@ -68,26 +44,14 @@ extern NSString *const ConnnectGroupInfoDidAddMembers;
 
 extern NSString *const ConnnectSendAddRequestSuccennNotification;
 
-// Friends list update notification
-
-extern NSString *const kFriendListChangeNotification;
-
 
 // Accept a friend request a successful notification
 
 extern NSString *const kAcceptNewFriendRequestNotification;
 
-// There is draft
-
-extern NSString *const SendDraftChangeNotification;
-
 // transfer status is exchange
 
 extern NSString *const TransactionStatusChangeNotification;
-
-// Update my nickname in the group
-
-extern NSString *const ConnectUpdateMyNickNameNotification;
 
 // Received an external red envelope message
 

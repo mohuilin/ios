@@ -6,40 +6,19 @@
 //  Copyright © 2017年 Connect. All rights reserved.
 //
 
-NSString *const ConnnectMuteNotification = @"ConnnectMuteNotification";
-
 // Download the completed notification
 
 NSString *const ConnnectDownAllCommonGroupCompleteNotification = @"ConnnectDownAllCommonGroupCompleteNotification";
-
-// Message sent a successful notification
-
-NSString *const ConnnectSendMessageSuccessNotification = @"ConnnectSendMessageSuccessNotification";
 
 // File upload failed notification
 
 NSString *const ConnnectUploadFileFailNotification = @"ConnnectUploadFileFailNotification";
 
 NSString *const ConnnectGroupDismissNotification = @"ConnnectGroupDismissNotification";
-// The conversation changed
-
-NSString *const ConnnectRecentChatChangeNotification = @"ConnnectRecentChatChangeNotification";
-
-// New session
-
-NSString *const ConnnectNewChatChangeNotification = @"ConnnectNewChatChangeNotification";
 
 // Global notification contact information is best to bring out publickey or address
 
 NSString *const ConnnectContactDidChangeNotification = @"ConnnectContactDidChangeNotification";
-
-// delete contact
-
-NSString *const ConnnectContactDidChangeDeleteUserNotification = @"ConnnectContactDidChangeDeleteUserNotification";
-
-// Global notifications exit group
-
-NSString *const ConnnectQuitGroupNotification = @"im.connect.QuitGroup";
 
 // Global notification of user address changes
 
@@ -60,24 +39,13 @@ NSString *const ConnnectGroupInfoDidAddMembers = @"ConnnectGroupInfoDidAddMember
 
 NSString *const ConnnectSendAddRequestSuccennNotification = @"ConnnectSendAddRequestSuccennNotification";
 
-// Friends list update notification
-
-NSString *const kFriendListChangeNotification = @"kFriendListChangeNotification";
-
 // Accept a friend request a successful notification
 
 NSString *const kAcceptNewFriendRequestNotification = @"kAcceptNewFriendRequestNotification";
 
-// There is draft
-
-NSString *const SendDraftChangeNotification = @"SendDraftChangeNotification";
-
 // Transaction status change notification
 
 NSString *const TransactionStatusChangeNotification = @"TransactionStatusChangeNotification";
-
-// Update my nickname in the group
-NSString *const ConnectUpdateMyNickNameNotification = @"ConnectUpdateMyNickNameNotification";
 
 // Received an external red envelope message
 

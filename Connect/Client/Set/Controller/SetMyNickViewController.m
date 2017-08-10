@@ -95,11 +95,6 @@
                 }
             }
         }
-        if (updateCount > 0) {
-            [GCDQueue executeInMainQueue:^{
-                SendNotify(ConnectUpdateMyNickNameNotification, nil);
-            }];
-        }
     }];
 }
 

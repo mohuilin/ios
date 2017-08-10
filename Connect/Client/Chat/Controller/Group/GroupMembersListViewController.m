@@ -270,9 +270,6 @@
     message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     __weak __typeof(&*self) weakSelf = self;
     [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:self.groupEcdhKey onQueue:nil completion:^(MMMessage *message, NSError *error) {
-        [GCDQueue executeInMainQueue:^{
-            SendNotify(ConnnectSendMessageSuccessNotification, weakSelf.groupid);
-        }];
     }                                   onQueue:nil];
 }
 
@@ -575,7 +572,6 @@
         NSArray *groupArray = [[GroupDBManager sharedManager] getgroupMemberByGroupIdentifier:weakSelf.groupid];
         if (groupArray.count < 3) {
             [GCDQueue executeInMainQueue:^{
-                SendNotify(ConnnectQuitGroupNotification, weakSelf.groupid);
                 [[GroupDBManager sharedManager] deletegroupWithGroupId:weakSelf.groupid];
                 [self.navigationController popToRootViewControllerAnimated:YES];
             }];

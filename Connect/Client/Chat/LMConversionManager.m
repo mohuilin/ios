@@ -22,6 +22,10 @@
 @property (strong ,nonatomic)NSMutableDictionary *unNotiMessageCountDict;
 @property (strong ,nonatomic)NSMutableArray *noFriendShipPulickArray;
 
+
+@property (nonatomic ,strong) RLMResults *recentResults;
+@property (nonatomic ,strong) RLMNotificationToken *recentResultsToken;
+
 @end
 
 @implementation LMConversionManager
@@ -33,43 +37,46 @@ CREATE_SHARED_MANAGER(LMConversionManager)
         
         self.unNotiMessageCountDict = [NSMutableDictionary dictionary];
         self.noFriendShipPulickArray = [NSMutableArray array];
-        RegisterNotify(ConnectUpdateMyNickNameNotification, @selector(groupNicknameChange));
-        RegisterNotify(SendDraftChangeNotification, @selector(haveDraft:));
-        RegisterNotify(ConnnectSendMessageSuccessNotification, @selector(sendMessageSuccess:));
-        RegisterNotify(ConnnectRecentChatChangeNotification, @selector(recentChatChange:));
-        RegisterNotify(ConnnectNewChatChangeNotification, @selector(recentChatChange:));
-        RegisterNotify(ConnnectContactDidChangeNotification, @selector(ContactInfoChange:));
-        RegisterNotify(ConnnectGroupInfoDidChangeNotification, @selector(GroupInfoChange:));
-        RegisterNotify(ConnnectQuitGroupNotification, @selector(quitGroup:));
         RegisterNotify(kAcceptNewFriendRequestNotification, @selector(acceptRequest:));
-        RegisterNotify(ConnnectContactDidChangeDeleteUserNotification, @selector(deleteUser:));
-        RegisterNotify(kFriendListChangeNotification,@selector(friendListChange:));
-        RegisterNotify(ConnnectMuteNotification, @selector(muteChange:));
         
-        RegisterNotify(DeleteMessageHistoryNotification, @selector(deleteAllmessage:));
     }
     return self;
 }
+
 
 - (void)clearAllModel{
     [[SessionManager sharedManager] clearAllModel];
     [self.unNotiMessageCountDict removeAllObjects];
     [self.noFriendShipPulickArray removeAllObjects];
+    
+    
+    [self.recentResultsToken stop];
+    self.recentResults = nil;
+    self.recentResultsToken = nil;
 }
 
 - (void)getAllConversationFromDB{
-    [[RecentChatDBManager sharedManager] getAllRecentChatWithComplete:^(NSArray *allRecentChats) {
-        [GCDQueue executeInMainQueue:^{
-            [SessionManager sharedManager].allRecentChats = [NSMutableArray arrayWithArray:allRecentChats];
-            [SessionManager sharedManager].topChatCount = 0;
-            for (RecentChatModel *model in allRecentChats) {
-                if (model.isTopChat) {
-                    [SessionManager sharedManager].topChatCount ++;
-                }
+    if (!self.recentResults) {
+        self.recentResults = [LMRecentChat allObjects];
+        __weak __typeof(&*self)weakSelf = self;
+        self.recentResultsToken = [self.recentResults addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+            NSMutableArray *recentChatArrayM = [NSMutableArray array];
+            RLMResults <LMRecentChat *> *topResults = [[results objectsWhere:@"isTopChat = 1"] sortedResultsUsingKeyPath:@"createTime" ascending:NO];
+            RLMResults <LMRecentChat *> *normalResults = [[results objectsWhere:@"isTopChat = 0"] sortedResultsUsingKeyPath:@"createTime" ascending:NO];
+            //model trasfer
+            for (LMRecentChat *realmModel in topResults) {
+                RecentChatModel *model = realmModel.normalInfo;
+                [recentChatArrayM addObject:model];
             }
-            [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
+            for (LMRecentChat *realmModel in normalResults) {
+                RecentChatModel *model = realmModel.normalInfo;
+                [recentChatArrayM addObject:model];
+            }
+            [SessionManager sharedManager].allRecentChats = recentChatArrayM;
+            [SessionManager sharedManager].topChatCount = (int)topResults.count;
+            [weakSelf reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
         }];
-    }];
+    }
 }
 
 - (void)getNewMessagesWithLastMessage:(ChatMessageInfo *)lastMessage newMessageCount:(int)messageCount type:(GJGCChatFriendTalkType)type withSnapChatTime:(long long)snapChatTime{
@@ -414,19 +421,6 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     [self getNewMessagesWithLastMessage:messageInfo newMessageCount:1 type:GJGCChatFriendTalkTypePrivate withSnapChatTime:0];
 }
 
-- (void)deleteAllmessage:(NSNotification *)note{
-    NSString *identifier = (NSString *)note.object;
-    if (!GJCFStringIsNull(identifier)) {
-        RecentChatModel *recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:identifier];
-        recentModel.content = @"";
-    } else {
-        for (RecentChatModel *model in [SessionManager sharedManager].allRecentChats) {
-            model.content = @"";
-        }
-    }
-    [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
-}
-
 - (BOOL)deleteConversationWithIdentifier:(NSString *)identifier{
     RecentChatModel *recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:identifier];
     return [self deleteConversation:recentModel];
@@ -573,37 +567,6 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     }];
 }
 
-- (void)groupNicknameChange{
-    [self getAllConversationFromDB];
-}
-
-- (void)haveDraft:(NSNotification *)note{
-    /*
-     @{@"identifier":_chatSession,
-     @"draft":draft})
-     */
-    NSString *identifier = [note.object valueForKey:@"identifier"];
-    NSString *draft = [note.object valueForKey:@"draft"];
-    RecentChatModel *model = [[SessionManager sharedManager] getRecentChatWithIdentifier:identifier];
-    model.draft = draft;
-    if (model) {
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
-    }
-}
-
-
-- (void)muteChange:(NSNotification *)note{
-    NSString *chatIdentifier = note.object;
-    if (GJCFStringIsNull(chatIdentifier)) {
-        return;
-    }
-    RecentChatModel *findModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:chatIdentifier];
-    if (findModel) {
-        findModel.notifyStatus = !findModel.notifyStatus;
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
-    }
-}
-
 /**
  @{@"identifier":publiKeyOrGroupid,
  @"status":@(NO)};
@@ -627,91 +590,6 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
 }
 
-#pragma mark - sendMessageSuccess
-- (void)sendMessageSuccess:(NSNotification *)note{
-    
-    NSString *identifier = note.object;
-    if (GJCFStringIsNull(identifier)) {
-        return;
-    }
-    RecentChatModel *findModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:identifier];
-    if (findModel) {
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
-    }
-}
-
-- (void)recentChatChange:(NSNotification *)note{
-    RecentChatModel *recentChat = note.object;
-    if (!recentChat) {
-        return;
-    }
-    NSInteger index = [[SessionManager sharedManager].allRecentChats indexOfObject:recentChat];
-    if (recentChat.talkType == GJGCChatFriendTalkTypeGroup) {
-        if (recentChat.chatGroupInfo.membersArray.count == 0) {
-            LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:recentChat.identifier];
-            recentChat.chatGroupInfo = group;
-            recentChat.name = group.groupName;
-        }
-    }
-    if (index != NSNotFound) {
-        [[SessionManager sharedManager].allRecentChats moveObject:recentChat toIndex:recentChat.isTopChat?0:[SessionManager sharedManager].topChatCount];
-    } else{
-        index = recentChat.isTopChat?0:[SessionManager sharedManager].topChatCount;
-        [[SessionManager sharedManager].allRecentChats objectInsert:recentChat atIndex:index];
-    }
-    [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
-}
-
-- (void)ContactInfoChange:(NSNotification *)note{
-    AccountInfo *changeUser = note.object;
-    if (!changeUser) {
-        return;
-    }
-    RecentChatModel *findModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:changeUser.pub_key];
-    if (findModel) {
-        findModel.name = changeUser.normalShowName;
-        findModel.headUrl = changeUser.avatar;
-        findModel.chatUser = changeUser;
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
-    }
-}
-
-
-- (void)GroupInfoChange:(NSNotification *)note{
-    NSString *groupIdentifer = note.object;
-    if (GJCFStringIsNull(groupIdentifer)) {
-        return;
-    }
-    RecentChatModel *findModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:groupIdentifer];
-    if (findModel) {
-        LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:groupIdentifer];
-        findModel.name = group.groupName;
-        findModel.chatGroupInfo = group;
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:NO];
-    }
-}
-
-- (void)quitGroup:(NSNotification *)note
-{
-    NSString *groupid = note.object;
-    if (GJCFStringIsNull(groupid)) {
-        return;
-    }
-    RecentChatModel *model = [[SessionManager sharedManager] getRecentChatWithIdentifier:groupid];
-    [ChatMessageFileManager deleteRecentChatAllMessageFilesByAddress:groupid];
-    [[RecentChatDBManager sharedManager] deleteByIdentifier:groupid];
-    [[MessageDBManager sharedManager] deleteAllMessageByMessageOwer:groupid];
-    [[SessionManager sharedManager] removeRecentChatWithIdentifier:model.identifier];
-    if (model) {
-        if (model.talkType == GJGCChatFriendTalkTypeGroup) {
-            [[GroupDBManager sharedManager] deletegroupWithGroupId:model.identifier];
-        }
-    }
-    [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
-
-}
-
-
 - (void)enterForeground{
     [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
 }
@@ -720,57 +598,6 @@ CREATE_SHARED_MANAGER(LMConversionManager)
 - (void)acceptRequest:(NSNotification *)note{
     AccountInfo *user = note.object;
     [self chatWithNewFriend:user];
-}
-
-
-- (void)deleteUser:(NSNotification *)note{
-    AccountInfo *willDeleteUser = (AccountInfo *)note.object;
-    if (willDeleteUser) {
-        [[SessionManager sharedManager] removeRecentChatWithIdentifier:willDeleteUser.pub_key];
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
-    }
-}
-
-- (void)friendListChange:(NSNotification *)note{
-    BOOL __block changeFlag = NO;
-    @synchronized([SessionManager sharedManager].allRecentChats) {
-        for (RecentChatModel *model in [SessionManager sharedManager].allRecentChats) {
-            if (model.talkType != GJGCChatFriendTalkTypeGroup && !model.chatUser) {
-                AccountInfo *chatUser = [[UserDBManager sharedManager] getUserByPublickey:model.identifier];
-                model.chatUser = chatUser;
-                if (!model.name) {
-                    model.name = chatUser.username;
-                }
-                if (!model.headUrl) {
-                    model.headUrl = chatUser.avatar;
-                }
-                changeFlag = YES;
-            } else if(!model.chatGroupInfo){
-                LMRamGroupInfo *groupInfo = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:model.identifier];
-                model.chatGroupInfo = groupInfo;
-                if (!model.name) {
-                    model.name = groupInfo.groupName;
-                }
-                changeFlag = YES;
-            }
-        }
-    }
-
-    if (changeFlag) {
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
-    }
-}
-
-- (void)getNewMessageToUpdateUnreadCountWithRecentChatIdentifier:(NSString *)identifier{
-    if (GJCFStringIsNull(identifier)) {
-        return;
-    }
-    RecentChatModel *model = [[SessionManager sharedManager] getRecentChatWithIdentifier:identifier];
-    model.unReadCount ++;
-    [[RecentChatDBManager sharedManager] updataUnReadCount:model.unReadCount idetifier:identifier];
-    if (model) {
-        [self reloadRecentChatWithRecentChatModel:nil needReloadBadge:YES];
-    }
 }
 
 @end

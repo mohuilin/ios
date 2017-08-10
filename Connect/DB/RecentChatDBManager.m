@@ -231,12 +231,6 @@ static RecentChatDBManager *manager = nil;
     [self executeRealmWithBlock:^{
         realmModel.draft = draft;
     }];
-    /*
-     @{@"identifier":_chatSession,
-     @"draft":draft})
-     */
-    SendNotify(SendDraftChangeNotification, (@{@"identifier":identifier,
-                                               @"draft":draft}));
 }
 
 - (void)removeDraftWithIdentifier:(NSString *)identifier {
@@ -394,12 +388,6 @@ static RecentChatDBManager *manager = nil;
 
         [self save:recentChat];
     }
-    if (flag) {
-
-        [GCDQueue executeInMainQueue:^{
-            SendNotify(ConnnectRecentChatChangeNotification, recentChat);
-        }];
-    }
 }
 
 
@@ -500,9 +488,6 @@ static RecentChatDBManager *manager = nil;
         recentChat.snapChatDeleteTime = [self getSnapTimeWithChatIdentifer:recentChat.identifier];
         [self save:recentChat];
     }
-    [GCDQueue executeInMainQueue:^{
-        SendNotify(ConnnectRecentChatChangeNotification, recentChat);
-    }];
     return recentChat;
 }
 
@@ -529,10 +514,6 @@ static RecentChatDBManager *manager = nil;
             realmModel.unReadCount = recentChat.unReadCount;
             realmModel.createTime = time;
             realmModel.content = recentChat.content;
-        }];
-
-        [GCDQueue executeInMainQueue:^{
-            SendNotify(ConnnectRecentChatChangeNotification, recentChat);
         }];
 
     } else {
@@ -599,9 +580,6 @@ static RecentChatDBManager *manager = nil;
             }
         }
         [self save:recentChat];
-        [GCDQueue executeInMainQueue:^{
-            SendNotify(ConnnectNewChatChangeNotification, recentChat);
-        }];
     }
 
 }
@@ -640,9 +618,6 @@ static RecentChatDBManager *manager = nil;
         recentChat.chatUser = user;
         [self save:recentChat];
     }
-    [GCDQueue executeInMainQueue:^{
-        SendNotify(ConnnectRecentChatChangeNotification, recentChat);
-    }];
 }
 
 - (void)createConnectTermWelcomebackChatAndMessage {
@@ -703,9 +678,7 @@ static RecentChatDBManager *manager = nil;
         model.content = message.content;
         [self save:model];
     }
-    [GCDQueue executeInMainQueue:^{
-        SendNotify(ConnnectRecentChatChangeNotification, model);
-    }];
+
 }
 
 @end

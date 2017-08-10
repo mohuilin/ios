@@ -213,8 +213,6 @@
         // top session
         recentModel.createTime = [NSDate date];
         [[RecentChatDBManager sharedManager] updataRecentChatLastTimeByIdentifer:recentModel.identifier];
-        SendNotify(ConnnectRecentChatChangeNotification, recentModel);
-
         // send message
         __weak __typeof(&*self) weakSelf = self;
         if (recentModel.talkType == GJGCChatFriendTalkTypeGroup) {

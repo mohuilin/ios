@@ -376,7 +376,7 @@ static MessageDBManager *manager = nil;
         [where appendFormat:@" and ID < %ld and createTime <= %lld", autoMsgid, time];
     }
     RLMResults<LMMessage *> *results = [[LMMessage objectsWhere:where]
-            sortedResultsUsingKeyPath:@"createTime" ascending:YES];
+            sortedResultsUsingKeyPath:@"ID" ascending:YES];
     NSMutableArray *chatMessages = [NSMutableArray array];
     if (results.count <= limit) {
         for (LMMessage *realmModel in results) {
@@ -403,7 +403,7 @@ static MessageDBManager *manager = nil;
         [where appendFormat:@" and createTime <= %lld", time];
     }
     RLMResults<LMMessage *> *results = [[LMMessage objectsWhere:where]
-            sortedResultsUsingKeyPath:@"createTime" ascending:YES];
+            sortedResultsUsingKeyPath:@"ID" ascending:YES];
 
     NSMutableArray *chatMessages = [NSMutableArray array];
     if (results.count <= limit) {

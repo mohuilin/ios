@@ -139,9 +139,6 @@ typedef NS_ENUM(NSUInteger, SourceType) {
                 } else {
                     [[RecentChatDBManager sharedManager] removeMuteWithIdentifer:self.talkModel.chatIdendifier];
                 }
-                [GCDQueue executeInMainQueue:^{
-                    SendNotify(ConnnectMuteNotification, self.talkModel.chatIdendifier);
-                }];
             }
             [[GroupDBManager sharedManager] updateGroupPublic:groupSetInfo.public_p reviewed:groupSetInfo.reviewed summary:groupSetInfo.summary avatar:groupSetInfo.avatar withGroupId:self.talkModel.chatGroupInfo.groupIdentifer];
             [self reloadDataOnMainQueue];
@@ -282,9 +279,6 @@ typedef NS_ENUM(NSUInteger, SourceType) {
                     [[RecentChatDBManager sharedManager] removeMuteWithIdentifer:weakSelf.talkModel.chatIdendifier];
                 }
                 weakSelf.talkModel.mute = notify;
-                [GCDQueue executeInMainQueue:^{
-                    SendNotify(ConnnectMuteNotification, weakSelf.talkModel.chatIdendifier);
-                }];
             }
         }];
     };
@@ -359,7 +353,6 @@ typedef NS_ENUM(NSUInteger, SourceType) {
                     if (!erro) {
                         [[YYImageCache sharedCache] removeImageForKey:weakSelf.talkModel.chatGroupInfo.avatarUrl];
                         [MBProgressHUD hideHUDForView:weakSelf.view];
-                        SendNotify(ConnnectQuitGroupNotification, weakSelf.talkModel.chatIdendifier);
                         [[GroupDBManager sharedManager] deletegroupWithGroupId:weakSelf.talkModel.chatIdendifier];
                         [weakSelf.navigationController popToRootViewControllerAnimated:NO];
                     } else {
@@ -611,9 +604,6 @@ typedef NS_ENUM(NSUInteger, SourceType) {
             @"message": welcomeTip};
 
     [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:weakSelf.talkModel.group_ecdhKey onQueue:nil completion:^(MMMessage *message, NSError *error) {
-        [GCDQueue executeInMainQueue:^{
-            SendNotify(ConnnectSendMessageSuccessNotification, weakSelf.talkModel.chatIdendifier);
-        }];
     }                                   onQueue:nil];
 }
 

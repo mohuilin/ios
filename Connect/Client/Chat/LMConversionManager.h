@@ -63,11 +63,6 @@
 - (void)clearConversionUnreadAndGroupNoteWithIdentifier:(NSString *)conversationIdentifier;
 
 /**
- * get new message
- */
-- (void)getNewMessageToUpdateUnreadCountWithRecentChatIdentifier:(NSString *)identifier;
-
-/**
  * group mute change
  */
 - (void)setConversationMute:(RecentChatModel *)conversationModel complete:(void (^)(BOOL complete))complete;

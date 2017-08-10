@@ -823,9 +823,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
         message = [[MessageDBManager sharedManager] createSendtoOtherTransactionMessageWithMessageOwer:reciverUser hashId:hashId monney:[PayTool getBtcStringWithAmount:amount] isOutTransfer:isOutTransfer];
         if ([[UserDBManager sharedManager] isFriendByAddress:reciverUser.address]) {
             RecentChatModel *model = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:reciverUser.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:nil]];
-            [GCDQueue executeInMainQueue:^{
-                SendNotify(ConnnectRecentChatChangeNotification, model);
-            }];
         } else {
             [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:reciverUser];
         }
@@ -834,9 +831,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
         message = [[MessageDBManager sharedManager] createSendtoMyselfTransactionMessageWithMessageOwer:senderUser hashId:hashId monney:[PayTool getBtcStringWithAmount:amount] isOutTransfer:isOutTransfer];
         if ([[UserDBManager sharedManager] isFriendByAddress:senderUser.address]) {
             RecentChatModel *model = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:nil]];
-            [GCDQueue executeInMainQueue:^{
-                SendNotify(ConnnectRecentChatChangeNotification, model);
-            }];
         } else {
             [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:senderUser];
         }
@@ -1047,9 +1041,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
     }
 
     [[MMAppSetting sharedSetting] saveContactVersion:version];
-    [GCDQueue executeInMainQueue:^{
-        SendNotify(kFriendListChangeNotification, nil);
-    }];
 }
 
 
@@ -1062,10 +1053,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
 
     //delete user
     [[UserDBManager sharedManager] deleteUserBypubkey:deleteUser.pub_key];
-
-    [GCDQueue executeInMainQueue:^{
-        SendNotify(ConnnectContactDidChangeDeleteUserNotification, deleteUser);
-    }];
 
     if (command.errNo > 0) {
         if (sendComModel.callBack) {
@@ -1185,9 +1172,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
 
                 if (!senderUser.stranger) {
                     RecentChatModel *model = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:messageInfo.type textMessage:nil]];
-                    [GCDQueue executeInMainQueue:^{
-                        SendNotify(ConnnectRecentChatChangeNotification, model);
-                    }];
                 } else {
                     [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:senderUser];
                 }

@@ -7,7 +7,7 @@
 //
 
 #import "GroupDBManager.h"
-
+#import "RecentChatDBManager.h"
 
 static GroupDBManager *manager = nil;
 
@@ -105,14 +105,16 @@ static GroupDBManager *manager = nil;
     if (GJCFStringIsNull(groupId)) {
         return;
     }
-
     LMRamGroupInfo *groupInfo = [[LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ", groupId]] lastObject];
+    //delete chat
+    [[RecentChatDBManager sharedManager] deleteByIdentifier:groupId];
+    //delete chat setting
+    [[RecentChatDBManager sharedManager] deleteRecentChatSettingWithIdentifier:groupId];
     if (groupInfo) {
         [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
            [realm deleteObject:groupInfo];
         }];
     }
-
 }
 /**
  * get group summary

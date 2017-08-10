@@ -25,8 +25,17 @@
 
 + (NSDictionary *)defaultPropertyValues {
     return @{
-            @"ID": @((long long) ([[NSDate date] timeIntervalSince1970] * 1000))
+            @"ID": @([self getNextID])
     };
+}
+
++ (NSInteger)getNextID {
+    LMBaseModel *lastModel = [[[self allObjects] sortedResultsUsingKeyPath:@"ID" ascending:YES] lastObject];
+    if (lastModel) {
+        return lastModel.ID + 1;
+    } else {
+        return 1;
+    }
 }
 
 @end
