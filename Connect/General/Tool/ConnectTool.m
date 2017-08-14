@@ -535,36 +535,6 @@
     return [self createGcmDataWithEcdhkey:ecdhKey data:data aad:aad];
 }
 
-+ (MessagePost *)createMessagePostWithEcdhKey:(NSData *)ecdhkey
-                                messageString:(MMMessage *)message{
-    
-    NSString *messageString = [message mj_JSONString];
-    
-    NSData *aad = nil;
-    if (!aad) {
-        aad = [ServerCenter shareCenter].defineAad;
-        if (!aad) {
-            aad = [self getIvData];
-        }
-    }
-    GcmData *messageGcmData = [self createGcmDataWithEcdhkey:ecdhkey data:[messageString dataUsingEncoding:NSUTF8StringEncoding] aad:aad];
-    
-    MessageData *messageData = [[MessageData alloc] init];
-    messageData.cipherData = messageGcmData;
-    messageData.receiverAddress = message.publicKey;
-    messageData.msgId = message.message_id;
-    messageData.typ = message.type;
-    
-    
-    NSString *sign = [LMIMHelper signHashWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey data:[LMIMHelper hexStringFromData:[messageData data]]];
-    
-    MessagePost *messagePost = [[MessagePost alloc] init];
-    messagePost.sign = sign;
-    messagePost.pubKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-    messagePost.msgData = messageData;
-    
-    return messagePost;
-}
 
 
 + (IMRequest *)createRequestWithData:(GcmData *)gcmData

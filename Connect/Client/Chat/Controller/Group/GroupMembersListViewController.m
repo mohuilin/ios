@@ -22,6 +22,7 @@
 #import "MyInfoPage.h"
 #include "RecentChatDBManager.h"
 #import "LMConversionManager.h"
+#import "LMMessageAdapter.h"
 
 
 @interface GroupMembersListViewController () <UITableViewDelegate, UITableViewDataSource, MGSwipeTableCellDelegate> {
@@ -215,23 +216,15 @@
     groupMessage.identifier = self.groupid;
 
     for (LMRamMemberInfo *info in membsers) {
-
         if ([info.pubKey isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
             continue;
         }
-
         [welcomeTip appendString:info.username];
         if (info != [membsers lastObject]) {
             [welcomeTip appendString:@"、"];
         }
+        MessageData *messageData = [LMMessageAdapter packageMessageDataWithTo:info.pubKey chatType:0 msgType:0 ext:nil groupEcdh:nil cipherData:groupMessage];
 
-        GcmData *groupInfoGcmData = [ConnectTool createGcmWithData:groupMessage.data publickey:info.pubKey needEmptySalt:YES];
-        NSString *messageID = [ConnectTool generateMessageId];
-
-        MessageData *messageData = [[MessageData alloc] init];
-        messageData.cipherData = groupInfoGcmData;
-        messageData.receiverAddress = info.address;
-        messageData.msgId = messageID;
         NSString *sign = [ConnectTool signWithData:messageData.data];
         MessagePost *messagePost = [[MessagePost alloc] init];
         messagePost.sign = sign;
@@ -268,7 +261,7 @@
     message.publicKey = self.groupid;
     message.user_id = self.groupid;
     message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    __weak __typeof(&*self) weakSelf = self;
+    
     [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:self.groupEcdhKey onQueue:nil completion:^(MMMessage *message, NSError *error) {
     }                                   onQueue:nil];
 }

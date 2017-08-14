@@ -111,12 +111,11 @@ static dispatch_once_t onceToken;
 
 - (void)handleIMMessage:(Message *)msg {
     MessagePost *post = (MessagePost *) msg.body;
-    DDLogError(@"get peer im message %@", post.msgData.msgId);
     BOOL isSign = [ConnectTool vertifyWithData:post.msgData.data sign:post.sign publickey:post.pubKey];
     if (isSign) {
         [[PeerMessageHandler instance] handleMessage:post];
     }
-    [self sendIMBackAck:post.msgData.msgId];
+    [self sendIMBackAck:post.msgData.chatMsg.msgId];
 }
 
 #pragma mark -Message-group
@@ -128,7 +127,7 @@ static dispatch_once_t onceToken;
         [[GroupMessageHandler instance] handleGroupInviteMessage:post];
     }
     //send ack
-    [self sendIMBackAck:post.msgData.msgId];
+    [self sendIMBackAck:post.msgData.chatMsg.msgId];
 }
 
 - (void)handleGroupIMMessage:(Message *)msg {
@@ -137,7 +136,7 @@ static dispatch_once_t onceToken;
     if (isSign) {
         [[GroupMessageHandler instance] handleMessage:post];
     }
-    [self sendIMBackAck:post.msgData.msgId];
+    [self sendIMBackAck:post.msgData.chatMsg.msgId];
 }
 
 

@@ -95,7 +95,6 @@
 
 
 + (IMTransferData *)createTransferWithEcdhKey:(NSData *)ecdhKey data:(id)data aad:(NSData *)aad;
-+ (MessagePost *)createMessagePostWithEcdhKey:(NSData *)ecdhkey messageString:(MMMessage *)message;
 
 
 /**

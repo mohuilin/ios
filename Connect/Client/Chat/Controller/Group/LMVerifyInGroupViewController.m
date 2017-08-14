@@ -309,14 +309,22 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
 
     NSString *messageID = [ConnectTool generateMessageId];
     MessageData *messageData = [[MessageData alloc] init];
-    messageData.cipherData = groupInfoGcmData;
-    messageData.receiverAddress = [LMIMHelper getAddressByPubkey:self.model.publickey];
-    messageData.msgId = messageID;
+    
+    ChatMessage *msg = [ChatMessage new];
+    msg.cipherData = groupInfoGcmData;
+    msg.to = self.model.publickey;
+    msg.from = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
+    msg.msgId = messageID;
+    
+    messageData.chatMsg = msg;
+    
+    
     NSString *sign = [ConnectTool signWithData:messageData.data];
     MessagePost *messagePost = [[MessagePost alloc] init];
     messagePost.sign = sign;
     messagePost.pubKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
     messagePost.msgData = messageData;
+    
     [[IMService instance] asyncSendGroupInfo:messagePost];
 
     [MBProgressHUD showLoadingMessageToView:self.view];

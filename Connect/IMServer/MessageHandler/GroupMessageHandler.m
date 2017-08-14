@@ -61,7 +61,7 @@
     NSMutableDictionary *owerMessagesDict = [NSMutableDictionary dictionary];
     NSMutableArray *messageExtendArray = [NSMutableArray array];
     for (MessagePost *msg in messages) {
-        NSString *identifer = msg.msgData.receiverAddress;
+        NSString *identifer = msg.msgData.chatMsg.to;
         LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:identifer];
         if (GJCFStringIsNull(group.groupEcdhKey)) {
             NSMutableArray *messages = [self.unHandleMessagees valueForKey:identifer];
@@ -87,7 +87,7 @@
             }
             continue;
         }
-        GcmData *gcmD = msg.msgData.cipherData;
+        GcmData *gcmD = msg.msgData.chatMsg.cipherData;
         NSString *messageString = [ConnectTool decodeGroupGcmDataWithEcdhKey:group.groupEcdhKey GcmData:gcmD];
         MMMessage *messageInfo = [MMMessage mj_objectWithKeyValues:[messageString dictionaryValue]];
         if (![LMMessageValidationTool checkMessageValidata:messageInfo messageType:MessageTypeGroup]) {
@@ -237,7 +237,7 @@
 - (BOOL)handleBatchGroupInviteMessage:(NSArray *)messages {
 
     for (MessagePost *msg in messages) {
-        GcmData *gcmD = msg.msgData.cipherData;
+        GcmData *gcmD = msg.msgData.chatMsg.cipherData;
         NSData *data = [ConnectTool decodeGcmDataGetDataWithEcdhKey:[[ServerCenter shareCenter] getCurrentServer_userEcdhkey] GcmData:gcmD];
         CreateGroupMessage *groupMessage = [CreateGroupMessage parseFromData:data error:nil];
         //upload Group encryption key
@@ -249,7 +249,7 @@
 }
 
 - (BOOL)handleGroupInviteMessage:(MessagePost *)msg {
-    GcmData *gcmD = msg.msgData.cipherData;
+    GcmData *gcmD = msg.msgData.chatMsg.cipherData;
     NSData *data = [ConnectTool decodeGcmDataWithGcmData:gcmD publickey:msg.pubKey needEmptySalt:YES];
     if (data.length <= 0) {
         return NO;
@@ -263,8 +263,8 @@
 
 
 - (BOOL)handleMessage:(MessagePost *)msg {
-    if (![[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:msg.msgData.receiverAddress] && [GJGCChatFriendConstans shouldNoticeWithType:msg.msgData.typ]) {
-        if (![[SessionManager sharedManager].chatSession isEqualToString:msg.msgData.receiverAddress]) {
+    if (![[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:msg.msgData.chatMsg.to] && [GJGCChatFriendConstans shouldNoticeWithType:msg.msgData.chatMsg.msgType]) {
+        if (![[SessionManager sharedManager].chatSession isEqualToString:msg.msgData.chatMsg.to]) {
             [SystemTool vibrateOrVoiceNoti];
         }
     };
@@ -374,7 +374,7 @@
     NSMutableDictionary *owerMessagesDict = [NSMutableDictionary dictionary];
     NSMutableArray *messageExtendArray = [NSMutableArray array];
     for (MessagePost *msg in unHandleMessage) {
-        GcmData *gcmD = msg.msgData.cipherData;
+        GcmData *gcmD = msg.msgData.chatMsg.cipherData;
         NSString *messageString = [ConnectTool decodeGroupGcmDataWithEcdhKey:lmGroup.groupEcdhKey GcmData:gcmD];
         MMMessage *messageInfo = [MMMessage mj_objectWithKeyValues:[messageString dictionaryValue]];
         if (![LMMessageValidationTool checkMessageValidata:messageInfo messageType:MessageTypeGroup]) {

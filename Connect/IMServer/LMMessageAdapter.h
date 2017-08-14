@@ -11,7 +11,6 @@
 #import "MMMessage.h"
 
 @interface LMMessageAdapter : NSObject
-
 /**
  * Encapsulates the data body of the im message
  * @param message
@@ -24,5 +23,8 @@
 + (NSString *)decodeMessageWithMassagePost:(MessagePost *)msgPost;
 
 + (MMMessage *)packSystemMessage:(MSMessage *)sysMsg;
+
+
++ (MessageData *)packageMessageDataWithTo:(NSString *)to chatType:(int)chatType msgType:(int)msgType ext:(id)ext groupEcdh:(NSString *)groupEcdh cipherData:(GPBMessage *)originMsg;
 
 @end

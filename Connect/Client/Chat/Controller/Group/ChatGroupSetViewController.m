@@ -24,6 +24,7 @@
 #import "MessageDBManager.h"
 #import "LMRamGroupInfo.h"
 #import "LMRamMemberInfo.h"
+#import "LMMessageAdapter.h"
 
 
 
@@ -566,19 +567,11 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         if ([info.pub_key isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
             continue;
         }
-
         [welcomeTip appendString:info.username];
         if (info != [membsers lastObject]) {
             [welcomeTip appendString:@"、"];
         }
-
-        GcmData *groupInfoGcmData = [ConnectTool createGcmWithData:groupMessage.data publickey:info.pub_key needEmptySalt:YES];
-        NSString *messageID = [ConnectTool generateMessageId];
-
-        MessageData *messageData = [[MessageData alloc] init];
-        messageData.cipherData = groupInfoGcmData;
-        messageData.receiverAddress = info.address;
-        messageData.msgId = messageID;
+        MessageData *messageData = [LMMessageAdapter packageMessageDataWithTo:info.pub_key chatType:0 msgType:0 ext:nil groupEcdh:nil cipherData:groupMessage];
 
         NSString *sign = [ConnectTool signWithData:messageData.data];
 

@@ -234,7 +234,8 @@
 }
 
 - (BOOL)handleMessage:(MessagePost *)msg {
-    if (![[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:msg.pubKey] && [GJGCChatFriendConstans shouldNoticeWithType:msg.msgData.typ]) {
+    MessageData *messageData = msg.msgData;
+    if (![[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:messageData.chatMsg.to] && [GJGCChatFriendConstans shouldNoticeWithType:messageData.chatMsg.msgType]) {
         if (![[SessionManager sharedManager].chatSession isEqualToString:msg.pubKey]) {
             [SystemTool vibrateOrVoiceNoti];
         }
