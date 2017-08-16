@@ -35,7 +35,7 @@
 
 
 + (NSString *)decodeGcmDataGetStringWithEcdhKey:(NSString *)ecdhKey GcmData:(GcmData *)gcmData;
-+ (NSString *)decodeMessageGcmData:(GcmData *)gcmData
++ (NSData *)decodeMessageGcmData:(GcmData *)gcmData
                          publickey:(NSString *)publickey
                      needEmptySalt:(BOOL)needEmptySalt;
 
@@ -45,7 +45,7 @@
 + (NSString *)decodeGcmData:(GcmData *)gcmData
                 withPrivkey:(NSString *)privkey
                   publickey:(NSString *)publickey;
-+ (NSString *)decodeGroupGcmDataWithEcdhKey:(NSString *)ecdhKey
++ (NSData *)decodeGroupGcmDataWithEcdhKey:(NSString *)ecdhKey
                                     GcmData:(GcmData *)gcmData;
 
 
@@ -151,7 +151,7 @@ The default is their own private key and the server's public key to do collabora
  * The other party's ChatCookie expires, using unilateral random
  */
 + (GcmData *)createHalfRandomPeerIMGcmWithData:(NSString *)data chatPubkey:(NSString *)chatPubkey;
-+ (NSString *)decodeHalfRandomPeerImMessageGcmData:(GcmData *)gcmData
++ (NSData *)decodeHalfRandomPeerImMessageGcmData:(GcmData *)gcmData
                                          publickey:(NSString *)publickey
                                               salt:(NSData *)salt;
 
@@ -159,7 +159,7 @@ The default is their own private key and the server's public key to do collabora
  * Use temporary co-key encryption
  */
 + (GcmData *)createPeerIMGcmWithData:(NSString *)data chatPubkey:(NSString *)chatPubkey;
-+ (NSString *)decodePeerImMessageGcmData:(GcmData *)gcmData
++ (NSData *)decodePeerImMessageGcmData:(GcmData *)gcmData
                                publickey:(NSString *)publickey
                                     salt:(NSData *)salt
                                      ver:(NSData *)ver;

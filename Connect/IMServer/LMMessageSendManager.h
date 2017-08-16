@@ -7,14 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "MMMessage.h"
 #import "Protofile.pbobjc.h"
 
-typedef void(^SendMessageCallBlock)(MMMessage *message, NSError *error);
+typedef void(^SendMessageCallBlock)(ChatMessage *message, NSError *error);
 
 @interface SendMessageModel : NSObject
 
-@property(nonatomic, strong) MMMessage *sendMsg;
+@property(nonatomic, strong) ChatMessage *sendMsg;
+@property(nonatomic, strong) GPBMessage *originContent;
 @property(nonatomic, assign) long long sendTime;
 @property(nonatomic, copy) SendMessageCallBlock callBack;
 
@@ -24,12 +24,7 @@ typedef void(^SendMessageCallBlock)(MMMessage *message, NSError *error);
 
 + (instancetype)sharedManager;
 
-/**
- * add sending message to queue
- * @param message
- * @param callBack
- */
-- (void)addSendingMessage:(MMMessage *)message callBack:(SendMessageCallBlock)callBack;
+- (void)addSendingMessage:(ChatMessage *)message originContent:(GPBMessage *)originContent callBack:(SendMessageCallBlock)callBack;
 
 /**
  * message send success and callback

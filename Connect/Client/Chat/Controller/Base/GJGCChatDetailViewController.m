@@ -165,7 +165,7 @@
 
 - (void)groupAdmingChange:(NSNotification *)note {
     ChatMessageInfo *messageInfo = note.object;
-    LMRamMemberInfo *currentAdmin = [[GroupDBManager sharedManager] getAdminByGroupId:messageInfo.message.publicKey];
+    LMRamMemberInfo *currentAdmin = [[GroupDBManager sharedManager] getAdminByGroupId:messageInfo.messageOwer];
 //    if (currentAdmin) {
 //        [[GroupDBManager sharedManager] executeRealmWithBlock:^{
 //          self.taklInfo.chatGroupInfo.admin = currentAdmin;
@@ -216,7 +216,7 @@
             case 2://TransactionTypeRedBag
             {
                 ChatMessageInfo *chatMessage = [note.object valueForKey:@"chatMessage"];
-                [self.dataSourceManager showGetRedBagMessageWithWithMessage:chatMessage.message];
+                [self.dataSourceManager showGetRedBagMessageWithWithMessage:chatMessage];
             }
                 break;
             case 3:
@@ -224,7 +224,7 @@
             {
                 [GCDQueue executeInGlobalQueue:^{
                     ChatMessageInfo *chatMessage = [note.object valueForKey:@"chatMessage"];
-                    chatMessage.message.content = [GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:self.taklInfo.chatUser.normalShowName receiptName:chatModel.senderName isCrowding:NO].string;
+                    NSString *tips = [GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:self.taklInfo.chatUser.normalShowName receiptName:chatModel.senderName isCrowding:NO].string;
                     [[MessageDBManager sharedManager] updataMessage:chatMessage];
                 }];
                 chatModel.payOrReceiptStatusMessage = [GJGCChatSystemNotiCellStyle formateRecieptSubTipsWithTotal:chatModel.memberCount payCount:0 isCrowding:NO transStatus:status];
@@ -234,7 +234,7 @@
             case 6://crowding pay note
             {
                 ChatMessageInfo *chatMessage = [note.object valueForKey:@"chatMessage"];
-                NSString *operation = chatMessage.message.content;
+                NSString *operation = @"";
                 NSArray *temA = [operation componentsSeparatedByString:@"/"];
                 Crowdfunding *crowdInfo = [note.object valueForKey:@"crowdfunding"];
                 if (temA.count == 2) {

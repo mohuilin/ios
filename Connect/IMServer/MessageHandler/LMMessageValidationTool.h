@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class MMMessage;
+@class ChatMessageInfo;
 
 typedef NS_ENUM(NSInteger, MessageType) {
     MessageTypePersion = 0,
@@ -24,6 +24,6 @@ typedef NS_ENUM(NSInteger, MessageType) {
  * @param msgType
  * @return
  */
-+ (BOOL)checkMessageValidata:(MMMessage *)message messageType:(MessageType)msgType;
++ (BOOL)checkMessageValidata:(ChatMessageInfo *)message messageType:(MessageType)msgType;
 
 @end

@@ -22,6 +22,7 @@
 #import "LMRamMemberInfo.h"
 #import "LMIMHelper.h"
 #import "LMMessageAdapter.h"
+#import "LMMessageTool.h"
 
 @interface ChatFriendSetViewController ()
 
@@ -351,16 +352,11 @@
     groupMessage.identifier = group.identifier;
 
     for (AccountInfo *info in self.members) {
-
         if ([info.pub_key isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
             continue;
         }
-        MessageData *messageData = [LMMessageAdapter packageMessageDataWithTo:info.pub_key chatType:0 msgType:0 ext:nil groupEcdh:nil cipherData:groupMessage];
-        NSString *sign = [ConnectTool signWithData:messageData.data];
-        MessagePost *messagePost = [[MessagePost alloc] init];
-        messagePost.sign = sign;
-        messagePost.pubKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        messagePost.msgData = messageData;
+        ChatMessage *chatMsg = [LMMessageTool chatMsgWithTo:info.pub_key chatType:0 msgType:0 ext:nil];
+        MessagePost *messagePost = [LMMessageAdapter packageChatMsg:chatMsg groupEcdh:nil cipherData:groupMessage];
         [[IMService instance] asyncSendGroupInfo:messagePost];
     }
     [GCDQueue executeInMainQueue:^{

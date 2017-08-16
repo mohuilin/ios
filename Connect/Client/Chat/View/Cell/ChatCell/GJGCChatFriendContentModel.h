@@ -57,10 +57,10 @@
 
 #pragma mark - image
 
-@property(nonatomic, strong) NSString *imageMessageUrl;
+@property(nonatomic, copy) NSString *imageMessageUrl;
 @property(nonatomic, copy) NSString *imageOriginDataCachePath;
 @property(nonatomic, copy) NSString *downEncodeImageCachePath;
-@property(nonatomic, strong) NSString *thumbImageCachePath;
+@property(nonatomic, copy) NSString *thumbImageCachePath;
 @property(nonatomic, copy) NSString *downThumbEncodeImageCachePath;
 @property(nonatomic, assign) NSInteger originImageWidth;
 @property(nonatomic, assign) NSInteger originImageHeight;

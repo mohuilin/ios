@@ -35,6 +35,7 @@
 #import "NSMutableArray+MoveObject.h"
 #import "LMRealmDBManager.h"
 #import "LMRealmManager.h"
+#import "LMMessageTool.h"
 
 @interface MainTabController (){
     dispatch_source_t _timer;
@@ -240,20 +241,7 @@
 - (void)createGroupWithGroupInfo:(LMRamGroupInfo *)groupInfo content:(NSString *)tipMessage{
     
     if (tipMessage) {
-        NSString *localMsgId = [ConnectTool generateMessageId];
-        ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-        chatMessage.messageId = localMsgId;
-        chatMessage.messageOwer = groupInfo.groupIdentifer;
-        chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-        chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-        MMMessage *message = [[MMMessage alloc] init];
-        message.type = GJGCChatFriendContentTypeStatusTip;
-        message.content = tipMessage;
-        message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-        message.message_id = localMsgId;
-        message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        chatMessage.message = message;
+        ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:groupInfo.groupIdentifer content:tipMessage noteType:0 ext:nil];
         [[MessageDBManager sharedManager] saveMessage:chatMessage];
     }
     GJGCChatFriendTalkModel *talk = [[GJGCChatFriendTalkModel alloc] init];

@@ -15,6 +15,7 @@
 #import "ConnectTool.h"
 #import "LMRecentChat.h"
 #import "LMIMHelper.h"
+#import "LMMessageTool.h"
 
 @interface LMConversionManager ()
 
@@ -89,12 +90,8 @@ CREATE_SHARED_MANAGER(LMConversionManager)
             recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:lastMessage.messageOwer];
             if (!recentModel) {
                 AccountInfo *contact = [[UserDBManager sharedManager] getUserByPublickey:lastMessage.messageOwer];
-                if (!contact &&
-                    lastMessage.message.senderInfoExt) {
+                if (!contact) {
                     contact = [[AccountInfo alloc] init];
-                    contact.address = [lastMessage.message.senderInfoExt valueForKey:@"address"];
-                    contact.avatar = [lastMessage.message.senderInfoExt valueForKey:@"avatar"];
-                    contact.username = [lastMessage.message.senderInfoExt valueForKey:@"username"];
                     contact.pub_key = lastMessage.messageOwer;
                     //Sync contacts
                     if (![[UserDBManager sharedManager] isFriendByAddress:contact.address] && !self.syncContacting) {
@@ -112,17 +109,17 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 recentModel.identifier = lastMessage.messageOwer;
                 recentModel.unReadCount = messageCount;
                 recentModel.chatUser = contact;
-                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content];
+                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:@""];
                 recentModel.snapChatDeleteTime = (int)snapChatTime;
                 recentModel.notifyStatus = [[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:recentModel.identifier];
-                if (lastMessage.message.type == GJGCChatFriendContentTypeSnapChat) {
+                if (lastMessage.messageType == GJGCChatFriendContentTypeSnapChat) {
                     recentModel.unReadCount = 0;
-                    recentModel.snapChatDeleteTime = [lastMessage.message.content intValue];
+                    recentModel.snapChatDeleteTime = 0;
                 }
                 [[RecentChatDBManager sharedManager] save:recentModel];
             } else{
                 
-                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content];
+                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:@""];
                 if (recentModel.stranger) {
                     recentModel.stranger = NO;
                     recentModel.chatUser.stranger = NO;
@@ -134,8 +131,8 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 NSDate *time = [NSDate date];
                 recentModel.createTime = time;
 
-                if (lastMessage.message.type == GJGCChatFriendContentTypeSnapChat) {
-                    recentModel.snapChatDeleteTime = [lastMessage.message.content intValue];
+                if (lastMessage.messageType == GJGCChatFriendContentTypeSnapChat) {
+                    recentModel.snapChatDeleteTime = 0;
                 }
                 
                 //update
@@ -158,15 +155,9 @@ CREATE_SHARED_MANAGER(LMConversionManager)
             
         case GJGCChatFriendTalkTypeGroup:
         {
-           
+            LMRamGroupInfo *group = nil;
             recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:lastMessage.messageOwer];
             if (!recentModel) {
-                
-                LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:lastMessage.messageOwer];
-                NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-                for (LMRamMemberInfo *info in group.membersArray) {
-                    dic[info.address] = info;
-                }
                 recentModel = [[RecentChatModel alloc] init];
                 recentModel.headUrl = group.avatarUrl;
                 recentModel.name = group.groupName;
@@ -175,35 +166,15 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 recentModel.unReadCount = messageCount;
                 NSString *sendName = nil;
                 LMRamMemberInfo *senderUser = nil;
-                if ([dic allValues].count > 0) {
-                   senderUser = [dic valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
-                }
-                if (senderUser) {
-                    sendName = senderUser.username;
-                } else{
-                    sendName = [lastMessage.message.senderInfoExt valueForKey:@"username"];
-                }
-                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content senderUserName:sendName];
+                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:@"" senderUserName:sendName];
                 recentModel.talkType = GJGCChatFriendTalkTypeGroup;
                 recentModel.chatGroupInfo = group;
                 recentModel.notifyStatus = [[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:recentModel.identifier];
                 [[RecentChatDBManager sharedManager] save:recentModel];
             } else{
                 NSString *sendName = nil;
-                NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-                for (LMRamMemberInfo *info in recentModel.chatGroupInfo.membersArray) {
-                    dic[info.address] = info;
-                }
                 LMRamMemberInfo *senderUser = nil;
-                if ([dic allValues].count > 0) {
-                   senderUser = [dic valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
-                }
-                if (senderUser) {
-                    sendName = senderUser.username;
-                } else{
-                    sendName = [lastMessage.message.senderInfoExt valueForKey:@"username"];
-                }
-                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content senderUserName:sendName];
+                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:@"" senderUserName:sendName];
                 if ([[SessionManager sharedManager].chatSession isEqualToString:recentModel.identifier]) {
                     recentModel.unReadCount = 0;
                 } else{
@@ -235,7 +206,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 }
                 NSDate *time = [NSDate date];
                 recentModel.createTime = time;
-                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content];
+                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:@""];
                 
                 
                 //update
@@ -253,7 +224,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 recentModel.name = @"Connect";
                 recentModel.headUrl = @"connect_logo";
                 recentModel.identifier = kSystemIdendifier;
-                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content];
+                recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:@""];
                 [[RecentChatDBManager sharedManager] save:recentModel];
             }
         }
@@ -273,24 +244,14 @@ CREATE_SHARED_MANAGER(LMConversionManager)
         recentModel.name = group.groupName;
         recentModel.createTime = [NSDate date];
         recentModel.identifier = lastMessage.messageOwer;
-        recentModel.content = lastMessage.message.content;
+        recentModel.content = @"";
         recentModel.unReadCount = messageCount;
         recentModel.groupNoteMyself = groupNoteMyself;
         NSString *sendName = nil;
-        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-        for (LMRamMemberInfo *info in group.membersArray) {
-            dic[info.address] = info;
-        }
+
         LMRamMemberInfo *senderUser = nil;
-        if ([dic allValues].count > 0) {
-           senderUser = [dic valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
-        }
-        if (senderUser) {
-            sendName = senderUser.username;
-        } else{
-            sendName = [lastMessage.message.senderInfoExt valueForKey:@"username"];
-        }
-        recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content senderUserName:sendName];
+        
+        recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:@"" senderUserName:sendName];
         recentModel.talkType = GJGCChatFriendTalkTypeGroup;
         recentModel.chatGroupInfo = group;
         recentModel.notifyStatus = [[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:recentModel.identifier];
@@ -304,20 +265,8 @@ CREATE_SHARED_MANAGER(LMConversionManager)
             }
         }
         NSString *sendName = nil;
-        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
         LMRamMemberInfo *senderUser = nil;
-        for (LMRamMemberInfo *info in recentModel.chatGroupInfo.membersArray) {
-            dic[info.address] = info;
-        }
-        if ([dic allValues].count > 0) {
-          senderUser = [dic valueForKey:[lastMessage.message.senderInfoExt valueForKey:@"address"]];
-        }
-        if (senderUser) {
-            sendName = senderUser.username;
-        } else{
-            sendName = [lastMessage.message.senderInfoExt valueForKey:@"username"];
-        }
-        recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:lastMessage.message.content senderUserName:sendName];
+        recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType textMessage:@"" senderUserName:sendName];
         if ([[SessionManager sharedManager].chatSession isEqualToString:recentModel.identifier]) {
             recentModel.unReadCount = 0;
         } else{
@@ -367,19 +316,19 @@ CREATE_SHARED_MANAGER(LMConversionManager)
 }
 
 
-- (void)sendMessage:(MMMessage *)message type:(GJGCChatFriendTalkType)type{
+- (void)sendMessage:(ChatMessage *)chatMsg content:(NSString *)content snapChat:(BOOL)snapChat type:(GJGCChatFriendTalkType)type{
     
     NSString *lastContentString = nil;
-    if (type == GJGCChatFriendTalkTypeGroup) {
-        lastContentString = [GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content senderUserName:[message.senderInfoExt valueForKey:@"username"]];
-    } else{
-        lastContentString = [GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content];
-    }
-    if ([[message.ext valueForKey:@"luck_delete"] integerValue] > 0) {
+    if (snapChat) {
         lastContentString = LMLocalizedString(@"Chat send a snap chat message", nil);
+    } else {
+        if (type == GJGCChatFriendTalkTypeGroup) {
+            lastContentString = [GJGCChatFriendConstans lastContentMessageWithType:chatMsg.msgType textMessage:content senderUserName:[[LKUserCenter shareCenter] currentLoginUser].username];
+        } else{
+            lastContentString = [GJGCChatFriendConstans lastContentMessageWithType:chatMsg.msgType textMessage:content];
+        }
     }
-    RecentChatModel *recentModel = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:message.publicKey groupChat:type == GJGCChatFriendTalkTypeGroup lastContentShowType:0 lastContent:lastContentString];
-    
+    RecentChatModel *recentModel = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:chatMsg.to groupChat:type == GJGCChatFriendTalkTypeGroup lastContentShowType:0 lastContent:lastContentString];
     if (recentModel.stranger && recentModel.talkType == GJGCChatFriendTalkTypePrivate) {
         recentModel.stranger = ![[UserDBManager sharedManager] isFriendByAddress:[LMIMHelper getAddressByPubkey:recentModel.identifier]];
         recentModel.chatUser.stranger = recentModel.stranger;
@@ -391,32 +340,9 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     if (!chatUser || [chatUser.pub_key isEqualToString:kSystemIdendifier]) {
         return;
     }
-    MMMessage *message = [[MMMessage alloc] init];
-    NSDictionary *senderInfoExt = @{@"address":chatUser.address,
-                                    @"avatar":chatUser.avatar,
-                                    @"username":chatUser.username};
-    message.senderInfoExt = senderInfoExt;
-    message.type = GJGCChatFriendContentTypeText;
-    long int time = [[UserDBManager sharedManager] getRequestTimeByUserPublickey:chatUser.pub_key];
-    if (time) {
-        message.sendtime  = time;
-    } else{
-        message.sendtime  = (long int)([[NSDate date] timeIntervalSince1970] * 1000);
-    }
-    message.message_id =  [ConnectTool generateMessageId];
-    message.content = !GJCFStringIsNull(chatUser.message)?chatUser.message:[NSString stringWithFormat:LMLocalizedString(@"Link Hello I am", nil),chatUser.username];
-    message.publicKey = chatUser.pub_key;
-    message.user_id = [[LKUserCenter shareCenter] currentLoginUser].address;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];
-    messageInfo.messageId = message.message_id;
-    messageInfo.messageType = message.type;
-    messageInfo.createTime = (NSInteger)message.sendtime;
-    messageInfo.messageOwer = chatUser.pub_key;
+    
+    ChatMessageInfo *messageInfo = [LMMessageTool makeTextChatMessageWithMessageText:!GJCFStringIsNull(chatUser.message)?chatUser.message:[NSString stringWithFormat:LMLocalizedString(@"Link Hello I am", nil),chatUser.username] msgOwer:chatUser.pub_key sender:chatUser.address];
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    messageInfo.message = message;
-    messageInfo.snapTime = 0;
-    messageInfo.readTime = 0;
     [[MessageDBManager sharedManager] saveMessage:messageInfo];
     [self getNewMessagesWithLastMessage:messageInfo newMessageCount:1 type:GJGCChatFriendTalkTypePrivate withSnapChatTime:0];
 }

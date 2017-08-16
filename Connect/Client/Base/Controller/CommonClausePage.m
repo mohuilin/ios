@@ -11,7 +11,6 @@
 #import "MMProgressWebView.h"
 #import "UIAlertController+Blocks.h"
 #import "ReconmandChatListPage.h"
-#import "MMMessage.h"
 #import "TFHpple.h"
 
 @interface CommonClausePage () <WKNavigationDelegate>
@@ -116,26 +115,25 @@
                                                    }
 
                                                    LMRerweetModel *retweetModel = [[LMRerweetModel alloc] init];
-                                                   MMMessage *message = [[MMMessage alloc] init];
-                                                   message.type = GJGCChatWalletLink;
-                                                   message.content = shareUrl;
-                                                   NSString *title = LMLocalizedString(@"Share the web page", nil);
-                                                   NSString *subTitle = [descElement.attributes valueForKey:@"content"];
-                                                   if (!subTitle) {
-                                                       subTitle = shareUrl;
+                                                   ChatMessageInfo *chatMessageInfo = [ChatMessageInfo new];
+                                                   chatMessageInfo.messageType = GJGCChatWalletLink;
+                                                   WebsiteMessage *website = [WebsiteMessage new];
+                                                   website.URL = shareUrl;
+                                                   website.title = LMLocalizedString(@"Share the web page", nil);
+                                                   website.subtitle = [descElement.attributes valueForKey:@"content"];
+                                                   if (!website.subtitle) {
+                                                       website.subtitle = shareUrl;
                                                    }
+                                                   chatMessageInfo.msgContent = website;
+                                                   
                                                    if (weakSelf.progressWebView.webView.title) {
-                                                       title = weakSelf.progressWebView.webView.title;
+                                                       website.title = weakSelf.progressWebView.webView.title;
                                                    }
-
-                                                   NSMutableDictionary *ext1 = [NSMutableDictionary dictionary];
-                                                   [ext1 setObject:title forKey:@"linkTitle"];
-                                                   [ext1 setObject:subTitle forKey:@"linkSubtitle"];
                                                    if (linkImageUrl) {
-                                                       [ext1 setObject:linkImageUrl forKey:@"linkImageUrl"];
+                                                       website.img = linkImageUrl;
                                                    }
-                                                   message.ext1 = ext1;
-                                                   retweetModel.retweetMessage = message;
+                                                   
+                                                   retweetModel.retweetMessage = chatMessageInfo;
                                                    ReconmandChatListPage *page = [[ReconmandChatListPage alloc] initWithRetweetModel:retweetModel];
                                                    page.title = LMLocalizedString(@"Chat Retweet", nil);
                                                    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:page];

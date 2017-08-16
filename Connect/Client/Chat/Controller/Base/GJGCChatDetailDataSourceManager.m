@@ -20,6 +20,7 @@
 #import "GJCFFileUploadManager.h"
 #import "LMMessageTool.h"
 #import "LMMessage.h"
+#import "LMConnectIMChater.h"
 
 @interface GJGCChatDetailDataSourceManager () <MessageHandlerGetNewMessage>
 
@@ -258,21 +259,14 @@
 }
 
 - (void)readMessageAck:(NSString *)messageid {
-    MMMessage *readedMessage = [[MMMessage alloc] init];
-    readedMessage.type = GJGCChatFriendContentTypeSnapChatReadedAck;
-    readedMessage.publicKey = self.taklInfo.chatIdendifier;
-    readedMessage.user_id = self.taklInfo.chatUser.address;
-    readedMessage.message_id = [ConnectTool generateMessageId];
-    readedMessage.content = messageid;
-
-    [[IMService instance] asyncSendMessageReadAck:readedMessage onQueue:nil completion:^(MMMessage *message, NSError *error) {
-        if (message.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
+    [[LMConnectIMChater sharedManager] sendReadAckWithMessageId:messageid to:self.taklInfo.chatIdendifier complete:^(ChatMessage *chatMsg, NSError *error) {
+        if (chatMsg.sendStatus == GJGCChatFriendSendMessageStatusSuccess) {
             GJGCChatFriendContentModel *model = (GJGCChatFriendContentModel *) [self contentModelByMsgId:messageid];
             [GCDQueue executeInMainQueue:^{
                 [self updateChatContentMessageCounterCricleAnimation:model];
             }];
         }
-    }                                     onQueue:nil];
+    }];
 }
 
 
@@ -586,19 +580,11 @@
 
     [self addChatContentModel:snapChatModel];
 
-    MMMessage *message = [[MMMessage alloc] init];
-    message.content = [NSString stringWithFormat:@"%d", time];
-    message.type = GJGCChatFriendContentTypeSnapChat;
-    message.message_id = snapChatModel.localMsgId;
-    message.sendtime = snapChatModel.sendTime;
-    message.publicKey = self.taklInfo.chatIdendifier;
-    message.user_id = self.taklInfo.chatUser.address;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-
-    [LMMessageTool savaSendMessageToDB:message];
-
+    
     [[RecentChatDBManager sharedManager] openSnapChatWithIdentifier:self.taklInfo.chatIdendifier snapTime:time openOrCloseByMyself:YES];
-    [self sendMessagePost:message];
+    
+    /// 发送消息
+    
     if (time == 0) {
         [self outSnapchatMode];
     } else {
@@ -815,26 +801,20 @@
     return nil;
 }
 
-- (MMMessage *)messageByMessageId:(NSString *)msgId {
+- (ChatMessageInfo *)messageByMessageId:(NSString *)msgId {
 
     if (GJCFStringIsNull(msgId)) {
         return nil;
     }
-
-    MMMessage *findMessage = nil;
-
+    ChatMessageInfo *findMessage = nil;
     for (int i = 0; i < self.orginMessageListArray.count; i++) {
-
-        MMMessage *message = [self.orginMessageListArray objectAtIndex:i];
-
-        if ([message.message_id isEqualToString:msgId]) {
-
-            findMessage = message;
+        ChatMessageInfo *chatMessageInfo = [self.orginMessageListArray objectAtIndex:i];
+        if ([chatMessageInfo.messageId isEqualToString:msgId]) {
+            findMessage = chatMessageInfo;
             break;
         }
 
     }
-
     return findMessage;
 
 }
@@ -857,7 +837,7 @@
 
 #pragma mark - formart message
 
-- (GJGCChatFriendContentType)formateChatFriendContent:(GJGCChatFriendContentModel *)chatContentModel withMsgModel:(MMMessage *)message {
+- (GJGCChatFriendContentType)formateChatFriendContent:(GJGCChatFriendContentModel *)chatContentModel withMsgModel:(ChatMessageInfo *)message {
     return [LMMessageTool formateChatFriendContent:chatContentModel withMsgModel:message];
 }
 
@@ -881,200 +861,25 @@
     [self addChatContentModel:messageContent];
     dispatch_source_merge_data(_refreshListSource, 1);
     self.lastSendMsgTime = [[NSDate date] timeIntervalSince1970] * 1000;
-    MMMessage *message = [LMMessageTool packSendMessageWithChatContent:messageContent snapTime:self.taklInfo.snapChatOutDataTime];
-    if (message) {
-        //add orgin message to array
-        [self.orginMessageListArray addObject:message];
-        messageContent.isSnapChatMode = self.taklInfo.snapChatOutDataTime > 0;
-        messageContent.readState = GJGCChatFriendMessageReadStateReaded;
-        if (![self.ignoreMessageTypes containsObject:@(messageContent.contentType)]) {
-            NSString *snapTime = @"0";
-            NSString *readTime = @"0";
-            NSDictionary *ext = message.ext;
-            if ([message.ext isKindOfClass:[NSString class]]) {
-                ext = [message.ext dictionaryValue];
-            } else if ([message.ext isKindOfClass:[NSDictionary class]]) {
-                ext = message.ext;
-            }
-            if (ext) {
-                if ([ext.allKeys containsObject:@"luck_delete"]) {
-                    snapTime = [ext valueForKey:@"luck_delete"];
-                }
-                if ([ext.allKeys containsObject:@"read_time"]) {
-                    readTime = [ext valueForKey:@"read_time"];
-                }
-            }
-            //set snaptime
-            messageContent.snapTime = [snapTime intValue];
-            if (messageContent.snapTime > 0) {
-                //readed message
-                if ([readTime integerValue] > 0) {
-                    messageContent.readTime = [readTime integerValue];
-                    messageContent.readState = GJGCChatFriendMessageReadStateReaded;
-                    [self openSnapMessageCounterState:messageContent];
-                } else {
-                    messageContent.readState = GJGCChatFriendMessageReadStateUnReaded;
-                }
-            }
-        }
-    }
-
-    //update conversion
-    [[LMConversionManager sharedManager] sendMessage:message type:self.taklInfo.talkType];
     
-    //save message
-    [LMMessageTool savaSendMessageToDB:message];
-    
-    //send message
-    [[IMService instance] asyncSendMessage:message uploadFileFailBlock:^(GJCFFileUploadTask *task, NSError *error) {
-        MMMessage *message = [task.userInfo valueForKey:@"message"];
-        GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self contentModelByMsgId:message.message_id];
-        contentModel.uploadSuccess = NO;
-        contentModel.uploadProgress = 0.f;
-        [self updateMessageState:message state:GJGCChatFriendSendMessageStatusFaild];
-    } uploadCompletionBlock:^(GJCFFileUploadTask *task, FileData *fileData) {
-        MMMessage *message = [task.userInfo valueForKey:@"message"];
-        GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self contentModelByMsgId:message.message_id];
-        contentModel.uploadSuccess = YES;
-        contentModel.uploadProgress = 1.f;
-        [self uploadSuccessWithUrlDict:fileData mmmessage:message messageContentModel:contentModel system:[task.userInfo valueForKey:@"system"]];
-    } progressBlock:^(GJCFFileUploadTask *updateTask, CGFloat progressValue) {
-        MMMessage *message = [updateTask.userInfo valueForKey:@"message"];
-        GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self contentModelByMsgId:message.message_id];
-        contentModel.uploadProgress = progressValue;
-        NSInteger index = [self.chatListArray indexOfObject:contentModel];
-        if ([self.delegate respondsToSelector:@selector(dataSourceManagerUpdateUploadprogress:progress:index:)]) {
-            [self.delegate dataSourceManagerUpdateUploadprogress:self progress:progressValue index:index];
-        }
-    } chatEcdhKey:self.taklInfo.group_ecdhKey contentModel:messageContent sendMessageCompletion:^(MMMessage *messageInfo, NSError *error) {
-        if (messageInfo && messageInfo.type != 12) {
-            //update message send_status and create tip message
-            [self updateMessageState:messageInfo state:messageInfo.sendstatus];
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccessUnArrive) { //show blocked tips
-                [self showUnArriveMessageCell];
-            } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNoRelationShip){ //show without relationcship tips
-                [self showNoRelationShipTipMessageCell];
-            } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNotInGroup) { //show you are not in group chat tips
-                [self showNoInfoGroupMessageCell];
-            }
-        }
+    [[LMConnectIMChater sharedManager] sendMsgWithUIContentModel:messageContent chatIdentifier:self.taklInfo.chatIdendifier chatType:self.taklInfo.talkType snapTime:self.taklInfo.snapChatOutDataTime progress:^(CGFloat progress) {
+        
+    } complete:^(ChatMessage *chatMsg, NSError *error) {
+        
     }];
     
     return YES;
 }
 
-
-/**
- *  upload message success callback
- *
- *  @param response
- *  @param message
- *  @param messageContent
- */
-- (void)uploadSuccessWithUrlDict:(FileData *)fileData mmmessage:(MMMessage *)message messageContentModel:(GJGCChatFriendContentModel *)messageContent system:(BOOL)system {
-
-    NSString *fileUrl = nil;
-    if (system) {
-        fileUrl = [NSString stringWithFormat:@"%@?token=%@", fileData.URL, fileData.token];
-    } else {
-        fileUrl = [NSString stringWithFormat:@"%@?pub_key=%@&token=%@", fileData.URL, messageContent.reciverPublicKey, fileData.token];
-    }
-    switch (messageContent.contentType) {
-        case GJGCChatFriendContentTypeVideo:
-        case GJGCChatFriendContentTypeImage: {
-            if (system) {
-                message.content = fileUrl;
-            } else {
-                message.content = [NSString stringWithFormat:@"%@/thumb?pub_key=%@&token=%@", fileData.URL, messageContent.reciverPublicKey, fileData.token];
-                message.url = fileUrl;
-            }
-        }
-            break;
-        case GJGCChatFriendContentTypeMapLocation:
-        case GJGCChatFriendContentTypeAudio: {
-            message.content = fileUrl;
-        }
-            break;
-        default:
-            break;
-    }
-
-    [LMMessageTool updateSendMessageStatus:message];
-    [self sendMessagePost:message];
-
-    NSInteger index = NSNotFound;
-    for (MMMessage *msg in self.orginMessageListArray) {
-        if ([msg.message_id isEqualToString:message.message_id]) {
-            index = [self.orginMessageListArray indexOfObject:msg];
-            break;
-        }
-    }
-    if (index != NSNotFound) {
-        [self.orginMessageListArray removeObjectAtIndexCheck:index];
-        [self.orginMessageListArray objectInsert:message atIndex:index];
-    }
-}
-
 #pragma mark - resend message
 
 - (void)reSendMesssage:(GJGCChatFriendContentModel *)messageContent {
-    MMMessage *bmMessage = [self messageByMessageId:messageContent.localMsgId];
-    if (!messageContent ||
-        !bmMessage) {
-        return;
-    }
-    if ([LMMessageTool checkRichtextUploadStatuts:bmMessage]) {
-        [self sendMessagePost:bmMessage];
-    } else {
-        //send message
-        [[IMService instance] asyncSendMessage:bmMessage uploadFileFailBlock:^(GJCFFileUploadTask *task, NSError *error) {
-            MMMessage *message = [task.userInfo valueForKey:@"message"];
-            GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self contentModelByMsgId:message.message_id];
-            contentModel.uploadSuccess = NO;
-            contentModel.uploadProgress = 0.f;
-            [self updateMessageState:message state:GJGCChatFriendSendMessageStatusFaild];
-        } uploadCompletionBlock:^(GJCFFileUploadTask *task, FileData *fileData) {
-            MMMessage *message = [task.userInfo valueForKey:@"message"];
-            GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self contentModelByMsgId:message.message_id];
-            contentModel.uploadSuccess = YES;
-            contentModel.uploadProgress = 1.f;
-            [self uploadSuccessWithUrlDict:fileData mmmessage:message messageContentModel:contentModel system:[task.userInfo valueForKey:@"system"]];
-        } progressBlock:^(GJCFFileUploadTask *updateTask, CGFloat progressValue) {
-            MMMessage *message = [updateTask.userInfo valueForKey:@"message"];
-            GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self contentModelByMsgId:message.message_id];
-            contentModel.uploadProgress = progressValue;
-            NSInteger index = [self.chatListArray indexOfObject:contentModel];
-            if ([self.delegate respondsToSelector:@selector(dataSourceManagerUpdateUploadprogress:progress:index:)]) {
-                [self.delegate dataSourceManagerUpdateUploadprogress:self progress:progressValue index:index];
-            }
-        } chatEcdhKey:self.taklInfo.group_ecdhKey contentModel:messageContent sendMessageCompletion:^(MMMessage *messageInfo, NSError *error) {
-            if (!messageInfo) {
-                return;
-            }
-            if (messageInfo.type == 12) {
-                DDLogInfo(@"Read receipt of the message of success！！！");
-                return;
-            }
-            //update message send_status
-            [self updateMessageState:messageInfo state:messageInfo.sendstatus];
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccessUnArrive) { //show blocked tips
-                [self showUnArriveMessageCell];
-            } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNoRelationShip){ //show without relationcship tips
-                [self showNoRelationShipTipMessageCell];
-            } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNotInGroup) { //show you are not in group chat tips
-                [self showNoInfoGroupMessageCell];
-            }
-            ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:messageInfo.message_id messageOwer:self.taklInfo.chatIdendifier];
-            chatMessage.message = messageInfo;
-            chatMessage.sendstatus = messageInfo.sendstatus;
-            [[MessageDBManager sharedManager] updataMessage:chatMessage];
-        }];
-    }
+    
 }
 
 - (void)reSendUnSendingMessages {
     for (MMMessage *bmMessage in self.sendingMessages) {
-        [self reSendMesssage:(GJGCChatFriendContentModel *) [self contentModelByMsgId:bmMessage.message_id]];
+        
     }
 }
 
@@ -1130,7 +935,7 @@
     if (message.messageType == GJGCChatFriendContentTypeSnapChat) {
 
         [self addMMMessage:message];
-        self.taklInfo.snapChatOutDataTime = [message.message.content intValue];
+        self.taklInfo.snapChatOutDataTime = 0;
         [GCDQueue executeInMainQueue:^{
             if (self.taklInfo.snapChatOutDataTime > 0) {
                 if ([self.delegate respondsToSelector:@selector(dataSourceManagerEnterSnapChat:)]) {
@@ -1184,16 +989,9 @@
 
                 snapChatModel.localMsgId = [ConnectTool generateMessageId];
                 [self addChatContentModel:snapChatModel];
-                MMMessage *message = [[MMMessage alloc] init];
-                message.content = [NSString stringWithFormat:@"%d", self.taklInfo.snapChatOutDataTime];
-                message.type = GJGCChatFriendContentTypeSnapChat;
-                message.message_id = snapChatModel.localMsgId;
-                message.sendtime = snapChatModel.sendTime;
-                message.publicKey = self.taklInfo.chatIdendifier;
-                message.user_id = self.taklInfo.chatUser.address;
-                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-
-                [LMMessageTool savaSendMessageToDB:message];
+                
+                /// 创建一条阅后即焚消息
+                
             }
             if (!isSnapChatModel) {
 
@@ -1216,16 +1014,8 @@
 
                 [self addChatContentModel:snapChatModel];
 
-                MMMessage *snapTipMessage = [[MMMessage alloc] init];
-                snapTipMessage.content = [NSString stringWithFormat:@"%d", self.taklInfo.snapChatOutDataTime];
-                snapTipMessage.type = GJGCChatFriendContentTypeSnapChat;
-                snapTipMessage.message_id = snapChatModel.localMsgId;
-                snapTipMessage.sendtime = snapChatModel.sendTime;
-                snapTipMessage.publicKey = self.taklInfo.chatIdendifier;
-                snapTipMessage.user_id = self.taklInfo.chatUser.address;
-                snapTipMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-
-                [LMMessageTool savaSendMessageToDB:snapTipMessage];
+                /// 创建一条阅后即焚消息
+                
                 //Read ack
                 [self sendMessageReadAck:message];
 
@@ -1254,17 +1044,9 @@
                 snapChatModel.sendTime = (long long int) ([sendTime timeIntervalSince1970] * 1000);
                 snapChatModel.localMsgId = [ConnectTool generateMessageId];
                 [self addChatContentModel:snapChatModel];
-                MMMessage *message = [[MMMessage alloc] init];
-                message.content = @"0";
-                message.type = GJGCChatFriendContentTypeSnapChat;
-                message.message_id = snapChatModel.localMsgId;
-                message.sendtime = snapChatModel.sendTime;
-                message.publicKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-                message.user_id = [[LKUserCenter shareCenter] currentLoginUser].address;
-                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-
-                [LMMessageTool savaSendMessageToDB:message];
-
+                
+                /// 创建一条关闭阅后即焚的消息
+                
                 [[RecentChatDBManager sharedManager] openOrCloseSnapChatWithTime:0 chatIdentifer:self.taklInfo.chatIdendifier];
                 for (GJGCChatContentBaseModel *model in self.chatListArray) {
                     model.isSnapChatMode = NO;
@@ -1291,7 +1073,7 @@
         case GJGCChatWalletLink:
         case GJGCChatFriendContentTypeMapLocation: {
             GJGCChatContentBaseModel *temModel = [GJGCChatContentBaseModel new];
-            temModel.sendTime = message.message.sendtime;
+            temModel.sendTime = message.createTime;
             GJGCChatContentBaseModel *timeConttentModel = [self updateTheNewMsgTimeString:temModel];
             if (timeConttentModel) {
                 [self.chatListArray addObject:timeConttentModel];
@@ -1342,12 +1124,12 @@
 }
 
 
-- (void)updateMessageState:(MMMessage *)theMessage state:(GJGCChatFriendSendMessageStatus)status {
+- (void)updateMessageState:(ChatMessageInfo *)theMessage state:(GJGCChatFriendSendMessageStatus)status {
     GJGCChatFriendContentModel *findContent = nil;
     NSInteger findIndex = NSNotFound;
     for (NSInteger index = 0; index < self.chatListArray.count; index++) {
         GJGCChatFriendContentModel *content = [self.chatListArray objectAtIndex:index];
-        if ([content.localMsgId isEqualToString:theMessage.message_id]) {
+        if ([content.localMsgId isEqualToString:theMessage.messageId]) {
             findContent = content;
             findIndex = index;
             break;
@@ -1457,8 +1239,8 @@
     self.lastSendMsgTime = time;
 }
 
-- (void)showGetRedBagMessageWithWithMessage:(MMMessage *)msg {
-    NSString *operation = msg.content;
+- (void)showGetRedBagMessageWithWithMessage:(ChatMessageInfo *)msg {
+    NSString *operation = @"";
     NSArray *temA = [operation componentsSeparatedByString:@"/"];
     if (temA.count == 2) {
         NSString *senderAddress = [temA firstObject];
@@ -1516,8 +1298,7 @@
         statusTipModel.statusIcon = @"luckybag";
         NSArray *contentHeightArray = [self heightForContentModel:statusTipModel];
         statusTipModel.contentHeight = [[contentHeightArray firstObject] floatValue];
-        statusTipModel.sendTime = msg.sendtime;
-        statusTipModel.localMsgId = msg.message_id;
+        
         [self addChatContentModel:statusTipModel];
 
         self.lastSendMsgTime = [[NSDate date] timeIntervalSince1970] * 1000;
@@ -1583,80 +1364,6 @@
 
 - (void)showEcdhKeyUpdataMessageWithSuccess:(BOOL)success {
 
-}
-
-
-- (void)sendMessagePost:(MMMessage *)message {
-    
-    __weak __typeof(&*self) weakSelf = self;
-    
-    if (self.taklInfo.talkType == GJGCChatFriendTalkTypePrivate) {
-        [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:^(MMMessage *messageInfo, NSError *error) {
-            if (!messageInfo) {
-                return;
-            }
-            if (messageInfo.type == 12) {
-                DDLogInfo(@"Read receipt of the message of success！！！");
-                return;
-            }
-            //update message send_status
-            [weakSelf updateMessageState:messageInfo state:messageInfo.sendstatus];
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccessUnArrive) { //show blocked tips
-                [weakSelf showUnArriveMessageCell];
-            } else if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNoRelationShip) //show without relationcship tips
-            {
-                [weakSelf showNoRelationShipTipMessageCell];
-            }
-            
-            ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:weakSelf.taklInfo.chatIdendifier];
-            chatMessage.message = messageInfo;
-            chatMessage.sendstatus = messageInfo.sendstatus;
-            
-            [[MessageDBManager sharedManager] updataMessage:chatMessage];
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
-                
-            }
-            
-        }                                     onQueue:nil];
-        
-    } else if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-        [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:self.taklInfo.group_ecdhKey onQueue:nil completion:^(MMMessage *messageInfo, NSError *error) {
-            
-            if (!messageInfo) {
-                return;
-            }
-            [weakSelf updateMessageState:messageInfo state:messageInfo.sendstatus];
-            
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusFailByNotInGroup) { //show you are not in group chat tips
-                [weakSelf showNoInfoGroupMessageCell];
-            }
-            
-            ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:weakSelf.taklInfo.chatIdendifier];
-            chatMessage.message = messageInfo;
-            chatMessage.sendstatus = messageInfo.sendstatus;
-            
-            [[MessageDBManager sharedManager] updataMessage:chatMessage];
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
-                
-            }
-        }                                   onQueue:nil];
-    } else if (self.taklInfo.talkType == GJGCChatFriendTalkTypePostSystem) {
-        [[IMService instance] asyncSendSystemMessage:message completion:^(MMMessage *messageInfo, NSError *error) {
-            if (!messageInfo) {
-                return;
-            }
-            [weakSelf updateMessageState:messageInfo state:messageInfo.sendstatus];
-            ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:weakSelf.taklInfo.chatIdendifier];
-            chatMessage.message = messageInfo;
-            chatMessage.sendstatus = messageInfo.sendstatus;
-            
-            [[MessageDBManager sharedManager] updataMessage:chatMessage];
-            
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
-                
-            }
-        }];
-    }
 }
 
 @end

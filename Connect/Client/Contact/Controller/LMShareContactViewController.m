@@ -29,6 +29,7 @@
 #import "LMRamGroupInfo.h"
 #import "LMContactAccountInfo.h"
 #import "LMRamGroupInfo.h"
+#import "LMMessageTool.h"
 
 @interface LMShareContactViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -94,7 +95,7 @@
     [self.view addSubview:self.tableView];
     //dudge is retweet
     if (self.retweetModel) {
-      self.contact = [[UserDBManager sharedManager] getUserByPublickey:self.retweetModel.retweetMessage.publicKey];
+      self.contact = [[UserDBManager sharedManager] getUserByPublickey:self.retweetModel.retweetMessage.messageOwer];
     }
     [[LMLinkManDataManager sharedManager] getRecommandGroupArrayWithRecommonUser:self.contact complete:^(NSMutableArray *groupArray, NSMutableArray *indexs) {
          self.groupsFriendArray = groupArray;
@@ -161,9 +162,9 @@
     }
     NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Chat Share contact to", nil), self.contact.username, displayName];
     if (self.retweetModel) {
-        if (self.retweetModel.retweetMessage.type == GJGCChatFriendContentTypeVideo) {
+        if (self.retweetModel.retweetMessage.messageType == GJGCChatFriendContentTypeVideo) {
             title = [NSString stringWithFormat:LMLocalizedString(@"Chat Send video to", nil), displayName];
-        } else if (self.retweetModel.retweetMessage.type == GJGCChatFriendContentTypeImage) {
+        } else if (self.retweetModel.retweetMessage.messageType == GJGCChatFriendContentTypeImage) {
             title = [NSString stringWithFormat:LMLocalizedString(@"Chat Send image to", nil), displayName];
         } else {
             title = [NSString stringWithFormat:LMLocalizedString(@"Link Send to", nil), displayName];
@@ -203,102 +204,25 @@
     } else {
         [MBProgressHUD showMessage:LMLocalizedString(@"Sending...", nil) toView:self.view];
         // create name card
-        MMMessage *message = [[MMMessage alloc] init];
+        ChatMessageInfo *messageInfo = nil;
         if ([data isKindOfClass:[AccountInfo class]]) {
             AccountInfo *info = (AccountInfo *) data;
-            message.user_name = info.username;
-            message.type = GJGCChatFriendContentTypeNameCard;
-            message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-            message.message_id = [ConnectTool generateMessageId];
-            message.content = self.contact.address;
-            message.publicKey = info.pub_key;
-            message.user_id = info.address;
-            message.sendstatus = GJGCChatFriendSendMessageStatusSending;
+            messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:info.pub_key sender:[[LKUserCenter shareCenter] currentLoginUser].address];
         } else {
             LMRamGroupInfo *info = (LMRamGroupInfo *) data;
-            message.user_name = info.groupName;
-            message.type = GJGCChatFriendContentTypeNameCard;
-            message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-            message.message_id = [ConnectTool generateMessageId];
-            message.content = self.contact.address;
-            message.publicKey = info.groupIdentifer;
-            message.user_id = info.groupIdentifer;
-            message.sendstatus = GJGCChatFriendSendMessageStatusSending;
+            messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:info.groupIdentifer sender:[[LKUserCenter shareCenter] currentLoginUser].address];
         }
-
-        message.senderInfoExt = @{@"username": [[LKUserCenter shareCenter] currentLoginUser].username,
-                @"address": [[LKUserCenter shareCenter] currentLoginUser].address,
-                @"avatar": [[LKUserCenter shareCenter] currentLoginUser].avatar};
-
-        message.ext1 = @{@"username": self.contact.username,
-                @"avatar": self.contact.avatar,
-                @"pub_key": self.contact.pub_key,
-                @"address": self.contact.address};
-
-        ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];
-        messageInfo.messageId = message.message_id;
-        messageInfo.messageType = message.type;
-        messageInfo.createTime = message.sendtime;
-
-        if ([data isKindOfClass:[AccountInfo class]]) {
-            AccountInfo *info = (AccountInfo *) data;
-            messageInfo.messageOwer = info.pub_key;
-        } else {
-            LMRamGroupInfo *info = (LMRamGroupInfo *) data;
-            messageInfo.messageOwer = info.groupIdentifer;
-        }
-
         messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSending;
-        messageInfo.message = message;
-        messageInfo.snapTime = 0;
-        messageInfo.readTime = 0;
         [[MessageDBManager sharedManager] saveMessage:messageInfo];
 
         if ([data isKindOfClass:[LMRamGroupInfo class]]) {
             LMRamGroupInfo *info = (LMRamGroupInfo *) data;
             // creat new session
-            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.groupIdentifer groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content] ecdhKey:info.groupEcdhKey talkName:nil];
+            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.groupIdentifer groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:messageInfo.messageType textMessage:@""] ecdhKey:info.groupEcdhKey talkName:nil];
         } else {
             AccountInfo *info = (AccountInfo *) data;
             NSString *ecdhKey = [KeyHandle getECDHkeyUsePrivkey:[LKUserCenter shareCenter].currentLoginUser.prikey PublicKey:info.pub_key];
-            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content] ecdhKey:ecdhKey talkName:nil];
-        }
-        // send message
-        __weak __typeof(&*self) weakSelf = self;
-        if ([data isKindOfClass:[LMRamGroupInfo class]]) {
-            LMRamGroupInfo *info = (LMRamGroupInfo *) data;
-            [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:info.groupEcdhKey onQueue:nil completion:^(MMMessage *message, NSError *error) {
-                if (error) {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Share failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                    }];
-                } else {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                    }];
-                    // update message status
-                    [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccess withMessageId:message.message_id messageOwer:info.groupIdentifer];
-                }
-            }                                   onQueue:nil];
-        } else {
-            AccountInfo *info = (AccountInfo *) data;
-            [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:^(MMMessage *message, NSError *error) {
-                if (error) {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Share failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                    }];
-                } else {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                    }];
-                    // update message status
-                    [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccess withMessageId:message.message_id messageOwer:info.pub_key];
-                }
-            }                                     onQueue:nil];
+            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:messageInfo.messageType textMessage:@""] ecdhKey:ecdhKey talkName:nil];
         }
     }
 }

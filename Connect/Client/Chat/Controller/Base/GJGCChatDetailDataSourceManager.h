@@ -20,7 +20,6 @@
 #import "MessageDBManager.h"
 #import "UserDBManager.h"
 #import "GroupDBManager.h"
-#import "MMMessage.h"
 
 
 @class GJGCChatDetailDataSourceManager;
@@ -96,7 +95,7 @@
  * lucky packge tips
  * @param msg
  */
-- (void)showGetRedBagMessageWithWithMessage:(MMMessage *)msg;
+- (void)showGetRedBagMessageWithWithMessage:(ChatMessageInfo *)chatMessageInfo;
 
 /**
  * crowding complete tips
@@ -183,7 +182,7 @@
 
 - (GJGCChatContentBaseModel *)contentModelByMsgId:(NSString *)msgId;
 
-- (MMMessage *)messageByMessageId:(NSString *)msgID;
+- (ChatMessageInfo *)messageByMessageId:(NSString *)msgID;
 
 - (NSArray *)deleteMessageAtIndex:(NSInteger)index;
 
@@ -205,7 +204,7 @@
  */
 - (void)clearOverEarlyMessage;
 
-- (GJGCChatFriendContentType)formateChatFriendContent:(GJGCChatFriendContentModel *)chatContentModel withMsgModel:(MMMessage *)msgModel;
+- (GJGCChatFriendContentType)formateChatFriendContent:(GJGCChatFriendContentModel *)chatContentModel withMsgModel:(ChatMessageInfo *)msgModel;
 
 - (GJGCChatFriendContentModel *)addMMMessage:(ChatMessageInfo *)aMessage;
 

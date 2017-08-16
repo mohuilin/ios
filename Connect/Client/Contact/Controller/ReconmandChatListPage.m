@@ -14,6 +14,7 @@
 #import "LMShareContactViewController.h"
 #import "LMTableHeaderView.h"
 #import "LMRetweetMessageManager.h"
+#import "LMMessageTool.h"
 
 
 @implementation LMRerweetModel
@@ -121,9 +122,9 @@
 
     NSString *title = [NSString stringWithFormat:LMLocalizedString(@"Chat Share contact to", nil), self.contact.username, recentModel.name];
     if (self.retweetModel) {
-        if (self.retweetModel.retweetMessage.type == GJGCChatFriendContentTypeVideo) {
+        if (self.retweetModel.retweetMessage.messageType == GJGCChatFriendContentTypeVideo) {
             title = [NSString stringWithFormat:LMLocalizedString(@"Chat Send video to", nil), recentModel.name];
-        } else if (self.retweetModel.retweetMessage.type == GJGCChatFriendContentTypeImage) {
+        } else if (self.retweetModel.retweetMessage.messageType == GJGCChatFriendContentTypeImage) {
             title = [NSString stringWithFormat:LMLocalizedString(@"Chat Send image to", nil), recentModel.name];
         } else {
             title = [NSString stringWithFormat:LMLocalizedString(@"Link Send to", nil), recentModel.name];
@@ -171,83 +172,16 @@
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD showMessage:LMLocalizedString(@"Common Loading", nil) toView:self.view];
         }];
-        // creat card
-        MMMessage *message = [[MMMessage alloc] init];
-        message.user_name = recentModel.name;
-        message.type = GJGCChatFriendContentTypeNameCard;
-        message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-        message.message_id = [ConnectTool generateMessageId];
-        message.content = self.contact.address;
-        message.publicKey = recentModel.identifier;
-        message.user_id = recentModel.chatUser.address;
-        message.sendstatus = GJGCChatFriendSendMessageStatusSending;
-        message.ext1 = @{@"username": self.contact.username,
-                @"avatar": self.contact.avatar,
-                @"pub_key": self.contact.pub_key,
-                @"address": self.contact.address};
-        if (recentModel.talkType == GJGCChatFriendTalkTypeGroup) {
-            message.senderInfoExt = @{@"username": [[LKUserCenter shareCenter] currentLoginUser].username,
-                    @"address": [[LKUserCenter shareCenter] currentLoginUser].address,
-                    @"avatar": [[LKUserCenter shareCenter] currentLoginUser].avatar};
-            message.user_id = recentModel.identifier;
-        }
-        NSInteger snapTime = 0;
-        if (message.ext && [message.ext isKindOfClass:[NSDictionary class]]) {
-            NSDictionary *dict = message.ext;
-            if ([dict.allKeys containsObject:@"luck_delete"]) {
-                snapTime = [[dict valueForKey:@"luck_delete"] integerValue];
-            }
-        }
-
-        ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];
-        messageInfo.messageId = message.message_id;
-        messageInfo.messageType = message.type;
-        messageInfo.createTime = message.sendtime;
-        messageInfo.messageOwer = recentModel.identifier;
+        
+        ChatMessageInfo *messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:recentModel.identifier sender:[[LKUserCenter shareCenter] currentLoginUser].address];
         messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSending;
-        messageInfo.message = message;
-        messageInfo.snapTime = snapTime;
-        messageInfo.readTime = 0;
+        messageInfo.snapTime = recentModel.snapChatDeleteTime;
         [[MessageDBManager sharedManager] saveMessage:messageInfo];
 
         // top session
         recentModel.createTime = [NSDate date];
         [[RecentChatDBManager sharedManager] updataRecentChatLastTimeByIdentifer:recentModel.identifier];
         // send message
-        __weak __typeof(&*self) weakSelf = self;
-        if (recentModel.talkType == GJGCChatFriendTalkTypeGroup) {
-            [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:recentModel.chatGroupInfo.groupEcdhKey onQueue:nil completion:^(MMMessage *message, NSError *error) {
-                if (error) {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Share failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                    }];
-                } else {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                    }];
-                    // update message status
-                    [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccess withMessageId:message.message_id messageOwer:recentModel.identifier];
-                }
-            }                                   onQueue:nil];
-        } else {
-            [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:^(MMMessage *message, NSError *error) {
-                if (error) {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Share failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
-                    }];
-                } else {
-                    [GCDQueue executeInMainQueue:^{
-                        [MBProgressHUD hideHUDForView:weakSelf.view];
-                        [weakSelf dismissViewControllerAnimated:YES completion:nil];
-                    }];
-                    // update message status
-                    [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccess withMessageId:message.message_id messageOwer:recentModel.identifier];
-                }
-            }                                     onQueue:nil];
-        }
     }
 }
 

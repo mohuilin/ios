@@ -17,6 +17,7 @@
 #import "ApplyJoinToGroupCell.h"
 #import "LMRedLuckyShowView.h"
 #import "SystemTool.h"
+#import "LMMessageTool.h"
 
 @interface GJGCChatSystemNotiViewController () <GJGCChatBaseCellDelegate, LMRedLuckyShowViewDelegate>
 
@@ -76,15 +77,14 @@
         chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateCellStatusWithHandle:NO refused:NO isNoted:YES];
         [joinToGroupCell haveNoteThisMessage];
     }
-    MMMessage *msg = [self.dataSourceManager messageByMessageId:chatContentModel.localMsgId];
-    NSMutableDictionary *temDict = [msg.ext1 mutableCopy];
-    if ([[temDict valueForKey:@"newaccept"] boolValue] == NO) {
-        [temDict setObject:@(YES) forKey:@"newaccept"];
-        msg.ext1 = temDict;
-        ChatMessageInfo *messageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:msg.message_id messageOwer:self.taklInfo.chatIdendifier];
-        messageInfo.message = msg;
-        [[MessageDBManager sharedManager] updataMessage:messageInfo];
-    }
+    ChatMessageInfo *chatMessageInfo = [self.dataSourceManager messageByMessageId:chatContentModel.localMsgId];
+//    NSMutableDictionary *temDict = [msg.ext1 mutableCopy];
+//    if ([[temDict valueForKey:@"newaccept"] boolValue] == NO) {
+//        [temDict setObject:@(YES) forKey:@"newaccept"];
+//        msg.ext1 = temDict;
+//        ChatMessageInfo *messageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:msg.message_id messageOwer:self.taklInfo.chatIdendifier];
+//        [[MessageDBManager sharedManager] updataMessage:messageInfo];
+//    }
     LMVerifyInGroupViewController *page = [[LMVerifyInGroupViewController alloc] init];
     page.model = model;
 
@@ -93,13 +93,12 @@
             chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateCellStatusWithHandle:YES refused:refused isNoted:YES];
             model.handled = YES;
             [joinToGroupCell showStatusLabelWithResult:refused];
-            MMMessage *msg = [self.dataSourceManager messageByMessageId:chatContentModel.localMsgId];
-            NSMutableDictionary *temDict = [msg.ext1 mutableCopy];
-            [temDict setObject:@(refused) forKey:@"refused"];
-            msg.ext1 = temDict;
-            ChatMessageInfo *messageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:msg.message_id messageOwer:self.taklInfo.chatIdendifier];
-            messageInfo.message = msg;
-            [[MessageDBManager sharedManager] updataMessage:messageInfo];
+//            MMMessage *msg = [self.dataSourceManager messageByMessageId:chatContentModel.localMsgId];
+//            NSMutableDictionary *temDict = [msg.ext1 mutableCopy];
+//            [temDict setObject:@(refused) forKey:@"refused"];
+//            msg.ext1 = temDict;
+//            ChatMessageInfo *messageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:msg.message_id messageOwer:self.taklInfo.chatIdendifier];
+//            [[MessageDBManager sharedManager] updataMessage:messageInfo];
         };
     }
     [self.navigationController pushViewController:page animated:YES];
@@ -139,23 +138,9 @@
                             //create tips message
                             if (![senderName isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].normalShowName]) {
                                 NSString *operation = [NSString stringWithFormat:@"%@/%@", self.taklInfo.chatUser.address, [[LKUserCenter shareCenter] currentLoginUser].address];
-                                
-                                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                                chatMessage.messageId = [ConnectTool generateMessageId];
-                                chatMessage.messageOwer = self.taklInfo.chatIdendifier;
-                                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                                MMMessage *message = [[MMMessage alloc] init];
-                                message.type = GJGCChatFriendContentTypeStatusTip;
-                                message.content = operation;
-                                message.ext1 = @(2);
-                                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                                message.message_id = chatMessage.messageId;
-                                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                chatMessage.message = message;
+                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:operation noteType:2 ext:nil];
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
-                                [self.dataSourceManager showGetRedBagMessageWithWithMessage:message];
+                                [self.dataSourceManager showGetRedBagMessageWithWithMessage:chatMessage];
                             }
                             
                             LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];

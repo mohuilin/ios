@@ -163,27 +163,13 @@
 - (void)createChatWithHashId:(NSString *)hashId address:(NSString *)address Amount:(NSString *)amount {
     AccountInfo *user = [[UserDBManager sharedManager] getUserByAddress:address];
     if (user) {
-        MMMessage *message = [[MessageDBManager sharedManager] createTransactionMessageWithUserInfo:user hashId:hashId monney:amount];
+        ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] createTransactionMessageWithUserInfo:user hashId:hashId monney:amount];
         // Create a session
         NSString *ecdh = [KeyHandle getECDHkeyUsePrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey PublicKey:user.pub_key];
-        [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:user.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content] ecdhKey:ecdh talkName:user.normalShowName];
+        [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:user.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessageInfo.messageType textMessage:@""] ecdhKey:ecdh talkName:user.normalShowName];
         [[RecentChatDBManager sharedManager] clearUnReadCountWithIdetifier:user.pub_key];
-        // Clear unread
-
-        [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:^(MMMessage *messageInfo, NSError *error) {
-            if ([messageInfo.message_id isEqualToString:message.message_id]) {
-                // Modify the message sending status
-                [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccess withMessageId:message.message_id messageOwer:user.pub_key];
-            }
-        }                                     onQueue:nil];
-        // save transfer
-        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-        [dic safeSetObject:message.message_id forKey:@"message_id"];
-        [dic safeSetObject:hashId forKey:@"hashid"];
-        [dic safeSetObject:@(1) forKey:@"status"];
-        [dic safeSetObject:@(0) forKey:@"pay_count"];
-        [dic safeSetObject:@(0) forKey:@"crowd_count"];
-        [[LMMessageExtendManager sharedManager] saveBitchMessageExtendDict:dic.copy];
+        
+        
     } else {
         SearchUser *usrAddInfo = [[SearchUser alloc] init];
         usrAddInfo.criteria = address;
@@ -206,15 +192,7 @@
                     accoutInfo.stranger = YES;
                     // creat session
                     [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:accoutInfo];
-                    MMMessage *message = [[MessageDBManager sharedManager] createTransactionMessageWithUserInfo:accoutInfo hashId:hashId monney:amount];
-                    // save transfer
-                    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-                    [dic safeSetObject:message.message_id forKey:@"message_id"];
-                    [dic safeSetObject:hashId forKey:@"hashid"];
-                    [dic safeSetObject:@(1) forKey:@"status"];
-                    [dic safeSetObject:@(0) forKey:@"pay_count"];
-                    [dic safeSetObject:@(0) forKey:@"crowd_count"];
-                    [[LMMessageExtendManager sharedManager] saveBitchMessageExtendDict:dic.copy];
+                    ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] createTransactionMessageWithUserInfo:accoutInfo hashId:hashId monney:amount];
                 }
             } else {
                 [MBProgressHUD showToastwithText:respon.message withType:ToastTypeFail showInView:self.view complete:nil];

@@ -354,15 +354,12 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 chatMessage.messageOwer = identifier;//transaction.idetifier;
                 chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
                 chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                chatMessage.createTime = (NSInteger) (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-                MMMessage *message = [[MMMessage alloc] init];
-                message.type = GJGCChatFriendContentTypeStatusTip;
-                message.content = operation;
-                message.ext1 = @(notice.category);
-                message.sendtime = (long long int) ([[NSDate date] timeIntervalSince1970] * 1000);
-                message.message_id = chatMessage.messageId;
-                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                chatMessage.message = message;
+                chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
+                
+                NotifyMessage *notify = [NotifyMessage new];
+                notify.content = @"";
+                chatMessage.msgContent = notify;
+                
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
             }
         }
@@ -385,15 +382,13 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 chatMessage.messageOwer = identifier;
                 chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
                 chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+                chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
+                
+                NotifyMessage *notify = [NotifyMessage new];
+                notify.content = @"";
+                chatMessage.msgContent = notify;
                 chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                MMMessage *message = [[MMMessage alloc] init];
-                message.type = GJGCChatFriendContentTypeStatusTip;
-                message.content = operation;
-                message.ext1 = @(notice.category);
-                message.sendtime = (long long int) ([[NSDate date] timeIntervalSince1970] * 1000);
-                message.message_id = chatMessage.messageId;
-                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                chatMessage.message = message;
+
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
                 //updata trancation status
                 [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:bill.status withHashId:hashId];
@@ -424,14 +419,11 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
                 chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
                 chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                MMMessage *message = [[MMMessage alloc] init];
-                message.type = GJGCChatFriendContentTypeStatusTip;
-                message.content = operation;
-                message.ext1 = @(notice.category);
-                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                message.message_id = chatMessage.messageId;
-                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                chatMessage.message = message;
+                
+                NotifyMessage *notify = [NotifyMessage new];
+                notify.content = @"";
+                chatMessage.msgContent = notify;
+                
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
                 [[LMMessageExtendManager sharedManager] updateMessageExtendPayCount:(int) (bill.crowdfunding.size - bill.crowdfunding.remainSize) status:(int) bill.crowdfunding.status withHashId:bill.crowdfunding.hashId];
@@ -444,13 +436,11 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                     chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
                     chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
                     chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-                    MMMessage *message = [[MMMessage alloc] init];
-                    message.type = GJGCChatFriendContentTypeStatusTip;
-                    message.content = LMLocalizedString(@"Chat Founded complete", nil);
-                    message.sendtime = chatMessage.createTime;
-                    message.message_id = chatMessage.messageId;
-                    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                    chatMessage.message = message;
+
+                    NotifyMessage *notify = [NotifyMessage new];
+                    notify.content = LMLocalizedString(@"Chat Founded complete", nil);;
+                    chatMessage.msgContent = notify;
+
                     [[MessageDBManager sharedManager] saveMessage:chatMessage];
                 }
             }
@@ -625,18 +615,14 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                         chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
                         chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
                         chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-                        MMMessage *message = [[MMMessage alloc] init];
-                        message.publicKey = groupChange.identifier;
-                        message.user_id = groupChange.identifier;
-                        message.type = GJGCChatFriendContentTypeStatusTip;
-                        message.content = myChatTip;
-                        message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                        message.message_id = chatMessage.messageId;
-                        message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                        chatMessage.message = message;
+                        
+                        NotifyMessage *notify = [NotifyMessage new];
+                        notify.content = myChatTip;
+                        chatMessage.msgContent = notify;
+                        
                         [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                        [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
+                        [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:myChatTip] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
 
                         if ([[SessionManager sharedManager].chatSession isEqualToString:groupChange.identifier]) {
                             SendNotify(GroupNewMemberEnterNotification, chatMessage);
@@ -657,18 +643,15 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                             chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
                             chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
                             chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-                            MMMessage *message = [[MMMessage alloc] init];
-                            message.publicKey = groupChange.identifier;
-                            message.user_id = groupChange.identifier;
-                            message.type = GJGCChatFriendContentTypeStatusTip;
-                            message.content = [NSString stringWithFormat:LMLocalizedString(@"Link enter the group", nil), userInfo.username];
-                            message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                            message.message_id = chatMessage.messageId;
-                            message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                            chatMessage.message = message;
+                            
+                            
+                            NotifyMessage *notify = [NotifyMessage new];
+                            notify.content = [NSString stringWithFormat:LMLocalizedString(@"Link enter the group", nil), userInfo.username];;
+                            chatMessage.msgContent = notify;
+                            
                             [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
+                            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:notify.content] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
 
                             if ([[SessionManager sharedManager].chatSession isEqualToString:groupChange.identifier]) {
                                 SendNotify(GroupNewMemberEnterNotification, chatMessage);
@@ -745,18 +728,14 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                                 chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
                                 chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
                                 chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-                                MMMessage *message = [[MMMessage alloc] init];
-                                message.publicKey = attorn.identifier;
-                                message.user_id = attorn.identifier;
-                                message.type = GJGCChatFriendContentTypeStatusTip;
-                                message.content = [NSString stringWithFormat:LMLocalizedString(@"Link become new group owner", nil), member.username];
-                                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                                message.message_id = chatMessage.messageId;
-                                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                chatMessage.message = message;
+                                
+                                NotifyMessage *notify = [NotifyMessage new];
+                                notify.content = [NSString stringWithFormat:LMLocalizedString(@"Link become new group owner", nil), member.username];
+                                chatMessage.msgContent = notify;
+                                
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:1 lastContent:message.content ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
+                                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:1 lastContent:notify.content ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
                                 [[GroupDBManager sharedManager] executeRealmWithBlock:^{
                                     member.isGroupAdmin = YES;
                                 }];
@@ -806,7 +785,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
     if (GJCFStringIsNull(hashId) || !reciver || !sender) {
         return;
     }
-    MMMessage *message = nil;
+    ChatMessageInfo *chatMessage = nil;
     AccountInfo *reciverUser = [[AccountInfo alloc] init];
     reciverUser.address = reciver.address;
     reciverUser.pub_key = reciver.pubKey;
@@ -820,17 +799,17 @@ CREATE_SHARED_MANAGER(LMCommandManager)
     senderUser.username = sender.username;
 
     if ([sender.address isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
-        message = [[MessageDBManager sharedManager] createSendtoOtherTransactionMessageWithMessageOwer:reciverUser hashId:hashId monney:[PayTool getBtcStringWithAmount:amount] isOutTransfer:isOutTransfer];
+        chatMessage = [[MessageDBManager sharedManager] createSendtoOtherTransactionMessageWithMessageOwer:reciverUser hashId:hashId monney:[PayTool getBtcStringWithAmount:amount] isOutTransfer:isOutTransfer];
         if ([[UserDBManager sharedManager] isFriendByAddress:reciverUser.address]) {
-            RecentChatModel *model = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:reciverUser.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:nil]];
+            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:reciverUser.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.chatType textMessage:nil]];
         } else {
             [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:reciverUser];
         }
 
     } else {
-        message = [[MessageDBManager sharedManager] createSendtoMyselfTransactionMessageWithMessageOwer:senderUser hashId:hashId monney:[PayTool getBtcStringWithAmount:amount] isOutTransfer:isOutTransfer];
+        chatMessage = [[MessageDBManager sharedManager] createSendtoMyselfTransactionMessageWithMessageOwer:senderUser hashId:hashId monney:[PayTool getBtcStringWithAmount:amount] isOutTransfer:isOutTransfer];
         if ([[UserDBManager sharedManager] isFriendByAddress:senderUser.address]) {
-            RecentChatModel *model = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:nil]];
+            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
         } else {
             [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:senderUser];
         }
@@ -1150,28 +1129,23 @@ CREATE_SHARED_MANAGER(LMCommandManager)
             senderUser.username = redPackgeinfo.sender.username;
             if (![[MessageDBManager sharedManager] isMessageIsExistWithMessageId:redPackgeinfo.msgId messageOwer:redPackgeinfo.sender.pubKey]) {
 
-                MMMessage *messageInfo = [[MMMessage alloc] init];
-                messageInfo.message_id = redPackgeinfo.msgId;
-                messageInfo.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                messageInfo.user_id = [[LKUserCenter shareCenter] currentLoginUser].address;
-                messageInfo.type = GJGCChatFriendContentTypeRedEnvelope;
-                messageInfo.user_name = [[LKUserCenter shareCenter] currentLoginUser].username;
-                messageInfo.publicKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-                messageInfo.content = redPackgeinfo.hashId;
                 ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                chatMessage.messageId = messageInfo.message_id;
-                chatMessage.createTime = messageInfo.sendtime;
-                chatMessage.readTime = 0;
-                chatMessage.message = messageInfo;
+                chatMessage.messageId = redPackgeinfo.msgId;
+                chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
+                
                 chatMessage.messageOwer = senderUser.pub_key;
-                chatMessage.messageType = messageInfo.type;
+                chatMessage.messageType = GJGCChatFriendContentTypeRedEnvelope;
                 chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
                 chatMessage.senderAddress = senderUser.address;
+                chatMessage.messageOwer = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
+                LuckPacketMessage *lucky = [LuckPacketMessage new];
+                lucky.hashId = redPackgeinfo.hashId;
+                chatMessage.msgContent = lucky;
+                
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
                 if (!senderUser.stranger) {
-                    RecentChatModel *model = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:messageInfo.type textMessage:nil]];
+                    [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
                 } else {
                     [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:senderUser];
                 }
@@ -1246,13 +1220,13 @@ CREATE_SHARED_MANAGER(LMCommandManager)
         DDLogInfo(@"update chatCookie success!");
         if (sendModel) {
             DDLogInfo(@"resend message....");
-            [[IMService instance] asyncSendMessageMessage:sendModel.sendMsg onQueue:nil completion:sendModel.callBack onQueue:nil];
+            [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent chatEcdhKey:nil sendMessageCompletion:sendModel.callBack];
         }
     } else if (command.errNo == 4) { //time error
         //note ui ,time error
         [SessionManager sharedManager].loginUserChatCookie = nil;
         if (sendModel.callBack) {
-            sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusFaild;
+            sendModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusFaild;
             NSError *error = [NSError errorWithDomain:@"imserver" code:-1 userInfo:nil];
             sendModel.callBack(sendModel.sendMsg, error);
         }

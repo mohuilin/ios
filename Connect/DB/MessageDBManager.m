@@ -9,6 +9,7 @@
 #import "MessageDBManager.h"
 #import "ConnectTool.h"
 #import "LMMessage.h"
+#import "LMMessageTool.h"
 
 @interface MessageDBManager ()
 
@@ -58,8 +59,7 @@ static MessageDBManager *manager = nil;
 
 - (void)saveMessage:(ChatMessageInfo *)messageInfo {
     if (GJCFStringIsNull(messageInfo.messageId) ||
-            GJCFStringIsNull(messageInfo.messageOwer) ||
-            !messageInfo.message) {
+            GJCFStringIsNull(messageInfo.messageOwer)) {
         return;
     }
     LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:messageInfo];
@@ -72,8 +72,7 @@ static MessageDBManager *manager = nil;
     NSMutableArray *bitchRealmMessages = [NSMutableArray array];
     for (ChatMessageInfo *messageInfo in messages) {
         if (GJCFStringIsNull(messageInfo.messageId) ||
-                GJCFStringIsNull(messageInfo.messageOwer) ||
-                !messageInfo.message) {
+                GJCFStringIsNull(messageInfo.messageOwer)) {
             continue;
         }
         LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:messageInfo];
@@ -85,108 +84,55 @@ static MessageDBManager *manager = nil;
 }
 
 
-- (MMMessage *)createTransactionMessageWithUserInfo:(AccountInfo *)user hashId:(NSString *)hashId monney:(NSString *)money {
+- (ChatMessageInfo *)createTransactionMessageWithUserInfo:(AccountInfo *)user hashId:(NSString *)hashId monney:(NSString *)money {
 
-    MMMessage *message = [[MMMessage alloc] init];
-    message.type = GJGCChatFriendContentTypeTransfer;
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = [ConnectTool generateMessageId];
-    message.publicKey = user.pub_key;
-    message.user_id = user.address;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSending;
-    message.content = hashId;
-    message.ext1 = @{@"amount": @([money doubleValue] * pow(10, 8)),
-            @"tips": @""};
-
-    message.senderInfoExt = @{@"username": [[LKUserCenter shareCenter] currentLoginUser].username,
-            @"address": [[LKUserCenter shareCenter] currentLoginUser].address,
-            @"publickey": [[LKUserCenter shareCenter] currentLoginUser].pub_key,
-            @"avatar": [[LKUserCenter shareCenter] currentLoginUser].avatar};
+    TransferMessage *transfer = [LMMessageTool makeTransferWithHashId:hashId transferType:0 amount:[money doubleValue] * pow(10, 8) tips:nil];
 
     ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];
-    messageInfo.messageId = message.message_id;
-    messageInfo.messageType = message.type;
-    messageInfo.createTime = message.sendtime;
+    messageInfo.messageId = [ConnectTool generateMessageId];
+    messageInfo.messageType = GJGCChatFriendContentTypeTransfer;
+    messageInfo.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     messageInfo.messageOwer = user.pub_key;
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSending;
-    messageInfo.message = message;
-    messageInfo.snapTime = 0;
-    messageInfo.readTime = 0;
-
+    messageInfo.msgContent = transfer;
 
     [self saveMessage:messageInfo];
 
-    return message;
+    return messageInfo;
 
 }
 
 
-- (MMMessage *)createSendtoOtherTransactionMessageWithMessageOwer:(AccountInfo *)ower hashId:(NSString *)hashId monney:(NSString *)money isOutTransfer:(BOOL)isOutTransfer {
-    MMMessage *message = [[MMMessage alloc] init];
-    message.type = GJGCChatFriendContentTypeTransfer;
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = [ConnectTool generateMessageId];
-    message.publicKey = ower.pub_key;
-    message.user_id = ower.address;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    message.content = hashId;
-    message.ext1 = @{@"amount": [[NSDecimalNumber decimalNumberWithString:money] decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLong:pow(10, 8)]].stringValue,
-            @"tips": @""};
-    message.senderInfoExt = @{@"username": [[LKUserCenter shareCenter] currentLoginUser].username,
-            @"address": [[LKUserCenter shareCenter] currentLoginUser].address,
-            @"publickey": [[LKUserCenter shareCenter] currentLoginUser].pub_key,
-            @"avatar": [[LKUserCenter shareCenter] currentLoginUser].avatar};
-
-    message.locationExt = @(isOutTransfer);
-
+- (ChatMessageInfo *)createSendtoOtherTransactionMessageWithMessageOwer:(AccountInfo *)ower hashId:(NSString *)hashId monney:(NSString *)money isOutTransfer:(BOOL)isOutTransfer {
+    TransferMessage *transfer = [LMMessageTool makeTransferWithHashId:hashId transferType:2 amount:[money doubleValue] * pow(10, 8) tips:nil];
     ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];
-    messageInfo.messageId = message.message_id;
-    messageInfo.messageType = message.type;
-    messageInfo.createTime = message.sendtime;
+    messageInfo.messageId = [ConnectTool generateMessageId];
+    messageInfo.messageType = GJGCChatFriendContentTypeTransfer;
+    messageInfo.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     messageInfo.messageOwer = ower.pub_key;
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    messageInfo.message = message;
-    messageInfo.snapTime = 0;
-    messageInfo.readTime = 0;
-
+    messageInfo.msgContent = transfer;
+    messageInfo.senderAddress = [[LKUserCenter shareCenter] currentLoginUser].address;
     [self saveMessage:messageInfo];
-
-    return message;
+    return messageInfo;
 }
 
 
-- (MMMessage *)createSendtoMyselfTransactionMessageWithMessageOwer:(AccountInfo *)messageOwer hashId:(NSString *)hashId monney:(NSString *)money isOutTransfer:(BOOL)isOutTransfer {
-
-
-    MMMessage *message = [[MMMessage alloc] init];
-    message.type = GJGCChatFriendContentTypeTransfer;
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = [ConnectTool generateMessageId];
-    message.publicKey = messageOwer.pub_key;
-    message.user_id = [[LKUserCenter shareCenter] currentLoginUser].address;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    message.content = hashId;
-    message.ext1 = @{@"amount": [[NSDecimalNumber decimalNumberWithString:money] decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithLong:pow(10, 8)]].stringValue,
-            @"tips": @""};
-    message.senderInfoExt = @{@"username": messageOwer.username,
-            @"address": messageOwer.address,
-            @"publickey": messageOwer.pub_key,
-            @"avatar": messageOwer.avatar};
-
-    message.locationExt = @(isOutTransfer);
+- (ChatMessageInfo *)createSendtoMyselfTransactionMessageWithMessageOwer:(AccountInfo *)messageOwer hashId:(NSString *)hashId monney:(NSString *)money isOutTransfer:(BOOL)isOutTransfer {
+    
+    TransferMessage *transfer = [LMMessageTool makeTransferWithHashId:hashId transferType:2 amount:[money doubleValue] * pow(10, 8) tips:nil];
     ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];
-    messageInfo.messageId = message.message_id;
-    messageInfo.messageType = message.type;
-    messageInfo.createTime = message.sendtime;
+    messageInfo.messageId = [ConnectTool generateMessageId];
+    messageInfo.messageType = GJGCChatFriendContentTypeTransfer;
+    messageInfo.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     messageInfo.messageOwer = messageOwer.pub_key;
+    messageInfo.senderAddress = messageOwer.address;
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    messageInfo.message = message;
-    messageInfo.snapTime = 0;
-    messageInfo.readTime = 0;
-
+    messageInfo.msgContent = transfer;
+    
     [self saveMessage:messageInfo];
 
-    return message;
+    return messageInfo;
 
 }
 
@@ -246,6 +192,7 @@ static MessageDBManager *manager = nil;
         message.createTime = createTime;
     }];
 }
+
 
 - (void)updateMessageReadTimeWithMsgID:(NSString *)messageId messageOwer:(NSString *)messageOwer {
 
@@ -427,19 +374,16 @@ static MessageDBManager *manager = nil;
     if (isnoRelationShipType) {
         type = GJGCChatFriendContentTypeNoRelationShipTip;
     }
+    
+    NotifyMessage *notify = [LMMessageTool makeNotifyMessageWithTips:content];
     ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
     chatMessage.messageId = [ConnectTool generateMessageId];
     chatMessage.messageOwer = messageOwer;
     chatMessage.messageType = type;
     chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+    chatMessage.msgContent = notify;
     chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-    MMMessage *message = [[MMMessage alloc] init];
-    message.type = type;
-    message.content = content;
-    message.sendtime = chatMessage.createTime;
-    message.message_id = chatMessage.messageId;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    chatMessage.message = message;
+    
     [self saveMessage:chatMessage];
 }
 

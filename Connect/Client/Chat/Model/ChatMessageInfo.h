@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "MMMessage.h"
+#import "GJGCChatFriendConstans.h"
 
 @interface ChatMessageInfo : NSObject
 
@@ -17,13 +17,13 @@
 @property (nonatomic ,assign) NSInteger createTime;
 @property (nonatomic ,assign) NSInteger readTime;
 @property (nonatomic ,assign) NSInteger snapTime;
-
 @property (nonatomic ,assign) BOOL isRead;
 @property (nonatomic ,copy) NSString *senderAddress;
+@property (nonatomic ,assign) int chatType;
 @property (nonatomic ,assign) GJGCChatFriendContentType messageType;
 @property (nonatomic, assign) GJGCChatFriendSendMessageStatus sendstatus;
 @property (nonatomic ,assign) int state;
-@property (nonatomic ,strong) MMMessage *message;
+@property (nonatomic ,strong) GPBMessage *msgContent; /// 发送的原始消息， eg:文本 图片
 @property (nonatomic ,assign) int payCount;
 @property (nonatomic ,assign) int crowdCount;
 

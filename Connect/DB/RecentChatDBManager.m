@@ -16,6 +16,7 @@
 #import "LMRealmDBManager.h"
 #import "LMRamGroupInfo.h"
 #import "LMIMHelper.h"
+#import "LMMessageTool.h"
 
 static RecentChatDBManager *manager = nil;
 
@@ -621,26 +622,10 @@ static RecentChatDBManager *manager = nil;
 }
 
 - (void)createConnectTermWelcomebackChatAndMessage {
-
-    MMMessage *message = [[MMMessage alloc] init];
-    message.user_name = @"Connect";
-    message.type = GJGCChatFriendContentTypeText;
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = [ConnectTool generateMessageId];
-    message.publicKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-    message.user_id = [[LKUserCenter shareCenter] currentLoginUser].address;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    message.content = LMLocalizedString(@"Login Welcome", nil);
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-    chatMessage.messageId = message.message_id;
-    chatMessage.createTime = (NSInteger) message.sendtime;
-    chatMessage.messageType = GJGCChatFriendContentTypeText;
+    
+    ChatMessageInfo *chatMessage = [LMMessageTool makeTextChatMessageWithMessageText:LMLocalizedString(@"Login Welcome", nil) msgOwer:kSystemIdendifier sender:kSystemIdendifier];
     chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    chatMessage.readTime = 0;
-    chatMessage.message = message;
-    chatMessage.messageOwer = kSystemIdendifier;
-
+    
     [[MessageDBManager sharedManager] saveBitchMessage:@[chatMessage]];
 
     RecentChatModel *model = [[SessionManager sharedManager] getRecentChatWithIdentifier:kSystemIdendifier];
@@ -655,7 +640,7 @@ static RecentChatDBManager *manager = nil;
         }
         NSDate *time = [NSDate date];
         model.unReadCount = unRead;
-        model.content = message.content;
+        model.content = LMLocalizedString(@"Login Welcome", nil);
         model.createTime = time;
 
         //update
@@ -675,7 +660,7 @@ static RecentChatDBManager *manager = nil;
         model.name = @"Connect";
         model.headUrl = @"connect_logo";
         model.identifier = kSystemIdendifier;
-        model.content = message.content;
+        model.content = LMLocalizedString(@"Login Welcome", nil);
         [self save:model];
     }
 

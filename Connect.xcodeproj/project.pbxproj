@@ -191,6 +191,8 @@
 		2C65A2F77344813C490750ED /* libPods-Connect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D7FC9FA4528B022EBC0831 /* libPods-Connect.a */; };
 		71C3EDF9126EE9B5FCB64F2F /* libPods-ConnectUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */; };
 		D9065A2C1F39C09A00AEF314 /* BottomLineTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = D9065A2B1F39C09A00AEF314 /* BottomLineTextField.m */; };
+		D9065A341F41939C00AEF314 /* LMChatMsgUploadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D9065A331F41939C00AEF314 /* LMChatMsgUploadManager.m */; };
+		D9065A371F419C1F00AEF314 /* LMConnectIMChater.m in Sources */ = {isa = PBXBuildFile; fileRef = D9065A361F419C1F00AEF314 /* LMConnectIMChater.m */; };
 		D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		D912C0201F2B1D1E00A97E1A /* LMNoteCreateWalletView.m in Sources */ = {isa = PBXBuildFile; fileRef = D912C01F1F2B1D1E00A97E1A /* LMNoteCreateWalletView.m */; };
 		D912C0221F2ED9A000A97E1A /* TestCryptographic.m in Sources */ = {isa = PBXBuildFile; fileRef = D912C0211F2ED9A000A97E1A /* TestCryptographic.m */; };
@@ -1010,7 +1012,6 @@
 		F16FD8431EC3205F002F9395 /* vector in Resources */ = {isa = PBXBuildFile; fileRef = F16FD4011EC32057002F9395 /* vector */; };
 		F16FD8441EC32060002F9395 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F16FD7B61EC3205B002F9395 /* libcrypto.a */; };
 		F16FD8451EC32060002F9395 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F16FD7B71EC3205B002F9395 /* libssl.a */; };
-		F172A66F1EB8843C006E186C /* MMMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F172A66E1EB8843C006E186C /* MMMessage.m */; };
 		F17CBE2F1ED40C700067234D /* LMselectCountryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */; };
 		F17CBE321ED536920067234D /* LMDisplayProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F17CBE311ED536920067234D /* LMDisplayProgressView.m */; };
 		F18AD34A1F273FA70096C76E /* LMaddTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F18AD3491F273FA70096C76E /* LMaddTableViewCell.xib */; };
@@ -1402,6 +1403,10 @@
 		BCE57494FEE8BF5465F6B3CC /* libPods-ConnectUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ConnectUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9065A2A1F39C09A00AEF314 /* BottomLineTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BottomLineTextField.h; sourceTree = "<group>"; };
 		D9065A2B1F39C09A00AEF314 /* BottomLineTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BottomLineTextField.m; sourceTree = "<group>"; };
+		D9065A321F41939C00AEF314 /* LMChatMsgUploadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMChatMsgUploadManager.h; sourceTree = "<group>"; };
+		D9065A331F41939C00AEF314 /* LMChatMsgUploadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMChatMsgUploadManager.m; sourceTree = "<group>"; };
+		D9065A351F419C1F00AEF314 /* LMConnectIMChater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMConnectIMChater.h; sourceTree = "<group>"; };
+		D9065A361F419C1F00AEF314 /* LMConnectIMChater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMConnectIMChater.m; sourceTree = "<group>"; };
 		D90E0F851F164701007D0C4F /* Wallet.pbobjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wallet.pbobjc.h; sourceTree = "<group>"; };
 		D90E0F861F164701007D0C4F /* Wallet.pbobjc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wallet.pbobjc.m; sourceTree = "<group>"; };
 		D912C01E1F2B1D1E00A97E1A /* LMNoteCreateWalletView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMNoteCreateWalletView.h; sourceTree = "<group>"; };
@@ -12554,8 +12559,6 @@
 		F16FD7B51EC3205B002F9395 /* xpressive_typeof.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = xpressive_typeof.hpp; sourceTree = "<group>"; };
 		F16FD7B61EC3205B002F9395 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
 		F16FD7B71EC3205B002F9395 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
-		F172A66D1EB8843C006E186C /* MMMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMMessage.h; sourceTree = "<group>"; };
-		F172A66E1EB8843C006E186C /* MMMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMMessage.m; sourceTree = "<group>"; };
 		F17CBE2D1ED40C700067234D /* LMselectCountryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMselectCountryCell.h; sourceTree = "<group>"; };
 		F17CBE2E1ED40C700067234D /* LMselectCountryCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMselectCountryCell.m; sourceTree = "<group>"; };
 		F17CBE301ED536920067234D /* LMDisplayProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMDisplayProgressView.h; sourceTree = "<group>"; };
@@ -13878,6 +13881,8 @@
 				D922312E1E822BF800D67110 /* GJCFFileUploadTask.m */,
 				D922312F1E822BF800D67110 /* GJCFUploadFileModel.h */,
 				D92231301E822BF800D67110 /* GJCFUploadFileModel.m */,
+				D9065A321F41939C00AEF314 /* LMChatMsgUploadManager.h */,
+				D9065A331F41939C00AEF314 /* LMChatMsgUploadManager.m */,
 			);
 			path = FileUploadManager;
 			sourceTree = "<group>";
@@ -14429,6 +14434,8 @@
 				D958451A1ECAF666004C8984 /* LMMessageSendManager.m */,
 				D95845251ECBF71C004C8984 /* LMCommandManager.h */,
 				D95845261ECBF71C004C8984 /* LMCommandManager.m */,
+				D9065A351F419C1F00AEF314 /* LMConnectIMChater.h */,
+				D9065A361F419C1F00AEF314 /* LMConnectIMChater.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -14518,8 +14525,6 @@
 		D95C02A51E8101A6006C5C8A /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				F172A66D1EB8843C006E186C /* MMMessage.h */,
-				F172A66E1EB8843C006E186C /* MMMessage.m */,
 				1923517D1E8123FF0022D844 /* AccountInfo.h */,
 				1923517E1E8123FF0022D844 /* AccountInfo.m */,
 				1923517F1E8123FF0022D844 /* ChatMessageInfo.h */,
@@ -33025,7 +33030,6 @@
 				D95C044F1E810902006C5C8A /* GJGCChatFriendImageMessageCell.m in Sources */,
 				D90E0F871F164701007D0C4F /* Wallet.pbobjc.m in Sources */,
 				D95C035E1E8108D8006C5C8A /* GJGCChatFriendDataSourceManager.m in Sources */,
-				F172A66F1EB8843C006E186C /* MMMessage.m in Sources */,
 				D92232F61E822BF900D67110 /* UIView+GJCFViewFrameUitil.m in Sources */,
 				D92232F71E822BF900D67110 /* GJCUAsyncImageView.m in Sources */,
 				19234FEA1E811BDA0022D844 /* TopImageBottomTitleButton.m in Sources */,
@@ -33200,6 +33204,7 @@
 				D92232B11E822BF800D67110 /* GJCFCachePathManager.m in Sources */,
 				192350451E811F520022D844 /* NCellLabel.m in Sources */,
 				D92232E71E822BF900D67110 /* GJCFCoreTextLine.m in Sources */,
+				D9065A371F419C1F00AEF314 /* LMConnectIMChater.m in Sources */,
 				D9222FEE1E822A3100D67110 /* YYSentinel.m in Sources */,
 				192351911E81249D0022D844 /* HelpSupportModel.m in Sources */,
 				D95C03771E8108D8006C5C8A /* GJGCChatSystemNotiDataManager.m in Sources */,
@@ -33275,6 +33280,7 @@
 				D9222FDF1E822A3100D67110 /* UIImageView+YYWebImage.m in Sources */,
 				D92232BE1E822BF900D67110 /* KTSContactsManager.m in Sources */,
 				192350DF1E8121A20022D844 /* LMUserInfo.m in Sources */,
+				D9065A341F41939C00AEF314 /* LMChatMsgUploadManager.m in Sources */,
 				D943CD891EB1AB5000BE94EF /* GJGCChatSystemNotiConstans.m in Sources */,
 				D9B084BB1E810DDC0067EC4A /* ChangePhoneVertifyPage.m in Sources */,
 				1923516C1E81237E0022D844 /* ServerInfo.m in Sources */,

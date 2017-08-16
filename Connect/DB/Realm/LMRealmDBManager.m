@@ -290,11 +290,6 @@ static FMDatabaseQueue *queue;
         NSString *ciphertext = [contentDict safeObjectForKey:@"ciphertext"];
         NSString *messageString = [KeyHandle xtalkDecodeAES_GCM:[[LKUserCenter shareCenter] getLocalGCDEcodePass] data:ciphertext aad:aad iv:iv tag:tag];
 
-        chatMessage.message = [MMMessage mj_objectWithKeyValues:messageString];
-        chatMessage.message.sendstatus = chatMessage.sendstatus;
-        chatMessage.message.isRead = chatMessage.readTime > 0;
-        chatMessage.messageType = chatMessage.message.type;
-
         LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:chatMessage];
         [chatMessages objectAddObject:realmModel];
     }

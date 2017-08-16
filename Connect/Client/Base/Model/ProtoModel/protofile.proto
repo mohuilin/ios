@@ -741,6 +741,7 @@ string avatar=3;
 enum ChatType {
 PRIVATE= 0; // 个人聊天
 GROUPCHAT  = 1;  //群组聊天
+CONNECT_SYSTEM = 3; // Connect
 }
 //临时协同密钥
 message ChatSession {
@@ -758,6 +759,7 @@ GcmData cipher_data = 5;
 ChatType chat_type=6;
 int32 msg_type = 7;
 string ext= 8;
+int32 send_status = 9;
 }
 //传输层模型
 message MessageData {
@@ -767,12 +769,15 @@ ChatSession chat_session = 2;
 //文本消息
 message TextMessage{
 string content=1;
-MessageUserInfo sender =2;
+repeated string at_addresses=2;
+int64 snap_time = 3;
+MessageUserInfo sender =4;
 }
 //emoj表情
 message EmotionMessage{
 string content=1;
-MessageUserInfo sender =2;
+int64 snap_time = 2;
+MessageUserInfo sender =3;
 }
 //图片消息
 message PhotoMessage{
@@ -781,22 +786,27 @@ string thum=2;
 string size=3;
 int32 image_width=4;
 int32 image_height=5;
-MessageUserInfo sender =6;
+int64 snap_time = 6;
+MessageUserInfo sender =7;
 }
 //音频消息
 message VoiceMessage{
 string url=1;
 string time_length=2;
-string size=3;
-MessageUserInfo sender =4;
+int32 size=3;
+int64 snap_time = 4;
+MessageUserInfo sender =5;
 }
 //视频消息
 message VideoMessage{
 string url=1;
 string cover=2;
 string time_length=3;
-string size=4;
-MessageUserInfo sender =5;
+int32 size=4;
+int32 image_width=5;
+int32 image_height=6;
+int64 snap_time = 7;
+MessageUserInfo sender =8;
 }
 //名片消息
 message CardMessage{
@@ -828,6 +838,7 @@ int32  transfer_type=1;
 string hash_id=2;
 int64 amount=3;
 string tips =4;
+MessageUserInfo sender =5;
 }
 //位置消息
 message LocationMessage{
@@ -844,7 +855,8 @@ message LuckPacketMessage{
 string hash_id=1;
 int32 lucky_type=2;
 string tips =3;
-MessageUserInfo sender =4;
+int64 amount=4;
+MessageUserInfo sender =5;
 }
 //提示消息
 message NotifyMessage{

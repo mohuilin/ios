@@ -15,11 +15,19 @@
 #import "MessageDBManager.h"
 #import "LMConversionManager.h"
 #import "LMIMHelper.h"
+#import "LMMessageTool.h"
 
 @implementation LMMessageAdapter
 
-+ (NSString *)decodeMessageWithMassagePost:(MessagePost *)msgPost {
-    NSString *messageString = nil;
++ (ChatMessageInfo *)decodeMessageWithMassagePost:(MessagePost *)msgPost groupECDH:(NSString *)groupECDH {
+    NSData *data = [ConnectTool decodeGroupGcmDataWithEcdhKey:groupECDH GcmData:msgPost.msgData.chatMsg.cipherData];
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[GPBMessage parseFromData:data error:nil]];
+    
+    return chatMessage;
+}
+
++ (ChatMessageInfo *)decodeMessageWithMassagePost:(MessagePost *)msgPost {
+    ChatMessageInfo *chatMessageInfo = nil;
     LMChatEcdhKeySecurityLevelType securityLevel = LMChatEcdhKeySecurityLevelTypeNomarl;
     if (!GJCFStringIsNull(msgPost.msgData.chatSession.pubKey) &&
             msgPost.msgData.chatSession.salt.length == 64 &&
@@ -32,117 +40,87 @@
     }
     switch (securityLevel) {
         case LMChatEcdhKeySecurityLevelTypeHalfRandom: {
-            messageString = [ConnectTool decodeHalfRandomPeerImMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.msgData.chatSession.pubKey salt:msgPost.msgData.chatSession.salt];
+            NSData *data = [ConnectTool decodeHalfRandomPeerImMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.msgData.chatSession.pubKey salt:msgPost.msgData.chatSession.salt];
+            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[GPBMessage parseFromData:data error:nil]];
         }
             break;
         case LMChatEcdhKeySecurityLevelTypeNomarl: {
-            messageString = [ConnectTool decodeMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.pubKey needEmptySalt:YES];
+            NSData *data = [ConnectTool decodeMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.pubKey needEmptySalt:YES];
+            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[GPBMessage parseFromData:data error:nil]];
         }
             break;
         case LMChatEcdhKeySecurityLevelTypeRandom: {
-            messageString = [ConnectTool decodePeerImMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.msgData.chatSession.pubKey salt:msgPost.msgData.chatSession.salt ver:msgPost.msgData.chatSession.ver];
-            if (GJCFStringIsNull(messageString)) {
-                MMMessage *tipMessage = [self createDecodeFailedTipMessageWithMassagePost:msgPost];
-                messageString = [tipMessage mj_JSONString];
+            NSData *data = [ConnectTool decodePeerImMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.msgData.chatSession.pubKey salt:msgPost.msgData.chatSession.salt ver:msgPost.msgData.chatSession.ver];
+            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[GPBMessage parseFromData:data error:nil]];
+            if (!data) {
+                chatMessageInfo = [self createDecodeFailedTipMessageWithMassagePost:msgPost];
             }
         }
             break;
         default:
             break;
     }
-    return messageString;
+    return chatMessageInfo;
 }
 
-+ (MMMessage *)createDecodeFailedTipMessageWithMassagePost:(MessagePost *)msgPost {
-    MMMessage *message = [[MMMessage alloc] init];
-    message.type = GJGCChatFriendContentTypeStatusTip;
-    message.content = LMLocalizedString(@"Chat One message failed to decrypt", nil);
-    message.ext1 = @(100);// not use ,just for check
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = [ConnectTool generateMessageId];
-    message.publicKey = msgPost.pubKey;
-    message.user_id = [LMIMHelper getAddressByPubkey:message.publicKey];
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-
-    return message;
++ (ChatMessageInfo *)createDecodeFailedTipMessageWithMassagePost:(MessagePost *)msgPost {
+    
+    NotifyMessage *notify = [LMMessageTool makeNotifyMessageWithTips:LMLocalizedString(@"Chat One message failed to decrypt", nil)];
+    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
+    chatMessage.messageId = [ConnectTool generateMessageId];
+    chatMessage.messageOwer = msgPost.msgData.chatMsg.to;
+    chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
+    chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+    chatMessage.msgContent = notify;
+    chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
+    
+    return chatMessage;
 }
 
 
-+ (MMMessage *)packSystemMessage:(MSMessage *)sysMsg {
-    MMMessage *message = [[MMMessage alloc] init];
-    message.user_name = @"Connect";
-    message.type = sysMsg.category;
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = sysMsg.msgId;
-    message.publicKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-    message.user_id = [[LKUserCenter shareCenter] currentLoginUser].address;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
++ (ChatMessageInfo *)packSystemMessage:(MSMessage *)sysMsg {
+    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
+    chatMessage.messageType = sysMsg.category;
+    chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
+    chatMessage.messageId = sysMsg.msgId;
+    chatMessage.messageOwer = kSystemIdendifier;
+    chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     switch (sysMsg.category) {
         case GJGCChatFriendContentTypeText: {
             TextMessage *textMsg = [TextMessage parseFromData:sysMsg.body error:nil];
-            message.content = textMsg.content;
+            chatMessage.msgContent = textMsg;
         }
             break;
         case GJGCChatFriendContentTypeAudio: {
-
-            Voice *voiceMsg = [Voice parseFromData:sysMsg.body error:nil];
-            message.content = voiceMsg.URL;
-            //duration
-            message.size = (int) voiceMsg.duration * 50;
+            VoiceMessage *voiceMsg = [VoiceMessage parseFromData:sysMsg.body error:nil];
+            chatMessage.msgContent = voiceMsg;
         }
             break;
         case GJGCChatFriendContentTypeImage: {
-            Image *imageMsg = [Image parseFromData:sysMsg.body error:nil];
-            message.content = imageMsg.URL;
-            message.imageOriginWidth = AUTO_WIDTH(200);
-            message.imageOriginHeight = AUTO_WIDTH(250);
-            if ([imageMsg.width floatValue] > 0) {
-                message.imageOriginWidth = [imageMsg.width floatValue];
+            PhotoMessage *imageMsg = [PhotoMessage parseFromData:sysMsg.body error:nil];
+            
+            if (imageMsg.imageWidth == 0) {
+                imageMsg.imageWidth = AUTO_WIDTH(200);
             }
-            if ([imageMsg.height floatValue] > 0) {
-                message.imageOriginHeight = [imageMsg.height floatValue];
+            if (imageMsg.imageHeight == 0) {
+                imageMsg.imageHeight = AUTO_WIDTH(250);
             }
+            chatMessage.msgContent = imageMsg;
         }
             break;
         case GJGCChatFriendContentTypeVideo: {
-            message.content = @"封面url";
-            message.url = @"视频url";
         }
             break;
         case GJGCChatFriendContentTypeMapLocation: {
-            if (message.type == GJGCChatFriendContentTypeMapLocation) {
-                message.locationExt = @{@"locationLatitude": @(1),
-                        @"locationLongitude": @(2),
-                        @"address": @"address"};
-            }
-
+            
         }
             break;
         case GJGCChatFriendContentTypeGif: {
-            message.content = @"1";
+            
         }
             break;
         case GJGCChatFriendContentTypeTransfer: {
-            /*
-             message.ext1 = @(messageContent.amount);
-             message.ext = messageContent.tipNote;
-             message.ext = messageContent.tipNote;
-             */
             SystemTransferPackage *transfer = [SystemTransferPackage parseFromData:sysMsg.body error:nil];
-            message.content = transfer.txid;
-            message.ext = transfer.tips;
-            message.ext1 = @{@"amount": @(transfer.amount),
-                    @"tips": @""};
-            message.locationExt = transfer.sender;
-
-
-            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-            [dict safeSetObject:message.message_id forKey:@"message_id"];
-            [dict safeSetObject:message.content forKey:@"hashid"];
-            [dict safeSetObject:@(1) forKey:@"status"];
-            [dict safeSetObject:@(0) forKey:@"pay_count"];
-            [dict safeSetObject:@(0) forKey:@"crowd_count"];
-            [[LMMessageExtendManager sharedManager] saveBitchMessageExtendDict:dict];
 
         }
             break;
@@ -152,27 +130,18 @@
             NSString *versionNum = [infoDict objectForKey:@"CFBundleShortVersionString"];
             int currentVer = [[versionNum stringByReplacingOccurrencesOfString:@"." withString:@""] intValue];
             if (currentVer < 6) {
-                message.type = GJGCChatFriendContentTypeNotFound;
+                chatMessage.messageType = GJGCChatFriendContentTypeNotFound;
             } else {
                 SystemRedPackage *redPackMsg = [SystemRedPackage parseFromData:sysMsg.body error:nil];
-                message.content = redPackMsg.hashId;
-                message.ext1 = redPackMsg.tips;
+                
+                
             }
         }
             break;
         case 101: //group reviewed
         {
             Reviewed *reviewed = [Reviewed parseFromData:sysMsg.body error:nil];
-            message.ext1 = @{@"username": reviewed.userInfo.username,
-                    @"avatar": reviewed.userInfo.avatar,
-                    @"pubKey": reviewed.userInfo.pubKey,
-                    @"identifier": reviewed.identifier,
-                    @"category": @(reviewed.category),
-                    @"tips": reviewed.tips ? reviewed.tips : @"",
-                    @"verificationCode": reviewed.verificationCode ? reviewed.verificationCode : @"",
-                    @"groupname": reviewed.name,
-                    @"source": @(reviewed.source)};
-            message.type = GJGCChatApplyToJoinGroup;
+            chatMessage.messageType = GJGCChatApplyToJoinGroup;
 
 
             if (!GJCFStringIsNull(reviewed.verificationCode)) {
@@ -198,7 +167,7 @@
 
                     applyMessage = [GroupApplyMessage new];
                     applyMessage.applyData = applyChange.data;
-                    applyMessage.messageId = message.message_id;
+                    applyMessage.messageId = chatMessage.messageId;
                     [ssdbManager set:reviewed.verificationCode data:applyMessage.data];
                 } else {
                     GroupApplyChange *applyChange = [GroupApplyChange new];
@@ -209,7 +178,7 @@
                     }
                     GroupApplyMessage *applyMessage = [GroupApplyMessage new];
                     applyMessage.applyData = applyChange.data;
-                    applyMessage.messageId = message.message_id;
+                    applyMessage.messageId = chatMessage.messageId;
                     [ssdbManager set:applyChange.verificationCode data:applyMessage.data];
                 }
                 [ssdbManager close];
@@ -222,31 +191,13 @@
             if (GJCFStringIsNull(announcement.title) || GJCFStringIsNull(announcement.desc)) {
                 return nil;
             }
-            NSMutableDictionary *ext1 = @{}.mutableCopy;
-            [ext1 setObject:announcement.title forKey:@"title"];
-            [ext1 setObject:announcement.desc forKey:@"content"];
-            [ext1 setObject:@(announcement.category) forKey:@"category"];
-            if (GJCFCheckObjectNull(@(announcement.createdAt))) {
-                [ext1 setObject:@([[NSDate date] timeIntervalSince1970]) forKey:@"createAt"];
-            } else {
-                [ext1 setObject:@(announcement.createdAt) forKey:@"createAt"];
-            }
-            if (!GJCFStringIsNull(announcement.URL)) {
-                [ext1 setObject:announcement.URL forKey:@"jumpUrl"];
-            }
-            if (!GJCFStringIsNull(announcement.coversURL)) {
-                [ext1 setObject:announcement.coversURL forKey:@"coversURL"];
-            }
-            message.ext1 = ext1;
+            chatMessage.msgContent = announcement;
         }
             break;
         case 103://luckypackage garb tips
         {
             SystemRedpackgeNotice *repackNotict = [SystemRedpackgeNotice parseFromData:sysMsg.body error:nil];
-            message.content = repackNotict.receiver.username;
-            message.ext1 = @{@"type": @"redpackge",
-                    @"hashid": repackNotict.hashid};
-            message.type = GJGCChatFriendContentTypeStatusTip;
+            chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
         }
             break;
 
@@ -260,16 +211,14 @@
             LMBaseSSDBManager *ssdbManager = [LMBaseSSDBManager open:@"system_message"];
             [ssdbManager set:repackNotict.identifier data:repackNotict.data];
             [ssdbManager close];
-            message.ext1 = @{@"type": @"groupreviewed",
-                    @"message": contentMessage};
-            message.type = GJGCChatFriendContentTypeStatusTip;
+            chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
         }
             break;
         case 105://phone number change
         {
             UpdateMobileBind *nameBind = [UpdateMobileBind parseFromData:sysMsg.body error:nil];
-            message.type = GJGCChatFriendContentTypeText;
-            message.content = [NSString stringWithFormat:LMLocalizedString(@"Chat Your Connect ID will no longer be linked with mobile number", nil), nameBind.username];
+            chatMessage.messageType = GJGCChatFriendContentTypeText;
+//            message.content = [NSString stringWithFormat:LMLocalizedString(@"Chat Your Connect ID will no longer be linked with mobile number", nil), nameBind.username];
 
             [[LKUserCenter shareCenter] currentLoginUser].bondingPhone = @"";
             [[LKUserCenter shareCenter] updateUserInfo:[[LKUserCenter shareCenter] currentLoginUser]];
@@ -279,14 +228,14 @@
         {
             RemoveGroup *dismissGroup = [RemoveGroup parseFromData:sysMsg.body error:nil];
             NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Chat Group has been disbanded", nil), dismissGroup.name];
-            message.ext1 = @{@"type": @"groupdismiss",
-                    @"message": tips};
+//            message.ext1 = @{@"type": @"groupdismiss",
+//                    @"message": tips};
 
 
             if ([[SessionManager sharedManager].chatSession isEqualToString:dismissGroup.groupId]) {
                 SendNotify(ConnnectGroupDismissNotification, dismissGroup.groupId)
             }
-            message.type = GJGCChatFriendContentTypeStatusTip;
+            chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
 
             [[LMConversionManager sharedManager] deleteConversation:[[SessionManager sharedManager] getRecentChatWithIdentifier:dismissGroup.groupId]];
 
@@ -296,19 +245,108 @@
             break;
         case 200: {//outer address transfer to self
             AddressNotify *addressNot = [AddressNotify parseFromData:sysMsg.body error:nil];
-            message.content = addressNot.txId;
-            message.ext1 = @{@"amount": @(addressNot.amount),
-                    @"tips": @""};
-            message.type = GJGCChatFriendContentTypeTransfer;
+//            message.ext1 = @{@"amount": @(addressNot.amount),
+//                    @"tips": @""};
+            chatMessage.messageType = GJGCChatFriendContentTypeTransfer;
         }
             break;
         default:
             break;
     }
-    return message;
+    return chatMessage;
 }
 
-+ (MessageData *)packageMessageDataWithTo:(NSString *)to chatType:(int)chatType msgType:(int)msgType ext:(id)ext groupEcdh:(NSString *)groupEcdh cipherData:(GPBMessage *)originMsg{
++ (GPBMessage *)packageChatMsg:(ChatMessage *)chatMsg groupEcdh:(NSString *)groupEcdh cipherData:(GPBMessage *)originMsg {
+    MessageData *messageData = [[MessageData alloc] init];
+    /// chat msg
+    messageData.chatMsg = chatMsg;
+    
+    /// chat session
+    ChatSession *chatSession = [[ChatSession alloc] init];
+    messageData.chatSession = chatSession;
+
+    switch (chatMsg.chatType) {
+        case GJGCChatFriendTalkTypePrivate:
+        {
+            ChatCookieData *reciverChatCookie = [[SessionManager sharedManager] getChatCookieWithChatSession:chatMsg.to];
+            LMChatEcdhKeySecurityLevelType securityLevel = LMChatEcdhKeySecurityLevelTypeNomarl;
+            BOOL reciverChatCookieExpire = [[SessionManager sharedManager] chatCookieExpire:chatMsg.to];
+            if (reciverChatCookie && [SessionManager sharedManager].loginUserChatCookie && !reciverChatCookieExpire) {
+                securityLevel = LMChatEcdhKeySecurityLevelTypeRandom;
+            } else if ((!reciverChatCookie || reciverChatCookieExpire)
+                       && [SessionManager sharedManager].loginUserChatCookie) {
+                securityLevel = LMChatEcdhKeySecurityLevelTypeHalfRandom;
+            }
+            switch (securityLevel) {
+                case LMChatEcdhKeySecurityLevelTypeRandom: {
+                    chatSession.pubKey = [SessionManager sharedManager].loginUserChatCookie.chatPubKey;
+                    chatSession.salt = [SessionManager sharedManager].loginUserChatCookie.salt;
+                    chatSession.ver = reciverChatCookie.salt;
+                    
+                    NSString * privkey = [SessionManager sharedManager].loginUserChatCookie.chatPrivkey;
+                    NSData *ecdhKey = [LMIMHelper getECDHkeyWithPrivkey:privkey publicKey:reciverChatCookie.chatPubKey];
+                    
+                    // Salt or
+                    NSData *exoData = [StringTool DataXOR1:[SessionManager sharedManager].loginUserChatCookie.salt DataXOR2:reciverChatCookie.salt];
+                    
+                    ecdhKey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhKey salt:exoData];
+                    chatMsg.cipherData = [ConnectTool createGcmDataWithEcdhkey:ecdhKey data:originMsg.data aad:nil];
+                }
+                    break;
+                case LMChatEcdhKeySecurityLevelTypeNomarl: {
+                    chatMsg.cipherData = [ConnectTool createGcmWithData:originMsg.data privkey:nil publickey:chatMsg.to aad:nil needEmptySalt:YES];
+                }
+                    break;
+                case LMChatEcdhKeySecurityLevelTypeHalfRandom: {
+                    
+                    chatSession.pubKey = [SessionManager sharedManager].loginUserChatCookie.chatPubKey;
+                    chatSession.salt = [SessionManager sharedManager].loginUserChatCookie.salt;
+                    
+                    NSString * privkey = [SessionManager sharedManager].loginUserChatCookie.chatPrivkey;
+                    NSData *ecdhKey = [LMIMHelper getECDHkeyWithPrivkey:privkey publicKey:chatMsg.to];
+                    // Extended
+                    ecdhKey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhKey salt:[SessionManager sharedManager].loginUserChatCookie.salt];
+                    chatMsg.cipherData = [ConnectTool createGcmDataWithEcdhkey:ecdhKey data:originMsg.data aad:nil];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+            break;
+            
+        case GJGCChatFriendTalkTypeGroup:{
+            chatMsg.cipherData = [ConnectTool createGcmWithData:originMsg.data ecdhKey:[StringTool hexStringToData:groupEcdh] needEmptySalt:NO];
+        }
+            break;
+            
+        case GJGCChatFriendTalkTypePostSystem:{
+            MSMessage *msMessage = [[MSMessage alloc] init];
+            msMessage.msgId = [ConnectTool generateMessageId];
+            msMessage.body = originMsg.data;
+            msMessage.category = chatMsg.msgType;
+            IMTransferData *imTransferData = [ConnectTool createTransferWithEcdhKey:[ServerCenter shareCenter].extensionPass data:msMessage.data aad:nil];
+            return imTransferData;
+        }
+            break;
+            
+        default:
+            break;
+    }
+
+    NSString *sign = [ConnectTool signWithData:messageData.data];
+    MessagePost *messagePost = [[MessagePost alloc] init];
+    messagePost.pubKey = [LKUserCenter shareCenter].currentLoginUser.pub_key;
+    messagePost.msgData = messageData;
+    messagePost.sign = sign;
+    
+    return messagePost;
+
+}
+
+
+
++ (MessageData *)packageMessageDataWithTo:(NSString *)to chatType:(int)chatType msgType:(int)msgType ext:(id)ext groupEcdh:(NSString *)groupEcdh cipherData:(GPBMessage *)originMsg {
     
     MessageData *messageData = [[MessageData alloc] init];
     
@@ -388,7 +426,6 @@
             msMessage.body = originMsg.data;
             msMessage.category = msgType;
             IMTransferData *imTransferData = [ConnectTool createTransferWithEcdhKey:[ServerCenter shareCenter].extensionPass data:msMessage.data aad:nil];
-            
             return imTransferData;
         }
             break;
@@ -396,7 +433,129 @@
         default:
             break;
     }
+    
     return messageData;
 }
+
+
++ (ChatMessageInfo *)chatMessageInfoWithChatMsg:(ChatMessage *)chatMsg originMsg:(GPBMessage *)originMsg{
+    ChatMessageInfo *chatMessageInfo = [ChatMessageInfo new];
+    chatMessageInfo.messageId = chatMsg.msgId;
+    chatMessageInfo.messageOwer = chatMsg.to;
+    chatMessageInfo.createTime = chatMsg.msgTime;
+    chatMessageInfo.senderAddress = chatMsg.from;
+    chatMessageInfo.chatType = chatMsg.chatType;
+    chatMessageInfo.messageType = chatMsg.msgType;
+    chatMessageInfo.msgContent = originMsg;
+    chatMessageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+
+    if ([originMsg isKindOfClass:[VoiceMessage class]]) {
+        VoiceMessage *voice = (VoiceMessage *)originMsg;
+        chatMessageInfo.snapTime = voice.snapTime;
+    } else if ([originMsg isKindOfClass:[VideoMessage class]]) {
+        VideoMessage *video = (VideoMessage *)originMsg;
+        chatMessageInfo.snapTime = video.snapTime;
+    } else if ([originMsg isKindOfClass:[PhotoMessage class]]) {
+        PhotoMessage *photo = (PhotoMessage *)originMsg;
+        chatMessageInfo.snapTime = photo.snapTime;
+    } else if ([originMsg isKindOfClass:[TextMessage class]]) {
+        TextMessage *test = (TextMessage *)originMsg;
+        chatMessageInfo.snapTime = test.snapTime;
+    } else if ([originMsg isKindOfClass:[EmotionMessage class]]) {
+        EmotionMessage *emotion = (EmotionMessage *)originMsg;
+        chatMessageInfo.snapTime = emotion.snapTime;
+    }
+ 
+    return chatMessageInfo;
+}
+
++ (MessageData *)packageChatMessageInfo:(ChatMessageInfo *)chatMessageInfo ext:(id)ext groupEcdh:(NSString *)groupEcdh {
+    MessageData *messageData = [[MessageData alloc] init];
+    /// chat msg
+    ChatMessage *chatMsg = [[ChatMessage alloc] init];
+    chatMsg.from = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
+    chatMsg.to = chatMessageInfo.messageOwer;
+    chatMsg.msgType = chatMessageInfo.messageType;
+    chatMsg.ext = ext;
+    chatMsg.msgTime = [[NSDate date] timeIntervalSince1970] * 1000;
+    chatMsg.chatType = chatMessageInfo.chatType;
+    messageData.chatMsg = chatMsg;
+    
+    /// chat session
+    ChatSession *chatSession = [[ChatSession alloc] init];
+    messageData.chatSession = chatSession;
+
+    switch (chatMsg.chatType) {
+        case GJGCChatFriendTalkTypePrivate:
+        {
+            ChatCookieData *reciverChatCookie = [[SessionManager sharedManager] getChatCookieWithChatSession:chatMsg.to];
+            LMChatEcdhKeySecurityLevelType securityLevel = LMChatEcdhKeySecurityLevelTypeNomarl;
+            BOOL reciverChatCookieExpire = [[SessionManager sharedManager] chatCookieExpire:chatMsg.to];
+            if (reciverChatCookie && [SessionManager sharedManager].loginUserChatCookie && !reciverChatCookieExpire) {
+                securityLevel = LMChatEcdhKeySecurityLevelTypeRandom;
+            } else if ((!reciverChatCookie || reciverChatCookieExpire)
+                       && [SessionManager sharedManager].loginUserChatCookie) {
+                securityLevel = LMChatEcdhKeySecurityLevelTypeHalfRandom;
+            }
+            switch (securityLevel) {
+                case LMChatEcdhKeySecurityLevelTypeRandom: {
+                    chatSession.pubKey = [SessionManager sharedManager].loginUserChatCookie.chatPubKey;
+                    chatSession.salt = [SessionManager sharedManager].loginUserChatCookie.salt;
+                    chatSession.ver = reciverChatCookie.salt;
+                    
+                    NSString * privkey = [SessionManager sharedManager].loginUserChatCookie.chatPrivkey;
+                    NSData *ecdhKey = [LMIMHelper getECDHkeyWithPrivkey:privkey publicKey:reciverChatCookie.chatPubKey];
+                    
+                    // Salt or
+                    NSData *exoData = [StringTool DataXOR1:[SessionManager sharedManager].loginUserChatCookie.salt DataXOR2:reciverChatCookie.salt];
+                    
+                    ecdhKey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhKey salt:exoData];
+                    chatMsg.cipherData = [ConnectTool createGcmDataWithEcdhkey:ecdhKey data:chatMessageInfo.msgContent.data aad:nil];
+                }
+                    break;
+                case LMChatEcdhKeySecurityLevelTypeNomarl: {
+                    chatMsg.cipherData = [ConnectTool createGcmWithData:chatMessageInfo.msgContent.data privkey:nil publickey:chatMsg.to aad:nil needEmptySalt:YES];
+                }
+                    break;
+                case LMChatEcdhKeySecurityLevelTypeHalfRandom: {
+                    
+                    chatSession.pubKey = [SessionManager sharedManager].loginUserChatCookie.chatPubKey;
+                    chatSession.salt = [SessionManager sharedManager].loginUserChatCookie.salt;
+                    
+                    NSString * privkey = [SessionManager sharedManager].loginUserChatCookie.chatPrivkey;
+                    NSData *ecdhKey = [LMIMHelper getECDHkeyWithPrivkey:privkey publicKey:chatMsg.to];
+                    // Extended
+                    ecdhKey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhKey salt:[SessionManager sharedManager].loginUserChatCookie.salt];
+                    chatMsg.cipherData = [ConnectTool createGcmDataWithEcdhkey:ecdhKey data:chatMessageInfo.msgContent.data aad:nil];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+            break;
+            
+        case GJGCChatFriendTalkTypeGroup:{
+            chatMsg.cipherData = [ConnectTool createGcmWithData:chatMessageInfo.msgContent.data ecdhKey:[StringTool hexStringToData:groupEcdh] needEmptySalt:NO];
+        }
+            break;
+            
+        case GJGCChatFriendTalkTypePostSystem:{
+            MSMessage *msMessage = [[MSMessage alloc] init];
+            msMessage.msgId = [ConnectTool generateMessageId];
+            msMessage.body = chatMessageInfo.msgContent.data;
+            msMessage.category = chatMessageInfo.messageType;
+            IMTransferData *imTransferData = [ConnectTool createTransferWithEcdhKey:[ServerCenter shareCenter].extensionPass data:msMessage.data aad:nil];
+            return imTransferData;
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+    return messageData;
+}
+
 
 @end

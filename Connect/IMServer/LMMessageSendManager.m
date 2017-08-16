@@ -77,14 +77,14 @@ typedef NS_ENUM(NSInteger, MessageRejectErrorType) {
                 int long long sendDuration = currentTime - sendMessageModel.sendTime;
                 if (sendDuration >= SOCKET_TIME_OUT) {
                     //update message send status
-                    sendMessageModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusFaild;
+                    sendMessageModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusFaild;
 
                     if (sendMessageModel.callBack) {
                         sendMessageModel.callBack(sendMessageModel.sendMsg, [NSError errorWithDomain:@"over_time" code:OVER_TIME_CODE userInfo:nil]);
                     }
 
 
-                    [weakSelf.sendingMessages removeObjectForKey:sendMessageModel.sendMsg.message_id];
+                    [weakSelf.sendingMessages removeObjectForKey:sendMessageModel.sendMsg.msgId];
                 }
             }
         });
@@ -97,15 +97,16 @@ typedef NS_ENUM(NSInteger, MessageRejectErrorType) {
 CREATE_SHARED_MANAGER(LMMessageSendManager)
 
 
-- (void)addSendingMessage:(MMMessage *)message callBack:(SendMessageCallBlock)callBack {
+- (void)addSendingMessage:(ChatMessage *)message originContent:(GPBMessage *)originContent callBack:(SendMessageCallBlock)callBack {
     SendMessageModel *sendMessageModel = [SendMessageModel new];
     sendMessageModel.sendMsg = message;
+    sendMessageModel.originContent = originContent;
     sendMessageModel.sendTime = [[NSDate date] timeIntervalSince1970];
     sendMessageModel.callBack = callBack;
-
+    
     //save to send queue
-    [self.sendingMessages setValue:sendMessageModel forKey:message.message_id];
-
+    [self.sendingMessages setValue:sendMessageModel forKey:message.msgId];
+    
     //open reflash
     if (!self.reflashSendStatusSourceActive) {
         dispatch_resume(self.reflashSendStatusSource);
@@ -119,10 +120,8 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
         return;
     }
     [GCDQueue executeInQueue:self.messageSendStatusQueue block:^{
-
         SendMessageModel *sendModel = [self.sendingMessages valueForKey:messageId];
-        NSString *messageOwer = sendModel.sendMsg.publicKey;
-
+        NSString *messageOwer = sendModel.sendMsg.to;
         GJGCChatFriendSendMessageStatus sendStatus = [[MessageDBManager sharedManager] getMessageSendStatusByMessageid:messageId messageOwer:messageOwer];
         if (sendStatus == GJGCChatFriendSendMessageStatusSuccessUnArrive ||
                 sendStatus == GJGCChatFriendSendMessageStatusFailByNotInGroup) {
@@ -132,12 +131,11 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
         } else {
             //update status
             [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccess withMessageId:messageId messageOwer:messageOwer];
-            sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+            sendModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusSuccess;
             if (sendModel.callBack) {
                 sendModel.callBack(sendModel.sendMsg, nil);
             }
             //updatea recent chat cell status
-
         }
 
         [self.sendingMessages removeObjectForKey:messageId];
@@ -147,7 +145,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
 - (void)messageSendFailedMessageId:(NSString *)messageId {
     [GCDQueue executeInQueue:self.messageSendStatusQueue block:^{
         SendMessageModel *sendModel = [self.sendingMessages valueForKey:messageId];
-        sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusFaild;
+        sendModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusFaild;
         if (sendModel.callBack) {
             NSError *error = [NSError errorWithDomain:@"imserver" code:-1 userInfo:nil];
             sendModel.callBack(sendModel.sendMsg, error);
@@ -172,7 +170,8 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
                 [[SessionManager sharedManager] removeChatCookieWithChatSession:identifier];
                 [[SessionManager sharedManager] chatCookie:YES chatSession:identifier];
-                [[IMService instance] asyncSendMessageMessage:sendModel.sendMsg onQueue:nil completion:sendModel.callBack onQueue:nil];
+                
+                [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent chatEcdhKey:nil sendMessageCompletion:sendModel.callBack];
             }
                 break;
             case MessageRejectErrorTypeChatinfoNotMatch: {
@@ -181,10 +180,11 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 if ([ConnectTool vertifyWithData:chatCookie.data_p.data sign:chatCookie.sign publickey:identifier]) {
                     ChatCookieData *chatInfo = chatCookie.data_p;
                     [[SessionManager sharedManager] setChatCookie:chatInfo chatSession:identifier];
-                    [[IMService instance] asyncSendMessageMessage:sendModel.sendMsg onQueue:nil completion:sendModel.callBack onQueue:nil];
+                    
+                    [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent chatEcdhKey:nil sendMessageCompletion:sendModel.callBack];
                 } else {
                     if (sendModel.callBack) {
-                        sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusFaild;
+                        sendModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusFaild;
                         NSError *error = [NSError errorWithDomain:@"imserver" code:-1 userInfo:nil];
                         sendModel.callBack(sendModel.sendMsg, error);
 
@@ -199,7 +199,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 if (!GJCFStringIsNull(identifier)) {
                     //updata message sendstatus
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNotInGroup withMessageId:rejectMsg.msgId messageOwer:identifier];
-                    sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusFailByNotInGroup;
+                    sendModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusFailByNotInGroup;
                     //create tip message
                     [[MessageDBManager sharedManager] createTipMessageWithMessageOwer:identifier isnoRelationShipType:NO content:LMLocalizedString(@"Message send fail not in group", nil)];
                     if (sendModel.callBack) {
@@ -217,7 +217,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 if (!GJCFStringIsNull(identifier)) {
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNoRelationShip withMessageId:rejectMsg.msgId messageOwer:identifier];
 
-                    sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusFailByNoRelationShip;
+                    sendModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusFailByNoRelationShip;
 
                     //create tip message
                     [[MessageDBManager sharedManager] createTipMessageWithMessageOwer:identifier isnoRelationShipType:YES content:nil];
@@ -235,7 +235,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 if (!GJCFStringIsNull(identifier)) {
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccessUnArrive withMessageId:rejectMsg.msgId messageOwer:identifier];
 
-                    sendModel.sendMsg.sendstatus = GJGCChatFriendSendMessageStatusSuccessUnArrive;
+                    sendModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusSuccessUnArrive;
                     //create tip message
                     [[MessageDBManager sharedManager] createTipMessageWithMessageOwer:identifier isnoRelationShipType:NO content:LMLocalizedString(@"Link Message has been sent the other rejected", nil)];
                     if (sendModel.callBack) {

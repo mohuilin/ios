@@ -755,7 +755,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
     GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
     LMRerweetModel *retweetModel = [[LMRerweetModel alloc] init];
 
-    MMMessage *retweetMessage = [self.dataSourceManager messageByMessageId:contentModel.localMsgId];
+    ChatMessageInfo *retweetMessage = [self.dataSourceManager messageByMessageId:contentModel.localMsgId];
     retweetModel.retweetMessage = retweetMessage;
     switch (contentModel.contentType) {
         case GJGCChatFriendContentTypeImage: {
@@ -984,22 +984,11 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                                 if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
                                     operation = [NSString stringWithFormat:@"%@/%@", sendAddress, [[LKUserCenter shareCenter] currentLoginUser].address];
                                 }
-                                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                                chatMessage.messageId = [ConnectTool generateMessageId];
-                                chatMessage.messageOwer = self.taklInfo.chatIdendifier;
-                                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                                MMMessage *message = [[MMMessage alloc] init];
-                                message.type = GJGCChatFriendContentTypeStatusTip;
-                                message.content = operation;
-                                message.ext1 = @(2);
-                                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                                message.message_id = chatMessage.messageId;
-                                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                chatMessage.message = message;
+                                
+                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:operation noteType:2 ext:nil];
+
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
-                                [self.dataSourceManager showGetRedBagMessageWithWithMessage:message];
+                                [self.dataSourceManager showGetRedBagMessageWithWithMessage:chatMessage];
                             }
                             
                             LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
@@ -1221,39 +1210,16 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                                 int payCount = (int) (payedCrowding.size - payedCrowding.remainSize);
                                 chatContentModel.payOrReceiptStatusMessage = [GJGCChatSystemNotiCellStyle formateRecieptSubTipsWithTotal:(int) payedCrowding.size payCount:payCount isCrowding:YES transStatus:(int) payedCrowding.status];
                                 [self.chatListTable reloadData];
-                                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                                chatMessage.messageId = [ConnectTool generateMessageId];
-                                chatMessage.messageOwer = weakSelf.taklInfo.chatIdendifier;
-                                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                                MMMessage *message = [[MMMessage alloc] init];
-                                message.type = GJGCChatFriendContentTypeStatusTip;
-                                message.content = [GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:crowdInfo.sender.username isCrowding:YES].string;
-                                message.ext1 = @(3);
-                                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                                message.message_id = chatMessage.messageId;
-                                message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                chatMessage.message = message;
+                                
+                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:[GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:crowdInfo.sender.username isCrowding:YES].string noteType:3 ext:nil];
+
                                 [GCDQueue executeInGlobalQueue:^{
                                     [[MessageDBManager sharedManager] saveMessage:chatMessage];
                                 }];
 
                                 [weakSelf.dataSourceManager showReceiptMessageMessageWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:crowdInfo.sender.username isCrowd:YES];
                                 if (crowdInfo.remainSize == 0) {
-                                    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                                    chatMessage.messageId = [ConnectTool generateMessageId];
-                                    chatMessage.messageOwer = weakSelf.taklInfo.chatIdendifier;
-                                    chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                                    chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                    chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-                                    MMMessage *message = [[MMMessage alloc] init];
-                                    message.type = GJGCChatFriendContentTypeStatusTip;
-                                    message.content = LMLocalizedString(@"Chat Founded complete", nil);
-                                    message.sendtime = chatMessage.createTime;
-                                    message.message_id = chatMessage.messageId;
-                                    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                    chatMessage.message = message;
+                                    ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:LMLocalizedString(@"Chat Founded complete", nil) noteType:3 ext:nil];
                                     [GCDQueue executeInGlobalQueue:^{
                                         [[MessageDBManager sharedManager] saveMessage:chatMessage];
                                     }];
@@ -1298,20 +1264,9 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                         [GCDQueue executeInMainQueue:^{
                             chatContentModel.payOrReceiptStatusMessage = [GJGCChatSystemNotiCellStyle formateRecieptSubTipsWithTotal:1 payCount:1 isCrowding:NO transStatus:1];
                             [self.chatListTable reloadData];
-                            ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                            chatMessage.messageId = [ConnectTool generateMessageId];
-                            chatMessage.messageOwer = weakSelf.taklInfo.chatIdendifier;
-                            chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                            chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                            chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                            MMMessage *message = [[MMMessage alloc] init];
-                            message.type = GJGCChatFriendContentTypeStatusTip;
-                            message.content = [GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:chatContentModel.senderName isCrowding:NO].string;
-                            message.ext1 = @(3);
-                            message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                            message.message_id = chatMessage.messageId;
-                            message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                            chatMessage.message = message;
+                            
+                            ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:[GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:chatContentModel.senderName isCrowding:NO].string noteType:3 ext:nil];
+                            
                             [GCDQueue executeInGlobalQueue:^{
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
                             }];

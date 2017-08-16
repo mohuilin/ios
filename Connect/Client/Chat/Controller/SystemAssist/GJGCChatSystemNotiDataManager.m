@@ -38,7 +38,7 @@
 
     for (ChatMessageInfo *messageInfo in messages) {
         if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSending) {
-            [self.sendingMessages objectAddObject:messageInfo.message];
+            [self.sendingMessages objectAddObject:messageInfo.msgContent];
         }
         [self addMMMessage:messageInfo];
     }
@@ -56,9 +56,7 @@
 
 - (GJGCChatFriendContentModel *)addMMMessage:(ChatMessageInfo *)chatMessage {
 
-    MMMessage *aMessage = chatMessage.message;
-    [self.orginMessageListArray objectAddObject:aMessage];
-
+    [self.orginMessageListArray objectAddObject:chatMessage];
     int type = chatMessage.messageType;
     switch (type) {
         case 101:
@@ -71,21 +69,18 @@
     }
 
     GJGCChatFriendContentModel *chatContentModel = [[GJGCChatFriendContentModel alloc] init];
-    chatContentModel.contentType = aMessage.type;
+    chatContentModel.contentType = chatMessage.messageType;
     chatContentModel.autoMsgid = chatMessage.ID;
-    chatContentModel.gifLocalId = aMessage.content;
-    chatContentModel.originTextMessage = aMessage.content;
     chatContentModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
-    chatContentModel.userName = aMessage.user_name;
-    chatContentModel.sendStatus = aMessage.sendstatus;
-    chatContentModel.sendTime = aMessage.sendtime;
-    chatContentModel.publicKey = aMessage.publicKey;
-    chatContentModel.localMsgId = aMessage.message_id;
+    chatContentModel.sendStatus = chatMessage.sendstatus;
+    chatContentModel.sendTime = chatMessage.createTime;
+    chatContentModel.publicKey = chatMessage.messageOwer;
+    chatContentModel.localMsgId = chatMessage.messageId;
     chatContentModel.talkType = self.taklInfo.talkType;
 
     chatContentModel.isSnapChatMode = self.taklInfo.snapChatOutDataTime > 0;
     chatContentModel.isFriend = YES;
-    if ([aMessage.user_id isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //如果user_id 是我 ，就是别人发给我的
+    if (![chatMessage.senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
         chatContentModel.isFromSelf = NO;
         chatContentModel.headUrl = self.taklInfo.headUrl;
         chatContentModel.senderName = self.taklInfo.name;
@@ -94,9 +89,9 @@
         chatContentModel.isFromSelf = YES;
         chatContentModel.senderName = [[LKUserCenter shareCenter] currentLoginUser].normalShowName;
     }
-    GJGCChatFriendContentType contentType = [self formateChatFriendContent:chatContentModel withMsgModel:aMessage];
+    GJGCChatFriendContentType contentType = [self formateChatFriendContent:chatContentModel withMsgModel:chatMessage];
     if (contentType != GJGCChatFriendContentTypeNotFound) {
-        if (![self contentModelByMsgId:aMessage.message_id]) {
+        if (![self contentModelByMsgId:chatMessage.messageId]) {
             [self addChatContentModel:chatContentModel];
         }
     }
@@ -153,7 +148,7 @@
      @"category":@(announcement.category),
      @"content":announcement.content};
      */
-    NSDictionary *announcementDict = chatMessage.message.ext1;
+    NSDictionary *announcementDict = nil;
     NSString *url = [announcementDict valueForKey:@"jumpUrl"];
     // card title
     NSString *title = [announcementDict valueForKey:@"title"];
@@ -177,7 +172,7 @@
     notiModel.systemJumpType = type;
     notiModel.systemGuideButtonTitle = [GJGCChatSystemNotiCellStyle formateActiveDescription:buttonTitle];
     notiModel.talkType = GJGCChatFriendTalkTypePostSystem;
-    notiModel.sendTime = chatMessage.message.sendtime;
+    notiModel.sendTime = chatMessage.createTime;
     notiModel.timeString = [GJGCChatSystemNotiCellStyle formateSystemNotiTime:notiModel.sendTime / 1000];
     notiModel.systemOperationTip = [GJGCChatSystemNotiCellStyle formateActiveDescription:desc];
     [self addChatContentModel:notiModel];

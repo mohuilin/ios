@@ -6,7 +6,6 @@
 #import <Foundation/Foundation.h>
 #import "Message.h"
 #import "TCPConnection.h"
-#import "MMMessage.h"
 #import "Protofile.pbobjc.h"
 #import "LMSocketHandleDelegate.h"
 #import "LMCommandManager.h"
@@ -116,93 +115,22 @@
 - (BOOL)asyncSendGroupInfo:(MessagePost *)msg;
 
 
-/**
- * send message with upload callback
- * @param message
- * @param faildBlock
- * @param completionBlock
- * @param progressBlock
- * @param ecdhKey
- * @param messageContent
- * @param completion
- */
-- (void)asyncSendMessage:(MMMessage *)message
-     uploadFileFailBlock:(GJCFFileUploadManagerTaskFaildBlock)faildBlock
-   uploadCompletionBlock:(GJCFFileUploadManagerTaskCompletionBlock)completionBlock
-           progressBlock:(GJCFFileUploadManagerUpdateTaskProgressBlock)progressBlock
-             chatEcdhKey:(NSString *)ecdhKey
-            contentModel:(GJGCChatFriendContentModel *)messageContent
-   sendMessageCompletion:(void (^)(MMMessage *message,
-           NSError *error))completion;
-
-/**
- * send message eg:text gif.. not image audio
- * @param message
- * @param ecdhKey
- * @param completion
- */
-- (void)asyncSendMessage:(MMMessage *)message
-             chatEcdhKey:(NSString *)ecdhKey
-   sendMessageCompletion:(void (^)(MMMessage *message,
+- (void)asyncSendMessage:(MessageData *)msgData
+           originContent:(GPBMessage *)originContent
+              completion:(void (^)(ChatMessage *msgData,
                                    NSError *error))completion;
 
-/**
- * Send messages asynchronously to friends
- * @param message
- * @param sendMessageQueue
- * @param completion
- * @param sendMessageStatusQueue
- * @return
- */
-- (MessagePost *)asyncSendMessageMessage:(MMMessage *)message
-                                 onQueue:(dispatch_queue_t)sendMessageQueue
-                              completion:(void (^)(MMMessage *message,
-                                      NSError *error))completion
-                                 onQueue:(dispatch_queue_t)sendMessageStatusQueue;
+- (void)asyncSendReadReceiptMessage:(MessageData *)msgData
+                      originContent:(GPBMessage *)originContent
+                         completion:(void (^)(ChatMessage *msgData,
+                                              NSError *error))completion;
 
 
-/**
- * send message read ack
- * snap chat
- * @param message
- * @param sendMessageQueue
- * @param completion
- * @param sendMessageStatusQueue
- * @return
- */
-- (MessagePost *)asyncSendMessageReadAck:(MMMessage *)message
-                                 onQueue:(dispatch_queue_t)sendMessageQueue
-                              completion:(void (^)(MMMessage *message,
-                                      NSError *error))completion
-                                 onQueue:(dispatch_queue_t)sendMessageStatusQueue;
-
-
-/**
- * async send group message
- * @param message
- * @param ecdhKey
- * @param sendMessageQueue
- * @param completion
- * @param sendMessageStatusQueue
- * @return
- */
-- (MessagePost *)asyncSendGroupMessage:(MMMessage *)message
-                      withGroupEckhKey:(NSString *)ecdhKey
-                               onQueue:(dispatch_queue_t)sendMessageQueue
-                            completion:(void (^)(MMMessage *message,
-                                    NSError *error))completion
-                               onQueue:(dispatch_queue_t)sendMessageStatusQueue;
-
-
-/**
- * async send system message
- * send message to Connect term
- * @param message
- * @param completion
- */
-- (void)asyncSendSystemMessage:(MMMessage *)message
-                    completion:(void (^)(MMMessage *message,
-                            NSError *error))completion;
+- (void)asyncSendMessage:(ChatMessage *)chatMsg
+           originContent:(GPBMessage *)originContent
+             chatEcdhKey:(NSString *)ecdhKey
+   sendMessageCompletion:(void (^)(ChatMessage *msgData,
+                                   NSError *error))completion;
 
 
 /**

@@ -38,19 +38,10 @@
     NSMutableArray *groupReviewArray = [NSMutableArray array];
     for (MSMessage *sysMsg in sysMsgs) {
         //package message
-        MMMessage *messageInfo = [LMMessageAdapter packSystemMessage:sysMsg];
-        if (![LMMessageValidationTool checkMessageValidata:messageInfo messageType:MessageTypeSystem]) {
+        ChatMessageInfo *chatMessage = [LMMessageAdapter packSystemMessage:sysMsg];
+        if (![LMMessageValidationTool checkMessageValidata:chatMessage messageType:MessageTypeSystem]) {
             continue;
         }
-        messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-        chatMessage.messageId = sysMsg.msgId;
-        chatMessage.createTime = (NSInteger) messageInfo.sendtime;
-        chatMessage.messageType = messageInfo.type;
-        chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        chatMessage.readTime = 0;
-        chatMessage.message = messageInfo;
-        chatMessage.messageOwer = kSystemIdendifier;
         if (chatMessage.messageType == GJGCChatApplyToJoinGroup) {
             [groupReviewArray objectAddObject:chatMessage];
         } else {
@@ -79,7 +70,7 @@
 
             NSMutableDictionary *verificationCodeMessage = [NSMutableDictionary dictionary];
             for (ChatMessageInfo *msg in groupReviewArray) {
-                NSString *verificationCode = [msg.message.ext1 valueForKey:@"verificationCode"];
+                NSString *verificationCode = @"";
                 if (verificationCode) {
                     [verificationCodeMessage setValue:msg forKey:verificationCode];
                 }

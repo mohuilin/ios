@@ -32,20 +32,16 @@
 
 - (GJGCChatFriendContentModel *)addMMMessage:(ChatMessageInfo *)chatMessage {
 
-    MMMessage *aMessage = chatMessage.message;
-    [self.orginMessageListArray objectAddObject:aMessage];
+    [self.orginMessageListArray objectAddObject:chatMessage];
 
     GJGCChatFriendContentModel *chatContentModel = [[GJGCChatFriendContentModel alloc] init];
-    chatContentModel.contentType = aMessage.type;
+    chatContentModel.contentType = chatMessage.messageType;
     chatContentModel.autoMsgid = chatMessage.ID;
-    chatContentModel.gifLocalId = aMessage.content;
-    chatContentModel.originTextMessage = aMessage.content;
     chatContentModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
-    chatContentModel.userName = aMessage.user_name;
-    chatContentModel.sendStatus = aMessage.sendstatus;
-    chatContentModel.sendTime = aMessage.sendtime;
-    chatContentModel.publicKey = aMessage.publicKey;
-    chatContentModel.localMsgId = aMessage.message_id;
+    chatContentModel.sendStatus = chatMessage.sendstatus;
+    chatContentModel.sendTime = chatMessage.createTime;
+    chatContentModel.publicKey = chatMessage.messageOwer;
+    chatContentModel.localMsgId = chatMessage.messageId;
     chatContentModel.talkType = self.taklInfo.talkType;
     chatContentModel.isRead = chatMessage.state > 0;
     chatContentModel.isSnapChatMode = self.taklInfo.snapChatOutDataTime > 0;
@@ -53,8 +49,8 @@
     chatContentModel.downloadTaskIdentifier = [[GJCFFileDownloadManager shareDownloadManager] getDownloadIdentifierWithMessageId:[NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, chatContentModel.localMsgId]];
     chatContentModel.isDownloading = chatContentModel.downloadTaskIdentifier != nil;
 
-    if (aMessage.type != GJGCChatFriendContentTypeSnapChat) {
-        if ([aMessage.user_id isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //if user_id is self ,the message is sent to me
+    if (chatMessage.messageType != GJGCChatFriendContentTypeSnapChat) {
+        if (![chatMessage.senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //if senderAddress is self ,the message is sent to me
             chatContentModel.isFromSelf = NO;
             chatContentModel.headUrl = self.taklInfo.headUrl;
             chatContentModel.senderName = self.taklInfo.name;
@@ -64,9 +60,9 @@
             chatContentModel.senderName = [[LKUserCenter shareCenter] currentLoginUser].normalShowName;
         }
     }
-    GJGCChatFriendContentType contentType = [self formateChatFriendContent:chatContentModel withMsgModel:aMessage];
+    GJGCChatFriendContentType contentType = [self formateChatFriendContent:chatContentModel withMsgModel:chatMessage];
     if (contentType != GJGCChatFriendContentTypeNotFound) {
-        if (![self contentModelByMsgId:aMessage.message_id]) {
+        if (![self contentModelByMsgId:chatMessage.messageId]) {
             [self addChatContentModel:chatContentModel];
         }
         if (contentType != GJGCChatFriendContentTypeSnapChat) {
@@ -77,23 +73,7 @@
                     chatMessage.state != 2) { //Voice message not played complete
                 chatContentModel.readTime = 0;
             }
-            if ([self.ignoreMessageTypes containsObject:@(chatContentModel.contentType)]) {
-
-            } else {
-                NSInteger snapTime = 0;
-                NSDictionary *ext = aMessage.ext;
-                if ([aMessage.ext isKindOfClass:[NSString class]]) {
-                    ext = [aMessage.ext dictionaryValue];
-                } else if ([aMessage.ext isKindOfClass:[NSDictionary class]]) {
-                    ext = aMessage.ext;
-                }
-                if (ext) {
-                    if ([ext.allKeys containsObject:@"luck_delete"]) {
-                        snapTime = [[ext valueForKey:@"luck_delete"] integerValue];
-                    }
-                }
-                //Set expiration time
-                chatContentModel.snapTime = snapTime;
+            if (![self.ignoreMessageTypes containsObject:@(chatContentModel.contentType)]) {
                 if (chatContentModel.snapTime > 0) {
                     if (chatContentModel.readTime > 0) {
                         [self openSnapMessageCounterState:chatContentModel];
@@ -118,12 +98,12 @@
     //Show encrypted chat tips
     ChatMessageInfo *fristMessage = [messages firstObject];
     if (self.taklInfo.talkType != GJGCChatFriendTalkTypePostSystem && messages.count != 20) {
-        [self showfirstChatSecureTipWithTime:fristMessage.message.sendtime];
+        [self showfirstChatSecureTipWithTime:fristMessage.createTime];
     }
 
     for (ChatMessageInfo *messageInfo in messages) {
         if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSending) {
-            [self.sendingMessages objectAddObject:messageInfo.message];
+            [self.sendingMessages objectAddObject:messageInfo.msgContent];
         }
         [self addMMMessage:messageInfo];
     }

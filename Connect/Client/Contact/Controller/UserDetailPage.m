@@ -220,9 +220,9 @@
 
     NSString *ecdhKey = [KeyHandle getECDHkeyUsePrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey PublicKey:self.user.pub_key];
 
-    MMMessage *message = [[MessageDBManager sharedManager] createTransactionMessageWithUserInfo:self.user hashId:hashId monney:money];
+    ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] createTransactionMessageWithUserInfo:self.user hashId:hashId monney:money];
     // creat session
-    [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:self.user.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:message.content] ecdhKey:ecdhKey talkName:self.user.username];
+    [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:self.user.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessageInfo.messageType textMessage:@""] ecdhKey:ecdhKey talkName:self.user.username];
     UIViewController *rootViewController = [self.navigationController.viewControllers firstObject];
     [self.navigationController popToRootViewControllerAnimated:NO];
     if ([rootViewController isKindOfClass:[SearchPage class]]) {
@@ -231,7 +231,7 @@
     // Interface jump
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     [[appDelegate shareMainTabController] chatWithFriend:self.user];
-    [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:nil onQueue:nil];
+//    [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:nil onQueue:nil];
 }
 
 /**

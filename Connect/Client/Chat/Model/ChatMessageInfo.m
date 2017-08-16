@@ -12,15 +12,6 @@
 @implementation ChatMessageInfo
 
 - (NSInteger)snapTime{
-    if (!self.message.ext) {
-        return 0;
-    }
-    if (self.message.ext && [self.message.ext isKindOfClass:[NSDictionary class]]) {
-        NSDictionary *dict = self.message.ext;
-        if ([dict.allKeys containsObject:@"luck_delete"]) {
-            _snapTime = [[dict safeObjectForKey:@"luck_delete"] integerValue];
-        }
-    }
     return _snapTime;
 }
 

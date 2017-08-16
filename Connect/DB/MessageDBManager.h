@@ -9,8 +9,6 @@
 #import "BaseDB.h"
 #import "ChatMessageInfo.h"
 
-#define MessageTable @"t_message"
-
 @interface MessageDBManager : BaseDB
 
 + (MessageDBManager *)sharedManager;
@@ -47,7 +45,7 @@
  * @param money
  * @return
  */
-- (MMMessage *)createTransactionMessageWithUserInfo:(AccountInfo *)user hashId:(NSString *)hashId monney:(NSString *)money;
+- (ChatMessageInfo *)createTransactionMessageWithUserInfo:(AccountInfo *)user hashId:(NSString *)hashId monney:(NSString *)money;
 
 /**
  * create transaction messsage
@@ -57,7 +55,7 @@
  * @param isOutTransfer  is out transfer ?
  * @return
  */
-- (MMMessage *)createSendtoOtherTransactionMessageWithMessageOwer:(AccountInfo *)ower hashId:(NSString *)hashId monney:(NSString *)money isOutTransfer:(BOOL)isOutTransfer;
+- (ChatMessageInfo *)createSendtoOtherTransactionMessageWithMessageOwer:(AccountInfo *)ower hashId:(NSString *)hashId monney:(NSString *)money isOutTransfer:(BOOL)isOutTransfer;
 
 /**
  * create transaction message
@@ -67,7 +65,7 @@
  * @param isOutTransfer
  * @return
  */
-- (MMMessage *)createSendtoMyselfTransactionMessageWithMessageOwer:(AccountInfo *)messageOwer hashId:(NSString *)hashId monney:(NSString *)money isOutTransfer:(BOOL)isOutTransfer;
+- (ChatMessageInfo *)createSendtoMyselfTransactionMessageWithMessageOwer:(AccountInfo *)messageOwer hashId:(NSString *)hashId monney:(NSString *)money isOutTransfer:(BOOL)isOutTransfer;
 
 /**
  * get contact message count

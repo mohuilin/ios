@@ -19,7 +19,6 @@
 #import "ConnectTool.h"
 #import "Protofile.pbobjc.h"
 #import "NetWorkOperationTool.h"
-#import "MMMessage.h"
 #import "MessageDBManager.h"
 #import "IMService.h"
 #import "RecentChatDBManager.h"
@@ -123,7 +122,6 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
     if ([self.currentForegroundObserverUniqueIdenfier isEqualToString:observerIdentifier]) {
         return;
     }
-    
     /* Clear the observation of the original foreground observer */
     [self clearCurrentObserveBlocks];
     self.currentForegroundObserverUniqueIdenfier = observerIdentifier;
@@ -159,9 +157,9 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
         }
         
         for (GJCFFileUploadTask *task in self.taskArray) {
-            MMMessage *willUploadMessage = [aTask.userInfo valueForKey:@"message"];
-            MMMessage *uploadindMessage = [task.userInfo valueForKey:@"message"];
-            if ([uploadindMessage.message_id isEqualToString:willUploadMessage.message_id]) {
+            NSString *msgId = [aTask.userInfo valueForKey:@"msgId"];
+            NSString *existMsgId = [task.userInfo valueForKey:@"msgId"];
+            if ([existMsgId isEqualToString:msgId]) {
                 [task addNewTaskObserverUniqueIdentifier:self.currentForegroundObserverUniqueIdenfier];
                 return;
             }
@@ -177,6 +175,7 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
             sturtData.plainData = uplodDataModel.fileData;
             sturtData.random = [ConnectTool get16_32RandData];
             GcmData *serverGcmData = [ConnectTool createGcmDataWithEcdhkey:self.serverUserEcdhKey data:sturtData.data aad:[ServerCenter shareCenter].defineAad];
+            
             MediaFile *mediaFile = [[MediaFile alloc] init];
             mediaFile.pubKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
             mediaFile.cipherData = serverGcmData;
@@ -258,54 +257,12 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
                     self.completionBlock(aTask,fileData);
                 }
             }
-            
-            NSLog(@"aTask.taskObservers %@ self.observerActionDict%@",aTask.taskObservers,self.observerActionDict);
-            
-            //update success
-            MMMessage *msg = [aTask.userInfo valueForKey:@"message"];
-            if (msg) {
-                // Not the current session is not forwarding the message
-                if (![[SessionManager sharedManager].chatSession isEqualToString:msg.publicKey] && ![aTask.userInfo valueForKey:@"toFriend"]) {
-                    // update message
-                    NSString *fileUrl = [NSString stringWithFormat:@"%@?pub_key=%@&token=%@",fileData.URL,msg.publicKey,fileData.token];
-                    switch (msg.type) {
-                        case GJGCChatFriendContentTypeVideo:
-                        case GJGCChatFriendContentTypeImage:
-                        {
-                            msg.content = [NSString stringWithFormat:@"%@/thumb?pub_key=%@&token=%@",fileData.URL,msg.publicKey,fileData.token];
-                            msg.url = fileUrl;
-                        }
-                            break;
-                        case GJGCChatFriendContentTypeMapLocation:
-                        case GJGCChatFriendContentTypeAudio:
-                        {
-                            msg.content = fileUrl;
-                        }
-                            break;
-                        default:
-                            break;
-                    }
-                    // update message
-                    ChatMessageInfo *messageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:msg.message_id messageOwer:msg.publicKey];
-                    messageInfo.message = msg;
-                    [[MessageDBManager sharedManager] updataMessage:messageInfo];
-                    // send message
-                    [self sendMessagePost:msg task:aTask];
-                }
-            }
-            
             for (NSString *taskObserverIdentifier in aTask.taskObservers) {
-                
                 NSMutableDictionary *existActionDict = [self.observerActionDict objectForKey:taskObserverIdentifier];
-                
                 if (existActionDict) {
-                    
                     GJCFFileUploadManagerTaskCompletionBlock successBlock = [existActionDict objectForKey:kGJCFFileUploadManagerCompletionBlockKey];
-                    
                     if (successBlock) {
-                        
                         successBlock(aTask,fileData);
-                        
                     }
                 }
             }
@@ -328,32 +285,13 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
             self.faildBlock(aTask,error);
         }
     }
-    
-    MMMessage *msg = [aTask.userInfo valueForKey:@"message"];
-    if (msg) {
-        // Update the sending status of the message
-        [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFaild withMessageId:msg.message_id messageOwer:msg.publicKey];
-        // Not in the current session
-        if (![[SessionManager sharedManager].chatSession isEqualToString:msg.publicKey]) {
-            [GCDQueue executeInMainQueue:^{
-                SendNotify(ConnnectUploadFileFailNotification, msg.publicKey);
-            }];
-        }
-    }
-    
     for (NSString *taskObserverIdentifier in aTask.taskObservers) {
-        
         NSMutableDictionary *existActionDict = [self.observerActionDict objectForKey:taskObserverIdentifier];
-        
         if (existActionDict) {
-            
             GJCFFileUploadManagerTaskFaildBlock faildBlock = [existActionDict objectForKey:kGJCFFileUploadManagerFaildBlockKey];
             if (faildBlock) {
-                
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    
                     faildBlock(aTask,error);
-
                 });
                 
             }
@@ -382,15 +320,10 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
         NSMutableDictionary *existActionDict = [self.observerActionDict objectForKey:taskObserverIdentifier];
         
         if (existActionDict) {
-            
             GJCFFileUploadManagerUpdateTaskProgressBlock progressBlock = [existActionDict objectForKey:kGJCFFileUploadManagerProgressBlockKey];
-            
             if (progressBlock) {
-                
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    
                     progressBlock(aTask,percent);
-
                 });
             }
             
@@ -526,8 +459,6 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
     NSString *observerActionInfoKey = [GJCFFileUploadManager uniqueKeyForObserver:observer];
     self.currentForegroundObserverUniqueIdenfier = observerActionInfoKey;
     
-    NSLog(@"completionBlock %@",observerActionInfoKey);
-    
     if (![self.observerActionDict objectForKey:observerActionInfoKey]) {
         
         NSMutableDictionary *observerInfo = [NSMutableDictionary dictionary];
@@ -576,14 +507,11 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
     NSLog(@"faildBlock %@",observerActionInfoKey);
     
     if (![self.observerActionDict objectForKey:observerActionInfoKey]) {
-        
         NSMutableDictionary *observerInfo = [NSMutableDictionary dictionary];
         [observerInfo setObject:faildBlock forKey:kGJCFFileUploadManagerFaildBlockKey];
-        
         [self.observerActionDict setObject:observerInfo forKey:observerActionInfoKey];
         return;
     }
-    
     NSMutableDictionary *existActionDict = [self.observerActionDict objectForKey:observerActionInfoKey];
     [existActionDict setObject:faildBlock forKey:kGJCFFileUploadManagerFaildBlockKey];
 }
@@ -622,71 +550,6 @@ static dispatch_queue_t _gjcfFileUploadManagerOperationQueue ;
         [self.observerActionDict removeObjectForKey:observerActionInfoKey];
     }
     
-}
-
-
-
-#pragma mark - send message
-- (void)sendMessagePost:(MMMessage *)message task:(GJCFFileUploadTask *)task{
-    
-    if (task.msgType == GJGCChatFriendTalkTypePrivate) {
-        [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:^(MMMessage *messageInfo,NSError *error) {
-            
-            if (!messageInfo) {
-                return;
-            }
-            if (messageInfo.type == 12) {
-                
-                DDLogInfo(@"Read receipt of the message of success！！！");
-                
-                return;
-            }
-            ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:message.publicKey];
-            chatMessage.message = messageInfo;
-            chatMessage.sendstatus = messageInfo.sendstatus;
-            
-            [[MessageDBManager sharedManager] updataMessage:chatMessage];
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
-                
-            }
-        } onQueue:nil];
-        
-    } else if (task.msgType == GJGCChatFriendTalkTypeGroup){
-        [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:@"" onQueue:nil completion:^(MMMessage *messageInfo, NSError *error) {
-            
-            if (!messageInfo) {
-                return;
-            }
-            
-            ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:message.message_id];
-            chatMessage.message = messageInfo;
-            chatMessage.sendstatus = messageInfo.sendstatus;
-            
-            [[MessageDBManager sharedManager] updataMessage:chatMessage];
-            if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
-                
-            }
-        } onQueue:nil];
-    } else if (task.msgType == GJGCChatFriendTalkTypePostSystem){
-        [[IMService instance] asyncSendSystemMessage:message completion:^(MMMessage *messageInfo, NSError *error) {
-            if (!messageInfo) {
-                return;
-            }
-            //update db status 
-            [GCDQueue executeInBackgroundPriorityGlobalQueue:^{
-                
-                ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:message.message_id];
-                chatMessage.message = messageInfo;
-                chatMessage.sendstatus = messageInfo.sendstatus;
-                
-                [[MessageDBManager sharedManager] updataMessage:chatMessage];
-                
-                if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
-                    
-                }
-            }];
-        }];
-    }
 }
 
 - (void)setCurrentForegroundObserverUniqueIdenfier:(NSString *)currentForegroundObserverUniqueIdenfier{

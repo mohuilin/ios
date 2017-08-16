@@ -85,6 +85,9 @@ typedef GPB_ENUM(ChatType) {
 
   /** 群组聊天 */
   ChatType_Groupchat = 1,
+
+  /** Connect */
+  ChatType_ConnectSystem = 3,
 };
 
 GPBEnumDescriptor *ChatType_EnumDescriptor(void);
@@ -2466,6 +2469,7 @@ typedef GPB_ENUM(ChatMessage_FieldNumber) {
   ChatMessage_FieldNumber_ChatType = 6,
   ChatMessage_FieldNumber_MsgType = 7,
   ChatMessage_FieldNumber_Ext = 8,
+  ChatMessage_FieldNumber_SendStatus = 9,
 };
 
 /**
@@ -2490,6 +2494,8 @@ typedef GPB_ENUM(ChatMessage_FieldNumber) {
 @property(nonatomic, readwrite) int32_t msgType;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *ext;
+
+@property(nonatomic, readwrite) int32_t sendStatus;
 
 @end
 
@@ -2531,7 +2537,9 @@ typedef GPB_ENUM(MessageData_FieldNumber) {
 
 typedef GPB_ENUM(TextMessage_FieldNumber) {
   TextMessage_FieldNumber_Content = 1,
-  TextMessage_FieldNumber_Sender = 2,
+  TextMessage_FieldNumber_AtAddressesArray = 2,
+  TextMessage_FieldNumber_SnapTime = 3,
+  TextMessage_FieldNumber_Sender = 4,
 };
 
 /**
@@ -2540,6 +2548,12 @@ typedef GPB_ENUM(TextMessage_FieldNumber) {
 @interface TextMessage : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *content;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *atAddressesArray;
+/** The number of items in @c atAddressesArray without causing the array to be created. */
+@property(nonatomic, readonly) NSUInteger atAddressesArray_Count;
+
+@property(nonatomic, readwrite) int64_t snapTime;
 
 @property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
 /** Test to see if @c sender has been set. */
@@ -2551,7 +2565,8 @@ typedef GPB_ENUM(TextMessage_FieldNumber) {
 
 typedef GPB_ENUM(EmotionMessage_FieldNumber) {
   EmotionMessage_FieldNumber_Content = 1,
-  EmotionMessage_FieldNumber_Sender = 2,
+  EmotionMessage_FieldNumber_SnapTime = 2,
+  EmotionMessage_FieldNumber_Sender = 3,
 };
 
 /**
@@ -2560,6 +2575,8 @@ typedef GPB_ENUM(EmotionMessage_FieldNumber) {
 @interface EmotionMessage : GPBMessage
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *content;
+
+@property(nonatomic, readwrite) int64_t snapTime;
 
 @property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
 /** Test to see if @c sender has been set. */
@@ -2575,7 +2592,8 @@ typedef GPB_ENUM(PhotoMessage_FieldNumber) {
   PhotoMessage_FieldNumber_Size = 3,
   PhotoMessage_FieldNumber_ImageWidth = 4,
   PhotoMessage_FieldNumber_ImageHeight = 5,
-  PhotoMessage_FieldNumber_Sender = 6,
+  PhotoMessage_FieldNumber_SnapTime = 6,
+  PhotoMessage_FieldNumber_Sender = 7,
 };
 
 /**
@@ -2593,6 +2611,8 @@ typedef GPB_ENUM(PhotoMessage_FieldNumber) {
 
 @property(nonatomic, readwrite) int32_t imageHeight;
 
+@property(nonatomic, readwrite) int64_t snapTime;
+
 @property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
 /** Test to see if @c sender has been set. */
 @property(nonatomic, readwrite) BOOL hasSender;
@@ -2605,7 +2625,8 @@ typedef GPB_ENUM(VoiceMessage_FieldNumber) {
   VoiceMessage_FieldNumber_URL = 1,
   VoiceMessage_FieldNumber_TimeLength = 2,
   VoiceMessage_FieldNumber_Size = 3,
-  VoiceMessage_FieldNumber_Sender = 4,
+  VoiceMessage_FieldNumber_SnapTime = 4,
+  VoiceMessage_FieldNumber_Sender = 5,
 };
 
 /**
@@ -2617,7 +2638,9 @@ typedef GPB_ENUM(VoiceMessage_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *timeLength;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *size;
+@property(nonatomic, readwrite) int32_t size;
+
+@property(nonatomic, readwrite) int64_t snapTime;
 
 @property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
 /** Test to see if @c sender has been set. */
@@ -2632,7 +2655,10 @@ typedef GPB_ENUM(VideoMessage_FieldNumber) {
   VideoMessage_FieldNumber_Cover = 2,
   VideoMessage_FieldNumber_TimeLength = 3,
   VideoMessage_FieldNumber_Size = 4,
-  VideoMessage_FieldNumber_Sender = 5,
+  VideoMessage_FieldNumber_ImageWidth = 5,
+  VideoMessage_FieldNumber_ImageHeight = 6,
+  VideoMessage_FieldNumber_SnapTime = 7,
+  VideoMessage_FieldNumber_Sender = 8,
 };
 
 /**
@@ -2646,7 +2672,13 @@ typedef GPB_ENUM(VideoMessage_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *timeLength;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *size;
+@property(nonatomic, readwrite) int32_t size;
+
+@property(nonatomic, readwrite) int32_t imageWidth;
+
+@property(nonatomic, readwrite) int32_t imageHeight;
+
+@property(nonatomic, readwrite) int64_t snapTime;
 
 @property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
 /** Test to see if @c sender has been set. */
@@ -2749,6 +2781,7 @@ typedef GPB_ENUM(TransferMessage_FieldNumber) {
   TransferMessage_FieldNumber_HashId = 2,
   TransferMessage_FieldNumber_Amount = 3,
   TransferMessage_FieldNumber_Tips = 4,
+  TransferMessage_FieldNumber_Sender = 5,
 };
 
 /**
@@ -2763,6 +2796,10 @@ typedef GPB_ENUM(TransferMessage_FieldNumber) {
 @property(nonatomic, readwrite) int64_t amount;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+
+@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
+/** Test to see if @c sender has been set. */
+@property(nonatomic, readwrite) BOOL hasSender;
 
 @end
 
@@ -2807,7 +2844,8 @@ typedef GPB_ENUM(LuckPacketMessage_FieldNumber) {
   LuckPacketMessage_FieldNumber_HashId = 1,
   LuckPacketMessage_FieldNumber_LuckyType = 2,
   LuckPacketMessage_FieldNumber_Tips = 3,
-  LuckPacketMessage_FieldNumber_Sender = 4,
+  LuckPacketMessage_FieldNumber_Amount = 4,
+  LuckPacketMessage_FieldNumber_Sender = 5,
 };
 
 /**
@@ -2820,6 +2858,8 @@ typedef GPB_ENUM(LuckPacketMessage_FieldNumber) {
 @property(nonatomic, readwrite) int32_t luckyType;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+
+@property(nonatomic, readwrite) int64_t amount;
 
 @property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
 /** Test to see if @c sender has been set. */

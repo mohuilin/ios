@@ -20,6 +20,7 @@
 #import "LMMessageExtendManager.h"
 #import "LMRamMemberInfo.h"
 #import "LMRamGroupInfo.h"
+#import "LMMessageAdapter.h"
 
 
 @interface GroupMessageHandler ()
@@ -87,22 +88,10 @@
             }
             continue;
         }
-        GcmData *gcmD = msg.msgData.chatMsg.cipherData;
-        NSString *messageString = [ConnectTool decodeGroupGcmDataWithEcdhKey:group.groupEcdhKey GcmData:gcmD];
-        MMMessage *messageInfo = [MMMessage mj_objectWithKeyValues:[messageString dictionaryValue]];
-        if (![LMMessageValidationTool checkMessageValidata:messageInfo messageType:MessageTypeGroup]) {
+        ChatMessageInfo *chatMessage = [LMMessageAdapter decodeMessageWithMassagePost:msg groupECDH:group.groupEcdhKey];
+        if (![LMMessageValidationTool checkMessageValidata:chatMessage messageType:MessageTypeGroup]) {
             continue;
         }
-
-        messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-        chatMessage.messageId = messageInfo.message_id;
-        chatMessage.createTime = messageInfo.sendtime;
-        chatMessage.messageType = messageInfo.type;
-        chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        chatMessage.readTime = 0;
-        chatMessage.message = messageInfo;
-        chatMessage.messageOwer = identifer;
 
         NSMutableDictionary *msgDict = [owerMessagesDict valueForKey:chatMessage.messageOwer];
         NSMutableArray *messages = [msgDict valueForKey:@"messages"];
@@ -116,10 +105,8 @@
                 [msgDict setValue:@(unReadCount) forKey:@"unReadCount"];
             }
             if (!groupNoteMyself && chatMessage.messageType == GJGCChatFriendContentTypeText) {
-                NSArray *array = messageInfo.ext1;
-                if (![messageInfo.ext1 isKindOfClass:[NSArray class]]) {
-                    array = [messageInfo.ext1 mj_JSONObject];
-                }
+                TextMessage *text = (TextMessage *)chatMessage.msgContent;
+                NSArray *array = text.atAddressesArray;
                 if ([array containsObject:[[LKUserCenter shareCenter] currentLoginUser].address]) {
                     [msgDict setValue:@(YES) forKey:@"groupNoteMyself"];
                 }
@@ -131,10 +118,8 @@
                 unReadCount = 1;
             }
             if (!groupNoteMyself && chatMessage.messageType == GJGCChatFriendContentTypeText) {
-                NSArray *array = messageInfo.ext1;
-                if (![messageInfo.ext1 isKindOfClass:[NSArray class]]) {
-                    array = [messageInfo.ext1 mj_JSONObject];
-                }
+                TextMessage *text = (TextMessage *)chatMessage.msgContent;
+                NSArray *array = text.atAddressesArray;
                 if ([array containsObject:[[LKUserCenter shareCenter] currentLoginUser].address]) {
                     groupNoteMyself = YES;
                 }
@@ -144,22 +129,10 @@
                     @"groupNoteMyself": @(groupNoteMyself)}.mutableCopy;
             [owerMessagesDict setObject:msgDict forKey:chatMessage.messageOwer];
         }
-        if (chatMessage.messageType == GJGCChatFriendContentTypeText) {
-            messageInfo.ext1 = nil;
-        }
+        
         if (chatMessage.messageType == GJGCChatFriendContentTypePayReceipt ||
             chatMessage.messageType == GJGCChatFriendContentTypeTransfer) {
-            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-            [dict safeSetObject:messageInfo.message_id forKey:@"message_id"];
-            [dict safeSetObject:messageInfo.content forKey:@"hashid"];
-            if (chatMessage.messageType == GJGCChatFriendContentTypePayReceipt) {
-                [dict safeSetObject:@(1) forKey:@"status"];
-            } else {
-                [dict safeSetObject:@(0) forKey:@"status"];
-            }
-            [dict safeSetObject:@(0) forKey:@"pay_count"];
-            [dict safeSetObject:@(0) forKey:@"crowd_count"];
-            [messageExtendArray addObject:dict];
+        
         }
     }
     
@@ -370,120 +343,7 @@
 }
 
 - (void)handMessage:(NSArray *)unHandleMessage groupInfo:(LMRamGroupInfo *)lmGroup{
-    
-    NSMutableDictionary *owerMessagesDict = [NSMutableDictionary dictionary];
-    NSMutableArray *messageExtendArray = [NSMutableArray array];
-    for (MessagePost *msg in unHandleMessage) {
-        GcmData *gcmD = msg.msgData.chatMsg.cipherData;
-        NSString *messageString = [ConnectTool decodeGroupGcmDataWithEcdhKey:lmGroup.groupEcdhKey GcmData:gcmD];
-        MMMessage *messageInfo = [MMMessage mj_objectWithKeyValues:[messageString dictionaryValue]];
-        if (![LMMessageValidationTool checkMessageValidata:messageInfo messageType:MessageTypeGroup]) {
-            continue;
-        }
-        messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-        chatMessage.messageId = messageInfo.message_id;
-        chatMessage.createTime = messageInfo.sendtime;
-        chatMessage.messageType = messageInfo.type;
-        chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-        chatMessage.readTime = 0;
-        chatMessage.message = messageInfo;
-        chatMessage.messageOwer = lmGroup.groupIdentifer;
-        
-        NSMutableDictionary *msgDict = [owerMessagesDict valueForKey:chatMessage.messageOwer];
-        NSMutableArray *messages = [msgDict valueForKey:@"messages"];
-        int unReadCount = [[msgDict valueForKey:@"unReadCount"] intValue];
-        BOOL groupNoteMyself = [[msgDict valueForKey:@"groupNoteMyself"] boolValue];
-        if (msgDict) {
-            [messages objectAddObject:chatMessage];
-            if ([GJGCChatFriendConstans shouldNoticeWithType:chatMessage.messageType]) {
-                unReadCount++;
-                
-                [msgDict setValue:@(unReadCount) forKey:@"unReadCount"];
-            }
-            
-            if (!groupNoteMyself && chatMessage.messageType == GJGCChatFriendContentTypeText) {
-                NSArray *array = messageInfo.ext1;
-                if (![messageInfo.ext1 isKindOfClass:[NSArray class]]) {
-                    array = [messageInfo.ext1 mj_JSONObject];
-                }
-                if ([array containsObject:[[LKUserCenter shareCenter] currentLoginUser].address]) {
-                    [msgDict setValue:@(YES) forKey:@"groupNoteMyself"];
-                }
-            }
-        } else {
-            messages = [NSMutableArray array];
-            [messages addObject:chatMessage];
-            if ([GJGCChatFriendConstans shouldNoticeWithType:chatMessage.messageType]) {
-                unReadCount = 1;
-            }
-            
-            if (!groupNoteMyself && chatMessage.messageType == GJGCChatFriendContentTypeText) {
-                NSArray *array = messageInfo.ext1;
-                if (![messageInfo.ext1 isKindOfClass:[NSArray class]]) {
-                    array = [messageInfo.ext1 mj_JSONObject];
-                }
-                if ([array containsObject:[[LKUserCenter shareCenter] currentLoginUser].address]) {
-                    groupNoteMyself = YES;
-                }
-            }
-            NSMutableDictionary *msgDict = @{@"messages": messages,
-                                             @"unReadCount": @(unReadCount),
-                                             @"groupNoteMyself": @(groupNoteMyself)}.mutableCopy;
-            [owerMessagesDict setObject:msgDict forKey:chatMessage.messageOwer];
-        }
-        
-        if (chatMessage.messageType == GJGCChatFriendContentTypeText) {
-            messageInfo.ext1 = nil;
-        }
-        
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-        [dict safeSetObject:chatMessage.messageId forKey:@"message_id"];
-        [dict safeSetObject:chatMessage.message.content forKey:@"hashid"];
-        [dict safeSetObject:@(0) forKey:@"status"];
-        [dict safeSetObject:@(chatMessage.payCount) forKey:@"pay_count"];
-        [dict safeSetObject:@(chatMessage.crowdCount) forKey:@"crowd_count"];
-        [messageExtendArray addObject:dict];
-    }
-    [[LMMessageExtendManager sharedManager] saveBitchMessageExtend:messageExtendArray];
-    for (NSDictionary *msgDict in owerMessagesDict.allValues) {
-        NSMutableArray *messages = [msgDict valueForKey:@"messages"];
-        int unReadCount = [[msgDict valueForKey:@"unReadCount"] intValue];
-        BOOL groupNoteMyself = [[msgDict valueForKey:@"groupNoteMyself"] boolValue];
-        [messages sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
-            ChatMessageInfo *r1 = obj1;
-            ChatMessageInfo *r2 = obj2;
-            int long long time1 = r1.createTime;
-            int long long time2 = r2.createTime;
-            if (time1 < time2) {
-                return NSOrderedAscending;
-            } else if (time1 == time2) {
-                return NSOrderedSame;
-            } else {
-                return NSOrderedDescending;
-            }
-        }];
-        
-        NSMutableArray *pushMessages = [NSMutableArray arrayWithArray:messages];
-        while (pushMessages.count > 0) {
-            if (pushMessages.count > 20) {
-                NSInteger location = pushMessages.count - 20;
-                NSMutableArray *pushArray = [NSMutableArray arrayWithArray:[pushMessages subarrayWithRange:NSMakeRange(location, 20)]];
-                [pushMessages removeObjectsInRange:NSMakeRange(location, 20)];
-                [self pushGetBitchNewMessages:pushArray];
-                [[MessageDBManager sharedManager] saveBitchMessage:pushArray];
-            } else {
-                NSMutableArray *pushArray = [NSMutableArray arrayWithArray:pushMessages];
-                [self pushGetBitchNewMessages:pushArray];
-                [[MessageDBManager sharedManager] saveBitchMessage:pushArray];
-                [pushMessages removeAllObjects];
-            }
-        }
-        
-        ChatMessageInfo *lastMsg = [messages lastObject];
-        [self updataRecentChatLastMessageStatus:lastMsg messageCount:unReadCount groupNoteMyself:groupNoteMyself];
-    }
-
+    [self handleBatchGroupMessage:unHandleMessage];
 }
 
 

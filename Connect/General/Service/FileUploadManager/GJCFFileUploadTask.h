@@ -27,10 +27,6 @@ typedef NS_ENUM(NSUInteger, GJCFFileUploadState) {
 /* File upload task */
 @interface GJCFFileUploadTask : NSObject<NSCoding>
 
-
-//Upload file type (group, personal, system)
-@property (nonatomic ,assign) GJGCChatFriendTalkType msgType;
-
 /* current status  */
 @property (nonatomic,assign)GJCFFileUploadState uploadState;
 

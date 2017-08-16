@@ -7,7 +7,7 @@
 //
 
 #import "BaseViewController.h"
-#import "GJGCChatFriendConstans.h"
+#import "ChatMessageInfo.h"
 
 
 @interface LMRerweetModel : NSObject
@@ -17,7 +17,7 @@
 @property(nonatomic, strong) NSData *thumData;
 
 
-@property(nonatomic, strong) MMMessage *retweetMessage;
+@property(nonatomic, strong) ChatMessageInfo *retweetMessage;
 //member group
 @property(nonatomic, strong) id toFriendModel;
 

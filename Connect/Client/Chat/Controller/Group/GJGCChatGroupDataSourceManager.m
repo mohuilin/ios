@@ -51,26 +51,19 @@
 
 
 - (GJGCChatFriendContentModel *)addMMMessage:(ChatMessageInfo *)chatMessage {
-    /**
-     添加到通讯消息数组中
-     */
+    
 
-    MMMessage *aMessage = chatMessage.message;
-
-    [self.orginMessageListArray objectAddObject:aMessage];
+    [self.orginMessageListArray objectAddObject:chatMessage];
 
     /* 格式化消息 */
     GJGCChatFriendContentModel *chatContentModel = [[GJGCChatFriendContentModel alloc] init];
-    chatContentModel.contentType = aMessage.type;
+    chatContentModel.contentType = chatMessage.messageType;
     chatContentModel.autoMsgid = chatMessage.ID;
-    chatContentModel.gifLocalId = aMessage.content;
-    chatContentModel.originTextMessage = aMessage.content;
     chatContentModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
-    chatContentModel.userName = aMessage.user_name;
-    chatContentModel.sendStatus = aMessage.sendstatus;
-    chatContentModel.sendTime = aMessage.sendtime;
-    chatContentModel.publicKey = aMessage.publicKey;
-    chatContentModel.localMsgId = aMessage.message_id;
+    chatContentModel.sendStatus = chatMessage.sendstatus;
+    chatContentModel.sendTime = chatMessage.createTime;
+    chatContentModel.publicKey = chatMessage.messageOwer;
+    chatContentModel.localMsgId = chatMessage.messageId;
     chatContentModel.talkType = self.taklInfo.talkType;
     chatContentModel.isGroupChat = self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup;
     chatContentModel.snapTime = 0;
@@ -79,13 +72,8 @@
     chatContentModel.isRead = chatMessage.state > 0;
     chatContentModel.downloadTaskIdentifier = [[GJCFFileDownloadManager shareDownloadManager] getDownloadIdentifierWithMessageId:[NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, chatContentModel.localMsgId]];
     chatContentModel.isDownloading = chatContentModel.downloadTaskIdentifier != nil;
-    if (aMessage.type != GJGCChatFriendContentTypeStatusTip && aMessage.type != GJGCChatInviteNewMemberTip) {
-        NSDictionary *senderInfoExt = aMessage.senderInfoExt;
-        if ([senderInfoExt isKindOfClass:[NSString class]]) {
-            senderInfoExt = [senderInfoExt mj_JSONObject];
-            NSAssert(senderInfoExt != nil, @"senderInfoExt should not be nil");
-        }
-        NSString *senderAddress = [senderInfoExt valueForKey:@"address"];
+    if (chatMessage.messageType != GJGCChatFriendContentTypeStatusTip && chatMessage.messageType != GJGCChatInviteNewMemberTip) {
+        NSString *senderAddress = chatMessage.senderAddress;
         if (![senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //发送者不是自己
             chatContentModel.isFromSelf = NO;
             LMRamMemberInfo *member = [[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:senderAddress];
@@ -94,9 +82,10 @@
                 chatContentModel.senderName = member.username;
                 chatContentModel.senderAddress = member.address;
             } else {
-                chatContentModel.headUrl = [senderInfoExt valueForKey:@"avatar"];
-                chatContentModel.senderName = [senderInfoExt valueForKey:@"username"];
-                chatContentModel.senderAddress = [senderInfoExt valueForKey:@"address"];
+                LMRamMemberInfo *member = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' and address = '%@'",chatMessage.messageOwer,chatMessage.senderAddress]];
+                chatContentModel.headUrl = member.avatar;
+                chatContentModel.senderName = member.groupNicksName.length ?member.groupNicksName:member.username;
+                chatContentModel.senderAddress = senderAddress;
             }
         } else {
             chatContentModel.headUrl = [[LKUserCenter shareCenter] currentLoginUser].avatar;
@@ -106,10 +95,10 @@
     }
     chatContentModel.readState = GJGCChatFriendMessageReadStateReaded;
     /* 格式内容字段 */
-    GJGCChatFriendContentType contentType = [self formateChatFriendContent:chatContentModel withMsgModel:aMessage];
+    GJGCChatFriendContentType contentType = [self formateChatFriendContent:chatContentModel withMsgModel:chatMessage];
     if (contentType != GJGCChatFriendContentTypeNotFound) {
         // 界面消息去重
-        if (![self contentModelByMsgId:aMessage.message_id]) {
+        if (![self contentModelByMsgId:chatMessage.messageId]) {
             [self addChatContentModel:chatContentModel];
         }
 
@@ -127,12 +116,12 @@
     //显示安全提示
     ChatMessageInfo *fristMessage = [messages firstObject];
     if (self.taklInfo.talkType != GJGCChatFriendTalkTypePostSystem && messages.count != 20) {
-        [self showfirstChatSecureTipWithTime:fristMessage.message.sendtime];
+        [self showfirstChatSecureTipWithTime:fristMessage.createTime];
     }
 
     for (ChatMessageInfo *messageInfo in messages) {
         if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSending) {
-            [self.sendingMessages objectAddObject:messageInfo.message];
+            [self.sendingMessages objectAddObject:messageInfo.msgContent];
         }
         [self addMMMessage:messageInfo];
     }

@@ -23,6 +23,7 @@
 #include "RecentChatDBManager.h"
 #import "LMConversionManager.h"
 #import "LMMessageAdapter.h"
+#import "LMMessageTool.h"
 
 
 @interface GroupMembersListViewController () <UITableViewDelegate, UITableViewDataSource, MGSwipeTableCellDelegate> {
@@ -139,46 +140,12 @@
                 chatMessage.messageId = msgId;
                 chatMessage.messageOwer = info.pubKey;
                 chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-                MMMessage *message = [[MMMessage alloc] init];
-                message.type = GJGCChatInviteToGroup;
-                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                message.message_id = msgId;
-                message.publicKey = info.pubKey;
-                message.user_id = info.address;
-                message.ext1 = @{@"avatar": self.talkInfo.chatGroupInfo.avatarUrl ? self.talkInfo.chatGroupInfo.avatarUrl : @"",
-                        @"groupname": self.talkInfo.chatGroupInfo.groupName,
-                        @"groupidentifier": self.talkInfo.chatGroupInfo.groupIdentifer,
-                        @"inviteToken": tokenResponse.token};
-                message.senderInfoExt = @{@"username": [[LKUserCenter shareCenter] currentLoginUser].username,
-                        @"address": [[LKUserCenter shareCenter] currentLoginUser].address,
-                        @"publickey": [[LKUserCenter shareCenter] currentLoginUser].pub_key,
-                        @"avatar": [[LKUserCenter shareCenter] currentLoginUser].avatar};
-                message.sendstatus = GJGCChatFriendSendMessageStatusSending;
-                chatMessage.message = message;
+                chatMessage.messageType = GJGCChatInviteToGroup;
+                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSending;
+                
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pubKey groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:nil]];
-
-                [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:^(MMMessage *message, NSError *error) {
-
-                    ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:message.publicKey];
-                    chatMessage.message = message;
-                    chatMessage.sendstatus = message.sendstatus;
-                    [[MessageDBManager sharedManager] updataMessage:chatMessage];
-                    if (message.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
-                        [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Group invitation has been sent", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
-
-                            }];
-                        }];
-                    } else {
-                        [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Group invitation sent failed", nil) withType:ToastTypeFail showInView:self.view complete:^{
-
-                            }];
-                        }];
-                    }
-                }                                     onQueue:nil];
+                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pubKey groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
             }
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD hideHUDForView:self.view];
@@ -223,47 +190,18 @@
         if (info != [membsers lastObject]) {
             [welcomeTip appendString:@"、"];
         }
-        MessageData *messageData = [LMMessageAdapter packageMessageDataWithTo:info.pubKey chatType:0 msgType:0 ext:nil groupEcdh:nil cipherData:groupMessage];
-
-        NSString *sign = [ConnectTool signWithData:messageData.data];
-        MessagePost *messagePost = [[MessagePost alloc] init];
-        messagePost.sign = sign;
-        messagePost.pubKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        messagePost.msgData = messageData;
+        ChatMessage *chatMsg = [LMMessageTool chatMsgWithTo:info.pubKey chatType:0 msgType:0 ext:nil];
+        MessagePost *messagePost = (MessagePost *)[LMMessageAdapter packageChatMsg:chatMsg groupEcdh:nil cipherData:groupMessage];
         [[IMService instance] asyncSendGroupInfo:messagePost];
     }
     //create local message
     NSString *myChatTip = [NSString stringWithFormat:LMLocalizedString(@"Link invited to the group chat", nil), LMLocalizedString(@"Chat You", nil), welcomeTip];
     SendNotify(ConnnectGroupInfoDidAddMembers, myChatTip);
-    NSString *msgId = [ConnectTool generateMessageId];
-    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-    chatMessage.messageId = msgId;
-    chatMessage.messageOwer = self.groupid;
-    chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-    MMMessage *message1 = [[MMMessage alloc] init];
-    message1.type = GJGCChatFriendContentTypeStatusTip;
-    message1.content = myChatTip;
-    message1.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message1.message_id = msgId;
-    message1.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    chatMessage.message = message1;
-    [[MessageDBManager sharedManager] saveMessage:chatMessage];
-
-    MMMessage *message = [[MMMessage alloc] init];
-    message.user_name = @"";
-    message.type = GJGCChatFriendContentTypeStatusTip;
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = [ConnectTool generateMessageId];
-    message.content = [NSString stringWithFormat:LMLocalizedString(@"Link invited to the group chat", nil), [[LKUserCenter shareCenter] currentLoginUser].username, welcomeTip];
-    message.senderInfoExt = @{@"username": [[LKUserCenter shareCenter] currentLoginUser].username,
-            @"address": [[LKUserCenter shareCenter] currentLoginUser].address,
-            @"avatar": [[LKUserCenter shareCenter] currentLoginUser].avatar};
-    message.publicKey = self.groupid;
-    message.user_id = self.groupid;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
+    ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.groupid content:myChatTip noteType:0 ext:nil];
     
-    [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:self.groupEcdhKey onQueue:nil completion:^(MMMessage *message, NSError *error) {
-    }                                   onQueue:nil];
+    NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Link invited to the group chat", nil), [[LKUserCenter shareCenter] currentLoginUser].username, welcomeTip];
+    
+    /// 发送一条提示消息
 }
 
 
@@ -593,21 +531,8 @@
     [self.groupMembers removeObject:user];
     [self reloadView];
     SendNotify(ConnnectGroupInfoDidDeleteMember, user.username);
-    NSString *msgId = [ConnectTool generateMessageId];
-    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-    chatMessage.messageId = msgId;
-    chatMessage.messageOwer = self.groupid;
-    chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-    MMMessage *message = [[MMMessage alloc] init];
-    message.type = GJGCChatFriendContentTypeStatusTip;
-    message.content = [NSString stringWithFormat:LMLocalizedString(@"Link You Remove from the group chat", nil), user.username];
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = msgId;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    chatMessage.message = message;
-
+    ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.groupid content:[NSString stringWithFormat:LMLocalizedString(@"Link You Remove from the group chat", nil), user.username] noteType:0 ext:nil];
     [[MessageDBManager sharedManager] saveMessage:chatMessage];
-
 }
 
 

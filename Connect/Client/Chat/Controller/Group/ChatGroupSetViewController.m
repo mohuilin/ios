@@ -25,7 +25,7 @@
 #import "LMRamGroupInfo.h"
 #import "LMRamMemberInfo.h"
 #import "LMMessageAdapter.h"
-
+#import "LMMessageTool.h"
 
 
 typedef NS_ENUM(NSUInteger, SourceType) {
@@ -494,46 +494,18 @@ typedef NS_ENUM(NSUInteger, SourceType) {
                 chatMessage.messageId = msgId;
                 chatMessage.messageOwer = info.pub_key;
                 chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-                MMMessage *message = [[MMMessage alloc] init];
-                message.type = GJGCChatInviteToGroup;
-                message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-                message.message_id = msgId;
-                message.publicKey = info.pub_key;
-                message.user_id = info.address;
-                message.ext1 = @{@"avatar": self.talkModel.chatGroupInfo.avatarUrl ? self.talkModel.chatGroupInfo.avatarUrl : @"",
-                        @"groupname": self.talkModel.chatGroupInfo.groupName,
-                        @"groupidentifier": self.talkModel.chatGroupInfo.groupIdentifer,
-                        @"inviteToken": tokenResponse.token};
-                message.senderInfoExt = @{@"username": [[LKUserCenter shareCenter] currentLoginUser].username,
-                        @"address": [[LKUserCenter shareCenter] currentLoginUser].address,
-                        @"publickey": [[LKUserCenter shareCenter] currentLoginUser].pub_key,
-                        @"avatar": [[LKUserCenter shareCenter] currentLoginUser].avatar};
-                message.sendstatus = GJGCChatFriendSendMessageStatusSending;
-                chatMessage.message = message;
+                chatMessage.messageType = GJGCChatInviteToGroup;
+                
+
+//                message.ext1 = @{@"avatar": self.talkModel.chatGroupInfo.avatarUrl ? self.talkModel.chatGroupInfo.avatarUrl : @"",
+//                        @"groupname": self.talkModel.chatGroupInfo.groupName,
+//                        @"groupidentifier": self.talkModel.chatGroupInfo.groupIdentifer,
+//                        @"inviteToken": tokenResponse.token};
+                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSending;
+                
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:message.type textMessage:nil]];
-
-                [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:^(MMMessage *message, NSError *error) {
-
-                    ChatMessageInfo *chatMessage = [[MessageDBManager sharedManager] getMessageInfoByMessageid:message.message_id messageOwer:message.publicKey];
-                    chatMessage.message = message;
-                    chatMessage.sendstatus = message.sendstatus;
-                    [[MessageDBManager sharedManager] updataMessage:chatMessage];
-                    if (message.sendstatus == GJGCChatFriendSendMessageStatusSuccess) {
-                        [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Group invitation has been sent", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
-
-                            }];
-                        }];
-                    } else {
-                        [GCDQueue executeInMainQueue:^{
-                            [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Group invitation sent failed", nil) withType:ToastTypeFail showInView:self.view complete:^{
-
-                            }];
-                        }];
-                    }
-                }                                     onQueue:nil];
+                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
             }
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD hideHUDForView:self.view];
@@ -571,33 +543,10 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         if (info != [membsers lastObject]) {
             [welcomeTip appendString:@"、"];
         }
-        MessageData *messageData = [LMMessageAdapter packageMessageDataWithTo:info.pub_key chatType:0 msgType:0 ext:nil groupEcdh:nil cipherData:groupMessage];
-
-        NSString *sign = [ConnectTool signWithData:messageData.data];
-
-        MessagePost *messagePost = [[MessagePost alloc] init];
-        messagePost.sign = sign;
-        messagePost.pubKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        messagePost.msgData = messageData;
+        ChatMessage *chatMsg = [LMMessageTool chatMsgWithTo:info.pub_key chatType:0 msgType:0 ext:nil];
+        MessagePost *messagePost = (MessagePost *)[LMMessageAdapter packageChatMsg:chatMsg groupEcdh:nil cipherData:groupMessage];
         [[IMService instance] asyncSendGroupInfo:messagePost];
     }
-    MMMessage *message = [[MMMessage alloc] init];
-    message.user_name = weakSelf.talkModel.name;
-    message.type = GJGCChatInviteNewMemberTip;
-    message.sendtime = [[NSDate date] timeIntervalSince1970] * 1000;
-    message.message_id = [ConnectTool generateMessageId];
-    message.senderInfoExt = @{@"username": [[LKUserCenter shareCenter] currentLoginUser].username,
-            @"address": [[LKUserCenter shareCenter] currentLoginUser].address,
-            @"avatar": [[LKUserCenter shareCenter] currentLoginUser].avatar};
-
-    message.publicKey = weakSelf.talkModel.chatIdendifier;
-    message.user_id = weakSelf.talkModel.chatIdendifier;
-    message.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    message.ext1 = @{@"inviter": [[LKUserCenter shareCenter] currentLoginUser].username,
-            @"message": welcomeTip};
-
-    [[IMService instance] asyncSendGroupMessage:message withGroupEckhKey:weakSelf.talkModel.group_ecdhKey onQueue:nil completion:^(MMMessage *message, NSError *error) {
-    }                                   onQueue:nil];
 }
 
 - (void)showAccountListPage {
