@@ -64,13 +64,14 @@
     return date;
 }
 
-+ (ChatMessageInfo *)chatMessageInfoWithMessageOwer:(NSString *)msgOwer messageType:(GJGCChatFriendContentType)messageType sender:(NSString *)sender{
++ (ChatMessageInfo *)chatMessageInfoWithMessageOwer:(NSString *)msgOwer messageType:(GJGCChatFriendContentType)messageType sender:(NSString *)sender chatType:(int)chatType {
     ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
     chatMessage.messageId = [ConnectTool generateMessageId];
     chatMessage.messageOwer = msgOwer;
     chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     chatMessage.messageType = messageType;
-    chatMessage.senderAddress = sender;
+    chatMessage.from = sender;
+    chatMessage.chatType = chatType;
     chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSending;
     return chatMessage;
 }
@@ -88,8 +89,8 @@
     return text;
 }
 
-+ (ChatMessageInfo *)makeTextChatMessageWithMessageText:(NSString *)msgText msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeText sender:sender];
++ (ChatMessageInfo *)makeTextChatMessageWithMessageText:(NSString *)msgText msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeText sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeTextWithMessageText:msgText];
     return chatMessage;
 }
@@ -107,8 +108,8 @@
     return emotion;
 }
 
-+ (ChatMessageInfo *)makeEmotionChatMessageWithGifID:(NSString *)gifId  msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeGif sender:sender];
++ (ChatMessageInfo *)makeEmotionChatMessageWithGifID:(NSString *)gifId  msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeGif sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeEmotionWithGifID:gifId];
     return chatMessage;
 }
@@ -132,8 +133,8 @@
     return payment;
 }
 
-+ (ChatMessageInfo *)makeRecipetChatMessageWithHashId:(NSString *)hashId paymentType:(int)paymentType amount:(int64_t)amount tips:(NSString *)tips memberSize:(int)memberSize msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypePayReceipt sender:sender];
++ (ChatMessageInfo *)makeRecipetChatMessageWithHashId:(NSString *)hashId paymentType:(int)paymentType amount:(int64_t)amount tips:(NSString *)tips memberSize:(int)memberSize msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypePayReceipt sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeRecipetWithHashId:hashId paymentType:paymentType amount:amount tips:tips memberSize:memberSize];
     return chatMessage;
 }
@@ -155,8 +156,8 @@
     return transfer;
 }
 
-+ (ChatMessageInfo *)makeTransferChatMessageWithHashId:(NSString *)hashId transferType:(int)transferType amount:(int64_t)amount tips:(NSString *)tips msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeTransfer sender:sender];
++ (ChatMessageInfo *)makeTransferChatMessageWithHashId:(NSString *)hashId transferType:(int)transferType amount:(int64_t)amount tips:(NSString *)tips msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeTransfer sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeTransferWithHashId:hashId transferType:transferType amount:amount tips:tips];
     return chatMessage;
 }
@@ -177,8 +178,8 @@
     return luck;
 }
 
-+ (ChatMessageInfo *)makeLuckyPackageChatMessageWithHashId:(NSString *)hashId luckType:(int)luckType amount:(int64_t)amount tips:(NSString *)tips msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeRedEnvelope sender:sender];
++ (ChatMessageInfo *)makeLuckyPackageChatMessageWithHashId:(NSString *)hashId luckType:(int)luckType amount:(int64_t)amount tips:(NSString *)tips msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeRedEnvelope sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeLuckyPackageWithHashId:hashId luckType:luckType amount:amount tips:tips];
     return chatMessage;
 }
@@ -199,8 +200,8 @@
     return card;
 }
 
-+ (ChatMessageInfo *)makeCardChatMessageWithUsername:(NSString *)username avatar:(NSString *)avatar uid:(NSString *)uid msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeNameCard sender:sender];
++ (ChatMessageInfo *)makeCardChatMessageWithUsername:(NSString *)username avatar:(NSString *)avatar uid:(NSString *)uid msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeNameCard sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeCardWithUsername:username avatar:avatar uid:uid];
     return chatMessage;
 }
@@ -238,8 +239,8 @@
     return website;
 }
 
-+ (ChatMessageInfo *)makeWebSiteChatMessageWithURL:(NSString *)url walletLinkType:(LMWalletlinkType)walletLinkType msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatWalletLink sender:sender];
++ (ChatMessageInfo *)makeWebSiteChatMessageWithURL:(NSString *)url walletLinkType:(LMWalletlinkType)walletLinkType msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatWalletLink sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeWebSiteWithURL:url walletLinkType:walletLinkType];
     return chatMessage;
 }
@@ -260,8 +261,8 @@
     return location;
 }
 
-+ (ChatMessageInfo *)makeLocationChatMessageWithLatitude:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeMapLocation sender:sender];
++ (ChatMessageInfo *)makeLocationChatMessageWithLatitude:(CGFloat)latitude longitude:(CGFloat)longitude address:(NSString *)address msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeMapLocation sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeLocationWithLatitude:latitude longitude:longitude address:address];
     return chatMessage;
 }
@@ -280,8 +281,8 @@
     return voice;
 }
 
-+ (ChatMessageInfo *)makeVoiceChatMessageWithSize:(int)size url:(NSString *)url msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeAudio sender:sender];
++ (ChatMessageInfo *)makeVoiceChatMessageWithSize:(int)size url:(NSString *)url msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeAudio sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeVoiceWithSize:size url:url];
     return chatMessage;
 }
@@ -304,8 +305,8 @@
     return video;
 }
 
-+ (ChatMessageInfo *)makeVideoChatMessageWithSize:(int)size timeStr:(NSString *)timeStr videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeVideo sender:sender];
++ (ChatMessageInfo *)makeVideoChatMessageWithSize:(int)size timeStr:(NSString *)timeStr videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeVideo sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeVideoWithSize:size timeStr:timeStr videoCoverW:videoCoverW videoCoverH:videoCoverH videoUrl:videoUrl videoCover:videoCover];
     return chatMessage;
 }
@@ -327,8 +328,8 @@
     return photo;
 }
 
-+ (ChatMessageInfo *)makePhotoChatMessageWithImageW:(CGFloat )ImageW imageH:(CGFloat)imageH oriImage:(NSString *)oriImage thumImage:(NSString *)thumImage msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeImage sender:sender];
++ (ChatMessageInfo *)makePhotoChatMessageWithImageW:(CGFloat )ImageW imageH:(CGFloat)imageH oriImage:(NSString *)oriImage thumImage:(NSString *)thumImage msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeImage sender:sender chatType:chatType];
     chatMessage.msgContent = [self makePhotoWithImageW:ImageW imageH:imageH oriImage:oriImage thumImage:thumImage];
     return chatMessage;
 }
@@ -339,14 +340,14 @@
     return readReceipt;
 }
 
-+ (ChatMessageInfo *)makeReadReceiptChatMessageWithMsgId:(NSString *)msgId msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeSnapChatReadedAck sender:sender];
++ (ChatMessageInfo *)makeReadReceiptChatMessageWithMsgId:(NSString *)msgId msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeSnapChatReadedAck sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeReadReceiptWithMsgId:msgId];
     return chatMessage;
 }
 
-+ (ChatMessageInfo *)makeDestructChatMessageWithTime:(int)time msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeSnapChat sender:sender];
++ (ChatMessageInfo *)makeDestructChatMessageWithTime:(int)time msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeSnapChat sender:sender chatType:0];
     chatMessage.msgContent = [self makeDestructWithTime:time];
     return chatMessage;
 }
@@ -375,6 +376,20 @@
     return chatMessage;
 }
 
++ (ChatMessageInfo *)makeJoinGroupChatMessageWithAvatar:(NSString *)avatar groupId:(NSString *)groupId groupName:(NSString *)groupName token:(NSString *)token msgOwer:(NSString *)msgOwer sender:(NSString *)sender {
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatInviteToGroup sender:sender chatType:0];
+    chatMessage.msgContent = [self makeJoinGroupWithAvatar:avatar groupId:groupId groupName:groupName token:token];
+    return chatMessage;
+}
+
++ (JoinGroupMessage *)makeJoinGroupWithAvatar:(NSString *)avatar groupId:(NSString *)groupId groupName:(NSString *)groupName token:(NSString *)token{
+    JoinGroupMessage *joinGroup = [JoinGroupMessage new];
+    joinGroup.avatar = avatar;
+    joinGroup.groupId = groupId;
+    joinGroup.groupName = groupName;
+    joinGroup.token = token;
+    return joinGroup;
+}
 
 + (GPBMessage *)packageOriginMsgWithChatContent:(GJGCChatFriendContentModel *)messageContent snapTime:(int)snapTime {
     GPBMessage *msg = nil;
@@ -489,6 +504,7 @@
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSending;
     messageInfo.msgContent = msgContent;
     messageInfo.chatType = chatType;
+    messageInfo.from = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
     
     return messageInfo;
 }
@@ -698,7 +714,7 @@
             chatContentModel.contentType = GJGCChatFriendContentTypeSnapChat;
             type = chatContentModel.contentType;
             DestructMessage *destruct = (DestructMessage *)chatMessage.msgContent;
-            chatContentModel.snapChatTipString = [GJGCChatSystemNotiCellStyle formateOpensnapChatWithTime:destruct.time isSendToMe:![chatMessage.senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address] chatUserName:user.normalShowName];
+            chatContentModel.snapChatTipString = [GJGCChatSystemNotiCellStyle formateOpensnapChatWithTime:destruct.time isSendToMe:![chatMessage.from isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key] chatUserName:user.normalShowName];
         }
             break;
         case GJGCChatFriendContentTypeImage:{

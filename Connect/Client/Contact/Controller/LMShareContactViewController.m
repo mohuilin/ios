@@ -207,10 +207,10 @@
         ChatMessageInfo *messageInfo = nil;
         if ([data isKindOfClass:[AccountInfo class]]) {
             AccountInfo *info = (AccountInfo *) data;
-            messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:info.pub_key sender:[[LKUserCenter shareCenter] currentLoginUser].address];
+            messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:info.pub_key sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key chatType:ChatType_Private];
         } else {
             LMRamGroupInfo *info = (LMRamGroupInfo *) data;
-            messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:info.groupIdentifer sender:[[LKUserCenter shareCenter] currentLoginUser].address];
+            messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:info.groupIdentifer sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key chatType:ChatType_Groupchat];
         }
         messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSending;
         [[MessageDBManager sharedManager] saveMessage:messageInfo];

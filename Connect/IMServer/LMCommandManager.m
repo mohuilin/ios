@@ -22,6 +22,7 @@
 #import "LMHistoryCacheManager.h"
 #import "LMMessageSendManager.h"
 #import "LMRamGroupInfo.h"
+#import "LMMessageTool.h"
 
 @implementation SendCommandModel
 
@@ -636,22 +637,10 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                             newUser.address = userInfo.address;
                             newUser.pub_key = userInfo.pubKey;
                             [newUsers objectAddObject:newUser];
-
-                            ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                            chatMessage.messageId = [ConnectTool generateMessageId];
-                            chatMessage.messageOwer = groupChange.identifier;
-                            chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                            chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                            chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-                            
-                            
-                            NotifyMessage *notify = [NotifyMessage new];
-                            notify.content = [NSString stringWithFormat:LMLocalizedString(@"Link enter the group", nil), userInfo.username];;
-                            chatMessage.msgContent = notify;
-                            
+                            ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:groupChange.identifier content:[NSString stringWithFormat:LMLocalizedString(@"Link enter the group", nil), userInfo.username] noteType:0 ext:nil];
                             [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:notify.content] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
+                            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:[NSString stringWithFormat:LMLocalizedString(@"Link enter the group", nil), userInfo.username]] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
 
                             if ([[SessionManager sharedManager].chatSession isEqualToString:groupChange.identifier]) {
                                 SendNotify(GroupNewMemberEnterNotification, chatMessage);
@@ -722,20 +711,10 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                         for (LMRamMemberInfo *member in lmGroup.membersArray) {
                             if ([member.address isEqualToString:attorn.address]) {
 
-                                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                                chatMessage.messageId = [ConnectTool generateMessageId];
-                                chatMessage.messageOwer = attorn.identifier;
-                                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                                chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-                                
-                                NotifyMessage *notify = [NotifyMessage new];
-                                notify.content = [NSString stringWithFormat:LMLocalizedString(@"Link become new group owner", nil), member.username];
-                                chatMessage.msgContent = notify;
+                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:attorn.identifier content:[NSString stringWithFormat:LMLocalizedString(@"Link become new group owner", nil), member.username] noteType:0 ext:nil];
                                 
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
-
-                                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:1 lastContent:notify.content ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
+                                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:1 lastContent:[NSString stringWithFormat:LMLocalizedString(@"Link become new group owner", nil), member.username]ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
                                 [[GroupDBManager sharedManager] executeRealmWithBlock:^{
                                     member.isGroupAdmin = YES;
                                 }];
@@ -1127,23 +1106,10 @@ CREATE_SHARED_MANAGER(LMCommandManager)
             senderUser.pub_key = redPackgeinfo.sender.pubKey;
             senderUser.avatar = redPackgeinfo.sender.avatar;
             senderUser.username = redPackgeinfo.sender.username;
+            
             if (![[MessageDBManager sharedManager] isMessageIsExistWithMessageId:redPackgeinfo.msgId messageOwer:redPackgeinfo.sender.pubKey]) {
-
-                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                chatMessage.messageId = redPackgeinfo.msgId;
-                chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-                
-                chatMessage.messageOwer = senderUser.pub_key;
-                chatMessage.messageType = GJGCChatFriendContentTypeRedEnvelope;
-                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                chatMessage.senderAddress = senderUser.address;
-                chatMessage.messageOwer = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-                LuckPacketMessage *lucky = [LuckPacketMessage new];
-                lucky.hashId = redPackgeinfo.hashId;
-                chatMessage.msgContent = lucky;
-                
+                ChatMessageInfo *chatMessage = [LMMessageTool makeLuckyPackageChatMessageWithHashId:redPackgeinfo.hashId luckType:0 amount:0 tips:message msgOwer:senderUser.pub_key sender:senderUser.pub_key chatType:0];
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
-
                 if (!senderUser.stranger) {
                     [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
                 } else {

@@ -79,7 +79,7 @@
 /**
  * send message
  */
-- (void)sendMessage:(ChatMessage *)chatMsg content:(NSString *)content snapChat:(BOOL)snapChat type:(GJGCChatFriendTalkType)type;
+- (void)sendMessage:(ChatMessageInfo *)chatMessageInfo content:(NSString *)content snapChat:(BOOL)snapChat type:(GJGCChatFriendTalkType)type;
 
 
 - (void)chatTop:(BOOL)topChat identifier:(NSString *)identifier;

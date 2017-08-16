@@ -211,11 +211,11 @@ CREATE_SHARED_MANAGER(LMHistoryCacheManager)
 }
 
 
-- (void)cacheTransferHistoryWith:(NSString *)address {
-    if (GJCFStringIsNull(address)) {
+- (void)cacheTransferHistoryWith:(NSString *)uid {
+    if (GJCFStringIsNull(uid)) {
         return;
     }
-    AccountInfo *user = [[UserDBManager sharedManager] getUserByAddress:address];
+    AccountInfo *user = [[UserDBManager sharedManager] getUserByPublickey:uid];
     if (!user) {
         return;
     }

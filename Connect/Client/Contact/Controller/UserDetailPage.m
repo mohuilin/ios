@@ -25,6 +25,8 @@
 #import "LMDeleteTableViewCell.h"
 #import "AppDelegate.h"
 #import "StringTool.h"
+#import "LMConnectIMChater.h"
+
 @interface UserDetailPage ()
 
 @property(nonatomic, strong) AccountInfo *user;
@@ -231,7 +233,10 @@
     // Interface jump
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     [[appDelegate shareMainTabController] chatWithFriend:self.user];
-//    [[IMService instance] asyncSendMessageMessage:message onQueue:nil completion:nil onQueue:nil];
+
+    [[LMConnectIMChater sharedManager] sendChatMessageInfo:chatMessageInfo progress:nil complete:^(ChatMessageInfo *chatMsgInfo, NSError *error) {
+        
+    }];
 }
 
 /**

@@ -235,7 +235,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     [self reloadRecentChatWithRecentChatModel:recentModel needReloadBadge:messageCount > 0];
 }
 
-- (void)getNewMessagesWithLastMessage:(ChatMessageInfo *)lastMessage newMessageCount:(int)messageCount  groupNoteMyself:(BOOL)groupNoteMyself{
+- (void)getNewMessagesWithLastMessage:(ChatMessageInfo *)lastMessage newMessageCount:(int)messageCount groupNoteMyself:(BOOL)groupNoteMyself{
     RecentChatModel *recentModel = [[SessionManager sharedManager] getRecentChatWithIdentifier:lastMessage.messageOwer];
     if (!recentModel) {
         LMRamGroupInfo *group = [[GroupDBManager sharedManager] getGroupByGroupIdentifier:lastMessage.messageOwer];
@@ -316,19 +316,19 @@ CREATE_SHARED_MANAGER(LMConversionManager)
 }
 
 
-- (void)sendMessage:(ChatMessage *)chatMsg content:(NSString *)content snapChat:(BOOL)snapChat type:(GJGCChatFriendTalkType)type{
+- (void)sendMessage:(ChatMessageInfo *)chatMessageInfo content:(NSString *)content snapChat:(BOOL)snapChat type:(GJGCChatFriendTalkType)type{
     
     NSString *lastContentString = nil;
     if (snapChat) {
         lastContentString = LMLocalizedString(@"Chat send a snap chat message", nil);
     } else {
         if (type == GJGCChatFriendTalkTypeGroup) {
-            lastContentString = [GJGCChatFriendConstans lastContentMessageWithType:chatMsg.msgType textMessage:content senderUserName:[[LKUserCenter shareCenter] currentLoginUser].username];
+            lastContentString = [GJGCChatFriendConstans lastContentMessageWithType:chatMessageInfo.messageType textMessage:content senderUserName:[[LKUserCenter shareCenter] currentLoginUser].username];
         } else{
-            lastContentString = [GJGCChatFriendConstans lastContentMessageWithType:chatMsg.msgType textMessage:content];
+            lastContentString = [GJGCChatFriendConstans lastContentMessageWithType:chatMessageInfo.messageType textMessage:content];
         }
     }
-    RecentChatModel *recentModel = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:chatMsg.to groupChat:type == GJGCChatFriendTalkTypeGroup lastContentShowType:0 lastContent:lastContentString];
+    RecentChatModel *recentModel = [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:chatMessageInfo.messageOwer groupChat:type == GJGCChatFriendTalkTypeGroup lastContentShowType:0 lastContent:lastContentString];
     if (recentModel.stranger && recentModel.talkType == GJGCChatFriendTalkTypePrivate) {
         recentModel.stranger = ![[UserDBManager sharedManager] isFriendByAddress:[LMIMHelper getAddressByPubkey:recentModel.identifier]];
         recentModel.chatUser.stranger = recentModel.stranger;
@@ -340,8 +340,7 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     if (!chatUser || [chatUser.pub_key isEqualToString:kSystemIdendifier]) {
         return;
     }
-    
-    ChatMessageInfo *messageInfo = [LMMessageTool makeTextChatMessageWithMessageText:!GJCFStringIsNull(chatUser.message)?chatUser.message:[NSString stringWithFormat:LMLocalizedString(@"Link Hello I am", nil),chatUser.username] msgOwer:chatUser.pub_key sender:chatUser.address];
+    ChatMessageInfo *messageInfo = [LMMessageTool makeTextChatMessageWithMessageText:!GJCFStringIsNull(chatUser.message)?chatUser.message:[NSString stringWithFormat:LMLocalizedString(@"Link Hello I am", nil),chatUser.username] msgOwer:chatUser.pub_key sender:chatUser.address chatType:ChatType_Private];
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     [[MessageDBManager sharedManager] saveMessage:messageInfo];
     [self getNewMessagesWithLastMessage:messageInfo newMessageCount:1 type:GJGCChatFriendTalkTypePrivate withSnapChatTime:0];
@@ -365,7 +364,6 @@ CREATE_SHARED_MANAGER(LMConversionManager)
     if (conversationModel.isTopChat && [SessionManager sharedManager].topChatCount >= 1) {
         [SessionManager sharedManager].topChatCount--;
     }
-    
     
     //delete recentchat
     [[SessionManager sharedManager] removeRecentChatWithIdentifier:conversationModel.identifier];

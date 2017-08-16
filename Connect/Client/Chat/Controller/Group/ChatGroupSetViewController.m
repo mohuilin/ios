@@ -26,6 +26,7 @@
 #import "LMRamMemberInfo.h"
 #import "LMMessageAdapter.h"
 #import "LMMessageTool.h"
+#import "LMConnectIMChater.h"
 
 
 typedef NS_ENUM(NSUInteger, SourceType) {
@@ -489,23 +490,13 @@ typedef NS_ENUM(NSUInteger, SourceType) {
                 if ([info.pub_key isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
                     continue;
                 }
-                NSString *msgId = [ConnectTool generateMessageId];
-                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                chatMessage.messageId = msgId;
-                chatMessage.messageOwer = info.pub_key;
-                chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-                chatMessage.messageType = GJGCChatInviteToGroup;
-                
-
-//                message.ext1 = @{@"avatar": self.talkModel.chatGroupInfo.avatarUrl ? self.talkModel.chatGroupInfo.avatarUrl : @"",
-//                        @"groupname": self.talkModel.chatGroupInfo.groupName,
-//                        @"groupidentifier": self.talkModel.chatGroupInfo.groupIdentifer,
-//                        @"inviteToken": tokenResponse.token};
-                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSending;
-                
+                ChatMessageInfo *chatMessage = [LMMessageTool makeJoinGroupChatMessageWithAvatar:self.talkModel.chatGroupInfo.avatarUrl ? self.talkModel.chatGroupInfo.avatarUrl : @"" groupId:self.talkModel.chatGroupInfo.groupIdentifer groupName:self.talkModel.chatGroupInfo.groupName token:tokenResponse.token msgOwer:info.pub_key sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
-
                 [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
+                /// 发送消息
+                [[LMConnectIMChater sharedManager] sendChatMessageInfo:chatMessage progress:nil complete:^(ChatMessageInfo *chatMsgInfo, NSError *error) {
+                    
+                }];
             }
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD hideHUDForView:self.view];
@@ -543,9 +534,7 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         if (info != [membsers lastObject]) {
             [welcomeTip appendString:@"、"];
         }
-        ChatMessage *chatMsg = [LMMessageTool chatMsgWithTo:info.pub_key chatType:0 msgType:0 ext:nil];
-        MessagePost *messagePost = (MessagePost *)[LMMessageAdapter packageChatMsg:chatMsg groupEcdh:nil cipherData:groupMessage];
-        [[IMService instance] asyncSendGroupInfo:messagePost];
+        [[LMConnectIMChater sharedManager] sendCreateGroupMsg:groupMessage to:info.pub_key];
     }
 }
 

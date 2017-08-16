@@ -125,7 +125,6 @@
                                                        website.subtitle = shareUrl;
                                                    }
                                                    chatMessageInfo.msgContent = website;
-                                                   
                                                    if (weakSelf.progressWebView.webView.title) {
                                                        website.title = weakSelf.progressWebView.webView.title;
                                                    }

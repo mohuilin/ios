@@ -11,11 +11,7 @@
 @implementation GJGCChatFriendTalkModel
 
 - (NSString *)fileDocumentName {
-    if (self.talkType == GJGCChatFriendTalkTypeGroup) {
-        _fileDocumentName = self.chatIdendifier;
-    } else {
-        _fileDocumentName = self.chatUser.address;
-    }
+    _fileDocumentName = self.chatIdendifier;
     return _fileDocumentName;
 }
 

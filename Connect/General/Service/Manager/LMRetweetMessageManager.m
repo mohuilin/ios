@@ -28,34 +28,50 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
 - (void)retweetMessageWithModel:(LMRerweetModel *)retweetModel
                        complete:(void (^)(NSError *error,float progress))complete{
     
+    /// 迁移数据
+    switch (retweetModel.retweetMessage.messageType) {
+        case GJGCChatFriendContentTypeImage:
+        {
+            
+        }
+            break;
+            
+        case GJGCChatFriendContentTypeVideo:
+        {
+            
+        }
+            break;
+        default:
+            break;
+    }
+    
     self.RetweetComplete = complete;
     ChatMessageInfo *chatMessageInfo = [self packSendMessageWithRetweetMessage:retweetModel.retweetMessage toFriend:retweetModel.toFriendModel];
     // save message
     [self savaMessageToDB:chatMessageInfo];
-    if (chatMessageInfo.messageType == GJGCChatFriendContentTypeImage || chatMessageInfo.messageType == GJGCChatFriendContentTypeVideo) {
-        
-    }
 }
 
 
 - (ChatMessageInfo *)packSendMessageWithRetweetMessage:(ChatMessageInfo *)retweetMessage toFriend:(id)toFriend{
+    
     ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];
     messageInfo.messageId = [ConnectTool generateMessageId];
     messageInfo.messageType = retweetMessage.messageType;
     messageInfo.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSending;
     messageInfo.msgContent = retweetMessage.msgContent;
+    messageInfo.from = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
     
     if ([toFriend isKindOfClass:[LMRamGroupInfo class]]) {
         LMRamGroupInfo *group = (LMRamGroupInfo *)toFriend;
-        retweetMessage.messageOwer = group.groupIdentifer;
+        messageInfo.messageOwer = group.groupIdentifer;
+        messageInfo.chatType = ChatType_Groupchat;
     } else if([toFriend isKindOfClass:[AccountInfo class]]){
         AccountInfo *user = (AccountInfo *)toFriend;
-        retweetMessage.messageOwer = user.pub_key;
+        messageInfo.messageOwer = user.pub_key;
+        messageInfo.chatType = ChatType_Private;
         RecentChatModel *recent = [[RecentChatDBManager sharedManager] getRecentModelByIdentifier:user.pub_key];
-        if (recent.snapChatDeleteTime > 0) {
-            messageInfo.snapTime = recent.snapChatDeleteTime;
-        }
+        messageInfo.snapTime = recent.snapChatDeleteTime;
     }
     return messageInfo;
 }

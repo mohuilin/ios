@@ -26,7 +26,7 @@
         return NO;
     }
 
-    if (GJCFStringIsNull(chatMessageInfo.senderAddress)) {
+    if (GJCFStringIsNull(chatMessageInfo.from)) {
         return NO;
     }
 

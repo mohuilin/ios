@@ -754,7 +754,6 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
     NSIndexPath *tapIndexPath = [self.chatListTable indexPathForCell:tappedCell];
     GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
     LMRerweetModel *retweetModel = [[LMRerweetModel alloc] init];
-
     ChatMessageInfo *retweetMessage = [self.dataSourceManager messageByMessageId:contentModel.localMsgId];
     retweetModel.retweetMessage = retweetMessage;
     switch (contentModel.contentType) {

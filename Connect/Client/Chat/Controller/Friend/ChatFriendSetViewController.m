@@ -8,6 +8,7 @@
 
 #import "ChatFriendSetViewController.h"
 #import "ChooseContactViewController.h"
+#import "LMConnectIMChater.h"
 #import "IMService.h"
 #import "NetWorkOperationTool.h"
 #import "GroupDBManager.h"
@@ -282,7 +283,6 @@
 - (void)broadcastGroupInfoToAllMembers:(GroupInfo *)groupInfo {
     __weak typeof(self) weakSelf = self;
     if (groupInfo.membersArray.count < 3) {
-
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD hideHUDForView:weakSelf.view];
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Create group fail", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
@@ -350,14 +350,11 @@
     CreateGroupMessage *groupMessage = [[CreateGroupMessage alloc] init];
     groupMessage.secretKey = self.groupEcdhKey;
     groupMessage.identifier = group.identifier;
-
     for (AccountInfo *info in self.members) {
         if ([info.pub_key isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
             continue;
         }
-        ChatMessage *chatMsg = [LMMessageTool chatMsgWithTo:info.pub_key chatType:0 msgType:0 ext:nil];
-        MessagePost *messagePost = [LMMessageAdapter packageChatMsg:chatMsg groupEcdh:nil cipherData:groupMessage];
-        [[IMService instance] asyncSendGroupInfo:messagePost];
+        [[LMConnectIMChater sharedManager] sendCreateGroupMsg:groupMessage to:info.pub_key];
     }
     [GCDQueue executeInMainQueue:^{
         [MBProgressHUD hideHUDForView:self.view];

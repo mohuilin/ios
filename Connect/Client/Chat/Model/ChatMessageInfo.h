@@ -14,11 +14,11 @@
 @property (nonatomic ,assign) NSInteger ID;//auto id
 @property (nonatomic ,copy) NSString *messageOwer;
 @property (nonatomic ,copy) NSString *messageId;
+@property (nonatomic ,copy) NSString *from;
 @property (nonatomic ,assign) NSInteger createTime;
 @property (nonatomic ,assign) NSInteger readTime;
 @property (nonatomic ,assign) NSInteger snapTime;
 @property (nonatomic ,assign) BOOL isRead;
-@property (nonatomic ,copy) NSString *senderAddress;
 @property (nonatomic ,assign) int chatType;
 @property (nonatomic ,assign) GJGCChatFriendContentType messageType;
 @property (nonatomic, assign) GJGCChatFriendSendMessageStatus sendstatus;

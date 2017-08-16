@@ -24,6 +24,7 @@
 #import "LMConversionManager.h"
 #import "LMMessageAdapter.h"
 #import "LMMessageTool.h"
+#import "LMConnectIMChater.h"
 
 
 @interface GroupMembersListViewController () <UITableViewDelegate, UITableViewDataSource, MGSwipeTableCellDelegate> {
@@ -134,17 +135,13 @@
                 if ([info.pubKey isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
                     continue;
                 }
-
-                NSString *msgId = [ConnectTool generateMessageId];
-                ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                chatMessage.messageId = msgId;
-                chatMessage.messageOwer = info.pubKey;
-                chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-                chatMessage.messageType = GJGCChatInviteToGroup;
-                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSending;
-                
+                ChatMessageInfo *chatMessage = [LMMessageTool makeJoinGroupChatMessageWithAvatar:self.talkInfo.chatGroupInfo.avatarUrl ? self.talkInfo.chatGroupInfo.avatarUrl : @"" groupId:self.talkInfo.chatGroupInfo.groupIdentifer groupName:self.talkInfo.chatGroupInfo.groupName token:tokenResponse.token msgOwer:info.pubKey sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
-
+                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pubKey groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
+                /// 发送消息
+                [[LMConnectIMChater sharedManager] sendChatMessageInfo:chatMessage progress:nil complete:^(ChatMessageInfo *chatMsgInfo, NSError *error) {
+                    
+                }];
                 [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pubKey groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
             }
             [GCDQueue executeInMainQueue:^{
@@ -198,10 +195,13 @@
     NSString *myChatTip = [NSString stringWithFormat:LMLocalizedString(@"Link invited to the group chat", nil), LMLocalizedString(@"Chat You", nil), welcomeTip];
     SendNotify(ConnnectGroupInfoDidAddMembers, myChatTip);
     ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.groupid content:myChatTip noteType:0 ext:nil];
+    [[MessageDBManager sharedManager] saveMessage:chatMessage];
     
     NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Link invited to the group chat", nil), [[LKUserCenter shareCenter] currentLoginUser].username, welcomeTip];
-    
     /// 发送一条提示消息
+    ChatMessageInfo *sendTipsChatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.groupid content:tips noteType:0 ext:nil];
+    [[MessageDBManager sharedManager] saveMessage:sendTipsChatMessage];
+    [[LMConnectIMChater sharedManager] sendChatMessageInfo:sendTipsChatMessage progress:nil complete:nil];
 }
 
 

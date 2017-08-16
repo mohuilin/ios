@@ -38,7 +38,7 @@
 
     for (ChatMessageInfo *messageInfo in messages) {
         if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSending) {
-            [self.sendingMessages objectAddObject:messageInfo.msgContent];
+            [self.sendingMessages objectAddObject:messageInfo];
         }
         [self addMMMessage:messageInfo];
     }
@@ -80,7 +80,7 @@
 
     chatContentModel.isSnapChatMode = self.taklInfo.snapChatOutDataTime > 0;
     chatContentModel.isFriend = YES;
-    if (![chatMessage.senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+    if (![chatMessage.from isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
         chatContentModel.isFromSelf = NO;
         chatContentModel.headUrl = self.taklInfo.headUrl;
         chatContentModel.senderName = self.taklInfo.name;

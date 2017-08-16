@@ -623,7 +623,7 @@ static RecentChatDBManager *manager = nil;
 
 - (void)createConnectTermWelcomebackChatAndMessage {
     
-    ChatMessageInfo *chatMessage = [LMMessageTool makeTextChatMessageWithMessageText:LMLocalizedString(@"Login Welcome", nil) msgOwer:kSystemIdendifier sender:kSystemIdendifier];
+    ChatMessageInfo *chatMessage = [LMMessageTool makeTextChatMessageWithMessageText:LMLocalizedString(@"Login Welcome", nil) msgOwer:kSystemIdendifier sender:kSystemIdendifier chatType:ChatType_ConnectSystem];
     chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     
     [[MessageDBManager sharedManager] saveBitchMessage:@[chatMessage]];

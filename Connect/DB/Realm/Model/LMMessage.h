@@ -14,12 +14,15 @@
 
 @property(nonatomic, copy) NSString *uniqueId;
 @property(nonatomic, copy) NSString *messageOwer;
+@property(nonatomic, copy) NSString *from;
 @property(nonatomic, copy) NSString *messageId;
 @property(nonatomic, copy) NSString *messageContent;
 @property(nonatomic, assign) NSInteger createTime;
 @property(nonatomic, assign) NSInteger readTime;
 @property(nonatomic, assign) NSInteger snapTime;
 @property(nonatomic, assign) int sendstatus;
+@property(nonatomic, assign) int msgType;
+@property(nonatomic, assign) int chatType;
 @property(nonatomic, assign) int state;
 
 @property(nonatomic, strong) LMMessageExt *msgExt;

@@ -86,18 +86,8 @@ static MessageDBManager *manager = nil;
 
 - (ChatMessageInfo *)createTransactionMessageWithUserInfo:(AccountInfo *)user hashId:(NSString *)hashId monney:(NSString *)money {
 
-    TransferMessage *transfer = [LMMessageTool makeTransferWithHashId:hashId transferType:0 amount:[money doubleValue] * pow(10, 8) tips:nil];
-
-    ChatMessageInfo *messageInfo = [[ChatMessageInfo alloc] init];
-    messageInfo.messageId = [ConnectTool generateMessageId];
-    messageInfo.messageType = GJGCChatFriendContentTypeTransfer;
-    messageInfo.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-    messageInfo.messageOwer = user.pub_key;
-    messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSending;
-    messageInfo.msgContent = transfer;
-
+    ChatMessageInfo *messageInfo = [LMMessageTool makeTransferChatMessageWithHashId:hashId transferType:0 amount:[money doubleValue] * pow(10, 8) tips:nil msgOwer:user.pub_key sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key chatType:ChatType_Private];
     [self saveMessage:messageInfo];
-
     return messageInfo;
 
 }
@@ -112,7 +102,7 @@ static MessageDBManager *manager = nil;
     messageInfo.messageOwer = ower.pub_key;
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     messageInfo.msgContent = transfer;
-    messageInfo.senderAddress = [[LKUserCenter shareCenter] currentLoginUser].address;
+    messageInfo.from = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
     [self saveMessage:messageInfo];
     return messageInfo;
 }
@@ -126,7 +116,7 @@ static MessageDBManager *manager = nil;
     messageInfo.messageType = GJGCChatFriendContentTypeTransfer;
     messageInfo.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     messageInfo.messageOwer = messageOwer.pub_key;
-    messageInfo.senderAddress = messageOwer.address;
+    messageInfo.from = messageOwer.pub_key;
     messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     messageInfo.msgContent = transfer;
     

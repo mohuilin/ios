@@ -9,7 +9,7 @@
 #import "ReconmandChatListPage.h"
 #import "RecentChatDBManager.h"
 #import "MessageDBManager.h"
-#import "IMService.h"
+#import "LMConnectIMChater.h"
 #import "RecentChatForRecommendCell.h"
 #import "LMShareContactViewController.h"
 #import "LMTableHeaderView.h"
@@ -149,7 +149,6 @@
         } else {
             self.retweetModel.toFriendModel = recentModel.chatUser;
         }
-        __weak __typeof(&*self) weakSelf = self;
         MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         hud.mode = MBProgressHUDModeAnnularDeterminate;
         hud.labelText = LMLocalizedString(@"Common Loading", nil);
@@ -159,29 +158,40 @@
                     if (progress <= 1) {
                         hud.progress = progress;
                     } else {
-                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Send successful", nil) withType:ToastTypeSuccess showInView:weakSelf.view complete:nil];
+                        [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Send successful", nil) withType:ToastTypeSuccess showInView:self.view complete:nil];
                         [self dismissViewControllerAnimated:YES completion:nil];
                     }
                 } else {
-                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Send failed", nil) withType:ToastTypeFail showInView:weakSelf.view complete:nil];
+                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Login Send failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
                 }
             }];
         }];
     } else {
-        
         [GCDQueue executeInMainQueue:^{
             [MBProgressHUD showMessage:LMLocalizedString(@"Common Loading", nil) toView:self.view];
         }];
-        
-        ChatMessageInfo *messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:recentModel.identifier sender:[[LKUserCenter shareCenter] currentLoginUser].address];
+        ChatMessageInfo *messageInfo = [LMMessageTool makeCardChatMessageWithUsername:self.contact.username avatar:self.contact.avatar uid:self.contact.pub_key msgOwer:recentModel.identifier sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key chatType:recentModel.talkType];
         messageInfo.sendstatus = GJGCChatFriendSendMessageStatusSending;
         messageInfo.snapTime = recentModel.snapChatDeleteTime;
         [[MessageDBManager sharedManager] saveMessage:messageInfo];
-
         // top session
         recentModel.createTime = [NSDate date];
         [[RecentChatDBManager sharedManager] updataRecentChatLastTimeByIdentifer:recentModel.identifier];
         // send message
+        [[LMConnectIMChater sharedManager] sendChatMessageInfo:messageInfo progress:^(NSString *to, NSString *msgId, CGFloat progress) {
+            
+        } complete:^(ChatMessageInfo *chatMsgInfo, NSError *error) {
+            if (error) {
+                [GCDQueue executeInMainQueue:^{
+                    [MBProgressHUD showToastwithText:LMLocalizedString(@"Link Share failed", nil) withType:ToastTypeFail showInView:self.view complete:nil];
+                }];
+            } else {
+                [GCDQueue executeInMainQueue:^{
+                    [MBProgressHUD hideHUDForView:self.view];
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                }];
+            }
+        }];
     }
 }
 

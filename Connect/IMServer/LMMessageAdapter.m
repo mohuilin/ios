@@ -64,16 +64,7 @@
 }
 
 + (ChatMessageInfo *)createDecodeFailedTipMessageWithMassagePost:(MessagePost *)msgPost {
-    
-    NotifyMessage *notify = [LMMessageTool makeNotifyMessageWithTips:LMLocalizedString(@"Chat One message failed to decrypt", nil)];
-    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-    chatMessage.messageId = [ConnectTool generateMessageId];
-    chatMessage.messageOwer = msgPost.msgData.chatMsg.to;
-    chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-    chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    chatMessage.msgContent = notify;
-    chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-    
+    ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:msgPost.msgData.chatMsg.to content:LMLocalizedString(@"Chat One message failed to decrypt", nil) noteType:0 ext:nil];
     return chatMessage;
 }
 
@@ -443,7 +434,7 @@
     chatMessageInfo.messageId = chatMsg.msgId;
     chatMessageInfo.messageOwer = chatMsg.to;
     chatMessageInfo.createTime = chatMsg.msgTime;
-    chatMessageInfo.senderAddress = chatMsg.from;
+    chatMessageInfo.from = chatMsg.from;
     chatMessageInfo.chatType = chatMsg.chatType;
     chatMessageInfo.messageType = chatMsg.msgType;
     chatMessageInfo.msgContent = originMsg;

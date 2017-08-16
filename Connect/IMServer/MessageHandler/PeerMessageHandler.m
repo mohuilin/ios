@@ -105,7 +105,7 @@
         
         //transfer message
         if (chatMessageInfo.messageType == GJGCChatFriendContentTypeTransfer) {
-            [[LMHistoryCacheManager sharedManager] cacheTransferHistoryWith:chatMessageInfo.senderAddress];
+            [[LMHistoryCacheManager sharedManager] cacheTransferHistoryWith:chatMessageInfo.from];
         }
                 
         NSMutableDictionary *msgDict = [owerMessagesDict valueForKey:chatMessageInfo.messageOwer];

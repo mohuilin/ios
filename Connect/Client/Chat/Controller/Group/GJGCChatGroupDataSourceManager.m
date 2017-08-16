@@ -51,8 +51,6 @@
 
 
 - (GJGCChatFriendContentModel *)addMMMessage:(ChatMessageInfo *)chatMessage {
-    
-
     [self.orginMessageListArray objectAddObject:chatMessage];
 
     /* 格式化消息 */
@@ -73,20 +71,12 @@
     chatContentModel.downloadTaskIdentifier = [[GJCFFileDownloadManager shareDownloadManager] getDownloadIdentifierWithMessageId:[NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, chatContentModel.localMsgId]];
     chatContentModel.isDownloading = chatContentModel.downloadTaskIdentifier != nil;
     if (chatMessage.messageType != GJGCChatFriendContentTypeStatusTip && chatMessage.messageType != GJGCChatInviteNewMemberTip) {
-        NSString *senderAddress = chatMessage.senderAddress;
-        if (![senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //发送者不是自己
+        if (![chatMessage.from isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //发送者不是自己
             chatContentModel.isFromSelf = NO;
-            LMRamMemberInfo *member = [[GroupDBManager sharedManager] getGroupMemberByGroupId:self.taklInfo.chatIdendifier memberAddress:senderAddress];
-            if (member) {
-                chatContentModel.headUrl = member.avatar;
-                chatContentModel.senderName = member.username;
-                chatContentModel.senderAddress = member.address;
-            } else {
-                LMRamMemberInfo *member = [LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' and address = '%@'",chatMessage.messageOwer,chatMessage.senderAddress]];
-                chatContentModel.headUrl = member.avatar;
-                chatContentModel.senderName = member.groupNicksName.length ?member.groupNicksName:member.username;
-                chatContentModel.senderAddress = senderAddress;
-            }
+            LMRamMemberInfo *member = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' and pubKey = '%@'",chatMessage.messageOwer,chatMessage.from]] lastObject];
+            chatContentModel.headUrl = member.avatar;
+            chatContentModel.senderName = member.username;
+            chatContentModel.senderAddress = member.address;
         } else {
             chatContentModel.headUrl = [[LKUserCenter shareCenter] currentLoginUser].avatar;
             chatContentModel.senderName = [[LKUserCenter shareCenter] currentLoginUser].normalShowName;
@@ -121,7 +111,7 @@
 
     for (ChatMessageInfo *messageInfo in messages) {
         if (messageInfo.sendstatus == GJGCChatFriendSendMessageStatusSending) {
-            [self.sendingMessages objectAddObject:messageInfo.msgContent];
+            [self.sendingMessages objectAddObject:messageInfo];
         }
         [self addMMMessage:messageInfo];
     }

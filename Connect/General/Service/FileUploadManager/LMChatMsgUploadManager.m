@@ -16,7 +16,7 @@
 
 CREATE_SHARED_MANAGER(LMChatMsgUploadManager)
 
-- (void)uploadMainData:(NSData *)mainData minorData:(NSData *)minorData encryptECDH:(NSData *)ecdhkey to:(NSString *)to msgId:(NSString *)msgId chatType:(int)chatType originMsg:(GPBMessage *)originMsg progress:(void (^)(CGFloat progress))progress  complete:(void(^)(GPBMessage *originMsg,NSString *to,NSString *msgId,NSError *error))completion {
+- (void)uploadMainData:(NSData *)mainData minorData:(NSData *)minorData encryptECDH:(NSData *)ecdhkey to:(NSString *)to msgId:(NSString *)msgId chatType:(int)chatType originMsg:(GPBMessage *)originMsg progress:(void (^)(NSString *to,NSString *msgId,CGFloat progress))progress  complete:(void(^)(GPBMessage *originMsg,NSString *to,NSString *msgId,NSError *error))completion {
     
     ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
     if (!mainData) {
@@ -80,9 +80,11 @@ CREATE_SHARED_MANAGER(LMChatMsgUploadManager)
             }
         }
     } forObserver:self];
-    [[GJCFFileUploadManager shareUploadManager] setProgressBlock:^(GJCFFileUploadTask *updateTask, CGFloat progressValue) {
+    [[GJCFFileUploadManager shareUploadManager] setProgressBlock:^(GJCFFileUploadTask *task, CGFloat progressValue) {
         if (progress) {
-            progress(progressValue);
+            NSString *chatId = [task.userInfo valueForKey:@"to"];
+            NSString *msgId = [task.userInfo valueForKey:@"msgId"];
+            progress(chatId,msgId,progressValue);
         }
     } forObserver:self];
 }
