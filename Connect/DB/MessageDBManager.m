@@ -365,7 +365,7 @@ static MessageDBManager *manager = nil;
         type = GJGCChatFriendContentTypeNoRelationShipTip;
     }
     
-    NotifyMessage *notify = [LMMessageTool makeNotifyMessageWithTips:content];
+    NotifyMessage *notify = [LMMessageTool makeNotifyNormalMessageWithTips:content];
     ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
     chatMessage.messageId = [ConnectTool generateMessageId];
     chatMessage.messageOwer = messageOwer;

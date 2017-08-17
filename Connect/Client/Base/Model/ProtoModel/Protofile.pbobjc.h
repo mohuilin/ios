@@ -53,7 +53,6 @@ CF_EXTERN_C_BEGIN
 @class IMResponse;
 @class Input;
 @class MessageData;
-@class MessageUserInfo;
 @class OfflineMsg;
 @class Output;
 @class PhoneBookUserInfo;
@@ -62,6 +61,7 @@ CF_EXTERN_C_BEGIN
 @class RedPackage;
 @class RedPackageInfo;
 @class RelationShip;
+@class Reviewed;
 @class Transaction;
 @class Unspent;
 @class UserCommonGroups;
@@ -285,6 +285,26 @@ typedef GPB_ENUM(Reviewed_FieldNumber) {
 @property(nonatomic, readwrite) int32_t source;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *name;
+
+@end
+
+#pragma mark - ReviewedStatus
+
+typedef GPB_ENUM(ReviewedStatus_FieldNumber) {
+  ReviewedStatus_FieldNumber_Review = 1,
+  ReviewedStatus_FieldNumber_Refused = 2,
+  ReviewedStatus_FieldNumber_Newaccept = 3,
+};
+
+@interface ReviewedStatus : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) Reviewed *review;
+/** Test to see if @c review has been set. */
+@property(nonatomic, readwrite) BOOL hasReview;
+
+@property(nonatomic, readwrite) BOOL refused;
+
+@property(nonatomic, readwrite) BOOL newaccept;
 
 @end
 
@@ -2539,7 +2559,6 @@ typedef GPB_ENUM(TextMessage_FieldNumber) {
   TextMessage_FieldNumber_Content = 1,
   TextMessage_FieldNumber_AtAddressesArray = 2,
   TextMessage_FieldNumber_SnapTime = 3,
-  TextMessage_FieldNumber_Sender = 4,
 };
 
 /**
@@ -2555,10 +2574,6 @@ typedef GPB_ENUM(TextMessage_FieldNumber) {
 
 @property(nonatomic, readwrite) int64_t snapTime;
 
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
-
 @end
 
 #pragma mark - EmotionMessage
@@ -2566,7 +2581,6 @@ typedef GPB_ENUM(TextMessage_FieldNumber) {
 typedef GPB_ENUM(EmotionMessage_FieldNumber) {
   EmotionMessage_FieldNumber_Content = 1,
   EmotionMessage_FieldNumber_SnapTime = 2,
-  EmotionMessage_FieldNumber_Sender = 3,
 };
 
 /**
@@ -2577,10 +2591,6 @@ typedef GPB_ENUM(EmotionMessage_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *content;
 
 @property(nonatomic, readwrite) int64_t snapTime;
-
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
 
 @end
 
@@ -2593,7 +2603,6 @@ typedef GPB_ENUM(PhotoMessage_FieldNumber) {
   PhotoMessage_FieldNumber_ImageWidth = 4,
   PhotoMessage_FieldNumber_ImageHeight = 5,
   PhotoMessage_FieldNumber_SnapTime = 6,
-  PhotoMessage_FieldNumber_Sender = 7,
 };
 
 /**
@@ -2613,10 +2622,6 @@ typedef GPB_ENUM(PhotoMessage_FieldNumber) {
 
 @property(nonatomic, readwrite) int64_t snapTime;
 
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
-
 @end
 
 #pragma mark - VoiceMessage
@@ -2624,9 +2629,7 @@ typedef GPB_ENUM(PhotoMessage_FieldNumber) {
 typedef GPB_ENUM(VoiceMessage_FieldNumber) {
   VoiceMessage_FieldNumber_URL = 1,
   VoiceMessage_FieldNumber_TimeLength = 2,
-  VoiceMessage_FieldNumber_Size = 3,
-  VoiceMessage_FieldNumber_SnapTime = 4,
-  VoiceMessage_FieldNumber_Sender = 5,
+  VoiceMessage_FieldNumber_SnapTime = 3,
 };
 
 /**
@@ -2636,15 +2639,9 @@ typedef GPB_ENUM(VoiceMessage_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *URL;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *timeLength;
-
-@property(nonatomic, readwrite) int32_t size;
+@property(nonatomic, readwrite) int32_t timeLength;
 
 @property(nonatomic, readwrite) int64_t snapTime;
-
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
 
 @end
 
@@ -2658,7 +2655,6 @@ typedef GPB_ENUM(VideoMessage_FieldNumber) {
   VideoMessage_FieldNumber_ImageWidth = 5,
   VideoMessage_FieldNumber_ImageHeight = 6,
   VideoMessage_FieldNumber_SnapTime = 7,
-  VideoMessage_FieldNumber_Sender = 8,
 };
 
 /**
@@ -2670,7 +2666,7 @@ typedef GPB_ENUM(VideoMessage_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *cover;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *timeLength;
+@property(nonatomic, readwrite) int32_t timeLength;
 
 @property(nonatomic, readwrite) int32_t size;
 
@@ -2680,10 +2676,6 @@ typedef GPB_ENUM(VideoMessage_FieldNumber) {
 
 @property(nonatomic, readwrite) int64_t snapTime;
 
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
-
 @end
 
 #pragma mark - CardMessage
@@ -2692,7 +2684,6 @@ typedef GPB_ENUM(CardMessage_FieldNumber) {
   CardMessage_FieldNumber_Uid = 1,
   CardMessage_FieldNumber_Username = 2,
   CardMessage_FieldNumber_Avatar = 3,
-  CardMessage_FieldNumber_Sender = 4,
 };
 
 /**
@@ -2705,10 +2696,6 @@ typedef GPB_ENUM(CardMessage_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *username;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *avatar;
-
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
 
 @end
 
@@ -2750,7 +2737,6 @@ typedef GPB_ENUM(PaymentMessage_FieldNumber) {
   PaymentMessage_FieldNumber_Amount = 3,
   PaymentMessage_FieldNumber_MemberSize = 4,
   PaymentMessage_FieldNumber_Tips = 5,
-  PaymentMessage_FieldNumber_Sender = 6,
 };
 
 /**
@@ -2758,6 +2744,7 @@ typedef GPB_ENUM(PaymentMessage_FieldNumber) {
  **/
 @interface PaymentMessage : GPBMessage
 
+/** 0:单人收款 1:众筹 */
 @property(nonatomic, readwrite) int32_t paymentType;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
@@ -2768,10 +2755,6 @@ typedef GPB_ENUM(PaymentMessage_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
 
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
-
 @end
 
 #pragma mark - TransferMessage
@@ -2781,7 +2764,6 @@ typedef GPB_ENUM(TransferMessage_FieldNumber) {
   TransferMessage_FieldNumber_HashId = 2,
   TransferMessage_FieldNumber_Amount = 3,
   TransferMessage_FieldNumber_Tips = 4,
-  TransferMessage_FieldNumber_Sender = 5,
 };
 
 /**
@@ -2789,6 +2771,7 @@ typedef GPB_ENUM(TransferMessage_FieldNumber) {
  **/
 @interface TransferMessage : GPBMessage
 
+/** 0:单人转账 1:多人转账  2:外部转账 */
 @property(nonatomic, readwrite) int32_t transferType;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
@@ -2797,9 +2780,30 @@ typedef GPB_ENUM(TransferMessage_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
 
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
+@end
+
+#pragma mark - LuckPacketMessage
+
+typedef GPB_ENUM(LuckPacketMessage_FieldNumber) {
+  LuckPacketMessage_FieldNumber_HashId = 1,
+  LuckPacketMessage_FieldNumber_LuckyType = 2,
+  LuckPacketMessage_FieldNumber_Tips = 3,
+  LuckPacketMessage_FieldNumber_Amount = 4,
+};
+
+/**
+ * 红包消息
+ **/
+@interface LuckPacketMessage : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
+
+/** 0:内部红包 1:外部红包 2:系统红包 */
+@property(nonatomic, readwrite) int32_t luckyType;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
+
+@property(nonatomic, readwrite) int64_t amount;
 
 @end
 
@@ -2812,7 +2816,6 @@ typedef GPB_ENUM(LocationMessage_FieldNumber) {
   LocationMessage_FieldNumber_ScreenShot = 4,
   LocationMessage_FieldNumber_ImageWidth = 5,
   LocationMessage_FieldNumber_ImageHeight = 6,
-  LocationMessage_FieldNumber_Sender = 7,
 };
 
 /**
@@ -2832,45 +2835,14 @@ typedef GPB_ENUM(LocationMessage_FieldNumber) {
 
 @property(nonatomic, readwrite) int32_t imageHeight;
 
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
-
-@end
-
-#pragma mark - LuckPacketMessage
-
-typedef GPB_ENUM(LuckPacketMessage_FieldNumber) {
-  LuckPacketMessage_FieldNumber_HashId = 1,
-  LuckPacketMessage_FieldNumber_LuckyType = 2,
-  LuckPacketMessage_FieldNumber_Tips = 3,
-  LuckPacketMessage_FieldNumber_Amount = 4,
-  LuckPacketMessage_FieldNumber_Sender = 5,
-};
-
-/**
- * 红包消息
- **/
-@interface LuckPacketMessage : GPBMessage
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *hashId;
-
-@property(nonatomic, readwrite) int32_t luckyType;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *tips;
-
-@property(nonatomic, readwrite) int64_t amount;
-
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
-
 @end
 
 #pragma mark - NotifyMessage
 
 typedef GPB_ENUM(NotifyMessage_FieldNumber) {
-  NotifyMessage_FieldNumber_Content = 1,
+  NotifyMessage_FieldNumber_NotifyType = 1,
+  NotifyMessage_FieldNumber_Content = 2,
+  NotifyMessage_FieldNumber_Extion = 3,
 };
 
 /**
@@ -2878,7 +2850,12 @@ typedef GPB_ENUM(NotifyMessage_FieldNumber) {
  **/
 @interface NotifyMessage : GPBMessage
 
+/** 红包 普通提醒 红包带详情（hashid） eg。。。。 */
+@property(nonatomic, readwrite) int32_t notifyType;
+
 @property(nonatomic, readwrite, copy, null_resettable) NSString *content;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *extion;
 
 @end
 
@@ -2889,7 +2866,6 @@ typedef GPB_ENUM(JoinGroupMessage_FieldNumber) {
   JoinGroupMessage_FieldNumber_GroupName = 2,
   JoinGroupMessage_FieldNumber_GroupId = 3,
   JoinGroupMessage_FieldNumber_Token = 4,
-  JoinGroupMessage_FieldNumber_Sender = 5,
 };
 
 /**
@@ -2905,10 +2881,6 @@ typedef GPB_ENUM(JoinGroupMessage_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *token;
 
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
-
 @end
 
 #pragma mark - WebsiteMessage
@@ -2918,7 +2890,6 @@ typedef GPB_ENUM(WebsiteMessage_FieldNumber) {
   WebsiteMessage_FieldNumber_Title = 2,
   WebsiteMessage_FieldNumber_Subtitle = 3,
   WebsiteMessage_FieldNumber_Img = 4,
-  WebsiteMessage_FieldNumber_Sender = 5,
 };
 
 /**
@@ -2933,10 +2904,6 @@ typedef GPB_ENUM(WebsiteMessage_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *subtitle;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *img;
-
-@property(nonatomic, readwrite, strong, null_resettable) MessageUserInfo *sender;
-/** Test to see if @c sender has been set. */
-@property(nonatomic, readwrite) BOOL hasSender;
 
 @end
 

@@ -139,24 +139,15 @@
 #pragma mark - announcement
 
 - (GJGCChatFriendContentModel *)addSystemAnnouncementWithMessage:(ChatMessageInfo *)chatMessage {
-
-    /*
-     @{@"title":announcement.title,
-     @"jumpUrl":announcement.URL,
-     @"createAt":@(announcement.createdAt),
-     @"coversURL":announcement.coversURL,
-     @"category":@(announcement.category),
-     @"content":announcement.content};
-     */
-    NSDictionary *announcementDict = nil;
-    NSString *url = [announcementDict valueForKey:@"jumpUrl"];
+    Announcement *announceMement = (Announcement *)chatMessage.msgContent;
+    NSString *url = announceMement.URL;
     // card title
-    NSString *title = [announcementDict valueForKey:@"title"];
+    NSString *title = announceMement.title;
     // desc
-    NSString *desc = [announcementDict valueForKey:@"content"];
+    NSString *desc = announceMement.desc;
     // type
-    NSInteger type = [[announcementDict valueForKey:@"category"] integerValue];
-    NSString *pic = [announcementDict valueForKey:@"coversURL"];
+    NSInteger type = announceMement.category;
+    NSString *pic = announceMement.coversURL;
     NSString *buttonTitle = LMLocalizedString(@"Wallet Detail", nil);
     GJGCChatSystemNotiModel *notiModel = [[GJGCChatSystemNotiModel alloc] init];
     notiModel.systemActiveImageUrl = pic;

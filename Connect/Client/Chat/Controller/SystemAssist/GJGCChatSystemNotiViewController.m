@@ -71,20 +71,17 @@
     NSIndexPath *tapIndexPath = [self.chatListTable indexPathForCell:tappedCell];
     GJGCChatFriendContentModel *chatContentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
     LMOtherModel *model = (LMOtherModel *) chatContentModel.contentModel;
-
     ApplyJoinToGroupCell *joinToGroupCell = (ApplyJoinToGroupCell *) tappedCell;
     if (!model.userIsinGroup) {
         chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateCellStatusWithHandle:NO refused:NO isNoted:YES];
         [joinToGroupCell haveNoteThisMessage];
     }
     ChatMessageInfo *chatMessageInfo = [self.dataSourceManager messageByMessageId:chatContentModel.localMsgId];
-//    NSMutableDictionary *temDict = [msg.ext1 mutableCopy];
-//    if ([[temDict valueForKey:@"newaccept"] boolValue] == NO) {
-//        [temDict setObject:@(YES) forKey:@"newaccept"];
-//        msg.ext1 = temDict;
-//        ChatMessageInfo *messageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:msg.message_id messageOwer:self.taklInfo.chatIdendifier];
-//        [[MessageDBManager sharedManager] updataMessage:messageInfo];
-//    }
+    ReviewedStatus *reviewedStatus = (ReviewedStatus *)chatMessageInfo.msgContent;
+    if (reviewedStatus.newaccept == NO) {
+        reviewedStatus.newaccept = YES;
+        [[MessageDBManager sharedManager] updataMessage:chatMessageInfo];
+    }
     LMVerifyInGroupViewController *page = [[LMVerifyInGroupViewController alloc] init];
     page.model = model;
 
@@ -93,12 +90,10 @@
             chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateCellStatusWithHandle:YES refused:refused isNoted:YES];
             model.handled = YES;
             [joinToGroupCell showStatusLabelWithResult:refused];
-//            MMMessage *msg = [self.dataSourceManager messageByMessageId:chatContentModel.localMsgId];
-//            NSMutableDictionary *temDict = [msg.ext1 mutableCopy];
-//            [temDict setObject:@(refused) forKey:@"refused"];
-//            msg.ext1 = temDict;
-//            ChatMessageInfo *messageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:msg.message_id messageOwer:self.taklInfo.chatIdendifier];
-//            [[MessageDBManager sharedManager] updataMessage:messageInfo];
+            
+            /// 更新 refused 状态
+            reviewedStatus.refused = refused;
+            [[MessageDBManager sharedManager] updataMessage:chatMessageInfo];
         };
     }
     [self.navigationController pushViewController:page animated:YES];
@@ -138,11 +133,10 @@
                             //create tips message
                             if (![senderName isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].normalShowName]) {
                                 NSString *operation = [NSString stringWithFormat:@"%@/%@", self.taklInfo.chatUser.address, [[LKUserCenter shareCenter] currentLoginUser].address];
-                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:operation noteType:2 ext:nil];
+                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:operation noteType:NotifyMessageTypeLuckyPackageSender_Reciver ext:hashId];
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
                                 [self.dataSourceManager showGetRedBagMessageWithWithMessage:chatMessage];
                             }
-                            
                             LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
                             redLuckyView.hashId = hashId;
                             [redLuckyView setDelegate:self];

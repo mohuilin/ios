@@ -124,6 +124,7 @@
 @property(nonatomic, copy) NSString *videoDownVideoEncodePath;
 @property(nonatomic, assign) NSInteger videoDuration;
 @property(nonatomic, copy) NSString *videoSize;
+@property(nonatomic, assign) int size;
 @property(nonatomic, assign) BOOL uploadVideoComplete;
 @property(nonatomic, assign) BOOL uploadVideoCoverComplete;
 @property(nonatomic, assign) BOOL videoIsDownload;

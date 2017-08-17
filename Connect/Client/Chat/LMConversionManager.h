@@ -11,7 +11,6 @@
 #import "GJGCChatContentBaseModel.h"
 
 @class ChatMessageInfo;
-@class MMMessage;
 
 @protocol LMConversionListChangeManagerDelegate <NSObject>
 

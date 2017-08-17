@@ -125,12 +125,6 @@ typedef NS_ENUM(NSUInteger, GJGCChatFriendContentType) {
      *  wallet link
      */
             GJGCChatWalletLink = 25,
-
-    /**
-     * Announcement
-     */
-            GJGCChatSystemGonggao = 101,
-    GJGCChatSystemShenhe = 102,
 };
 
 #define GJGCContentTypeToString(contentType) [GJGCChatFriendConstans contentTypeToString:contentType]

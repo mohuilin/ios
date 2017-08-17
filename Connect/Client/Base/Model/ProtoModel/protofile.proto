@@ -60,6 +60,13 @@ string verificationCode = 5;
 int32 source =6;
 string name = 7;
 }
+
+message ReviewedStatus {
+Reviewed review = 1;
+bool refused = 2;
+bool newaccept = 3;
+}
+
 message AddressNotify {
 string txId = 1;
 int64 amount = 2;
@@ -771,13 +778,11 @@ message TextMessage{
 string content=1;
 repeated string at_addresses=2;
 int64 snap_time = 3;
-MessageUserInfo sender =4;
 }
 //emoj表情
 message EmotionMessage{
 string content=1;
 int64 snap_time = 2;
-MessageUserInfo sender =3;
 }
 //图片消息
 message PhotoMessage{
@@ -787,33 +792,28 @@ string size=3;
 int32 image_width=4;
 int32 image_height=5;
 int64 snap_time = 6;
-MessageUserInfo sender =7;
 }
 //音频消息
 message VoiceMessage{
 string url=1;
-string time_length=2;
-int32 size=3;
-int64 snap_time = 4;
-MessageUserInfo sender =5;
+int32 time_length=2;
+int64 snap_time = 3;
 }
 //视频消息
 message VideoMessage{
 string url=1;
 string cover=2;
-string time_length=3;
+int32 time_length=3;
 int32 size=4;
 int32 image_width=5;
 int32 image_height=6;
 int64 snap_time = 7;
-MessageUserInfo sender =8;
 }
 //名片消息
 message CardMessage{
 string uid=1;
 string username=2;
 string avatar=3;
-MessageUserInfo sender =4;
 }
 //开始阅后即焚
 message DestructMessage{
@@ -825,21 +825,28 @@ string message_id=1;
 }
 //收款消息
 message PaymentMessage{
-int32 payment_type=1;
+int32 payment_type=1;// 0:单人收款 1:众筹
 string hash_id=2;
 int64 amount=3;
 int32 member_size =4;
 string tips =5;
-MessageUserInfo sender =6;
 }
 //转账消息
 message TransferMessage{
-int32  transfer_type=1;
+int32  transfer_type=1;//0:单人转账 1:多人转账  2:外部转账
 string hash_id=2;
 int64 amount=3;
 string tips =4;
-MessageUserInfo sender =5;
 }
+
+//红包消息
+message LuckPacketMessage{
+string hash_id=1;
+int32 lucky_type=2;//0:内部红包 1:外部红包 2:系统红包
+string tips =3;
+int64 amount=4;
+}
+
 //位置消息
 message LocationMessage{
 float latitude=1;
@@ -848,19 +855,13 @@ string address=3;
 string screen_shot=4;
 int32 image_width=5;
 int32 image_height=6;
-MessageUserInfo sender =7;
 }
-//红包消息
-message LuckPacketMessage{
-string hash_id=1;
-int32 lucky_type=2;
-string tips =3;
-int64 amount=4;
-MessageUserInfo sender =5;
-}
+
 //提示消息
 message NotifyMessage{
-string content=1;
+int32 notify_type = 1; // 红包 普通提醒 红包带详情（hashid） eg。。。。
+string content = 2;
+string extion = 3;
 }
 //加入群组消息
 message JoinGroupMessage{
@@ -868,7 +869,6 @@ string avatar=1;
 string group_name=2;
 string group_id=3;
 string token=4;
-MessageUserInfo sender =5;
 }
 //外部链接消息
 message WebsiteMessage{
@@ -876,7 +876,6 @@ string url=1;
 string title=2;
 string subtitle=3;
 string img=4;
-MessageUserInfo sender =5;
 }
 
 message MSMessage {

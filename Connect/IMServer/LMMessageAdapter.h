@@ -24,4 +24,6 @@
 
 + (MessageData *)packageChatMessageInfo:(ChatMessageInfo *)chatMessageInfo ext:(id)ext groupEcdh:(NSString *)groupEcdh;
 
++ (GPBMessage *)parseDataWithData:(NSData *)data msgType:(int)msgType;
+
 @end

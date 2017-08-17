@@ -1145,8 +1145,6 @@
         case GJGCChatFriendContentTypeImage:
         case GJGCChatFriendContentTypeVideo:
         case GJGCChatInviteNewMemberTip:
-        case GJGCChatSystemGonggao:
-        case GJGCChatSystemShenhe:
         case GJGCChatInviteToGroup:
         case GJGCChatApplyToJoinGroup:
         case GJGCChatWalletLink:
@@ -1319,7 +1317,8 @@
 }
 
 - (void)showGetRedBagMessageWithWithMessage:(ChatMessageInfo *)msg {
-    NSString *operation = @"";
+    NotifyMessage *notify = (NotifyMessage *)msg.msgContent;
+    NSString *operation = notify.content;
     NSArray *temA = [operation componentsSeparatedByString:@"/"];
     if (temA.count == 2) {
         NSString *senderAddress = [temA firstObject];

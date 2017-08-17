@@ -711,6 +711,69 @@ typedef struct Reviewed__storage_ {
 
 @end
 
+#pragma mark - ReviewedStatus
+
+@implementation ReviewedStatus
+
+@dynamic hasReview, review;
+@dynamic refused;
+@dynamic newaccept;
+
+typedef struct ReviewedStatus__storage_ {
+  uint32_t _has_storage_[1];
+  Reviewed *review;
+} ReviewedStatus__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "review",
+        .dataTypeSpecific.className = GPBStringifySymbol(Reviewed),
+        .number = ReviewedStatus_FieldNumber_Review,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(ReviewedStatus__storage_, review),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "refused",
+        .dataTypeSpecific.className = NULL,
+        .number = ReviewedStatus_FieldNumber_Refused,
+        .hasIndex = 1,
+        .offset = 2,  // Stored in _has_storage_ to save space.
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeBool,
+      },
+      {
+        .name = "newaccept",
+        .dataTypeSpecific.className = NULL,
+        .number = ReviewedStatus_FieldNumber_Newaccept,
+        .hasIndex = 3,
+        .offset = 4,  // Stored in _has_storage_ to save space.
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeBool,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[ReviewedStatus class]
+                                     rootClass:[ProtofileRoot class]
+                                          file:ProtofileRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(ReviewedStatus__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
 #pragma mark - AddressNotify
 
 @implementation AddressNotify
@@ -8422,13 +8485,11 @@ typedef struct MessageData__storage_ {
 @dynamic content;
 @dynamic atAddressesArray, atAddressesArray_Count;
 @dynamic snapTime;
-@dynamic hasSender, sender;
 
 typedef struct TextMessage__storage_ {
   uint32_t _has_storage_[1];
   NSString *content;
   NSMutableArray *atAddressesArray;
-  MessageUserInfo *sender;
   int64_t snapTime;
 } TextMessage__storage_;
 
@@ -8465,15 +8526,6 @@ typedef struct TextMessage__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
       },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = TextMessage_FieldNumber_Sender,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(TextMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[TextMessage class]
@@ -8497,12 +8549,10 @@ typedef struct TextMessage__storage_ {
 
 @dynamic content;
 @dynamic snapTime;
-@dynamic hasSender, sender;
 
 typedef struct EmotionMessage__storage_ {
   uint32_t _has_storage_[1];
   NSString *content;
-  MessageUserInfo *sender;
   int64_t snapTime;
 } EmotionMessage__storage_;
 
@@ -8529,15 +8579,6 @@ typedef struct EmotionMessage__storage_ {
         .offset = (uint32_t)offsetof(EmotionMessage__storage_, snapTime),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
-      },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = EmotionMessage_FieldNumber_Sender,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(EmotionMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -8566,7 +8607,6 @@ typedef struct EmotionMessage__storage_ {
 @dynamic imageWidth;
 @dynamic imageHeight;
 @dynamic snapTime;
-@dynamic hasSender, sender;
 
 typedef struct PhotoMessage__storage_ {
   uint32_t _has_storage_[1];
@@ -8575,7 +8615,6 @@ typedef struct PhotoMessage__storage_ {
   NSString *URL;
   NSString *thum;
   NSString *size;
-  MessageUserInfo *sender;
   int64_t snapTime;
 } PhotoMessage__storage_;
 
@@ -8639,15 +8678,6 @@ typedef struct PhotoMessage__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
       },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = PhotoMessage_FieldNumber_Sender,
-        .hasIndex = 6,
-        .offset = (uint32_t)offsetof(PhotoMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[PhotoMessage class]
@@ -8676,16 +8706,12 @@ typedef struct PhotoMessage__storage_ {
 
 @dynamic URL;
 @dynamic timeLength;
-@dynamic size;
 @dynamic snapTime;
-@dynamic hasSender, sender;
 
 typedef struct VoiceMessage__storage_ {
   uint32_t _has_storage_[1];
-  int32_t size;
+  int32_t timeLength;
   NSString *URL;
-  NSString *timeLength;
-  MessageUserInfo *sender;
   int64_t snapTime;
 } VoiceMessage__storage_;
 
@@ -8711,34 +8737,16 @@ typedef struct VoiceMessage__storage_ {
         .hasIndex = 1,
         .offset = (uint32_t)offsetof(VoiceMessage__storage_, timeLength),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "size",
-        .dataTypeSpecific.className = NULL,
-        .number = VoiceMessage_FieldNumber_Size,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(VoiceMessage__storage_, size),
-        .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
       {
         .name = "snapTime",
         .dataTypeSpecific.className = NULL,
         .number = VoiceMessage_FieldNumber_SnapTime,
-        .hasIndex = 3,
+        .hasIndex = 2,
         .offset = (uint32_t)offsetof(VoiceMessage__storage_, snapTime),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
-      },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = VoiceMessage_FieldNumber_Sender,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(VoiceMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -8773,17 +8781,15 @@ typedef struct VoiceMessage__storage_ {
 @dynamic imageWidth;
 @dynamic imageHeight;
 @dynamic snapTime;
-@dynamic hasSender, sender;
 
 typedef struct VideoMessage__storage_ {
   uint32_t _has_storage_[1];
+  int32_t timeLength;
   int32_t size;
   int32_t imageWidth;
   int32_t imageHeight;
   NSString *URL;
   NSString *cover;
-  NSString *timeLength;
-  MessageUserInfo *sender;
   int64_t snapTime;
 } VideoMessage__storage_;
 
@@ -8818,7 +8824,7 @@ typedef struct VideoMessage__storage_ {
         .hasIndex = 2,
         .offset = (uint32_t)offsetof(VideoMessage__storage_, timeLength),
         .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
+        .dataType = GPBDataTypeInt32,
       },
       {
         .name = "size",
@@ -8856,15 +8862,6 @@ typedef struct VideoMessage__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt64,
       },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = VideoMessage_FieldNumber_Sender,
-        .hasIndex = 7,
-        .offset = (uint32_t)offsetof(VideoMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[VideoMessage class]
@@ -8894,14 +8891,12 @@ typedef struct VideoMessage__storage_ {
 @dynamic uid;
 @dynamic username;
 @dynamic avatar;
-@dynamic hasSender, sender;
 
 typedef struct CardMessage__storage_ {
   uint32_t _has_storage_[1];
   NSString *uid;
   NSString *username;
   NSString *avatar;
-  MessageUserInfo *sender;
 } CardMessage__storage_;
 
 // This method is threadsafe because it is initially called
@@ -8936,15 +8931,6 @@ typedef struct CardMessage__storage_ {
         .offset = (uint32_t)offsetof(CardMessage__storage_, avatar),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = CardMessage_FieldNumber_Sender,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(CardMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
       },
     };
     GPBDescriptor *localDescriptor =
@@ -9058,7 +9044,6 @@ typedef struct ReadReceiptMessage__storage_ {
 @dynamic amount;
 @dynamic memberSize;
 @dynamic tips;
-@dynamic hasSender, sender;
 
 typedef struct PaymentMessage__storage_ {
   uint32_t _has_storage_[1];
@@ -9066,7 +9051,6 @@ typedef struct PaymentMessage__storage_ {
   int32_t memberSize;
   NSString *hashId;
   NSString *tips;
-  MessageUserInfo *sender;
   int64_t amount;
 } PaymentMessage__storage_;
 
@@ -9121,15 +9105,6 @@ typedef struct PaymentMessage__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = PaymentMessage_FieldNumber_Sender,
-        .hasIndex = 5,
-        .offset = (uint32_t)offsetof(PaymentMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[PaymentMessage class]
@@ -9155,14 +9130,12 @@ typedef struct PaymentMessage__storage_ {
 @dynamic hashId;
 @dynamic amount;
 @dynamic tips;
-@dynamic hasSender, sender;
 
 typedef struct TransferMessage__storage_ {
   uint32_t _has_storage_[1];
   int32_t transferType;
   NSString *hashId;
   NSString *tips;
-  MessageUserInfo *sender;
   int64_t amount;
 } TransferMessage__storage_;
 
@@ -9208,15 +9181,6 @@ typedef struct TransferMessage__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = TransferMessage_FieldNumber_Sender,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(TransferMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[TransferMessage class]
@@ -9225,6 +9189,82 @@ typedef struct TransferMessage__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(TransferMessage__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - LuckPacketMessage
+
+@implementation LuckPacketMessage
+
+@dynamic hashId;
+@dynamic luckyType;
+@dynamic tips;
+@dynamic amount;
+
+typedef struct LuckPacketMessage__storage_ {
+  uint32_t _has_storage_[1];
+  int32_t luckyType;
+  NSString *hashId;
+  NSString *tips;
+  int64_t amount;
+} LuckPacketMessage__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "hashId",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckPacketMessage_FieldNumber_HashId,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, hashId),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "luckyType",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckPacketMessage_FieldNumber_LuckyType,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, luckyType),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
+        .name = "tips",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckPacketMessage_FieldNumber_Tips,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, tips),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "amount",
+        .dataTypeSpecific.className = NULL,
+        .number = LuckPacketMessage_FieldNumber_Amount,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, amount),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt64,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[LuckPacketMessage class]
+                                     rootClass:[ProtofileRoot class]
+                                          file:ProtofileRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(LuckPacketMessage__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
@@ -9244,7 +9284,6 @@ typedef struct TransferMessage__storage_ {
 @dynamic screenShot;
 @dynamic imageWidth;
 @dynamic imageHeight;
-@dynamic hasSender, sender;
 
 typedef struct LocationMessage__storage_ {
   uint32_t _has_storage_[1];
@@ -9254,7 +9293,6 @@ typedef struct LocationMessage__storage_ {
   int32_t imageHeight;
   NSString *address;
   NSString *screenShot;
-  MessageUserInfo *sender;
 } LocationMessage__storage_;
 
 // This method is threadsafe because it is initially called
@@ -9317,15 +9355,6 @@ typedef struct LocationMessage__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeInt32,
       },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = LocationMessage_FieldNumber_Sender,
-        .hasIndex = 6,
-        .offset = (uint32_t)offsetof(LocationMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[LocationMessage class]
@@ -9343,102 +9372,19 @@ typedef struct LocationMessage__storage_ {
 
 @end
 
-#pragma mark - LuckPacketMessage
-
-@implementation LuckPacketMessage
-
-@dynamic hashId;
-@dynamic luckyType;
-@dynamic tips;
-@dynamic amount;
-@dynamic hasSender, sender;
-
-typedef struct LuckPacketMessage__storage_ {
-  uint32_t _has_storage_[1];
-  int32_t luckyType;
-  NSString *hashId;
-  NSString *tips;
-  MessageUserInfo *sender;
-  int64_t amount;
-} LuckPacketMessage__storage_;
-
-// This method is threadsafe because it is initially called
-// in +initialize for each subclass.
-+ (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
-  if (!descriptor) {
-    static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "hashId",
-        .dataTypeSpecific.className = NULL,
-        .number = LuckPacketMessage_FieldNumber_HashId,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, hashId),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "luckyType",
-        .dataTypeSpecific.className = NULL,
-        .number = LuckPacketMessage_FieldNumber_LuckyType,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, luckyType),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt32,
-      },
-      {
-        .name = "tips",
-        .dataTypeSpecific.className = NULL,
-        .number = LuckPacketMessage_FieldNumber_Tips,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, tips),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "amount",
-        .dataTypeSpecific.className = NULL,
-        .number = LuckPacketMessage_FieldNumber_Amount,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, amount),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt64,
-      },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = LuckPacketMessage_FieldNumber_Sender,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(LuckPacketMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
-    };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[LuckPacketMessage class]
-                                     rootClass:[ProtofileRoot class]
-                                          file:ProtofileRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(LuckPacketMessage__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
-  }
-  return descriptor;
-}
-
-@end
-
 #pragma mark - NotifyMessage
 
 @implementation NotifyMessage
 
+@dynamic notifyType;
 @dynamic content;
+@dynamic extion;
 
 typedef struct NotifyMessage__storage_ {
   uint32_t _has_storage_[1];
+  int32_t notifyType;
   NSString *content;
+  NSString *extion;
 } NotifyMessage__storage_;
 
 // This method is threadsafe because it is initially called
@@ -9448,11 +9394,29 @@ typedef struct NotifyMessage__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
+        .name = "notifyType",
+        .dataTypeSpecific.className = NULL,
+        .number = NotifyMessage_FieldNumber_NotifyType,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(NotifyMessage__storage_, notifyType),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeInt32,
+      },
+      {
         .name = "content",
         .dataTypeSpecific.className = NULL,
         .number = NotifyMessage_FieldNumber_Content,
-        .hasIndex = 0,
+        .hasIndex = 1,
         .offset = (uint32_t)offsetof(NotifyMessage__storage_, content),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "extion",
+        .dataTypeSpecific.className = NULL,
+        .number = NotifyMessage_FieldNumber_Extion,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(NotifyMessage__storage_, extion),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
@@ -9481,7 +9445,6 @@ typedef struct NotifyMessage__storage_ {
 @dynamic groupName;
 @dynamic groupId;
 @dynamic token;
-@dynamic hasSender, sender;
 
 typedef struct JoinGroupMessage__storage_ {
   uint32_t _has_storage_[1];
@@ -9489,7 +9452,6 @@ typedef struct JoinGroupMessage__storage_ {
   NSString *groupName;
   NSString *groupId;
   NSString *token;
-  MessageUserInfo *sender;
 } JoinGroupMessage__storage_;
 
 // This method is threadsafe because it is initially called
@@ -9534,15 +9496,6 @@ typedef struct JoinGroupMessage__storage_ {
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = JoinGroupMessage_FieldNumber_Sender,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(JoinGroupMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:[JoinGroupMessage class]
@@ -9568,7 +9521,6 @@ typedef struct JoinGroupMessage__storage_ {
 @dynamic title;
 @dynamic subtitle;
 @dynamic img;
-@dynamic hasSender, sender;
 
 typedef struct WebsiteMessage__storage_ {
   uint32_t _has_storage_[1];
@@ -9576,7 +9528,6 @@ typedef struct WebsiteMessage__storage_ {
   NSString *title;
   NSString *subtitle;
   NSString *img;
-  MessageUserInfo *sender;
 } WebsiteMessage__storage_;
 
 // This method is threadsafe because it is initially called
@@ -9620,15 +9571,6 @@ typedef struct WebsiteMessage__storage_ {
         .offset = (uint32_t)offsetof(WebsiteMessage__storage_, img),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "sender",
-        .dataTypeSpecific.className = GPBStringifySymbol(MessageUserInfo),
-        .number = WebsiteMessage_FieldNumber_Sender,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(WebsiteMessage__storage_, sender),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
       },
     };
     GPBDescriptor *localDescriptor =

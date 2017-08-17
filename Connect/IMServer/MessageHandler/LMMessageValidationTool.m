@@ -8,6 +8,7 @@
 
 #import "LMMessageValidationTool.h"
 #import "ChatMessageInfo.h"
+#import "LMMessageTool.h"
 
 @implementation LMMessageValidationTool
 
@@ -30,12 +31,7 @@
         return NO;
     }
 
-
     switch (msgType) {
-        case MessageTypeGroup: {
-
-        }
-            break;
         case MessageTypeSystem:
             return [self checkSystemMessage:chatMessageInfo];
             break;
@@ -44,83 +40,191 @@
     }
 
     switch (chatMessageInfo.messageType) {
-        case GJGCChatFriendContentTypeGif:
+        case GJGCChatFriendContentTypeGif: {
+            EmotionMessage *msgContent = (EmotionMessage *)chatMessageInfo.msgContent;
+            if (msgContent.content.length == 0) {
+                return NO;
+            }
+            return YES;
+        }
+            break;
         case GJGCChatFriendContentTypeText: {
-            
+            TextMessage *msgContent = (TextMessage *)chatMessageInfo.msgContent;
+            if (msgContent.content.length == 0) {
+                return NO;
+            }
             return YES;
         }
             break;
         case GJGCChatFriendContentTypeAudio: {
-            
+            VoiceMessage *msgContent = (VoiceMessage *)chatMessageInfo.msgContent;
+            if (msgContent.URL.length == 0) {
+                return NO;
+            }
+            if (msgContent.timeLength < 0 ||
+                msgContent.timeLength > 60) {
+                return NO;
+            }
             return YES;
         }
             break;
 
         case GJGCChatFriendContentTypeImage: {
+            PhotoMessage *msgContent = (PhotoMessage *)chatMessageInfo.msgContent;
+            if (msgContent.URL.length == 0) {
+                return NO;
+            }
+            if (msgContent.imageWidth == 0) {
+                return NO;
+            }
             
+            if (msgContent.imageHeight == 0) {
+                return NO;
+            }
             return YES;
         }
             break;
 
         case GJGCChatFriendContentTypeVideo: {
-
-            return YES;
-        }
-            break;
-
-        case GJGCChatFriendContentTypeSnapChat: {
+            VideoMessage *msgContent = (VideoMessage *)chatMessageInfo.msgContent;
+            if (msgContent.URL.length == 0) {
+                return NO;
+            }
+            if (msgContent.cover.length == 0) {
+                return NO;
+            }
+            if (msgContent.imageWidth == 0) {
+                return NO;
+            }
+            if (msgContent.imageHeight == 0) {
+                return NO;
+            }
+            
+            if (msgContent.size == 0) {
+                return NO;
+            }
+            
+            if (msgContent.timeLength == 0) {
+                return NO;
+            }
             
             return YES;
         }
             break;
 
-        case GJGCChatFriendContentTypeSnapChatReadedAck: {
+        case GJGCChatFriendContentTypeSnapChat: {
+            DestructMessage *msgContent = (DestructMessage *)chatMessageInfo.msgContent;
+            if (msgContent.time < 0) {
+                return NO;
+            }
+            return YES;
+        }
+            break;
 
+        case GJGCChatFriendContentTypeSnapChatReadedAck: {
+            ReadReceiptMessage *msgContent = (ReadReceiptMessage *)chatMessageInfo.msgContent;
+            if (msgContent.messageId.length == 0) {
+                return NO;
+            }
             return YES;
         }
             break;
 
         case GJGCChatFriendContentTypePayReceipt: {
+            PaymentMessage *msgContent = (PaymentMessage *)chatMessageInfo.msgContent;
+            if (msgContent.hashId.length == 0) {
+                return NO;
+            }
+            if (msgContent.amount == 0) {
+                return NO;
+            }
             
             return YES;
         }
             break;
 
         case GJGCChatFriendContentTypeTransfer: {
-            
+            TransferMessage *msgContent = (TransferMessage *)chatMessageInfo.msgContent;
+            if (msgContent.hashId.length == 0) {
+                return NO;
+            }
+            if (msgContent.amount == 0) {
+                return NO;
+            }
             return YES;
         }
             break;
 
         case GJGCChatFriendContentTypeRedEnvelope: {
-            
+            LuckPacketMessage *msgContent = (LuckPacketMessage *)chatMessageInfo.msgContent;
+            if (msgContent.hashId.length == 0) {
+                return NO;
+            }
             return YES;
         }
             break;
 
         case GJGCChatFriendContentTypeMapLocation: {
+            LocationMessage *msgContent = (LocationMessage *)chatMessageInfo.msgContent;
+            if (msgContent.latitude == 0) {
+                return NO;
+            }
+            if (msgContent.longitude == 0) {
+                return NO;
+            }
+            if (msgContent.address.length == 0) {
+                return NO;
+            }
+            
+            if (msgContent.screenShot.length == 0) {
+                return NO;
+            }
+            if (msgContent.imageWidth == 0) {
+                return NO;
+            }
+            if (msgContent.imageHeight == 0) {
+                return NO;
+            }
             
             return YES;
         }
             break;
         case GJGCChatFriendContentTypeNameCard: {
-
+            CardMessage *msgContent = (CardMessage *)chatMessageInfo.msgContent;
+            if (msgContent.username == 0) {
+                return NO;
+            }
+            if (msgContent.uid == 0) {
+                return NO;
+            }
             return YES;
         }
             break;
         case GJGCChatFriendContentTypeStatusTip: {
-            
+            NotifyMessage *msgContent = (NotifyMessage *)chatMessageInfo.msgContent;
+            if (msgContent.content == 0) {
+                return NO;
+            }
             return YES;
         }
             break;
 
         case GJGCChatInviteToGroup: {
-            
+            JoinGroupMessage *msgContent = (JoinGroupMessage *)chatMessageInfo.msgContent;
+            if (msgContent.groupName.length == 0) {
+                return NO;
+            }
+            if (msgContent.groupId.length == 0) {
+                return NO;
+            }
+            if (msgContent.token.length == 0) {
+                return NO;
+            }
             return YES;
         }
             break;
         case GJGCChatApplyToJoinGroup: {
-            
+//            Reviewed *msgContent = (Reviewed *)chatMessageInfo.msgContent;
             return YES;
         }
 
@@ -131,15 +235,15 @@
             break;
         case GJGCChatWalletLink: {
         
-
             return YES;
         }
             break;
 
         default: //cant parse message
         {
-//            message.content = LMLocalizedString(@"Chat Message not parse upgrade version", nil);
-//            message.type = GJGCChatFriendContentTypeText;
+            chatMessageInfo.messageType = GJGCChatFriendContentTypeText;
+            chatMessageInfo.msgContent = [LMMessageTool makeTextWithMessageText:LMLocalizedString(@"Chat Message not parse upgrade version", nil)];
+            
             return YES;
         }
             break;
@@ -148,8 +252,8 @@
 }
 
 
-+ (BOOL)checkSystemMessage:(ChatMessageInfo *)chatMesssageInfo {
-    switch (chatMesssageInfo.messageType) {
++ (BOOL)checkSystemMessage:(ChatMessageInfo *)chatMessageInfo {
+    switch (chatMessageInfo.messageType) {
         case GJGCChatFriendContentTypeText: {
             
             return YES;
@@ -199,8 +303,8 @@
             break;
 
         default: {
-//            message.content = LMLocalizedString(@"Chat Message not parse upgrade version", nil);
-//            message.type = GJGCChatFriendContentTypeText;
+            chatMessageInfo.messageType = GJGCChatFriendContentTypeText;
+            chatMessageInfo.msgContent = [LMMessageTool makeTextWithMessageText:LMLocalizedString(@"Chat Message not parse upgrade version", nil)];
             return YES;
         }
             break;

@@ -7,10 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
 #import "Protofile.pbobjc.h"
-
-@class MMMessage;
 
 @interface ConnectTool : NSObject
 

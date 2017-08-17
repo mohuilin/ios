@@ -344,23 +344,12 @@ CREATE_SHARED_MANAGER(LMCommandManager)
             if (!error) {
                 operation = [NSString stringWithFormat:@"%@/%@", redNotice.sender, redNotice.receiver];
                 hashId = redNotice.hashId;
-
-                chatMessage = [[ChatMessageInfo alloc] init];
-                chatMessage.messageId = [ConnectTool generateMessageId];
                 if (redNotice.category == 1) {
                     identifier = redNotice.identifer;
                 } else {
                     identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:redNotice.receiver];
                 }
-                chatMessage.messageOwer = identifier;//transaction.idetifier;
-                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-                
-                NotifyMessage *notify = [NotifyMessage new];
-                notify.content = @"";
-                chatMessage.msgContent = notify;
-                
+                chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:identifier content:operation noteType:NotifyMessageTypeLuckyPackageSender_Reciver ext:redNotice.hashId];
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
             }
         }
@@ -373,23 +362,12 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 operation = [NSString stringWithFormat:@"%@/%@", bill.receiver, bill.sender];
                 hashId = bill.hashId;
 
-                chatMessage = [[ChatMessageInfo alloc] init];
-                chatMessage.messageId = [ConnectTool generateMessageId];
                 identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:bill.sender]; //sender  payer
                 if (GJCFStringIsNull(identifier)) {
                     DDLogError(@"case 3 5 : //bill payed note? server error bill.sender:%@", bill.sender);
                     return;
                 }
-                chatMessage.messageOwer = identifier;
-                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
-                
-                NotifyMessage *notify = [NotifyMessage new];
-                notify.content = @"";
-                chatMessage.msgContent = notify;
-                chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-
+                chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:identifier content:operation noteType:NotifyMessageTypePaymentReciver_Payer ext:bill.hashId];
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
                 //updata trancation status
                 [[LMMessageExtendManager sharedManager] updateMessageExtendStatus:bill.status withHashId:hashId];
@@ -413,35 +391,14 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 operation = [NSString stringWithFormat:@"%@/%@", bill.sender, bill.receiver];
                 hashId = bill.hashId;
                 identifier = bill.groupId;
-
-                chatMessage = [[ChatMessageInfo alloc] init];
-                chatMessage.messageId = [ConnectTool generateMessageId];
-                chatMessage.messageOwer = bill.groupId;
-                chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                chatMessage.createTime = (NSInteger) ([[NSDate date] timeIntervalSince1970] * 1000);
-                
-                NotifyMessage *notify = [NotifyMessage new];
-                notify.content = @"";
-                chatMessage.msgContent = notify;
+                chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:identifier content:operation noteType:NotifyMessageTypePaymentReciver_Payer ext:bill.hashId];
                 
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
-
                 [[LMMessageExtendManager sharedManager] updateMessageExtendPayCount:(int) (bill.crowdfunding.size - bill.crowdfunding.remainSize) status:(int) bill.crowdfunding.status withHashId:bill.crowdfunding.hashId];
 
                 if (bill.crowdfunding.remainSize == 0) { //crowding complete
                     crowdfunding = bill.crowdfunding;
-                    ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
-                    chatMessage.messageId = [ConnectTool generateMessageId];
-                    chatMessage.messageOwer = bill.groupId;
-                    chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-                    chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-                    chatMessage.createTime = (long long) ([[NSDate date] timeIntervalSince1970] * 1000);
-
-                    NotifyMessage *notify = [NotifyMessage new];
-                    notify.content = LMLocalizedString(@"Chat Founded complete", nil);;
-                    chatMessage.msgContent = notify;
-
+                    ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:identifier content:LMLocalizedString(@"Chat Founded complete", nil) noteType:NotifyMessageTypeNormal ext:hashId];
                     [[MessageDBManager sharedManager] saveMessage:chatMessage];
                 }
             }
@@ -451,7 +408,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
             break;
     }
     if (hashId) {
-
         NSMutableDictionary *noteDict = [NSMutableDictionary dictionary];
         [noteDict setObject:hashId forKey:@"hashId"];
         [noteDict setObject:chatMessage forKey:@"chatMessage"];
@@ -462,7 +418,6 @@ CREATE_SHARED_MANAGER(LMCommandManager)
         [noteDict setObject:identifier forKey:@"identifier"];
         SendNotify(TransactionStatusChangeNotification, (noteDict));
     }
-
     //send ack
     [[IMService instance] sendOnlineBackAck:notice.msgId type:msg.typechar];
 }

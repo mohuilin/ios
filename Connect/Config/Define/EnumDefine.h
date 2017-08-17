@@ -112,4 +112,13 @@ typedef NS_ENUM(NSUInteger,CategoryType) {
     CategoryTypeNewUser = 2,
     CategoryTypeImport  = 3
 };
+
+
+typedef NS_ENUM(NSUInteger,NotifyMessageType) {
+    NotifyMessageTypeNormal = 0,
+    NotifyMessageTypeGrabRULLuckyPackage,
+    NotifyMessageTypeLuckyPackageSender_Reciver,
+    NotifyMessageTypePaymentReciver_Payer,
+};
+
 #endif /* EnumDefine_h */

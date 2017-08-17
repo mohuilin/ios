@@ -983,13 +983,10 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                                 if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
                                     operation = [NSString stringWithFormat:@"%@/%@", sendAddress, [[LKUserCenter shareCenter] currentLoginUser].address];
                                 }
-                                
-                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:operation noteType:2 ext:nil];
-
+                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:operation noteType:NotifyMessageTypeLuckyPackageSender_Reciver ext:hashId];
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
                                 [self.dataSourceManager showGetRedBagMessageWithWithMessage:chatMessage];
                             }
-                            
                             LMRedLuckyShowView *redLuckyView = [[LMRedLuckyShowView alloc] initWithFrame:[UIScreen mainScreen].bounds redLuckyGifImages:nil];
                             redLuckyView.hashId = hashId;
                             [redLuckyView setDelegate:self];
@@ -1209,13 +1206,11 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                                 int payCount = (int) (payedCrowding.size - payedCrowding.remainSize);
                                 chatContentModel.payOrReceiptStatusMessage = [GJGCChatSystemNotiCellStyle formateRecieptSubTipsWithTotal:(int) payedCrowding.size payCount:payCount isCrowding:YES transStatus:(int) payedCrowding.status];
                                 [self.chatListTable reloadData];
-                                
-                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:[GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:crowdInfo.sender.username isCrowding:YES].string noteType:3 ext:nil];
-
+                                NSString *tips = [GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:chatContentModel.senderName isCrowding:NO].string;
+                                ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:tips noteType:NotifyMessageTypeNormal ext:chatContentModel.hashID];
                                 [GCDQueue executeInGlobalQueue:^{
                                     [[MessageDBManager sharedManager] saveMessage:chatMessage];
                                 }];
-
                                 [weakSelf.dataSourceManager showReceiptMessageMessageWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:crowdInfo.sender.username isCrowd:YES];
                                 if (crowdInfo.remainSize == 0) {
                                     ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:LMLocalizedString(@"Chat Founded complete", nil) noteType:3 ext:nil];
@@ -1264,8 +1259,8 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                             chatContentModel.payOrReceiptStatusMessage = [GJGCChatSystemNotiCellStyle formateRecieptSubTipsWithTotal:1 payCount:1 isCrowding:NO transStatus:1];
                             [self.chatListTable reloadData];
                             
-                            ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:[GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:chatContentModel.senderName isCrowding:NO].string noteType:3 ext:nil];
-                            
+                            NSString *tips = [GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:[[LKUserCenter shareCenter] currentLoginUser].username receiptName:chatContentModel.senderName isCrowding:NO].string;
+                            ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:self.taklInfo.chatIdendifier content:tips noteType:NotifyMessageTypeNormal ext:chatContentModel.hashID];
                             [GCDQueue executeInGlobalQueue:^{
                                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
                             }];
@@ -2263,7 +2258,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                                                     } else if (buttonIndex == controller.destructiveButtonIndex) {
                                                     } else if (buttonIndex >= controller.firstOtherButtonIndex) {
                                                         [picker dismissViewControllerAnimated:YES completion:^{
-                                                            [weakSelf sendVideo:videoURL compressedFile:temVideoPath videoSize:videoSize];
+                                                            [weakSelf sendVideo:videoURL compressedFile:temVideoPath videoSize:videoSize fileSize:fileSize];
                                                         }];
                                                     }
                                                 }];
@@ -2313,11 +2308,11 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
 #pragma mark - send video
 
-- (void)sendVideo:(NSURL *)originUrl compressedFile:(NSString *)filePath videoSize:(NSString *)videoSize {
-
+- (void)sendVideo:(NSURL *)originUrl compressedFile:(NSString *)filePath videoSize:(NSString *)videoSize fileSize:(int)fileSize {
     NSDictionary *dataDict = @{@"originUrl": originUrl,
             @"filePath": filePath,
-            @"videoSize": videoSize};
+            @"videoSize": videoSize,
+                               @"fileSize":@(fileSize)};
     GJGCChatFriendContentModel *chatContentModel = [LMMessageTool packContentModelWithTalkModel:self.taklInfo contentType:GJGCChatFriendContentTypeVideo extData:dataDict];
     [self.dataSourceManager sendMesssage:chatContentModel];
 }

@@ -79,13 +79,6 @@
 + (TextMessage *)makeTextWithMessageText:(NSString *)msgText {
     TextMessage *text = [TextMessage new];
     text.content = msgText;
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        text.sender = sender;
-    }
     return text;
 }
 
@@ -98,13 +91,6 @@
 + (EmotionMessage *)makeEmotionWithGifID:(NSString *)gifId {
     EmotionMessage *emotion = [EmotionMessage new];
     emotion.content = gifId;
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        emotion.sender = sender;
-    }
     return emotion;
 }
 
@@ -122,14 +108,6 @@
     payment.amount = amount;
     payment.tips = tips;
     payment.memberSize = memberSize;
-    
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        payment.sender = sender;
-    }
     return payment;
 }
 
@@ -145,14 +123,6 @@
     transfer.transferType = transferType;
     transfer.tips = tips;
     transfer.hashId = hashId;
-    
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        transfer.sender = sender;
-    }
     return transfer;
 }
 
@@ -168,13 +138,7 @@
     luck.tips = tips;
     luck.amount = amount;
     luck.luckyType = luckType;
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        luck.sender = sender;
-    }
+
     return luck;
 }
 
@@ -190,13 +154,6 @@
     card.uid = uid;
     card.avatar = avatar;
     card.username = username;
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        card.sender = sender;
-    }
     return card;
 }
 
@@ -229,13 +186,6 @@
         default:
             break;
     }
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        website.sender = sender;
-    }
     return website;
 }
 
@@ -250,14 +200,6 @@
     location.latitude = latitude;
     location.longitude = longitude;
     location.address = address;
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        location.sender = sender;
-    }
-    
     return location;
 }
 
@@ -269,15 +211,8 @@
 
 + (VoiceMessage *)makeVoiceWithSize:(int)size url:(NSString *)url{
     VoiceMessage *voice = [VoiceMessage new];
-    voice.size = size;
+    voice.timeLength = size;
     voice.URL = url;
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        voice.sender = sender;
-    }
     return voice;
 }
 
@@ -287,27 +222,21 @@
     return chatMessage;
 }
 
-+ (VideoMessage *)makeVideoWithSize:(int)size timeStr:(NSString *)timeStr videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover {
++ (VideoMessage *)makeVideoWithSize:(int)size time:(int)time videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover {
     VideoMessage *video = [VideoMessage new];
     video.size = size;
     video.imageWidth = videoCoverW;
     video.imageHeight = videoCoverH;
-    video.timeLength = timeStr;
+    video.timeLength = time;
     video.URL = videoUrl;
     video.cover = videoCover;
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        video.sender = sender;
-    }
+
     return video;
 }
 
-+ (ChatMessageInfo *)makeVideoChatMessageWithSize:(int)size timeStr:(NSString *)timeStr videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
++ (ChatMessageInfo *)makeVideoChatMessageWithSize:(int)size time:(int)time videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
     ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeVideo sender:sender chatType:chatType];
-    chatMessage.msgContent = [self makeVideoWithSize:size timeStr:timeStr videoCoverW:videoCoverW videoCoverH:videoCoverH videoUrl:videoUrl videoCover:videoCover];
+    chatMessage.msgContent = [self makeVideoWithSize:size time:time videoCoverW:videoCoverW videoCoverH:videoCoverH videoUrl:videoUrl videoCover:videoCover];
     return chatMessage;
 }
 
@@ -317,14 +246,6 @@
     photo.imageHeight = imageH;
     photo.thum = thumImage;
     photo.URL = oriImage;
-    
-    if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypeGroup) {
-        MessageUserInfo *sender = [MessageUserInfo new];
-        sender.username = [[LKUserCenter shareCenter] currentLoginUser].username;
-        sender.avatar = [[LKUserCenter shareCenter] currentLoginUser].avatar;
-        sender.uid = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-        photo.sender = sender;
-    }
     return photo;
 }
 
@@ -359,20 +280,27 @@
     return destruct;
 }
 
-+ (NotifyMessage *)makeNotifyMessageWithTips:(NSString *)tips {
-    NotifyMessage *norify = [NotifyMessage new];
-    norify.content = tips;
-    return norify;
++ (NotifyMessage *)makeNotifyMessageWithTips:(NSString *)tips ext:(NSString *)ext notifyType:(NotifyMessageType)notifyType{
+    NotifyMessage *notify = [self makeNotifyNormalMessageWithTips:tips];
+    notify.extion = ext;
+    notify.notifyType = notifyType;
+    return notify;
 }
 
-+ (ChatMessageInfo *)makeNotifyMessageWithMessageOwer:(NSString *)messageOwer content:(NSString *)content noteType:(int)noteType ext:(id)ext {
++ (NotifyMessage *)makeNotifyNormalMessageWithTips:(NSString *)tips {
+    NotifyMessage *notify = [NotifyMessage new];
+    notify.content = tips;
+    return notify;
+}
+
++ (ChatMessageInfo *)makeNotifyMessageWithMessageOwer:(NSString *)messageOwer content:(NSString *)content noteType:(NotifyMessageType)noteType ext:(id)ext {
     ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
     chatMessage.messageId = [ConnectTool generateMessageId];
     chatMessage.messageOwer = messageOwer;
     chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
     chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-    chatMessage.msgContent = [self makeNotifyMessageWithTips:content];
+    chatMessage.msgContent = [self makeNotifyMessageWithTips:content ext:ext notifyType:noteType];
     return chatMessage;
 }
 
@@ -422,7 +350,7 @@
             
         case GJGCChatFriendContentTypeVideo:
         {
-            VideoMessage *video = [self makeVideoWithSize:(int)messageContent.videoDuration timeStr:messageContent.videoSize videoCoverW:messageContent.originImageWidth videoCoverH:messageContent.originImageHeight videoUrl:nil videoCover:nil];
+            VideoMessage *video = [self makeVideoWithSize:(int)messageContent.videoDuration time:messageContent.size videoCoverW:messageContent.originImageWidth videoCoverH:messageContent.originImageHeight videoUrl:nil videoCover:nil];
             video.snapTime = snapTime;
             msg = video;
         }
@@ -533,7 +461,6 @@
                 chatContentModel.uploadSuccess = YES;
                 chatContentModel.uploadProgress = 1.f;
             }
-            
             NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainAudioCacheDirectory];
             cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
                               stringByAppendingPathComponent:group?group.groupIdentifer:user.address];
@@ -553,7 +480,7 @@
             chatContentModel.audioModel.localAMRStorePath = amrFilePath;
             chatContentModel.audioModel.downloadEncodeCachePath = downloadEncodeCachePath;
             chatContentModel.audioModel.tempWamFilePath = temWavPath;
-            chatContentModel.audioModel.duration = voice.size;
+            chatContentModel.audioModel.duration = voice.timeLength;
             chatContentModel.audioDuration = [GJGCChatFriendCellStyle formateAudioDuration:GJCFStringFromInt(chatContentModel.audioModel.duration)];
             
             if (GJCFFileIsExist(chatContentModel.audioModel.localAMRStorePath)) {
@@ -606,24 +533,23 @@
         }
             break;
         case GJGCChatApplyToJoinGroup:{
-            
-            NSDictionary *temD = nil;
-            
+            ReviewedStatus *reviewedStatus = (ReviewedStatus *)chatMessage.msgContent;
+            Reviewed *reviewed = reviewedStatus.review;
             chatContentModel.contentType = GJGCChatApplyToJoinGroup;
             type = chatContentModel.contentType;
-            chatContentModel.contactName = [GJGCChatSystemNotiCellStyle formatetGroupInviteGroupName:[temD valueForKey:@"groupname"] reciverName:[temD valueForKey:@"username"] isSystemMessage:YES isSendFromMySelf:chatContentModel.isFromSelf];
-            chatContentModel.groupIdentifier = [temD valueForKey:@"groupidentifier"];
-            chatContentModel.contactAvatar = [temD valueForKey:@"avatar"];
+            chatContentModel.contactName = [GJGCChatSystemNotiCellStyle formatetGroupInviteGroupName:reviewed.name reciverName:reviewed.userInfo.username isSystemMessage:YES isSendFromMySelf:chatContentModel.isFromSelf];
+            chatContentModel.groupIdentifier = reviewed.identifier;
+            chatContentModel.contactAvatar = reviewed.userInfo.avatar;
             chatContentModel.contactSubTipMessage = [GJGCChatSystemNotiCellStyle formateCellLeftSubTipsWithType:GJGCChatApplyToJoinGroup withNote:nil isCrowding:NO];
             LMOtherModel *model = [[LMOtherModel alloc] init];
-            BOOL isNoted = [[temD valueForKey:@"newaccept"] boolValue];
-            NSString *groupId = [temD valueForKey:@"identifier"];
-            NSString *applyUserPubkey = [temD valueForKey:@"pubKey"];
+            BOOL isNoted = reviewedStatus.newaccept;
+            NSString *groupId = chatContentModel.groupIdentifier;
+            NSString *applyUserPubkey = reviewed.userInfo.pubKey;
             BOOL userIsInGroup = [[GroupDBManager sharedManager] userWithAddress:[LMIMHelper getAddressByPubkey:applyUserPubkey] isinGroup:groupId];
             if (userIsInGroup) {
                 chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateCellStatusWithHandle:YES refused:NO isNoted:isNoted];
             } else{
-                BOOL refused = [[temD valueForKey:@"refused"] boolValue];
+                BOOL refused = reviewedStatus.refused;
                 if (refused) {
                     chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateCellStatusWithHandle:YES refused:refused isNoted:isNoted];
                     model.handled = YES;
@@ -633,11 +559,11 @@
                 }
             }
             model.userIsinGroup = userIsInGroup;
-            model.userName = [temD valueForKey:@"username"];
-            model.headImageViewUrl = [temD valueForKey:@"avatar"];
-            model.contentName = [temD valueForKey:@"tips"];
-            model.sourceType = [[temD valueForKey:@"source"] intValue];
-            model.verificationCode = [temD valueForKey:@"verificationCode"];
+            model.userName = reviewed.userInfo.username;
+            model.headImageViewUrl = reviewed.userInfo.avatar;
+            model.contentName = reviewed.tips;
+            model.sourceType = reviewed.source;
+            model.verificationCode = reviewed.verificationCode;
             model.publickey = applyUserPubkey;
             model.groupIdentifier = groupId;
             chatContentModel.contentModel = model;
@@ -820,7 +746,18 @@
             type = chatContentModel.contentType;
             VideoMessage *video = (VideoMessage *)chatMessage.msgContent;
             chatContentModel.videoDuration = video.size;
-            chatContentModel.videoSize = video.timeLength;
+            
+            int fileSize = video.size;
+            float nM = fileSize / 1024 / 1024.f;
+            int nK = (fileSize % (1024 * 1024)) / 1024;
+            NSString *videoSize = [NSString stringWithFormat:@"%dkb", nK];
+            NSString *message = [NSString stringWithFormat:LMLocalizedString(@"Chat Video compress size Are yousend", nil), videoSize];
+            if (nM >= 1) {
+                videoSize = [NSString stringWithFormat:@"%.1fM", nM];
+                message = [NSString stringWithFormat:LMLocalizedString(@"Chat Video compress size Are yousend", nil), videoSize];
+            }
+            
+            chatContentModel.videoSize = videoSize;
             chatContentModel.encodeFileUrl = video.cover;
             chatContentModel.videoEncodeUrl = video.URL;
             
@@ -862,17 +799,140 @@
             break;
         case GJGCChatFriendContentTypeGif:{
             chatContentModel.contentType = GJGCChatFriendContentTypeGif;
+            EmotionMessage *emotion = (EmotionMessage *)chatMessage.msgContent;
+            chatContentModel.gifLocalId = emotion.content;
             type = chatContentModel.contentType;
         }
             break;
         case GJGCChatFriendContentTypeStatusTip:{
             chatContentModel.contentType = GJGCChatFriendContentTypeStatusTip;
             type = chatContentModel.contentType;
+            NotifyMessage *notify = (NotifyMessage *)chatMessage.msgContent;
+            switch (notify.notifyType) {
+                case NotifyMessageTypeNormal:
+                {
+                    chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateTipStringWithTipMessage:notify.content];
+                }
+                    break;
+                case NotifyMessageTypeGrabRULLuckyPackage:
+                {
+                    chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateTipStringWithTipMessage:notify.content];
+                    chatContentModel.statusIcon = @"luckybag";
+                    chatContentModel.hashID = notify.extion;
+                }
+                    break;
+                case NotifyMessageTypeLuckyPackageSender_Reciver:
+                {
+                    NSArray *sender_reciverArray = [notify.content componentsSeparatedByString:@"/"];
+                    if (sender_reciverArray.count == 2) {
+                        NSString *senderAddress = [sender_reciverArray firstObject];
+                        NSString *reciverAddress = [sender_reciverArray lastObject];
+                        NSString *garbName = nil;
+                        NSString *senderName = nil;
+                        switch ([SessionManager sharedManager].talkType) {
+                            case GJGCChatFriendTalkTypePrivate: {
+                                //reciver is self
+                                if ([reciverAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+                                    garbName = LMLocalizedString(@"Chat You", nil);
+                                    senderName = user.normalShowName;
+                                }
+                                //sender is self
+                                if ([senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+                                    senderName = LMLocalizedString(@"Chat You", nil);
+                                    garbName = user.normalShowName;
+                                }
+                            }
+                                break;
+                            case GJGCChatFriendTalkTypeGroup: {
+                                for (LMRamMemberInfo *groupMember in group.membersArray) {
+                                    //sender is self
+                                    if ([senderAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+                                        senderName = LMLocalizedString(@"Chat You", nil);
+                                    } else {
+                                        if ([groupMember.address isEqualToString:senderAddress]) {
+                                            senderName = groupMember.username;
+                                        }
+                                    }
+                                    //reciver is self
+                                    if ([reciverAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+                                        garbName = LMLocalizedString(@"Chat You", nil);
+                                    } else {
+                                        if ([groupMember.address isEqualToString:reciverAddress]) {
+                                            garbName = groupMember.username;
+                                        }
+                                    }
+                                }
+                            }
+                                break;
+                            case GJGCChatFriendTalkTypePostSystem: {
+                                garbName = LMLocalizedString(@"Chat You", nil);
+                                senderName = LMLocalizedString(@"Connect term", nil);
+                            }
+                                break;
+                            default:
+                                break;
+                        }
+                        chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateRedbagTipWithSenderName:senderName garbName:garbName];
+                        chatContentModel.statusIcon = @"luckybag";
+                    }
+                }
+                    break;
+                    
+                case NotifyMessageTypePaymentReciver_Payer:
+                {
+                    NSArray *reciverPayerArray = [notify.content componentsSeparatedByString:@"/"];
+                    if (reciverPayerArray.count == 2) { //reference socket tpe:5 extension :9
+                        NSString *payName = nil;
+                        NSString *reciverName = nil;
+                        NSString *payAddress = [reciverPayerArray lastObject];
+                        NSString *reciverAddress = [reciverPayerArray firstObject];
+                        switch ([SessionManager sharedManager].talkType) {
+                            case GJGCChatFriendTalkTypePrivate: {
+                                if ([payAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+                                    payName = LMLocalizedString(@"Chat You", nil);
+                                    reciverName = user.normalShowName;
+                                }
+                                if ([reciverAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+                                    reciverName = LMLocalizedString(@"Chat You", nil);
+                                    payName = user.normalShowName;
+                                }
+                                chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:payName receiptName:reciverName isCrowding:NO];
+                            }
+                                break;
+                            case GJGCChatFriendTalkTypeGroup: {
+                                for (LMRamMemberInfo *groupMember in group.membersArray) {
+                                    if ([payAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+                                        payName = LMLocalizedString(@"Chat You", nil);
+                                    } else {
+                                        if ([groupMember.address isEqualToString:payAddress]) {
+                                            payName = groupMember.username;
+                                        }
+                                    }
+                                    if ([reciverAddress isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
+                                        reciverName = LMLocalizedString(@"Chat You", nil);
+                                    } else {
+                                        if ([groupMember.address isEqualToString:reciverAddress]) {
+                                            reciverName = groupMember.username;
+                                        }
+                                    }
+                                }
+                                chatContentModel.statusMessageString = [GJGCChatSystemNotiCellStyle formateReceiptTipWithPayName:payName receiptName:reciverName isCrowding:YES];
+                            }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                    break;
+                default:
+                    break;
+            }
         }
             break;
         case GJGCChatInviteNewMemberTip:{
             chatContentModel.contentType = GJGCChatFriendContentTypeStatusTip;
-            
+            type = chatContentModel.contentType;
         }
             break;
         case GJGCChatFriendContentTypeNoRelationShipTip:{
@@ -929,6 +989,7 @@
             chatContentModel.videoOriginCoverImageCachePath = videoFileCoverImageLocalPath;
             chatContentModel.videoDuration = [self durationWithVideo:url];
             chatContentModel.videoSize = videoSize;
+            chatContentModel.size = [[videoDict valueForKey:@"fileSize"] intValue];
             
         }
             break;
@@ -1123,14 +1184,25 @@
 
 + (BOOL)checkRichtextUploadStatuts:(ChatMessageInfo *)chatMessageInfo {
     switch (chatMessageInfo.messageType) {
-        case GJGCChatFriendContentTypeAudio:
-        case GJGCChatFriendContentTypeImage:
-        case GJGCChatFriendContentTypeMapLocation:
-            return YES;
+        case GJGCChatFriendContentTypeAudio: {
+            VoiceMessage *voice = (VoiceMessage *)chatMessageInfo.msgContent;
+            return voice.URL.length;
+        }
             break;
-            
-        case GJGCChatFriendContentTypeVideo:
-            return YES;
+        case GJGCChatFriendContentTypeImage: {
+            PhotoMessage *photo = (PhotoMessage *)chatMessageInfo.msgContent;
+            return photo.URL.length && photo.thum.length;
+        }
+            break;
+        case GJGCChatFriendContentTypeMapLocation:{
+            LocationMessage *location = (LocationMessage *)chatMessageInfo.msgContent;
+            return location.screenShot;
+        }
+            break;
+        case GJGCChatFriendContentTypeVideo:{
+            VideoMessage *video = (VideoMessage *)chatMessageInfo.msgContent;
+            return video.URL.length && video.cover.length;
+        }
             break;
         default:
             return YES;

@@ -72,8 +72,8 @@
 + (VoiceMessage *)makeVoiceWithSize:(int)size url:(NSString *)url;
 
 
-+ (ChatMessageInfo *)makeVideoChatMessageWithSize:(int)size timeStr:(NSString *)timeStr videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType;
-+ (VideoMessage *)makeVideoWithSize:(int)size timeStr:(NSString *)timeStr videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover;
++ (ChatMessageInfo *)makeVideoChatMessageWithSize:(int)size time:(int)time videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType;
++ (VideoMessage *)makeVideoWithSize:(int)size time:(int)time videoCoverW:(CGFloat)videoCoverW videoCoverH:(CGFloat)videoCoverH videoUrl:(NSString *)videoUrl videoCover:(NSString *)videoCover;
 
 
 + (ChatMessageInfo *)makePhotoChatMessageWithImageW:(CGFloat )ImageW imageH:(CGFloat)imageH oriImage:(NSString *)oriImage thumImage:(NSString *)thumImage msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType;
@@ -84,8 +84,9 @@
 + (ChatMessageInfo *)makeDestructChatMessageWithTime:(int)time msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType;
 + (DestructMessage *)makeDestructWithTime:(int)time;
 
-+ (ChatMessageInfo *)makeNotifyMessageWithMessageOwer:(NSString *)messageOwer content:(NSString *)content noteType:(int)noteType ext:(id)ext;
-+ (NotifyMessage *)makeNotifyMessageWithTips:(NSString *)tips;
++ (ChatMessageInfo *)makeNotifyMessageWithMessageOwer:(NSString *)messageOwer content:(NSString *)content noteType:(NotifyMessageType)noteType ext:(id)ext;
++ (NotifyMessage *)makeNotifyNormalMessageWithTips:(NSString *)tips;
++ (NotifyMessage *)makeNotifyMessageWithTips:(NSString *)tips ext:(NSString *)ext notifyType:(NotifyMessageType)notifyType;
 
 + (ChatMessageInfo *)makeJoinGroupChatMessageWithAvatar:(NSString *)avatar groupId:(NSString *)groupId groupName:(NSString *)groupName token:(NSString *)token msgOwer:(NSString *)msgOwer sender:(NSString *)sender;
 + (JoinGroupMessage *)makeJoinGroupWithAvatar:(NSString *)avatar groupId:(NSString *)groupId groupName:(NSString *)groupName token:(NSString *)token;

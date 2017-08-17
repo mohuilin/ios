@@ -41,17 +41,17 @@
     switch (securityLevel) {
         case LMChatEcdhKeySecurityLevelTypeHalfRandom: {
             NSData *data = [ConnectTool decodeHalfRandomPeerImMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.msgData.chatSession.pubKey salt:msgPost.msgData.chatSession.salt];
-            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[GPBMessage parseFromData:data error:nil]];
+            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[self parseDataWithData:data msgType:msgPost.msgData.chatMsg.msgType]];
         }
             break;
         case LMChatEcdhKeySecurityLevelTypeNomarl: {
             NSData *data = [ConnectTool decodeMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.pubKey needEmptySalt:YES];
-            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[GPBMessage parseFromData:data error:nil]];
+            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[self parseDataWithData:data msgType:msgPost.msgData.chatMsg.msgType]];
         }
             break;
         case LMChatEcdhKeySecurityLevelTypeRandom: {
             NSData *data = [ConnectTool decodePeerImMessageGcmData:msgPost.msgData.chatMsg.cipherData publickey:msgPost.msgData.chatSession.pubKey salt:msgPost.msgData.chatSession.salt ver:msgPost.msgData.chatSession.ver];
-            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[GPBMessage parseFromData:data error:nil]];
+            chatMessageInfo = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[self parseDataWithData:data msgType:msgPost.msgData.chatMsg.msgType]];
             if (!data) {
                 chatMessageInfo = [self createDecodeFailedTipMessageWithMassagePost:msgPost];
             }
@@ -68,13 +68,13 @@
     return chatMessage;
 }
 
-
 + (ChatMessageInfo *)packSystemMessage:(MSMessage *)sysMsg {
     ChatMessageInfo *chatMessage = [[ChatMessageInfo alloc] init];
     chatMessage.messageType = sysMsg.category;
     chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     chatMessage.messageId = sysMsg.msgId;
     chatMessage.messageOwer = kSystemIdendifier;
+    chatMessage.chatType = ChatType_ConnectSystem;
     chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     switch (sysMsg.category) {
         case GJGCChatFriendContentTypeText: {
@@ -89,7 +89,6 @@
             break;
         case GJGCChatFriendContentTypeImage: {
             PhotoMessage *imageMsg = [PhotoMessage parseFromData:sysMsg.body error:nil];
-            
             if (imageMsg.imageWidth == 0) {
                 imageMsg.imageWidth = AUTO_WIDTH(200);
             }
@@ -100,6 +99,7 @@
         }
             break;
         case GJGCChatFriendContentTypeVideo: {
+            
         }
             break;
         case GJGCChatFriendContentTypeMapLocation: {
@@ -112,7 +112,7 @@
             break;
         case GJGCChatFriendContentTypeTransfer: {
             SystemTransferPackage *transfer = [SystemTransferPackage parseFromData:sysMsg.body error:nil];
-
+            chatMessage.msgContent = transfer;
         }
             break;
         case GJGCChatFriendContentTypeRedEnvelope: //luckypackage
@@ -124,25 +124,25 @@
                 chatMessage.messageType = GJGCChatFriendContentTypeNotFound;
             } else {
                 SystemRedPackage *redPackMsg = [SystemRedPackage parseFromData:sysMsg.body error:nil];
-                
-                
+                chatMessage.msgContent = redPackMsg;
             }
         }
             break;
         case 101: //group reviewed
         {
             Reviewed *reviewed = [Reviewed parseFromData:sysMsg.body error:nil];
+            ReviewedStatus *reviewedStatus = [ReviewedStatus new];
+            reviewedStatus.review = reviewed;
+            reviewedStatus.newaccept = YES;
+            reviewedStatus.refused = NO;
             chatMessage.messageType = GJGCChatApplyToJoinGroup;
-
-
+            chatMessage.msgContent = reviewedStatus;
             if (!GJCFStringIsNull(reviewed.verificationCode)) {
                 LMBaseSSDBManager *ssdbManager = [LMBaseSSDBManager open:@"system_message"];
-
                 NSData *applyMessageData = nil;
                 [ssdbManager get:reviewed.verificationCode data:&applyMessageData];
                 if (applyMessageData) {
                     GroupApplyMessage *applyMessage = [GroupApplyMessage parseFromData:applyMessageData error:nil];
-
                     BOOL isExist = [[MessageDBManager sharedManager] isMessageIsExistWithMessageId:applyMessage.messageId messageOwer:kSystemIdendifier];
                     if (isExist) {
                         [GCDQueue executeInMainQueue:^{
@@ -179,16 +179,16 @@
         case 102: //announcement
         {
             Announcement *announcement = [Announcement parseFromData:sysMsg.body error:nil];
-            if (GJCFStringIsNull(announcement.title) || GJCFStringIsNull(announcement.desc)) {
-                return nil;
-            }
             chatMessage.msgContent = announcement;
         }
             break;
         case 103://luckypackage garb tips
         {
-            SystemRedpackgeNotice *repackNotict = [SystemRedpackgeNotice parseFromData:sysMsg.body error:nil];
             chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
+            SystemRedpackgeNotice *repackNotict = [SystemRedpackgeNotice parseFromData:sysMsg.body error:nil];
+            NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Chat opened Lucky Packet of", nil),repackNotict.receiver.username,LMLocalizedString(@"Chat You", nil)];
+            NotifyMessage *notify = [LMMessageTool makeNotifyMessageWithTips:tips ext:repackNotict.hashid notifyType:NotifyMessageTypeGrabRULLuckyPackage];
+            chatMessage.msgContent = notify;
         }
             break;
 
@@ -199,18 +199,21 @@
             if (repackNotict.success) {
                 contentMessage = [NSString stringWithFormat:LMLocalizedString(@"Link You apply to join has passed", nil), repackNotict.name];
             }
+            NotifyMessage *notify = [LMMessageTool makeNotifyNormalMessageWithTips:contentMessage];
             LMBaseSSDBManager *ssdbManager = [LMBaseSSDBManager open:@"system_message"];
             [ssdbManager set:repackNotict.identifier data:repackNotict.data];
             [ssdbManager close];
             chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
+            chatMessage.msgContent = notify;
         }
             break;
         case 105://phone number change
         {
             UpdateMobileBind *nameBind = [UpdateMobileBind parseFromData:sysMsg.body error:nil];
             chatMessage.messageType = GJGCChatFriendContentTypeText;
-//            message.content = [NSString stringWithFormat:LMLocalizedString(@"Chat Your Connect ID will no longer be linked with mobile number", nil), nameBind.username];
-
+            TextMessage *text = [LMMessageTool makeTextWithMessageText:[NSString stringWithFormat:LMLocalizedString(@"Chat Your Connect ID will no longer be linked with mobile number", nil), nameBind.username]];
+            chatMessage.msgContent = text;
+            
             [[LKUserCenter shareCenter] currentLoginUser].bondingPhone = @"";
             [[LKUserCenter shareCenter] updateUserInfo:[[LKUserCenter shareCenter] currentLoginUser]];
         }
@@ -219,26 +222,22 @@
         {
             RemoveGroup *dismissGroup = [RemoveGroup parseFromData:sysMsg.body error:nil];
             NSString *tips = [NSString stringWithFormat:LMLocalizedString(@"Chat Group has been disbanded", nil), dismissGroup.name];
-//            message.ext1 = @{@"type": @"groupdismiss",
-//                    @"message": tips};
-
-
+            NotifyMessage *notify = [LMMessageTool makeNotifyNormalMessageWithTips:tips];
+            chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
+            chatMessage.msgContent = notify;
+            
             if ([[SessionManager sharedManager].chatSession isEqualToString:dismissGroup.groupId]) {
                 SendNotify(ConnnectGroupDismissNotification, dismissGroup.groupId)
             }
-            chatMessage.messageType = GJGCChatFriendContentTypeStatusTip;
-
             [[LMConversionManager sharedManager] deleteConversation:[[SessionManager sharedManager] getRecentChatWithIdentifier:dismissGroup.groupId]];
-
             [[GroupDBManager sharedManager] deletegroupWithGroupId:dismissGroup.groupId];
-            //clear group avatar
         }
             break;
         case 200: {//outer address transfer to self
             AddressNotify *addressNot = [AddressNotify parseFromData:sysMsg.body error:nil];
-//            message.ext1 = @{@"amount": @(addressNot.amount),
-//                    @"tips": @""};
+            TransferMessage *transfer = [LMMessageTool makeTransferWithHashId:addressNot.txId transferType:3 amount:addressNot.amount tips:nil];
             chatMessage.messageType = GJGCChatFriendContentTypeTransfer;
+            chatMessage.msgContent = transfer;
         }
             break;
         default:
@@ -548,5 +547,98 @@
     return messageData;
 }
 
++ (GPBMessage *)parseDataWithData:(NSData *)data msgType:(int)msgType {
+    GPBMessage *msgContent = nil;
+    switch (msgType) {
+        case GJGCChatFriendContentTypeText:
+        {
+            msgContent = [TextMessage parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatFriendContentTypeMapLocation: {
+            msgContent = [LocationMessage parseFromData:data error:nil];
+        }
+            break;
+            
+        case GJGCChatFriendContentTypeAudio:
+        {
+            msgContent = [VoiceMessage parseFromData:data error:nil];
+        }
+            break;
+            
+        case GJGCChatFriendContentTypeVideo:
+        {
+            msgContent = [VideoMessage parseFromData:data error:nil];
+        }
+            break;
+            
+        case GJGCChatFriendContentTypeImage:
+        {
+            msgContent = [PhotoMessage parseFromData:data error:nil];
+        }
+            break;
+            
+        case GJGCChatFriendContentTypeGif: {
+            msgContent = [EmotionMessage parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatFriendContentTypePayReceipt:
+        {
+            msgContent = [PaymentMessage parseFromData:data error:nil];
+        }
+            break;
+            
+        case GJGCChatFriendContentTypeTransfer:
+        {
+            msgContent = [TransferMessage parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatFriendContentTypeRedEnvelope: {
+            msgContent = [LuckPacketMessage parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatFriendContentTypeNameCard: {
+            msgContent = [CardMessage parseFromData:data error:nil];
+        }
+            break;
+            
+        case GJGCChatWalletLink: {
+            msgContent = [WebsiteMessage parseFromData:data error:nil];
+        }
+            break;
+        case 102:{
+            msgContent = [Announcement parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatApplyToJoinGroup:
+        {
+            msgContent = [ReviewedStatus parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatFriendContentTypeSnapChat:
+        {
+            msgContent = [DestructMessage parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatFriendContentTypeSnapChatReadedAck:
+        {
+            msgContent = [ReadReceiptMessage parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatFriendContentTypeStatusTip:
+        {
+            msgContent = [NotifyMessage parseFromData:data error:nil];
+        }
+            break;
+        case GJGCChatInviteToGroup:{
+            msgContent = [JoinGroupMessage parseFromData:data error:nil];
+        }
+            break;
+            
+        default:
+            break;
+    }
+    return msgContent;
+}
 
 @end

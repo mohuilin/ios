@@ -71,7 +71,7 @@
     chatContentModel.downloadTaskIdentifier = [[GJCFFileDownloadManager shareDownloadManager] getDownloadIdentifierWithMessageId:[NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, chatContentModel.localMsgId]];
     chatContentModel.isDownloading = chatContentModel.downloadTaskIdentifier != nil;
     if (chatMessage.messageType != GJGCChatFriendContentTypeStatusTip && chatMessage.messageType != GJGCChatInviteNewMemberTip) {
-        if (![chatMessage.from isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) { //发送者不是自己
+        if (![chatMessage.from isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) { //发送者不是自己
             chatContentModel.isFromSelf = NO;
             LMRamMemberInfo *member = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' and pubKey = '%@'",chatMessage.messageOwer,chatMessage.from]] lastObject];
             chatContentModel.headUrl = member.avatar;

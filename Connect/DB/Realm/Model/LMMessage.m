@@ -9,6 +9,7 @@
 #import "LMMessage.h"
 #import "NSDictionary+LMSafety.h"
 #import "StringTool.h"
+#import "LMMessageAdapter.h"
 
 @implementation LMMessage
 
@@ -73,66 +74,7 @@
     if (chatMessage.state == 0) {
         chatMessage.state = chatMessage.readTime > 0 ? 1 : 0;
     }
-    switch (chatMessage.messageType) {
-        case GJGCChatFriendContentTypeText:
-        {
-            chatMessage.msgContent = [TextMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-        case GJGCChatFriendContentTypeMapLocation: {
-            chatMessage.msgContent = [LocationMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-            
-        case GJGCChatFriendContentTypeAudio:
-        {
-            chatMessage.msgContent = [VoiceMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-            
-        case GJGCChatFriendContentTypeVideo:
-        {
-            chatMessage.msgContent = [VideoMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-            
-        case GJGCChatFriendContentTypeImage:
-        {
-            chatMessage.msgContent = [PhotoMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-            
-        case GJGCChatFriendContentTypeGif: {
-            chatMessage.msgContent = [EmotionMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-        case GJGCChatFriendContentTypePayReceipt:
-        {
-            chatMessage.msgContent = [PaymentMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-            
-        case GJGCChatFriendContentTypeTransfer:
-        {
-            chatMessage.msgContent = [TransferMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-        case GJGCChatFriendContentTypeRedEnvelope: {
-            chatMessage.msgContent = [LuckPacketMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-        case GJGCChatFriendContentTypeNameCard: {
-            chatMessage.msgContent = [CardMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-            
-        case GJGCChatWalletLink: {
-            chatMessage.msgContent = [WebsiteMessage parseFromData:[StringTool hexStringToData:self.messageContent] error:nil];
-        }
-            break;
-        default:
-            break;
-    }
+    chatMessage.msgContent = [LMMessageAdapter parseDataWithData:[StringTool hexStringToData:self.messageContent] msgType:self.msgType];
     return chatMessage;
 }
 
