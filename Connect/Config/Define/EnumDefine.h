@@ -121,4 +121,11 @@ typedef NS_ENUM(NSUInteger,NotifyMessageType) {
     NotifyMessageTypePaymentReciver_Payer,
 };
 
+
+typedef NS_ENUM(NSUInteger,TransferMessageType) {
+    TransferMessageTypeInnerSingle = 0,
+    TransferMessageTypeInnerGroup,
+    TransferMessageTypeOuterURL,
+};
+
 #endif /* EnumDefine_h */

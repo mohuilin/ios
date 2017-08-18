@@ -117,6 +117,7 @@
 
 - (void)asyncSendMessage:(MessageData *)msgData
            originContent:(GPBMessage *)originContent
+                chatType:(ChatType)chatType
               completion:(void (^)(ChatMessage *msgData,
                                    NSError *error))completion;
 

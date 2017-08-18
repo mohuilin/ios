@@ -162,12 +162,16 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
 
         MessageRejectErrorType rejectErrorType = (NSInteger) rejectMsg.status;
         switch (rejectErrorType) {
+            case MessageRejectErrorTypeNotExisted:{
+                
+            }
+                break;
             case MessageRejectErrorTypeMyChatCookieNotMatch: {
                 [[IMService instance] uploadCookieDuetoLocalChatCookieNotMatchServerChatCookieWithMessageCallModel:sendModel];
             }
                 break;
             case MessageRejectErrorTypeChatinfoExpire: {
-                NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
+                NSString *identifier = rejectMsg.uid;
                 [[SessionManager sharedManager] removeChatCookieWithChatSession:identifier];
                 [[SessionManager sharedManager] chatCookie:YES chatSession:identifier];
                 
@@ -176,7 +180,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 break;
             case MessageRejectErrorTypeChatinfoNotMatch: {
                 ChatCookie *chatCookie = [ChatCookie parseFromData:rejectMsg.data_p error:nil];
-                NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
+                NSString *identifier = rejectMsg.uid;
                 if ([ConnectTool vertifyWithData:chatCookie.data_p.data sign:chatCookie.sign publickey:identifier]) {
                     ChatCookieData *chatInfo = chatCookie.data_p;
                     [[SessionManager sharedManager] setChatCookie:chatInfo chatSession:identifier];
@@ -195,7 +199,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
             }
                 break;
             case MessageRejectErrorTypeNotInGroup: {
-                NSString *identifier = rejectMsg.receiverAddress;
+                NSString *identifier = rejectMsg.uid;
                 if (!GJCFStringIsNull(identifier)) {
                     //updata message sendstatus
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNotInGroup withMessageId:rejectMsg.msgId messageOwer:identifier];
@@ -213,7 +217,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
             }
                 break;
             case MessageRejectErrorTypeNotFriend: {
-                NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
+                NSString *identifier = rejectMsg.uid;
                 if (!GJCFStringIsNull(identifier)) {
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFailByNoRelationShip withMessageId:rejectMsg.msgId messageOwer:identifier];
 
@@ -231,7 +235,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
 
             case MessageRejectErrorTypeBlackList: {
 
-                NSString *identifier = [[UserDBManager sharedManager] getUserPubkeyByAddress:rejectMsg.receiverAddress];
+                NSString *identifier = rejectMsg.uid;
                 if (!GJCFStringIsNull(identifier)) {
                     [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusSuccessUnArrive withMessageId:rejectMsg.msgId messageOwer:identifier];
 

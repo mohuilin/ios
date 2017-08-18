@@ -114,15 +114,15 @@
     return [GJGCChatFriendConstans identifierForCellClass:className];
 }
 
-+ (NSString *)lastContentMessageWithType:(GJGCChatFriendContentType)type textMessage:(NSString *)textMessage senderUserName:(NSString *)senderUserName {
++ (NSString *)lastContentMessageWithType:(GJGCChatFriendContentType)type msgContent:(GPBMessage *)msgContent senderUserName:(NSString *)senderUserName {
     if ([senderUserName isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].normalShowName]) {
-        return [self lastContentMessageWithType:type textMessage:textMessage];
+        return [self lastContentMessageWithType:type msgContent:msgContent];
     }
     NSString *resultString = nil;
     switch (type) {
-
         case GJGCChatFriendContentTypeText: {
-            resultString = [NSString stringWithFormat:@"%@:%@", senderUserName, textMessage];
+            TextMessage *text = (TextMessage *)msgContent;
+            resultString = [NSString stringWithFormat:@"%@:%@", senderUserName, text.content];
         }
             break;
 
@@ -194,7 +194,8 @@
         }
             break;
         case 102: {
-            resultString = LMLocalizedString(@"Chat Announcement", nil);
+            Announcement *annoutcement = (Announcement *)msgContent;
+            resultString = annoutcement.title;
         }
             break;
         default:
@@ -205,13 +206,12 @@
 }
 
 + (NSString *)lastContentMessageWithType:(GJGCChatFriendContentType)type
-                             textMessage:(NSString *)textMessage {
+                             msgContent:(GPBMessage *)msgContent {
     NSString *resultString = nil;
-
     switch (type) {
-
         case GJGCChatFriendContentTypeText: {
-            resultString = textMessage;
+            TextMessage *text = (TextMessage *)msgContent;
+            resultString = text.content;
         }
             break;
 
@@ -283,7 +283,8 @@
         }
             break;
         case 102: {
-            resultString = LMLocalizedString(@"Chat Announcement", nil);
+            Announcement *annoutcement = (Announcement *)msgContent;
+            resultString = annoutcement.title;
         }
             break;
         default:

@@ -218,11 +218,11 @@
         if ([data isKindOfClass:[LMRamGroupInfo class]]) {
             LMRamGroupInfo *info = (LMRamGroupInfo *) data;
             // creat new session
-            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.groupIdentifer groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:messageInfo.messageType textMessage:@""] ecdhKey:info.groupEcdhKey talkName:nil];
+            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.groupIdentifer groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:messageInfo.messageType msgContent:messageInfo.msgContent] ecdhKey:info.groupEcdhKey talkName:nil];
         } else {
             AccountInfo *info = (AccountInfo *) data;
             NSString *ecdhKey = [KeyHandle getECDHkeyUsePrivkey:[LKUserCenter shareCenter].currentLoginUser.prikey PublicKey:info.pub_key];
-            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:messageInfo.messageType textMessage:@""] ecdhKey:ecdhKey talkName:nil];
+            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:messageInfo.messageType msgContent:messageInfo.msgContent] ecdhKey:ecdhKey talkName:nil];
         }
     }
 }

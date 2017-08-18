@@ -87,7 +87,7 @@ typedef GPB_ENUM(ChatType) {
   ChatType_Groupchat = 1,
 
   /** Connect */
-  ChatType_ConnectSystem = 3,
+  ChatType_ConnectSystem = 2,
 };
 
 GPBEnumDescriptor *ChatType_EnumDescriptor(void);
@@ -1914,12 +1914,12 @@ typedef GPB_ENUM(ChatCookieData_FieldNumber) {
 #pragma mark - FriendChatCookie
 
 typedef GPB_ENUM(FriendChatCookie_FieldNumber) {
-  FriendChatCookie_FieldNumber_Address = 1,
+  FriendChatCookie_FieldNumber_Uid = 1,
 };
 
 @interface FriendChatCookie : GPBMessage
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *address;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *uid;
 
 @end
 
@@ -2994,7 +2994,7 @@ typedef GPB_ENUM(CreateGroupMessage_FieldNumber) {
 
 typedef GPB_ENUM(RejectMessage_FieldNumber) {
   RejectMessage_FieldNumber_MsgId = 1,
-  RejectMessage_FieldNumber_ReceiverAddress = 2,
+  RejectMessage_FieldNumber_Uid = 2,
   RejectMessage_FieldNumber_Status = 3,
   RejectMessage_FieldNumber_Data_p = 4,
 };
@@ -3003,7 +3003,7 @@ typedef GPB_ENUM(RejectMessage_FieldNumber) {
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *msgId;
 
-@property(nonatomic, readwrite, copy, null_resettable) NSString *receiverAddress;
+@property(nonatomic, readwrite, copy, null_resettable) NSString *uid;
 
 @property(nonatomic, readwrite) int32_t status;
 

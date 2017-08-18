@@ -126,7 +126,7 @@
     return transfer;
 }
 
-+ (ChatMessageInfo *)makeTransferChatMessageWithHashId:(NSString *)hashId transferType:(int)transferType amount:(int64_t)amount tips:(NSString *)tips msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
++ (ChatMessageInfo *)makeTransferChatMessageWithHashId:(NSString *)hashId transferType:(TransferMessageType)transferType amount:(int64_t)amount tips:(NSString *)tips msgOwer:(NSString *)msgOwer sender:(NSString *)sender chatType:(int)chatType {
     ChatMessageInfo *chatMessage = [self chatMessageInfoWithMessageOwer:msgOwer messageType:GJGCChatFriendContentTypeTransfer sender:sender chatType:chatType];
     chatMessage.msgContent = [self makeTransferWithHashId:hashId transferType:transferType amount:amount tips:tips];
     return chatMessage;

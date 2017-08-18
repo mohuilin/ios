@@ -343,7 +343,7 @@ static dispatch_once_t onceToken;
     }
     
     FriendChatCookie *chatInfoAddress = [FriendChatCookie new];
-    chatInfoAddress.address = chatUser.address;
+    chatInfoAddress.uid = chatUser.pub_key;
     
     Message *m = [LMCommandAdapter sendAdapterWithExtension:BM_FRIEND_CHAT_COOKIE_EXT sendData:chatInfoAddress];
     m.sendOriginInfo = chatUser;
@@ -855,12 +855,13 @@ static dispatch_once_t onceToken;
 
 - (void)asyncSendMessage:(MessageData *)msgData
            originContent:(GPBMessage *)originContent
+                chatType:(ChatType)chatType
               completion:(void (^)(ChatMessage *msgData,
                                    NSError *error))completion {
 
     [GCDQueue executeInQueue:self.messageSendQueue block:^{
         BOOL result = NO;
-        switch (msgData.chatMsg.chatType) {
+        switch (chatType) {
             case GJGCChatFriendTalkTypePrivate:
             {
                 NSString *sign = [ConnectTool signWithData:msgData.data];
@@ -883,7 +884,12 @@ static dispatch_once_t onceToken;
                 break;
             case GJGCChatFriendTalkTypePostSystem:
             {
-                result = [self sendSystemMessage:(IMTransferData *)msgData];
+                MSMessage *msMessage = [[MSMessage alloc] init];
+                msMessage.msgId = [ConnectTool generateMessageId];
+                msMessage.body = originContent.data;
+                msMessage.category = msgData.chatMsg.msgType;
+                IMTransferData *imTransferData = [ConnectTool createTransferWithEcdhKey:[ServerCenter shareCenter].extensionPass data:msMessage.data aad:nil];
+                result = [self sendSystemMessage:imTransferData];
             }
                 break;
                 

@@ -411,12 +411,7 @@
             break;
             
         case GJGCChatFriendTalkTypePostSystem:{
-            MSMessage *msMessage = [[MSMessage alloc] init];
-            msMessage.msgId = [ConnectTool generateMessageId];
-            msMessage.body = originMsg.data;
-            msMessage.category = msgType;
-            IMTransferData *imTransferData = [ConnectTool createTransferWithEcdhKey:[ServerCenter shareCenter].extensionPass data:msMessage.data aad:nil];
-            return imTransferData;
+            
         }
             break;
             
@@ -431,9 +426,31 @@
 + (ChatMessageInfo *)chatMessageInfoWithChatMsg:(ChatMessage *)chatMsg originMsg:(GPBMessage *)originMsg{
     ChatMessageInfo *chatMessageInfo = [ChatMessageInfo new];
     chatMessageInfo.messageId = chatMsg.msgId;
-    chatMessageInfo.messageOwer = chatMsg.to;
+    switch (chatMsg.chatType) {
+        case ChatType_Private:
+        {
+            chatMessageInfo.messageOwer = chatMsg.from;
+            chatMessageInfo.from = chatMsg.from;
+        }
+            break;
+        case ChatType_Groupchat:
+        {
+            chatMessageInfo.messageOwer = chatMsg.to;
+            chatMessageInfo.from = chatMsg.from;
+        }
+            break;
+            
+        case ChatType_ConnectSystem:
+        {
+            chatMessageInfo.messageOwer = kSystemIdendifier;
+            chatMessageInfo.from = chatMsg.from;
+        }
+            break;
+            
+        default:
+            break;
+    }
     chatMessageInfo.createTime = chatMsg.msgTime;
-    chatMessageInfo.from = chatMsg.from;
     chatMessageInfo.chatType = chatMsg.chatType;
     chatMessageInfo.messageType = chatMsg.msgType;
     chatMessageInfo.msgContent = originMsg;
@@ -468,6 +485,7 @@
     chatMsg.msgType = chatMessageInfo.messageType;
     chatMsg.ext = ext;
     chatMsg.msgTime = [[NSDate date] timeIntervalSince1970] * 1000;
+    chatMsg.msgId = chatMessageInfo.messageId;
     chatMsg.chatType = chatMessageInfo.chatType;
     messageData.chatMsg = chatMsg;
     
@@ -531,15 +549,8 @@
             break;
             
         case GJGCChatFriendTalkTypePostSystem:{
-            MSMessage *msMessage = [[MSMessage alloc] init];
-            msMessage.msgId = [ConnectTool generateMessageId];
-            msMessage.body = chatMessageInfo.msgContent.data;
-            msMessage.category = chatMessageInfo.messageType;
-            IMTransferData *imTransferData = [ConnectTool createTransferWithEcdhKey:[ServerCenter shareCenter].extensionPass data:msMessage.data aad:nil];
-            return imTransferData;
         }
             break;
-            
         default:
             break;
     }

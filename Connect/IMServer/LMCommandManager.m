@@ -578,7 +578,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                         
                         [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                        [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:myChatTip] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
+                        [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType msgContent:chatMessage.msgContent] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
 
                         if ([[SessionManager sharedManager].chatSession isEqualToString:groupChange.identifier]) {
                             SendNotify(GroupNewMemberEnterNotification, chatMessage);
@@ -595,7 +595,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                             ChatMessageInfo *chatMessage = [LMMessageTool makeNotifyMessageWithMessageOwer:groupChange.identifier content:[NSString stringWithFormat:LMLocalizedString(@"Link enter the group", nil), userInfo.username] noteType:0 ext:nil];
                             [[MessageDBManager sharedManager] saveMessage:chatMessage];
 
-                            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:[NSString stringWithFormat:LMLocalizedString(@"Link enter the group", nil), userInfo.username]] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
+                            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:groupChange.identifier groupChat:YES lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType msgContent:chatMessage.msgContent] ecdhKey:lmGroup.groupEcdhKey talkName:lmGroup.groupName];
 
                             if ([[SessionManager sharedManager].chatSession isEqualToString:groupChange.identifier]) {
                                 SendNotify(GroupNewMemberEnterNotification, chatMessage);
@@ -735,7 +735,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
     if ([sender.address isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
         chatMessage = [[MessageDBManager sharedManager] createSendtoOtherTransactionMessageWithMessageOwer:reciverUser hashId:hashId monney:[PayTool getBtcStringWithAmount:amount] isOutTransfer:isOutTransfer];
         if ([[UserDBManager sharedManager] isFriendByAddress:reciverUser.address]) {
-            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:reciverUser.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.chatType textMessage:nil]];
+            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:reciverUser.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.chatType msgContent:chatMessage.msgContent]];
         } else {
             [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:reciverUser];
         }
@@ -743,7 +743,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
     } else {
         chatMessage = [[MessageDBManager sharedManager] createSendtoMyselfTransactionMessageWithMessageOwer:senderUser hashId:hashId monney:[PayTool getBtcStringWithAmount:amount] isOutTransfer:isOutTransfer];
         if ([[UserDBManager sharedManager] isFriendByAddress:senderUser.address]) {
-            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
+            [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType msgContent:chatMessage.msgContent]];
         } else {
             [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:senderUser];
         }
@@ -1066,7 +1066,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
                 ChatMessageInfo *chatMessage = [LMMessageTool makeLuckyPackageChatMessageWithHashId:redPackgeinfo.hashId luckType:0 amount:0 tips:message msgOwer:senderUser.pub_key sender:senderUser.pub_key chatType:0];
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
                 if (!senderUser.stranger) {
-                    [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
+                    [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:senderUser.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType msgContent:chatMessage.msgContent]];
                 } else {
                     [[RecentChatDBManager sharedManager] createNewChatNoRelationShipWihtRegisterUser:senderUser];
                 }

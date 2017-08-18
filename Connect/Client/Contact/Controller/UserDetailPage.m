@@ -224,7 +224,7 @@
 
     ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] createTransactionMessageWithUserInfo:self.user hashId:hashId monney:money];
     // creat session
-    [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:self.user.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessageInfo.messageType textMessage:@""] ecdhKey:ecdhKey talkName:self.user.username];
+    [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:self.user.pub_key groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessageInfo.messageType msgContent:chatMessageInfo.msgContent] ecdhKey:ecdhKey talkName:self.user.username];
     UIViewController *rootViewController = [self.navigationController.viewControllers firstObject];
     [self.navigationController popToRootViewControllerAnimated:NO];
     if ([rootViewController isKindOfClass:[SearchPage class]]) {

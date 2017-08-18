@@ -6339,11 +6339,11 @@ typedef struct ChatCookieData__storage_ {
 
 @implementation FriendChatCookie
 
-@dynamic address;
+@dynamic uid;
 
 typedef struct FriendChatCookie__storage_ {
   uint32_t _has_storage_[1];
-  NSString *address;
+  NSString *uid;
 } FriendChatCookie__storage_;
 
 // This method is threadsafe because it is initially called
@@ -6353,11 +6353,11 @@ typedef struct FriendChatCookie__storage_ {
   if (!descriptor) {
     static GPBMessageFieldDescription fields[] = {
       {
-        .name = "address",
+        .name = "uid",
         .dataTypeSpecific.className = NULL,
-        .number = FriendChatCookie_FieldNumber_Address,
+        .number = FriendChatCookie_FieldNumber_Uid,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(FriendChatCookie__storage_, address),
+        .offset = (uint32_t)offsetof(FriendChatCookie__storage_, uid),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
@@ -9896,7 +9896,7 @@ typedef struct CreateGroupMessage__storage_ {
 @implementation RejectMessage
 
 @dynamic msgId;
-@dynamic receiverAddress;
+@dynamic uid;
 @dynamic status;
 @dynamic data_p;
 
@@ -9904,7 +9904,7 @@ typedef struct RejectMessage__storage_ {
   uint32_t _has_storage_[1];
   int32_t status;
   NSString *msgId;
-  NSString *receiverAddress;
+  NSString *uid;
   NSData *data_p;
 } RejectMessage__storage_;
 
@@ -9924,11 +9924,11 @@ typedef struct RejectMessage__storage_ {
         .dataType = GPBDataTypeString,
       },
       {
-        .name = "receiverAddress",
+        .name = "uid",
         .dataTypeSpecific.className = NULL,
-        .number = RejectMessage_FieldNumber_ReceiverAddress,
+        .number = RejectMessage_FieldNumber_Uid,
         .hasIndex = 1,
-        .offset = (uint32_t)offsetof(RejectMessage__storage_, receiverAddress),
+        .offset = (uint32_t)offsetof(RejectMessage__storage_, uid),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },

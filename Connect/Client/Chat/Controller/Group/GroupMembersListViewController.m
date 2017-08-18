@@ -137,12 +137,11 @@
                 }
                 ChatMessageInfo *chatMessage = [LMMessageTool makeJoinGroupChatMessageWithAvatar:self.talkInfo.chatGroupInfo.avatarUrl ? self.talkInfo.chatGroupInfo.avatarUrl : @"" groupId:self.talkInfo.chatGroupInfo.groupIdentifer groupName:self.talkInfo.chatGroupInfo.groupName token:tokenResponse.token msgOwer:info.pubKey sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key];
                 [[MessageDBManager sharedManager] saveMessage:chatMessage];
-                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pubKey groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
+                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pubKey groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType msgContent:chatMessage.msgContent]];
                 /// 发送消息
                 [[LMConnectIMChater sharedManager] sendChatMessageInfo:chatMessage progress:nil complete:^(ChatMessageInfo *chatMsgInfo, NSError *error) {
                     
                 }];
-                [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:info.pubKey groupChat:NO lastContentShowType:0 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessage.messageType textMessage:nil]];
             }
             [GCDQueue executeInMainQueue:^{
                 [MBProgressHUD hideHUDForView:self.view];

@@ -566,25 +566,26 @@
 - (void)openSnapChatModeWithTime:(int)time {
 
     self.taklInfo.snapChatOutDataTime = time;
+    
+    ChatMessageInfo *chatMessageInfo = [LMMessageTool makeDestructChatMessageWithTime:time msgOwer:self.taklInfo.chatIdendifier sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key chatType:ChatType_Private];
+    
     GJGCChatFriendContentModel *snapChatModel = [GJGCChatFriendContentModel timeSubModel];
     snapChatModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
-    snapChatModel.contentType = GJGCChatFriendContentTypeSnapChat;
+    snapChatModel.contentType = chatMessageInfo.messageType;
     snapChatModel.snapChatTipString = [GJGCChatSystemNotiCellStyle formateOpensnapChatWithTime:time isSendToMe:NO chatUserName:self.taklInfo.chatUser.normalShowName];
     snapChatModel.originTextMessage = snapChatModel.snapChatTipString.string;
     NSArray *contentHeightArray = [self heightForContentModel:snapChatModel];
     snapChatModel.contentHeight = [[contentHeightArray firstObject] floatValue];
-    NSDate *sendTime = [NSDate date];
-    snapChatModel.sendTime = [sendTime timeIntervalSince1970] * 1000;
-
-    snapChatModel.localMsgId = [ConnectTool generateMessageId];
-
+    snapChatModel.sendTime = chatMessageInfo.createTime;
+    snapChatModel.localMsgId = chatMessageInfo.messageId;
     [self addChatContentModel:snapChatModel];
-
-    
     [[RecentChatDBManager sharedManager] openSnapChatWithIdentifier:self.taklInfo.chatIdendifier snapTime:time openOrCloseByMyself:YES];
-    
+    /// 保存消息
+    [[MessageDBManager sharedManager] saveMessage:chatMessageInfo];
     /// 发送消息
-    
+    [[LMConnectIMChater sharedManager] sendChatMessageInfo:chatMessageInfo progress:nil complete:^(ChatMessageInfo *chatMsgInfo, NSError *error) {
+        
+    }];
     if (time == 0) {
         [self outSnapchatMode];
     } else {

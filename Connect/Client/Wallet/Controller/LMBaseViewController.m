@@ -166,9 +166,8 @@
         ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] createTransactionMessageWithUserInfo:user hashId:hashId monney:amount];
         // Create a session
         NSString *ecdh = [KeyHandle getECDHkeyUsePrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey PublicKey:user.pub_key];
-        [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:user.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessageInfo.messageType textMessage:@""] ecdhKey:ecdh talkName:user.normalShowName];
+        [[RecentChatDBManager sharedManager] createNewChatWithIdentifier:user.pub_key groupChat:NO lastContentShowType:1 lastContent:[GJGCChatFriendConstans lastContentMessageWithType:chatMessageInfo.messageType msgContent:chatMessageInfo.msgContent] ecdhKey:ecdh talkName:user.normalShowName];
         [[RecentChatDBManager sharedManager] clearUnReadCountWithIdetifier:user.pub_key];
-        
         
     } else {
         SearchUser *usrAddInfo = [[SearchUser alloc] init];

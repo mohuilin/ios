@@ -138,7 +138,7 @@ typedef NS_ENUM(NSUInteger, GJGCChatFriendContentType) {
  * @return
  */
 + (NSString *)lastContentMessageWithType:(GJGCChatFriendContentType)type
-                             textMessage:(NSString *)textMessage;
+                             msgContent:(GPBMessage *)msgContent;
 
 /**
  * last content
@@ -148,7 +148,7 @@ typedef NS_ENUM(NSUInteger, GJGCChatFriendContentType) {
  * @return
  */
 + (NSString *)lastContentMessageWithType:(GJGCChatFriendContentType)type
-                             textMessage:(NSString *)textMessage
+                              msgContent:(GPBMessage *)msgContent
                           senderUserName:(NSString *)senderUserName;
 
 + (NSString *)identifierForContentType:(GJGCChatFriendContentType)contentType;

@@ -57,21 +57,19 @@ CREATE_SHARED_MANAGER(LMConnectIMChater)
         }
         /// Socket层
         MessageData *messageData = [LMMessageAdapter packageChatMessageInfo:chatMessageInfo ext:nil groupEcdh:groupECDH];
-        
         /// 更新会话
         [[LMConversionManager sharedManager] sendMessage:chatMessageInfo content:nil snapChat:chatMessageInfo.snapTime > 0 type:chatMessageInfo.chatType];
-        
         
         if (complete) {
             complete(chatMessageInfo,nil);
         }
         /// 发送数据
-//        [[IMService instance] asyncSendMessage:messageData originContent:chatMessageInfo.msgContent completion:^(ChatMessage *chatMsg, NSError *error) {
-//            ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:chatMsg.msgId messageOwer:chatMsg.to];
-//            if (complete) {
-//                complete(chatMessageInfo,error);
-//            }
-//        }];
+        [[IMService instance] asyncSendMessage:messageData originContent:chatMessageInfo.msgContent chatType:chatMessageInfo.chatType completion:^(ChatMessage *chatMsg, NSError *error) {
+            ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:chatMsg.msgId messageOwer:chatMsg.to];
+            if (complete) {
+                complete(chatMessageInfo,error);
+            }
+        }];
     } else {
         NSData *mainData = nil;
         NSData *minorData = nil;
@@ -153,7 +151,7 @@ CREATE_SHARED_MANAGER(LMConnectIMChater)
                 [[LMConversionManager sharedManager] sendMessage:chatMessageInfo content:nil snapChat:chatMsgInfo.snapTime > 0 type:chatMsgInfo.chatType];
                 
                 /// 发送数据
-                [[IMService instance] asyncSendMessage:messageData originContent:originMsg completion:^(ChatMessage *chatMsg, NSError *error) {
+                [[IMService instance] asyncSendMessage:messageData originContent:originMsg chatType:chatMsgInfo.chatType completion:^(ChatMessage *chatMsg, NSError *error) {
                     ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:chatMsg.msgId messageOwer:chatMsg.to];
                     if (complete) {
                         complete(chatMessageInfo,error);
@@ -170,6 +168,9 @@ CREATE_SHARED_MANAGER(LMConnectIMChater)
     GPBMessage *originMsg = [LMMessageTool packageOriginMsgWithChatContent:messageModel snapTime:snapTime];
     /// 保存消息
     ChatMessageInfo *chatMsgInfo = [LMMessageTool chatMsgInfoWithTo:chatIdentifier chatType:chatType msgType:messageModel.contentType msgContent:originMsg];
+    
+    /// 同步消息ID和界面模型一致
+    chatMsgInfo.messageId = messageModel.localMsgId;
     chatMsgInfo.snapTime = snapTime;
     
     [[MessageDBManager sharedManager] saveMessage:chatMsgInfo];
@@ -230,7 +231,7 @@ CREATE_SHARED_MANAGER(LMConnectIMChater)
             [[LMConversionManager sharedManager] sendMessage:chatMsgInfo content:messageModel.originTextMessage snapChat:chatMsgInfo.snapTime > 0 type:chatMsgInfo.chatType];
             
             /// 发送数据
-            [[IMService instance] asyncSendMessage:messageData originContent:originMsg completion:^(ChatMessage *chatMsg, NSError *error) {
+            [[IMService instance] asyncSendMessage:messageData originContent:originMsg chatType:chatMsgInfo.chatType completion:^(ChatMessage *chatMsg, NSError *error) {
                 ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:chatMsg.msgId messageOwer:chatMsg.to];
                 if (complete) {
                     complete(chatMessageInfo,error);
@@ -253,12 +254,12 @@ CREATE_SHARED_MANAGER(LMConnectIMChater)
             complete(chatMsgInfo,nil);
         }
         /// 发送数据
-//        [[IMService instance] asyncSendMessage:messageData originContent:originMsg completion:^(ChatMessage *chatMsg, NSError *error) {
-//            ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:chatMsg.msgId messageOwer:chatMsg.to];
-//            if (complete) {
-//                complete(chatMessageInfo,error);
-//            }
-//        }];
+        [[IMService instance] asyncSendMessage:messageData originContent:originMsg chatType:chatMsgInfo.chatType completion:^(ChatMessage *chatMsg, NSError *error) {
+            ChatMessageInfo *chatMessageInfo = [[MessageDBManager sharedManager] getMessageInfoByMessageid:chatMsg.msgId messageOwer:chatMsg.to];
+            if (complete) {
+                complete(chatMessageInfo,error);
+            }
+        }];
     }
 }
 
