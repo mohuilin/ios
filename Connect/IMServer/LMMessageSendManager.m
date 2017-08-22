@@ -26,15 +26,15 @@
  */
 typedef NS_ENUM(NSInteger, MessageRejectErrorType) {
     MessageRejectErrorTypeUnknow = 0,
-    MessageRejectErrorTypeNotExisted,
-    MessageRejectErrorTypeNotFriend,
-    MessageRejectErrorTypeBlackList,
-    MessageRejectErrorTypeNotInGroup,
-    MessageRejectErrorTypeChatinfoEmpty,
-    MessageRejectErrorTypeGetChatinfoError,
-    MessageRejectErrorTypeChatinfoNotMatch,
-    MessageRejectErrorTypeChatinfoExpire,
-    MessageRejectErrorTypeMyChatCookieNotMatch,
+    MessageRejectErrorTypeNotExisted = 1,
+    MessageRejectErrorTypeNotFriend = 2,
+    MessageRejectErrorTypeBlackList = 3,
+    MessageRejectErrorTypeNotInGroup = 4,
+    MessageRejectErrorTypeChatinfoEmpty = 5,
+    MessageRejectErrorTypeGetChatinfoError = 6,
+    MessageRejectErrorTypeChatinfoNotMatch = 7,
+    MessageRejectErrorTypeChatinfoExpire = 8,
+    MessageRejectErrorTypeMyChatCookieNotMatch = 9,
 };
 
 @implementation SendMessageModel
@@ -78,12 +78,11 @@ typedef NS_ENUM(NSInteger, MessageRejectErrorType) {
                 if (sendDuration >= SOCKET_TIME_OUT) {
                     //update message send status
                     sendMessageModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusFaild;
-
+                    //update status
+                    [[MessageDBManager sharedManager] updateMessageSendStatus:GJGCChatFriendSendMessageStatusFaild withMessageId:sendMessageModel.sendMsg.msgId messageOwer:sendMessageModel.sendMsg.to];
                     if (sendMessageModel.callBack) {
                         sendMessageModel.callBack(sendMessageModel.sendMsg, [NSError errorWithDomain:@"over_time" code:OVER_TIME_CODE userInfo:nil]);
                     }
-
-
                     [weakSelf.sendingMessages removeObjectForKey:sendMessageModel.sendMsg.msgId];
                 }
             }
@@ -136,8 +135,11 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 sendModel.callBack(sendModel.sendMsg, nil);
             }
             //updatea recent chat cell status
+            
         }
 
+        /// 发送消息发送成功的通知
+        SendNotify(ConnnectSendMsgSuccessNotification, messageId);
         [self.sendingMessages removeObjectForKey:messageId];
     }];
 }
@@ -175,7 +177,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 [[SessionManager sharedManager] removeChatCookieWithChatSession:identifier];
                 [[SessionManager sharedManager] chatCookie:YES chatSession:identifier];
                 
-                [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent chatEcdhKey:nil sendMessageCompletion:sendModel.callBack];
+                [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent sendMessageCompletion:sendModel.callBack];
             }
                 break;
             case MessageRejectErrorTypeChatinfoNotMatch: {
@@ -184,8 +186,7 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
                 if ([ConnectTool vertifyWithData:chatCookie.data_p.data sign:chatCookie.sign publickey:identifier]) {
                     ChatCookieData *chatInfo = chatCookie.data_p;
                     [[SessionManager sharedManager] setChatCookie:chatInfo chatSession:identifier];
-                    
-                    [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent chatEcdhKey:nil sendMessageCompletion:sendModel.callBack];
+                    [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent sendMessageCompletion:sendModel.callBack];
                 } else {
                     if (sendModel.callBack) {
                         sendModel.sendMsg.sendStatus = GJGCChatFriendSendMessageStatusFaild;
@@ -254,6 +255,8 @@ CREATE_SHARED_MANAGER(LMMessageSendManager)
             default:
                 break;
         }
+        /// 发送消息发送失败的通知
+        SendNotify(ConnnectSendMsgFailedNotification, rejectMsg.msgId);
         //remove send queue message
         [self.sendingMessages removeObjectForKey:rejectMsg.msgId];
     }];

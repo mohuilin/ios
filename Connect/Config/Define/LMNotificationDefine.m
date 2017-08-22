@@ -8,6 +8,12 @@
 
 // Download the completed notification
 
+
+// send message success
+NSString *const ConnnectSendMsgSuccessNotification = @"ConnnectSendMsgSuccessNotification";
+// send message failed
+NSString *const ConnnectSendMsgFailedNotification = @"ConnnectSendMsgFailedNotification";
+
 NSString *const ConnnectDownAllCommonGroupCompleteNotification = @"ConnnectDownAllCommonGroupCompleteNotification";
 
 // File upload failed notification

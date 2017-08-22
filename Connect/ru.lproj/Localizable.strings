@@ -350,7 +350,7 @@
 "Link Update Group Name Failed"="Сбой при выполнении обновления названия группы ";
 "Link User refuses camera permission please set"="Пользователь отказывается давать разрешение на использование камеры, вернуться на предыдущую страницу/n установить-->конфиденциальность/общие и другие параметры установки";
 "Link Verify"="Идет проверка...";
-"Link Web page"="Веб-страница  ";
+"Link Web page"="[Веб-страница]";
 "Link Whether Public"="Программа публичная?";
 "Link You Remove from the group chat"="Вы удалили %@ из группового чата";
 "Link You apply to join has passed"="Ваше заявление на добавление в группу %@ было принято";

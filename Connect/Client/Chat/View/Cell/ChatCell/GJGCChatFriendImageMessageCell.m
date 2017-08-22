@@ -9,6 +9,7 @@
 #import "GJGCChatFriendImageMessageCell.h"
 #import "UIImage+Color.h"
 #import "UIImage+YYAdd.h"
+#import "YYImageCache.h"
 
 @interface GJGCChatFriendImageMessageCell ()
 
@@ -144,7 +145,10 @@
 
     CGSize imageSize = CGSizeMake(chatContentModel.originImageWidth, chatContentModel.originImageHeight);
     UIImage *cacheImage = chatContentModel.messageContentImage;
-
+    if (chatContentModel.imageMessageUrl && !chatContentModel.messageContentImage) {
+        chatContentModel.messageContentImage = [[YYImageCache sharedCache] getImageForKey:chatContentModel.imageMessageUrl];
+        cacheImage = chatContentModel.messageContentImage;
+    }
     if (CGSizeEqualToSize(imageSize, CGSizeZero)) {
         imageSize = cacheImage.size;
         chatContentModel.originImageWidth = imageSize.width;
@@ -302,12 +306,11 @@
     self.cirProgressView.hidden = YES;
 }
 
-- (void)successDownloadWithImageData:(NSData *)imageData {
-    if (imageData) {
+- (void)successDownloadWithImageData:(UIImage *)cacheImage {
+    if (cacheImage) {
         self.cirProgressView.hidden = YES;
         self.imageDefaultView.hidden = YES;
         [self removePrepareState];
-        UIImage *cacheImage = [UIImage imageWithData:imageData];
         if (self.contentModel.isSnapChatMode) {
             cacheImage = [cacheImage imageByBlurRadius:30 tintColor:nil tintMode:0 saturation:1 maskImage:nil];
         }

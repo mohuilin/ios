@@ -44,7 +44,9 @@
     chatContentModel.localMsgId = chatMessage.messageId;
     chatContentModel.talkType = self.taklInfo.talkType;
     chatContentModel.isRead = chatMessage.state > 0;
-    chatContentModel.isSnapChatMode = self.taklInfo.snapChatOutDataTime > 0;
+    chatContentModel.isSnapChatMode = chatMessage.snapTime > 0;
+    chatContentModel.snapTime = chatMessage.snapTime;
+        
     chatContentModel.isFriend = YES;
     chatContentModel.downloadTaskIdentifier = [[GJCFFileDownloadManager shareDownloadManager] getDownloadIdentifierWithMessageId:[NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, chatContentModel.localMsgId]];
     chatContentModel.isDownloading = chatContentModel.downloadTaskIdentifier != nil;

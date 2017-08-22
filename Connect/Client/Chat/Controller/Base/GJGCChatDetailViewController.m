@@ -956,17 +956,18 @@
 
 - (void)dataSourceManagerRequireUpdateListTable:(GJGCChatDetailDataSourceManager *)dataManager reloadForUpdateMsgStateAtIndex:(NSInteger)index {
     if (index >= 0 && index < self.dataSourceManager.totalCount) {
-
         NSIndexPath *reloadPath = [NSIndexPath indexPathForRow:index inSection:0];
         if (![[self.chatListTable indexPathsForVisibleRows] containsObject:reloadPath]) {
             return;
         }
         GJGCChatFriendBaseCell *chatCell = (GJGCChatFriendBaseCell *) [self.chatListTable cellForRowAtIndexPath:reloadPath];
         GJGCChatContentBaseModel *contentModel = [self.dataSourceManager contentModelAtIndex:index];
-
-        if ([chatCell isKindOfClass:[GJGCChatFriendBaseCell class]]) {
-            [chatCell setSendStatus:contentModel.sendStatus];
-            [chatCell faildWithType:contentModel.faildType andReason:contentModel.faildReason];
+        if ([chatCell respondsToSelector:@selector(setSendStatus:)] && [chatCell respondsToSelector:@selector(faildWithType:andReason:)]) {
+            DDLogInfo(@"-----更新消息发送状态----- %@",contentModel.sendStatus == GJGCChatFriendSendMessageStatusSuccess?@"fa song chenggong ":@"fa song shi bai ");
+            [GCDQueue executeInMainQueue:^{
+                [chatCell setSendStatus:contentModel.sendStatus];
+                [chatCell faildWithType:contentModel.faildType andReason:contentModel.faildReason];
+            }];
         }
     }
 }

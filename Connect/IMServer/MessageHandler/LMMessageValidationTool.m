@@ -114,8 +114,8 @@
 
         case GJGCChatFriendContentTypeSnapChat: {
             DestructMessage *msgContent = (DestructMessage *)chatMessageInfo.msgContent;
-            if (msgContent.time < 0) {
-                return NO;
+            if (msgContent.time == -1) {
+                msgContent.time = 0;
             }
             return YES;
         }
@@ -177,12 +177,6 @@
             }
             
             if (msgContent.screenShot.length == 0) {
-                return NO;
-            }
-            if (msgContent.imageWidth == 0) {
-                return NO;
-            }
-            if (msgContent.imageHeight == 0) {
                 return NO;
             }
             

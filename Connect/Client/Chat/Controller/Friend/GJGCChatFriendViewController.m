@@ -54,6 +54,7 @@
 #import "LMUnSetMoneyResultViewController.h"
 #import "LMMessageTool.h"
 #import "LMIMHelper.h"
+#import "UIImageView+YYWebImage.h"
 
 #define GJGCActionSheetCallPhoneNumberTag 132134
 
@@ -468,7 +469,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
         }
         if ([imageCell isKindOfClass:[GJGCChatFriendImageMessageCell class]]) {
             [imageCell removePrepareState];
-            [imageCell successDownloadWithImageData:fileData];
+            [imageCell successDownloadWithImageData:[UIImage imageWithData:fileData]];
         }
     }
 
@@ -484,7 +485,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
         }
         if ([imageCell isKindOfClass:[GJGCChatFriendImageMessageCell class]]) {
             [imageCell removePrepareState];
-            [imageCell successDownloadWithImageData:fileData];
+            [imageCell successDownloadWithImageData:[UIImage imageWithData:fileData]];
         }
     }
 
@@ -498,7 +499,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
             return;
         }
         if ([imageCell isKindOfClass:[ChatMapCell class]]) {
-            [imageCell successDownloadWithImageData:fileData];
+            [imageCell successDownloadWithImageData:[UIImage imageWithData:fileData]];
         }
     }
 
@@ -690,6 +691,9 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
     GJGCChatFriendImageMessageCell *imageCell = (GJGCChatFriendImageMessageCell *) tapedCell;
     NSIndexPath *indexPath = [self.chatListTable indexPathForCell:tapedCell];
     GJGCChatFriendContentModel *contentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:indexPath.row];
+    
+    
+    
     BOOL isImageDown = GJCFFileIsExist(contentModel.imageOriginDataCachePath) || GJCFFileIsExist(contentModel.thumbImageCachePath);
 
     if (isImageDown && contentModel.snapTime > 0 && !contentModel.isFromSelf && contentModel.readState == GJGCChatFriendMessageReadStateUnReaded) {
@@ -1750,56 +1754,81 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
         }
             break;
         case GJGCChatFriendContentTypeImage: {
-            NSString *taskIdentifier = nil;
-            if (!imageContentModel.isDownloadThumbImage) {
-                if (imageContentModel.encodeThumbFileUrl) {
-                    GJCFFileDownloadTask *downloadTask = [GJCFFileDownloadTask taskWithDownloadUrl:imageContentModel.encodeThumbFileUrl withCachePath:imageContentModel.downThumbEncodeImageCachePath withObserver:self getTaskIdentifer:&taskIdentifier];
-                    imageContentModel.downloadTaskIdentifier = taskIdentifier;
-                    if (self.taklInfo.talkType != GJGCChatFriendTalkTypePrivate && self.taklInfo.talkType != GJGCChatFriendTalkTypeGroup) {
-                        downloadTask.unEncodeData = YES;
-                    } else {
-                        NSData *ecdhkey = nil;
-                        if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-                            ecdhkey = [StringTool hexStringToData:self.taklInfo.chatGroupInfo.groupEcdhKey];
-                        } else if (self.taklInfo.talkType == GJGCChatFriendTalkTypePrivate) {
-                            ecdhkey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
-                                                             publicKey:self.taklInfo.chatIdendifier];
+            if (self.taklInfo.talkType == ChatType_ConnectSystem) {
+                /// itemModel.imageOriginDataCachePath
+                [[YYWebImageManager sharedManager] requestImageWithURL:[NSURL URLWithString:imageContentModel.imageMessageUrl] options:YYWebImageOptionProgressiveBlur progress:nil transform:^UIImage *(UIImage *image, NSURL *url) {
+                    return image;
+                } completion:^(UIImage *image, NSURL *url, YYWebImageFromType from, YYWebImageStage stage, NSError *error) {
+                    if (image) {
+                        imageContentModel.messageContentImage = image;
+                        imageContentModel.isDownloadImage = YES;
+                        GJGCChatFriendImageMessageCell *imageCell = [self.chatListTable cellForRowAtIndexPath:indexPath];
+                        if (![self.chatListTable.visibleCells containsObject:imageCell]) {
+                            return;
                         }
-                        ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
-                        downloadTask.ecdhkey = ecdhkey;
-
+                        if ([imageCell isKindOfClass:[GJGCChatFriendImageMessageCell class]]) {
+                            [imageCell removePrepareState];
+                            [imageCell successDownloadWithImageData:image];
+                        }
+                        if (stage == YYWebImageStageFinished) {
+                            if (!GJCFFileIsExist(imageContentModel.imageOriginDataCachePath)) {
+                                GJCFFileWrite(UIImageJPEGRepresentation(image, 1), imageContentModel.imageOriginDataCachePath);
+                            }
+                        }
                     }
-                    downloadTask.userInfo = @{@"type": @"thumbimage"};
-                    downloadTask.msgIdentifier = [NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, contentModel.localMsgId];
-                    downloadTask.temOriginFilePath = imageContentModel.thumbImageCachePath;
-                    imageContentModel.downloadTaskIdentifier = taskIdentifier;
-
-                    [self addDownloadTask:downloadTask];
+                }];
+            } else {
+                NSString *taskIdentifier = nil;
+                if (!imageContentModel.isDownloadThumbImage) {
+                    if (imageContentModel.encodeThumbFileUrl) {
+                        GJCFFileDownloadTask *downloadTask = [GJCFFileDownloadTask taskWithDownloadUrl:imageContentModel.encodeThumbFileUrl withCachePath:imageContentModel.downThumbEncodeImageCachePath withObserver:self getTaskIdentifer:&taskIdentifier];
+                        imageContentModel.downloadTaskIdentifier = taskIdentifier;
+                        if (self.taklInfo.talkType != GJGCChatFriendTalkTypePrivate && self.taklInfo.talkType != GJGCChatFriendTalkTypeGroup) {
+                            downloadTask.unEncodeData = YES;
+                        } else {
+                            NSData *ecdhkey = nil;
+                            if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
+                                ecdhkey = [StringTool hexStringToData:self.taklInfo.chatGroupInfo.groupEcdhKey];
+                            } else if (self.taklInfo.talkType == GJGCChatFriendTalkTypePrivate) {
+                                ecdhkey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
+                                                                  publicKey:self.taklInfo.chatIdendifier];
+                            }
+                            ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
+                            downloadTask.ecdhkey = ecdhkey;
+                            
+                        }
+                        downloadTask.userInfo = @{@"type": @"thumbimage"};
+                        downloadTask.msgIdentifier = [NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, contentModel.localMsgId];
+                        downloadTask.temOriginFilePath = imageContentModel.thumbImageCachePath;
+                        imageContentModel.downloadTaskIdentifier = taskIdentifier;
+                        
+                        [self addDownloadTask:downloadTask];
+                    }
                 }
-            }
-            if (!imageContentModel.isDownloadImage && imageContentModel.isDownloadThumbImage) {
-                if (imageContentModel.encodeFileUrl) {
-                    GJCFFileDownloadTask *downloadOriginTask = [GJCFFileDownloadTask taskWithDownloadUrl:imageContentModel.encodeFileUrl withCachePath:imageContentModel.downEncodeImageCachePath withObserver:self getTaskIdentifer:&taskIdentifier];
-                    imageContentModel.downloadTaskIdentifier = taskIdentifier;
-                    if (self.taklInfo.talkType != GJGCChatFriendTalkTypePrivate && self.taklInfo.talkType != GJGCChatFriendTalkTypeGroup) {
-                        downloadOriginTask.unEncodeData = YES;
-                    } else {
-                        NSData *ecdhkey = nil;
-                        if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
-                            ecdhkey = [StringTool hexStringToData:self.taklInfo.chatGroupInfo.groupEcdhKey];
-                        } else if (self.taklInfo.talkType == GJGCChatFriendTalkTypePrivate) {
-                            ecdhkey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
-                                                             publicKey:self.taklInfo.chatIdendifier];
+                if (!imageContentModel.isDownloadImage && imageContentModel.isDownloadThumbImage) {
+                    if (imageContentModel.encodeFileUrl) {
+                        GJCFFileDownloadTask *downloadOriginTask = [GJCFFileDownloadTask taskWithDownloadUrl:imageContentModel.encodeFileUrl withCachePath:imageContentModel.downEncodeImageCachePath withObserver:self getTaskIdentifer:&taskIdentifier];
+                        imageContentModel.downloadTaskIdentifier = taskIdentifier;
+                        if (self.taklInfo.talkType != GJGCChatFriendTalkTypePrivate && self.taklInfo.talkType != GJGCChatFriendTalkTypeGroup) {
+                            downloadOriginTask.unEncodeData = YES;
+                        } else {
+                            NSData *ecdhkey = nil;
+                            if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
+                                ecdhkey = [StringTool hexStringToData:self.taklInfo.chatGroupInfo.groupEcdhKey];
+                            } else if (self.taklInfo.talkType == GJGCChatFriendTalkTypePrivate) {
+                                ecdhkey = [LMIMHelper getECDHkeyWithPrivkey:[[LKUserCenter shareCenter] currentLoginUser].prikey
+                                                                  publicKey:self.taklInfo.chatIdendifier];
+                            }
+                            ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
+                            downloadOriginTask.ecdhkey = ecdhkey;
+                            
                         }
-                        ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
-                        downloadOriginTask.ecdhkey = ecdhkey;
-
+                        downloadOriginTask.userInfo = @{@"type": @"image"};
+                        downloadOriginTask.msgIdentifier = [NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, contentModel.localMsgId];
+                        downloadOriginTask.temOriginFilePath = imageContentModel.imageOriginDataCachePath;
+                        imageContentModel.downloadTaskIdentifier = taskIdentifier;
+                        [self addDownloadTask:downloadOriginTask];
                     }
-                    downloadOriginTask.userInfo = @{@"type": @"image"};
-                    downloadOriginTask.msgIdentifier = [NSString stringWithFormat:@"%@_%@", self.taklInfo.chatIdendifier, contentModel.localMsgId];
-                    downloadOriginTask.temOriginFilePath = imageContentModel.imageOriginDataCachePath;
-                    imageContentModel.downloadTaskIdentifier = taskIdentifier;
-                    [self addDownloadTask:downloadOriginTask];
                 }
             }
         }

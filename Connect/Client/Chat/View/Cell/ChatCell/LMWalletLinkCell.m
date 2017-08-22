@@ -33,17 +33,12 @@
         self.bubbleBackImageView.width = AUTO_WIDTH(460);
         self.bubbleBackImageView.height = WalletLinkCellHeight;
 
-        self.iconImageView = [[UIImageView alloc] init];
-        self.iconImageView.width = IconImageHeight;
-        self.iconImageView.height = IconImageHeight;
-        self.iconImageView.right = self.contentSize.width - BubbleLeftRightMargin;
-        self.iconImageView.bottom = self.contentSize.height - BubbleLeftRightMargin;
-        [self.bubbleBackImageView addSubview:self.iconImageView];
-
+    
         self.titleLable = [[UILabel alloc] init];
-        self.titleLable.numberOfLines = 2;
+        self.titleLable.numberOfLines = 1;
         self.titleLable.font = [UIFont boldSystemFontOfSize:FONT_SIZE(30)];
-        self.titleLable.top = AUTO_HEIGHT(30);
+        self.titleLable.top = BubbleLeftRight;
+        self.titleLable.size = CGSizeMake(AUTO_WIDTH(460) - BubbleLeftRightMargin * 4, AUTO_HEIGHT(35));
         [self.bubbleBackImageView addSubview:self.titleLable];
 
         self.subTipLabel = [[UILabel alloc] init];
@@ -52,6 +47,14 @@
         self.subTipLabel.textColor = LMBasicDarkGray;
         [self.bubbleBackImageView addSubview:self.subTipLabel];
 
+        self.iconImageView = [[UIImageView alloc] init];
+        self.iconImageView.width = IconImageHeight;
+        self.iconImageView.height = IconImageHeight;
+        self.iconImageView.right = self.contentSize.width - BubbleLeftRightMargin;
+        self.iconImageView.bottom = self.contentSize.height - BubbleLeftRightMargin;
+        self.iconImageView.top = self.titleLable.bottom + BubbleLeftRight;
+        [self.bubbleBackImageView addSubview:self.iconImageView];
+        
         UITapGestureRecognizer *tapR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnSelf)];
         tapR.numberOfTapsRequired = 1;
         [self.bubbleBackImageView addGestureRecognizer:tapR];
@@ -96,13 +99,7 @@
         default:
             break;
     }
-    CGSize size = [self.titleLable.text sizeWithFont:self.titleLable.font constrainedToWidth:AUTO_WIDTH(460) - BubbleLeftRightMargin * 2];
-    if (size.height > MaxTitleHeight) {
-        size.height = MaxTitleHeight;
-    }
-    self.titleLable.size = size;
-
-    size = [self.subTipLabel.text sizeWithFont:self.subTipLabel.font constrainedToWidth:AUTO_WIDTH(460) - BubbleLeftRightMargin * 3.2 - IconImageHeight];
+    CGSize size = [self.subTipLabel.text sizeWithFont:self.subTipLabel.font constrainedToWidth:AUTO_WIDTH(460) - BubbleLeftRightMargin * 3.2 - IconImageHeight];
     if (size.height > MaxSubTitleHeight) {
         size.height = MaxSubTitleHeight;
     }
@@ -114,18 +111,11 @@
         height = WalletLinkCellHeight;
     }
     self.contentSize = CGSizeMake(AUTO_WIDTH(460), height);
+
     self.bubbleBackImageView.height = self.contentSize.height;
 
     [self adjustContent];
-    if (heightTooSmall) {
-        if (chatContentModel.isGroupChat && !self.isFromSelf) {
-            self.iconImageView.top = self.subTipLabel.top;
-        } else {
-            self.iconImageView.bottom = self.bubbleBackImageView.bottom - 5;
-        }
-    } else {
-        self.iconImageView.bottom = self.subTipLabel.bottom;
-    }
+
 
     if (self.isFromSelf) {
         //set payIconView 和 transferTipView

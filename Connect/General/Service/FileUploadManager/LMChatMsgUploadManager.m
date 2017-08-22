@@ -18,29 +18,42 @@ CREATE_SHARED_MANAGER(LMChatMsgUploadManager)
 
 - (void)uploadMainData:(NSData *)mainData minorData:(NSData *)minorData encryptECDH:(NSData *)ecdhkey to:(NSString *)to msgId:(NSString *)msgId chatType:(int)chatType originMsg:(GPBMessage *)originMsg progress:(void (^)(NSString *to,NSString *msgId,CGFloat progress))progress  complete:(void(^)(GPBMessage *originMsg,NSString *to,NSString *msgId,NSError *error))completion {
     
-    ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
-    if (!mainData) {
-        if (completion) {
-            completion(nil,nil,nil,[NSError errorWithDomain:@"" code:-1 userInfo:nil]);
+    if (chatType != ChatType_ConnectSystem) {
+        ecdhkey = [LMIMHelper getAes256KeyByECDHKeyAndSalt:ecdhkey salt:[ConnectTool get64ZeroData]];
+        if (!mainData) {
+            if (completion) {
+                completion(nil,nil,nil,[NSError errorWithDomain:@"" code:-1 userInfo:nil]);
+            }
+            return;
         }
-        return;
+        GcmData *mainGcmdata = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:mainData aad:nil];
+        
+        RichMedia *richMedia = [[RichMedia alloc] init];
+        richMedia.entity = mainGcmdata.data;
+        if (minorData) {
+            GcmData *minorGcmdata = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:minorData aad:nil];
+            richMedia.thumbnail = minorGcmdata.data;
+        }
+        
+        NSString *taskIdentifier = nil;
+        GJCFFileUploadTask *uploadTask = [GJCFFileUploadTask taskWithUploadData:richMedia.data taskObserver:nil getTaskUniqueIdentifier:&taskIdentifier];
+        uploadTask.userInfo = @{@"originMsg":originMsg,
+                                @"system":@(chatType == ChatType_ConnectSystem),
+                                @"to":to,
+                                @"msgId":msgId};
+        [[GJCFFileUploadManager shareUploadManager] addTask:uploadTask];
+    } else {
+        RichMedia *richMedia = [[RichMedia alloc] init];
+        richMedia.entity = mainData;
+        richMedia.thumbnail = minorData;
+        NSString *taskIdentifier = nil;
+        GJCFFileUploadTask *uploadTask = [GJCFFileUploadTask taskWithUploadData:richMedia.data taskObserver:nil getTaskUniqueIdentifier:&taskIdentifier];
+        uploadTask.userInfo = @{@"originMsg":originMsg,
+                                @"system":@(chatType == ChatType_ConnectSystem),
+                                @"to":to,
+                                @"msgId":msgId};
+        [[GJCFFileUploadManager shareUploadManager] addTask:uploadTask];
     }
-    GcmData *mainGcmdata = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:mainData aad:nil];
-
-    RichMedia *richMedia = [[RichMedia alloc] init];
-    richMedia.entity = mainGcmdata.data;
-    if (minorData) {
-        GcmData *minorGcmdata = [ConnectTool createGcmDataWithStructDataEcdhkey:ecdhkey data:minorData aad:nil];
-        richMedia.thumbnail = minorGcmdata.data;
-    }
-    
-    NSString *taskIdentifier = nil;
-    GJCFFileUploadTask *uploadTask = [GJCFFileUploadTask taskWithUploadData:richMedia.data taskObserver:nil getTaskUniqueIdentifier:&taskIdentifier];
-    uploadTask.userInfo = @{@"originMsg":originMsg,
-                            @"system":@(chatType == ChatType_ConnectSystem),
-                            @"to":to,
-                            @"msgId":msgId};
-    [[GJCFFileUploadManager shareUploadManager] addTask:uploadTask];
     
     [[GJCFFileUploadManager shareUploadManager] setFaildBlock:^(GJCFFileUploadTask *task, NSError *error) {
         if (completion) {
@@ -71,7 +84,9 @@ CREATE_SHARED_MANAGER(LMChatMsgUploadManager)
                 } else if ([originMsg isKindOfClass:[PhotoMessage class]]) {
                     PhotoMessage *photo = (PhotoMessage *)originMsg;
                     photo.URL = fileUrl;
-                    photo.thum = [NSString stringWithFormat:@"%@/thumb?pub_key=%@&token=%@", fileData.URL, chatId, fileData.token];
+                    if (!system) {
+                        photo.thum = [NSString stringWithFormat:@"%@/thumb?pub_key=%@&token=%@", fileData.URL, chatId, fileData.token];
+                    }
                 } else if ([originMsg isKindOfClass:[LocationMessage class]]) {
                     LocationMessage *location = (LocationMessage *)originMsg;
                     location.screenShot = fileUrl;

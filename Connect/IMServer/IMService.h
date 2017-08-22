@@ -129,7 +129,6 @@
 
 - (void)asyncSendMessage:(ChatMessage *)chatMsg
            originContent:(GPBMessage *)originContent
-             chatEcdhKey:(NSString *)ecdhKey
    sendMessageCompletion:(void (^)(ChatMessage *msgData,
                                    NSError *error))completion;
 

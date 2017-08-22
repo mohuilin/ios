@@ -20,8 +20,8 @@
 @implementation LMMessageAdapter
 
 + (ChatMessageInfo *)decodeMessageWithMassagePost:(MessagePost *)msgPost groupECDH:(NSString *)groupECDH {
-    NSData *data = [ConnectTool decodeGroupGcmDataWithEcdhKey:groupECDH GcmData:msgPost.msgData.chatMsg.cipherData];
-    ChatMessageInfo *chatMessage = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[GPBMessage parseFromData:data error:nil]];
+    NSData *data = [ConnectTool decodeGcmDataWithEcdhKey:[StringTool hexStringToData:groupECDH] GcmData:msgPost.msgData.chatMsg.cipherData haveStructData:YES];;
+    ChatMessageInfo *chatMessage = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[self parseDataWithData:data msgType:msgPost.msgData.chatMsg.msgType]];
     
     return chatMessage;
 }
@@ -74,6 +74,7 @@
     chatMessage.createTime = [[NSDate date] timeIntervalSince1970] * 1000;
     chatMessage.messageId = sysMsg.msgId;
     chatMessage.messageOwer = kSystemIdendifier;
+    chatMessage.from = kSystemIdendifier;
     chatMessage.chatType = ChatType_ConnectSystem;
     chatMessage.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
     switch (sysMsg.category) {
@@ -348,6 +349,7 @@
     chatMsg.ext = ext;
     chatMsg.msgTime = [[NSDate date] timeIntervalSince1970] * 1000;
     chatMsg.chatType = chatType;
+    chatMsg.msgId = [ConnectTool generateMessageId];
     messageData.chatMsg = chatMsg;
     
     /// chat session
@@ -455,23 +457,6 @@
     chatMessageInfo.messageType = chatMsg.msgType;
     chatMessageInfo.msgContent = originMsg;
     chatMessageInfo.sendstatus = GJGCChatFriendSendMessageStatusSuccess;
-
-    if ([originMsg isKindOfClass:[VoiceMessage class]]) {
-        VoiceMessage *voice = (VoiceMessage *)originMsg;
-        chatMessageInfo.snapTime = voice.snapTime;
-    } else if ([originMsg isKindOfClass:[VideoMessage class]]) {
-        VideoMessage *video = (VideoMessage *)originMsg;
-        chatMessageInfo.snapTime = video.snapTime;
-    } else if ([originMsg isKindOfClass:[PhotoMessage class]]) {
-        PhotoMessage *photo = (PhotoMessage *)originMsg;
-        chatMessageInfo.snapTime = photo.snapTime;
-    } else if ([originMsg isKindOfClass:[TextMessage class]]) {
-        TextMessage *test = (TextMessage *)originMsg;
-        chatMessageInfo.snapTime = test.snapTime;
-    } else if ([originMsg isKindOfClass:[EmotionMessage class]]) {
-        EmotionMessage *emotion = (EmotionMessage *)originMsg;
-        chatMessageInfo.snapTime = emotion.snapTime;
-    }
  
     return chatMessageInfo;
 }
@@ -588,7 +573,6 @@
             msgContent = [PhotoMessage parseFromData:data error:nil];
         }
             break;
-            
         case GJGCChatFriendContentTypeGif: {
             msgContent = [EmotionMessage parseFromData:data error:nil];
         }

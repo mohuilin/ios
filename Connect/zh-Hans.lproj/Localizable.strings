@@ -350,7 +350,7 @@
 "Link Update Group Name Failed"="更新群组名称失败";
 "Link User refuses camera permission please set"="用户拒绝授权摄像头的使用权,返回上一页.请打开\n设置-->隐私/通用等权限设置";
 "Link Verify"="验证中";
-"Link Web page"="网页连接";
+"Link Web page"="[链接]";
 "Link Whether Public"="是否公开";
 "Link You Remove from the group chat"="你将%@移除了群组";
 "Link You apply to join has passed"="你申请加入%@群聊已通过";

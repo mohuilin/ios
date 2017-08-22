@@ -566,8 +566,8 @@
 - (void)openSnapChatModeWithTime:(int)time {
 
     self.taklInfo.snapChatOutDataTime = time;
-    
-    ChatMessageInfo *chatMessageInfo = [LMMessageTool makeDestructChatMessageWithTime:time msgOwer:self.taklInfo.chatIdendifier sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key chatType:ChatType_Private];
+
+    ChatMessageInfo *chatMessageInfo = [LMMessageTool makeDestructChatMessageWithTime:time == 0?-1:time msgOwer:self.taklInfo.chatIdendifier sender:[[LKUserCenter shareCenter] currentLoginUser].pub_key chatType:ChatType_Private];
     
     GJGCChatFriendContentModel *snapChatModel = [GJGCChatFriendContentModel timeSubModel];
     snapChatModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
@@ -600,9 +600,6 @@
 
 - (void)enterSnapchatMode {
     for (GJGCChatFriendContentModel *model in self.chatListArray) {
-        /**
-         *  Control avatar display or hide
-         */
         model.isSnapChatMode = YES;
     }
     [self dispatchOptimzeRefresh];
@@ -860,6 +857,10 @@
     }
     //judge height
     [self addChatContentModel:messageContent];
+    
+    /// snap chat
+    messageContent.snapTime = self.taklInfo.snapChatOutDataTime;
+    
     dispatch_source_merge_data(_refreshListSource, 1);
     self.lastSendMsgTime = [[NSDate date] timeIntervalSince1970] * 1000;
     
@@ -1009,131 +1010,31 @@
 - (void)handleGetMessage:(ChatMessageInfo *)message isBitch:(BOOL)bitch complete:(BOOL)complete {
 
     if (message.messageType == GJGCChatFriendContentTypeSnapChat) {
-
         [self addMMMessage:message];
-        self.taklInfo.snapChatOutDataTime = 0;
-        [GCDQueue executeInMainQueue:^{
-            if (self.taklInfo.snapChatOutDataTime > 0) {
-                if ([self.delegate respondsToSelector:@selector(dataSourceManagerEnterSnapChat:)]) {
-                    [self.delegate dataSourceManagerEnterSnapChat:self];
-                }
-            } else {
-                if ([self.delegate respondsToSelector:@selector(dataSourceManagerCloseSnapChat:)]) {
-                    [self.delegate dataSourceManagerCloseSnapChat:self];
-                }
+        DestructMessage *desturct = (DestructMessage *)message.msgContent;
+        self.taklInfo.snapChatOutDataTime = desturct.time;
+        if (self.taklInfo.snapChatOutDataTime > 0) {
+            if ([self.delegate respondsToSelector:@selector(dataSourceManagerEnterSnapChat:)]) {
+                [self.delegate dataSourceManagerEnterSnapChat:self];
             }
-        }];
-        for (GJGCChatContentBaseModel *model in self.chatListArray) {
-            if (self.taklInfo.snapChatOutDataTime > 0) {
-                model.isSnapChatMode = YES;
-            } else {
-                model.isSnapChatMode = NO;
+            [self enterSnapchatMode];
+        } else {
+            if ([self.delegate respondsToSelector:@selector(dataSourceManagerCloseSnapChat:)]) {
+                [self.delegate dataSourceManagerCloseSnapChat:self];
             }
+            [self outSnapchatMode];
         }
-        //reload daga
-        [self dispatchOptimzeRefresh];
         return;
     }
-
     //remind
     [SystemTool showInstantMessageVoice];
+    
+    /// 发送已读消息
+    [self sendChatMessageAckWithChatMessageInfo:message];
 
-    if (self.taklInfo.talkType != GJGCChatFriendTalkTypeGroup &&
-            message.messageType != GJGCChatFriendContentTypeSnapChat) {
-        //Check whether the message contains the contents of the burn after reading
-        BOOL isSnapChatModel = NO;
-        if (self.taklInfo.snapChatOutDataTime > 0) {
-            isSnapChatModel = YES;
-            if (message.messageType == GJGCChatFriendContentTypeText) {
-                [self sendMessageReadAck:message];
-            }
-        }
-        if (message.snapTime > 0) {
-            if (isSnapChatModel && message.snapTime != self.taklInfo.snapChatOutDataTime) {
-                self.taklInfo.snapChatOutDataTime = (int) message.snapTime;
-                [[RecentChatDBManager sharedManager] openOrCloseSnapChatWithTime:self.taklInfo.snapChatOutDataTime chatIdentifer:self.taklInfo.chatIdendifier];
-                //Display a post burn time prompt message
-                GJGCChatFriendContentModel *snapChatModel = [GJGCChatFriendContentModel timeSubModel];
-                snapChatModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
-                snapChatModel.contentType = GJGCChatFriendContentTypeSnapChat;
-                snapChatModel.snapChatTipString = [GJGCChatSystemNotiCellStyle formateOpensnapChatWithTime:self.taklInfo.snapChatOutDataTime isSendToMe:YES chatUserName:self.taklInfo.chatUser.normalShowName];
-                snapChatModel.originTextMessage = snapChatModel.snapChatTipString.string;
-                NSArray *contentHeightArray = [self heightForContentModel:snapChatModel];
-                snapChatModel.contentHeight = [[contentHeightArray firstObject] floatValue];
-                NSDate *sendTime = [NSDate date];
-                snapChatModel.sendTime = [sendTime timeIntervalSince1970] * 1000;
-
-                snapChatModel.localMsgId = [ConnectTool generateMessageId];
-                [self addChatContentModel:snapChatModel];
-                /// 创建一条阅后即焚消息
-                ChatMessageInfo *desturctMessageInfo = [LMMessageTool makeDestructChatMessageWithTime:self.taklInfo.snapChatOutDataTime msgOwer:message.messageOwer sender:nil chatType:0];
-                [[MessageDBManager sharedManager] saveMessage:desturctMessageInfo];
-            }
-            if (!isSnapChatModel) {
-
-                if ([self.delegate respondsToSelector:@selector(dataSourceManagerEnterSnapChat:)]) {
-                    [self.delegate dataSourceManagerEnterSnapChat:self];
-                }
-                //Display a post burn time prompt message
-                self.taklInfo.snapChatOutDataTime = (int) message.snapTime;
-                GJGCChatFriendContentModel *snapChatModel = [GJGCChatFriendContentModel timeSubModel];
-                snapChatModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
-                snapChatModel.contentType = GJGCChatFriendContentTypeSnapChat;
-                snapChatModel.snapChatTipString = [GJGCChatSystemNotiCellStyle formateOpensnapChatWithTime:self.taklInfo.snapChatOutDataTime isSendToMe:YES chatUserName:self.taklInfo.chatUser.normalShowName];
-                snapChatModel.originTextMessage = snapChatModel.snapChatTipString.string;
-                NSArray *contentHeightArray = [self heightForContentModel:snapChatModel];
-                snapChatModel.contentHeight = [[contentHeightArray firstObject] floatValue];
-                NSDate *sendTime = [NSDate date];
-                snapChatModel.sendTime = [sendTime timeIntervalSince1970] * 1000;
-
-                snapChatModel.localMsgId = [ConnectTool generateMessageId];
-
-                [self addChatContentModel:snapChatModel];
-
-                /// 创建一条阅后即焚消息
-                ChatMessageInfo *desturctMessageInfo = [LMMessageTool makeDestructChatMessageWithTime:self.taklInfo.snapChatOutDataTime msgOwer:message.messageOwer sender:nil chatType:0];
-                [[MessageDBManager sharedManager] saveMessage:desturctMessageInfo];
-                
-                //Read ack
-                [self sendMessageReadAck:message];
-
-                [[RecentChatDBManager sharedManager] openOrCloseSnapChatWithTime:self.taklInfo.snapChatOutDataTime chatIdentifer:self.taklInfo.chatIdendifier];
-
-                for (GJGCChatContentBaseModel *model in self.chatListArray) {
-                    model.isSnapChatMode = YES;
-                }
-            }
-        } else {
-            if (isSnapChatModel) {
-                self.taklInfo.snapChatOutDataTime = 0;
-
-                if ([self.delegate respondsToSelector:@selector(dataSourceManagerCloseSnapChat:)]) {
-                    [self.delegate dataSourceManagerCloseSnapChat:self];
-                }
-                //Show off the burn after reading tips
-                GJGCChatFriendContentModel *snapChatModel = [GJGCChatFriendContentModel timeSubModel];
-                snapChatModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
-                snapChatModel.contentType = GJGCChatFriendContentTypeSnapChat;
-                snapChatModel.snapChatTipString = [GJGCChatSystemNotiCellStyle formateOpensnapChatWithTime:0 isSendToMe:YES chatUserName:self.taklInfo.chatUser.normalShowName];
-                snapChatModel.originTextMessage = snapChatModel.snapChatTipString.string;
-                NSArray *contentHeightArray = [self heightForContentModel:snapChatModel];
-                snapChatModel.contentHeight = [[contentHeightArray firstObject] floatValue];
-                NSDate *sendTime = [NSDate date];
-                snapChatModel.sendTime = (long long int) ([sendTime timeIntervalSince1970] * 1000);
-                snapChatModel.localMsgId = [ConnectTool generateMessageId];
-                [self addChatContentModel:snapChatModel];
-                
-                /// 创建一条关闭阅后即焚的消息
-                ChatMessageInfo *desturctMessageInfo = [LMMessageTool makeDestructChatMessageWithTime:self.taklInfo.snapChatOutDataTime msgOwer:message.messageOwer sender:nil chatType:0];
-                [[MessageDBManager sharedManager] saveMessage:desturctMessageInfo];
-                
-                [[RecentChatDBManager sharedManager] openOrCloseSnapChatWithTime:0 chatIdentifer:self.taklInfo.chatIdendifier];
-                for (GJGCChatContentBaseModel *model in self.chatListArray) {
-                    model.isSnapChatMode = NO;
-                }
-            }
-        }
-    }
+    /// 更新会话阅后即焚状态
+    [self updateSnapChatTimeWithTime:message.snapTime];
+    
     switch (message.messageType) {
         case GJGCChatFriendContentTypeGif:
         case GJGCChatFriendContentTypeText:
@@ -1170,6 +1071,49 @@
             break;
     }
 
+}
+
+- (void)updateSnapChatTimeWithTime:(int)time {
+    
+    if (self.taklInfo.snapChatOutDataTime == 0 && time > 0) {
+        [self enterSnapchatMode];
+        if ([self.delegate respondsToSelector:@selector(dataSourceManagerEnterSnapChat:)]) {
+            [self.delegate dataSourceManagerEnterSnapChat:self];
+        }
+    } else if (self.taklInfo.snapChatOutDataTime > 0 && time == 0) {
+        [self outSnapchatMode];
+        if ([self.delegate respondsToSelector:@selector(dataSourceManagerCloseSnapChat:)]) {
+            [self.delegate dataSourceManagerCloseSnapChat:self];
+        }
+    }
+    if (self.taklInfo.snapChatOutDataTime != time) {
+        self.taklInfo.snapChatOutDataTime = time;
+        [[RecentChatDBManager sharedManager] openOrCloseSnapChatWithTime:self.taklInfo.snapChatOutDataTime chatIdentifer:self.taklInfo.chatIdendifier];
+        //Display a post burn time prompt message
+        GJGCChatFriendContentModel *snapChatModel = [GJGCChatFriendContentModel timeSubModel];
+        snapChatModel.baseMessageType = GJGCChatBaseMessageTypeChatMessage;
+        snapChatModel.contentType = GJGCChatFriendContentTypeSnapChat;
+        snapChatModel.snapChatTipString = [GJGCChatSystemNotiCellStyle formateOpensnapChatWithTime:self.taklInfo.snapChatOutDataTime isSendToMe:YES chatUserName:self.taklInfo.chatUser.normalShowName];
+        snapChatModel.originTextMessage = snapChatModel.snapChatTipString.string;
+        NSArray *contentHeightArray = [self heightForContentModel:snapChatModel];
+        snapChatModel.contentHeight = [[contentHeightArray firstObject] floatValue];
+        NSDate *sendTime = [NSDate date];
+        snapChatModel.sendTime = [sendTime timeIntervalSince1970] * 1000;
+        
+        snapChatModel.localMsgId = [ConnectTool generateMessageId];
+        [self addChatContentModel:snapChatModel];
+        
+        /// 创建一条阅后即焚消息
+        ChatMessageInfo *desturctMessageInfo = [LMMessageTool makeDestructChatMessageWithTime:self.taklInfo.snapChatOutDataTime msgOwer:self.taklInfo.chatIdendifier sender:nil chatType:0];
+        [[MessageDBManager sharedManager] saveMessage:desturctMessageInfo];
+    }
+}
+
+- (void)sendChatMessageAckWithChatMessageInfo:(ChatMessageInfo *)chatMessageInfo {
+    if (chatMessageInfo.messageType == GJGCChatFriendContentTypeText &&
+        chatMessageInfo.snapTime > 0) {
+        [self sendMessageReadAck:chatMessageInfo];
+    }
 }
 
 - (void)updateChatContentMessageCounterCricleAnimation:(GJGCChatFriendContentModel *)contentModel {
@@ -1214,11 +1158,9 @@
         }
     }
     if (findContent && findIndex != NSNotFound) {
-        [GCDQueue executeInMainQueue:^{
-            findContent.sendStatus = status;
-            [self.chatListArray replaceObjectAtIndex:findIndex withObject:findContent];
-            [self.delegate dataSourceManagerRequireUpdateListTable:self reloadForUpdateMsgStateAtIndex:findIndex];
-        }];
+        findContent.sendStatus = status;
+        [self dispatchOptimzeRefresh];
+//        [self.delegate dataSourceManagerRequireUpdateListTable:self reloadForUpdateMsgStateAtIndex:findIndex];
     }
 }
 

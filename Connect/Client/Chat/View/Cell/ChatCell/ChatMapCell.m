@@ -158,11 +158,8 @@
 
 }
 
-- (void)successDownloadWithImageData:(NSData *)imageData {
-    if (imageData) {
-
-        UIImage *cacheImage = [UIImage imageWithData:imageData];
-
+- (void)successDownloadWithImageData:(UIImage *)cacheImage {
+    if (cacheImage) {
         if (self.contentModel.isSnapChatMode) {
             cacheImage = [cacheImage imageByBlurRadius:30 tintColor:nil tintMode:0 saturation:1 maskImage:nil];
         }

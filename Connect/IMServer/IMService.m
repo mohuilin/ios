@@ -307,12 +307,12 @@ static dispatch_once_t onceToken;
 - (void)uploadCookieDuetoLocalChatCookieNotMatchServerChatCookieWithMessageCallModel:(SendMessageModel *)callModel {
     
     ChatCacheCookie *chatCookie = [ChatCacheCookie new];
-    ChatCookieData *cookieData = [ChatCookieData new];
     chatCookie.chatPrivkey = [LMIMHelper creatNewPrivkey];
     chatCookie.chatPubKey = [LMIMHelper getPubkeyByPrikey:chatCookie.chatPrivkey];
     chatCookie.salt = [LMIMHelper createRandom512bits];
-    cookieData.expired = [[NSDate date] timeIntervalSince1970] + 24 * 60 * 60;
     
+    ChatCookieData *cookieData = [ChatCookieData new];
+    cookieData.expired = [[NSDate date] timeIntervalSince1970] + 24 * 60 * 60;
     cookieData.chatPubKey = chatCookie.chatPubKey;
     cookieData.salt = chatCookie.salt;
     
@@ -343,7 +343,7 @@ static dispatch_once_t onceToken;
     }
     
     FriendChatCookie *chatInfoAddress = [FriendChatCookie new];
-    chatInfoAddress.uid = chatUser.pub_key;
+    chatInfoAddress.uid = chatUser.pub_key;//@"03569e21b82f5524841f19adef77f02c0a5972419aa45f17ac4c5350d4ac2611cf";
     
     Message *m = [LMCommandAdapter sendAdapterWithExtension:BM_FRIEND_CHAT_COOKIE_EXT sendData:chatInfoAddress];
     m.sendOriginInfo = chatUser;
@@ -806,33 +806,6 @@ static dispatch_once_t onceToken;
     }
 }
 
-- (void)asyncSendMessage:(ChatMessage *)chatMsg
-           originContent:(GPBMessage *)originContent
-     uploadFileFailBlock:(GJCFFileUploadManagerTaskFaildBlock)faildBlock
-   uploadCompletionBlock:(GJCFFileUploadManagerTaskCompletionBlock)completionBlock
-           progressBlock:(GJCFFileUploadManagerUpdateTaskProgressBlock)progressBlock
-            groupEcdhKey:(NSString *)ecdhKey
-            contentModel:(GJGCChatFriendContentModel *)messageContent
-   sendMessageCompletion:(void (^)(ChatMessage *msgData,
-                                   NSError *error))completion {
-    switch (chatMsg.msgType) {
-        case GJGCChatFriendContentTypeAudio: // upload
-        case GJGCChatFriendContentTypeImage:
-        case GJGCChatFriendContentTypeVideo:
-        case GJGCChatFriendContentTypeMapLocation: {
-            
-        }
-            break;
-        default:
-        {
-            [self asyncSendMessage:chatMsg originContent:originContent chatEcdhKey:ecdhKey sendMessageCompletion:completion];
-        }
-            break;
-    }
-
-}
-
-
 - (void)asyncSendReadReceiptMessage:(MessageData *)msgData
            originContent:(GPBMessage *)originContent
               completion:(void (^)(ChatMessage *msgData,
@@ -859,6 +832,8 @@ static dispatch_once_t onceToken;
               completion:(void (^)(ChatMessage *msgData,
                                    NSError *error))completion {
 
+    DDLogInfo(@"send message data:%@\nmsgContent:%@",msgData,originContent);
+    
     [GCDQueue executeInQueue:self.messageSendQueue block:^{
         BOOL result = NO;
         switch (chatType) {
@@ -885,7 +860,7 @@ static dispatch_once_t onceToken;
             case GJGCChatFriendTalkTypePostSystem:
             {
                 MSMessage *msMessage = [[MSMessage alloc] init];
-                msMessage.msgId = [ConnectTool generateMessageId];
+                msMessage.msgId = msgData.chatMsg.msgId;
                 msMessage.body = originContent.data;
                 msMessage.category = msgData.chatMsg.msgType;
                 IMTransferData *imTransferData = [ConnectTool createTransferWithEcdhKey:[ServerCenter shareCenter].extensionPass data:msMessage.data aad:nil];
@@ -906,10 +881,11 @@ static dispatch_once_t onceToken;
 
 - (void)asyncSendMessage:(ChatMessage *)chatMsg
            originContent:(GPBMessage *)originContent
-             chatEcdhKey:(NSString *)ecdhKey
    sendMessageCompletion:(void (^)(ChatMessage *msgData,
                                    NSError *error))completion{
-    
+    /// 重新加密
+    MessageData *msgData = [LMMessageAdapter packageMessageDataWithTo:chatMsg.to chatType:chatMsg.chatType msgType:chatMsg.msgType ext:chatMsg.ext groupEcdh:nil cipherData:originContent];
+    [self asyncSendMessage:msgData originContent:originContent chatType:chatMsg.chatType completion:completion];
 }
 
 

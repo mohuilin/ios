@@ -12,7 +12,7 @@
 
 @property(nonatomic, strong) UIImageView *contentImageView;
 
-- (void)successDownloadWithImageData:(NSData *)imageData;
+- (void)successDownloadWithImageData:(UIImage *)cacheImage;
 
 - (void)failDownloadState;
 

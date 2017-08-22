@@ -61,14 +61,12 @@ static UserDBManager *manager = nil;
 
 - (void)batchSaveUsers:(NSArray *)users {
 
-    NSMutableArray *bitchRealmModel = [NSMutableArray array];
     for (AccountInfo *user in users) {
         LMContactAccountInfo *realmModel = [[LMContactAccountInfo alloc] initWithNormalInfo:user];
-        [bitchRealmModel addObject:realmModel];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm addOrUpdateObject:realmModel];
+        }];
     }
-    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-        [realm addOrUpdateObjectsFromArray:bitchRealmModel];
-    }];
 }
 
 - (void)deleteUserBypubkey:(NSString *)pubKey {

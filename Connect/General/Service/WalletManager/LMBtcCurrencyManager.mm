@@ -264,6 +264,11 @@ extern "C" {
 }
 
 -(void)decodeEncryptValue:(NSString *)encryptValue password:(NSString *)password complete:(void (^)(NSString *decodeValue,BOOL success))complete{
+    if (!encryptValue || encryptValue.length == 0 ) {
+        if (complete) {
+            complete(nil,NO);
+        }
+    }
     char value[256];
     char *ev = (char *)[encryptValue UTF8String];
     char *pass = (char *)[password UTF8String];

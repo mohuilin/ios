@@ -190,7 +190,8 @@
         }
             break;
         case GJGCChatWalletLink: {
-            resultString = [NSString stringWithFormat:@"%@:%@", senderUserName, LMLocalizedString(@"Link Web page", nil)];
+            WebsiteMessage *website = (WebsiteMessage *)msgContent;
+            resultString = [NSString stringWithFormat:@"%@:%@%@", senderUserName, LMLocalizedString(@"Link Web page", nil),website.title];
         }
             break;
         case 102: {
@@ -308,6 +309,7 @@
         case GJGCChatFriendContentTypeNameCard:
         case GJGCChatInviteToGroup:
         case GJGCChatApplyToJoinGroup:
+        case GJGCChatWalletLink:
             return YES;
             break;
         default:

@@ -39,7 +39,7 @@ CREATE_SHARED_MANAGER(LMConnectIMChater)
 - (void)sendReadAckWithMessageId:(NSString *)msgId to:(NSString *)to complete:(void (^)(ChatMessage *chatMsg,NSError *error))complete {
     /// 业务层
     GPBMessage *originMsg = [LMMessageTool makeReadReceiptWithMsgId:msgId];
-    MessageData *messageData = [LMMessageAdapter packageMessageDataWithTo:to chatType:ChatType_Private msgType:0 ext:nil groupEcdh:nil cipherData:originMsg];
+    MessageData *messageData = [LMMessageAdapter packageMessageDataWithTo:to chatType:ChatType_Private msgType:GJGCChatFriendContentTypeSnapChatReadedAck ext:nil groupEcdh:nil cipherData:originMsg];
     /// 发送数据
     [[IMService instance] asyncSendReadReceiptMessage:messageData originContent:originMsg completion:^(ChatMessage *msgData, NSError *error) {
         if (complete) {

@@ -35,7 +35,6 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
     ChatMessageInfo *chatMessageInfo = [self packSendMessageWithRetweetMessage:retweetModel.retweetMessage toFriend:retweetModel.toFriendModel];
     /// 保存消息
     [self savaMessageToDB:chatMessageInfo];
-    
     /// 迁移富文本数据 ,重新定义富文本的消息体的内容（清除之前消息的url信息，保留基本信息）
     switch (retweetModel.retweetMessage.messageType) {
         case GJGCChatFriendContentTypeImage:
@@ -52,6 +51,10 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
             NSString *currentFilePath = [[filePath stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
                                         stringByAppendingPathComponent:chatMessageInfo.messageOwer];
             ;
+            
+            if (!GJCFFileDirectoryIsExist(currentFilePath)) {
+                GJCFFileProtectCompleteDirectoryCreate(currentFilePath);
+            }
             
             NSString *originImagePath = [originFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.jpg", retweetModel.retweetMessage.messageId]];
             NSString *toImagePath = [currentFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.jpg", chatMessageInfo.messageId]];
@@ -78,6 +81,9 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
             NSString *currentFilePath = [[filePath stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
                                          stringByAppendingPathComponent:chatMessageInfo.messageOwer];
             ;
+            if (!GJCFFileDirectoryIsExist(currentFilePath)) {
+                GJCFFileProtectCompleteDirectoryCreate(currentFilePath);
+            }
             
             NSString *originCoverPath = [originFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-coverimage.jpg", retweetModel.retweetMessage.messageId]];
             NSString *toImagePath = [currentFilePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@coverimage.jpg", chatMessageInfo.messageId]];
@@ -96,9 +102,13 @@ CREATE_SHARED_MANAGER(LMRetweetMessageManager)
     
     /// 发送数据
     [[LMConnectIMChater sharedManager] sendChatMessageInfo:chatMessageInfo progress:^(NSString *to, NSString *msgId, CGFloat progress) {
-        
+        if (self.RetweetComplete) {
+            self.RetweetComplete(nil, progress);
+        }
     } complete:^(ChatMessageInfo *chatMsgInfo, NSError *error) {
-        
+        if (self.RetweetComplete) {
+            self.RetweetComplete(error, 1.1f); /// 1.1f 表示发送成功
+        }
     }];
 }
 

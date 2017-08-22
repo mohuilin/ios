@@ -26,6 +26,6 @@
 
 - (void)faildState;
 
-- (void)successDownloadWithImageData:(NSData *)imageData;
+- (void)successDownloadWithImageData:(UIImage *)image;
 
 @end

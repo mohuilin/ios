@@ -244,14 +244,10 @@ CREATE_SHARED_MANAGER(LMConversionManager)
         recentModel.name = group.groupName;
         recentModel.createTime = [NSDate date];
         recentModel.identifier = lastMessage.messageOwer;
-        recentModel.content = @"";
         recentModel.unReadCount = messageCount;
         recentModel.groupNoteMyself = groupNoteMyself;
-        NSString *sendName = nil;
-
-        LMRamMemberInfo *senderUser = nil;
-        
-        recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType msgContent:lastMessage.msgContent senderUserName:sendName];
+        LMRamMemberInfo *senderUser = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' and pubKey = '%@'",lastMessage.messageOwer,lastMessage.from]] lastObject];
+        recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType msgContent:lastMessage.msgContent senderUserName:senderUser.groupNicksName.length ? senderUser.groupNicksName:senderUser.username];
         recentModel.talkType = GJGCChatFriendTalkTypeGroup;
         recentModel.chatGroupInfo = group;
         recentModel.notifyStatus = [[RecentChatDBManager sharedManager] getMuteStatusWithIdentifer:recentModel.identifier];
@@ -264,9 +260,8 @@ CREATE_SHARED_MANAGER(LMConversionManager)
                 recentModel.groupNoteMyself = groupNoteMyself;
             }
         }
-        NSString *sendName = nil;
-        LMRamMemberInfo *senderUser = nil;
-        recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType msgContent:lastMessage.msgContent senderUserName:sendName];
+        LMRamMemberInfo *senderUser = [[LMRamMemberInfo objectsWhere:[NSString stringWithFormat:@"identifier = '%@' and pubKey = '%@'",lastMessage.messageOwer,lastMessage.from]] lastObject];
+        recentModel.content = [GJGCChatFriendConstans lastContentMessageWithType:lastMessage.messageType msgContent:lastMessage.msgContent senderUserName:senderUser.groupNicksName.length ? senderUser.groupNicksName:senderUser.username];
         if ([[SessionManager sharedManager].chatSession isEqualToString:recentModel.identifier]) {
             recentModel.unReadCount = 0;
         } else{

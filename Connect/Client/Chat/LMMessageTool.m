@@ -39,7 +39,7 @@
     if (date) {
         NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainAudioCacheDirectory];
         cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
-                          stringByAppendingPathComponent:group?group.groupIdentifer:user.address];
+                          stringByAppendingPathComponent:group?group.groupIdentifer:user.pub_key];
         
         if (!GJCFFileDirectoryIsExist(cacheDirectory)) {
             GJCFFileProtectCompleteDirectoryCreate(cacheDirectory);
@@ -350,7 +350,7 @@
             
         case GJGCChatFriendContentTypeVideo:
         {
-            VideoMessage *video = [self makeVideoWithSize:(int)messageContent.videoDuration time:messageContent.size videoCoverW:messageContent.originImageWidth videoCoverH:messageContent.originImageHeight videoUrl:nil videoCover:nil];
+            VideoMessage *video = [self makeVideoWithSize:messageContent.size time:(int)messageContent.videoDuration videoCoverW:messageContent.originImageWidth videoCoverH:messageContent.originImageHeight videoUrl:nil videoCover:nil];
             video.snapTime = snapTime;
             msg = video;
         }
@@ -463,7 +463,7 @@
             }
             NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainAudioCacheDirectory];
             cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
-                              stringByAppendingPathComponent:group?group.groupIdentifer:user.address];
+                              stringByAppendingPathComponent:group?group.groupIdentifer:user.pub_key];
             
             if (!GJCFFileDirectoryIsExist(cacheDirectory)) {
                 GJCFFileProtectCompleteDirectoryCreate(cacheDirectory);
@@ -648,7 +648,10 @@
             type = chatContentModel.contentType;
             PhotoMessage *photo = (PhotoMessage *)chatMessage.msgContent;
             chatContentModel.encodeFileUrl = photo.URL;
+            chatContentModel.imageMessageUrl = photo.URL;
             chatContentModel.encodeThumbFileUrl = photo.thum;
+            chatContentModel.originImageHeight = photo.imageHeight;
+            chatContentModel.originImageWidth = photo.imageWidth;
             
             if ([SessionManager sharedManager].talkType == GJGCChatFriendTalkTypePostSystem) {
                 if (photo.URL.length && chatContentModel.isFromSelf) {
@@ -664,7 +667,7 @@
             
             NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainImageCacheDirectory];
             cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
-                              stringByAppendingPathComponent:group?group.groupIdentifer:user.address];
+                              stringByAppendingPathComponent:group?group.groupIdentifer:user.pub_key];
             
             if (!GJCFFileDirectoryIsExist(cacheDirectory)) {
                 GJCFFileProtectCompleteDirectoryCreate(cacheDirectory);
@@ -685,9 +688,8 @@
             chatContentModel.downEncodeImageCachePath = downloadEncodeCachePath;
             chatContentModel.downThumbEncodeImageCachePath = downloadThumbEncodeCachePath;
             chatContentModel.thumbImageCachePath = thumbImageNamePath;
-            chatContentModel.originImageHeight = photo.imageHeight;
-            chatContentModel.originImageWidth = photo.imageWidth;
-
+            
+            
             if (GJCFFileIsExist(chatContentModel.thumbImageCachePath)) {
                 chatContentModel.isDownloadThumbImage = YES;
                 NSData *imageData = [NSData dataWithContentsOfFile:chatContentModel.thumbImageCachePath];
@@ -715,7 +717,7 @@
             
             NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainImageCacheDirectory];
             cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
-                              stringByAppendingPathComponent:group?group.groupIdentifer:user.address];
+                              stringByAppendingPathComponent:group?group.groupIdentifer:user.pub_key];
             
             if (!GJCFFileDirectoryIsExist(cacheDirectory)) {
                 GJCFFileProtectCompleteDirectoryCreate(cacheDirectory);
@@ -745,7 +747,7 @@
             chatContentModel.contentType = GJGCChatFriendContentTypeVideo;
             type = chatContentModel.contentType;
             VideoMessage *video = (VideoMessage *)chatMessage.msgContent;
-            chatContentModel.videoDuration = video.size;
+            chatContentModel.videoDuration = video.timeLength;
             
             int fileSize = video.size;
             float nM = fileSize / 1024 / 1024.f;
@@ -778,7 +780,7 @@
             
             NSString *cacheDirectory = [[GJCFCachePathManager shareManager] mainVideoCacheDirectory];
             cacheDirectory = [[cacheDirectory stringByAppendingPathComponent:[[LKUserCenter shareCenter] currentLoginUser].address]
-                              stringByAppendingPathComponent:group?group.groupIdentifer:user.address];
+                              stringByAppendingPathComponent:group?group.groupIdentifer:user.pub_key];
             
             if (!GJCFFileDirectoryIsExist(cacheDirectory)) {
                 GJCFFileProtectCompleteDirectoryCreate(cacheDirectory);

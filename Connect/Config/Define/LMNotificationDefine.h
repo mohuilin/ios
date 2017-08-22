@@ -8,6 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+// send message success
+extern NSString *const ConnnectSendMsgSuccessNotification;
+
+// send message failed
+extern NSString *const ConnnectSendMsgFailedNotification;
+
 // Download the completed notification
 
 extern NSString *const ConnnectDownAllCommonGroupCompleteNotification;

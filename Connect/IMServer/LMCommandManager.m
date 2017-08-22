@@ -1141,7 +1141,7 @@ CREATE_SHARED_MANAGER(LMCommandManager)
         DDLogInfo(@"update chatCookie success!");
         if (sendModel) {
             DDLogInfo(@"resend message....");
-            [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent chatEcdhKey:nil sendMessageCompletion:sendModel.callBack];
+            [[IMService instance] asyncSendMessage:sendModel.sendMsg originContent:sendModel.originContent sendMessageCompletion:sendModel.callBack];
         }
     } else if (command.errNo == 4) { //time error
         //note ui ,time error
