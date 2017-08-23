@@ -68,16 +68,12 @@ static LMRecommandFriendManager *manager = nil;
     if (friendArray.count <= 0) {
         return;
     }
-    NSMutableArray *addArray = [NSMutableArray array];
     for (LMFriendRecommandInfo *recommandInfo in friendArray) {
         if (!(recommandInfo.username.length <= 0 || recommandInfo.address.length <= 0)) {
-            [addArray addObject:recommandInfo];
+            [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                [realm addOrUpdateObject:recommandInfo];
+            }];
         }
-    }
-    if (addArray.count > 0) {
-        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-            [realm addOrUpdateObjectsFromArray:addArray];
-        }];
     }
 }
 

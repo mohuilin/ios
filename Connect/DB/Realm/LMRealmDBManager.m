@@ -362,7 +362,9 @@ static FMDatabaseQueue *queue;
 
     RLMRealm *realm = [RLMRealm defaultLoginUserRealm];
     [realm beginWriteTransaction];
-    [realm addOrUpdateObjectsFromArray:realmArray];
+    for (RLMObject *realmModel in realmArray) {
+        [realm addOrUpdateObject:realmModel];
+    }
     [realm commitWriteTransaction];
 }
 

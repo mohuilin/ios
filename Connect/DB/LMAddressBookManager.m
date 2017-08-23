@@ -55,9 +55,11 @@ static LMAddressBookManager *manager = nil;
         return;
     }
     if (addressBooks.count > 0) {
-        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-           [realm addOrUpdateObjectsFromArray:addressBooks];
-        }];
+        for (RLMObject *realmModel in addressBooks) {
+            [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                [realm addOrUpdateObject:realmModel];
+            }];
+        }
     }
 }
 

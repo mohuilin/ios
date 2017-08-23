@@ -69,18 +69,16 @@ static MessageDBManager *manager = nil;
 }
 
 - (void)saveBitchMessage:(NSArray *)messages {
-    NSMutableArray *bitchRealmMessages = [NSMutableArray array];
     for (ChatMessageInfo *messageInfo in messages) {
         if (GJCFStringIsNull(messageInfo.messageId) ||
                 GJCFStringIsNull(messageInfo.messageOwer)) {
             continue;
         }
         LMMessage *realmModel = [[LMMessage alloc] initWithNormalInfo:messageInfo];
-        [bitchRealmMessages addObject:realmModel];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm addOrUpdateObject:realmModel];
+        }];
     }
-    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-        [realm addOrUpdateObjectsFromArray:bitchRealmMessages];
-    }];
 }
 
 

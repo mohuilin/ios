@@ -112,7 +112,6 @@ CREATE_SHARED_MANAGER(LMWalletManager);
  */
 - (void)saveWallet:(RespSyncWallet *)syncWallet {
     
-    NSMutableArray *addedCurrencyArray = [NSMutableArray array];
     for (Coin *coinInfo in syncWallet.coinsArray) {
         LMCurrencyModel *getCurrencyModel = [[LMCurrencyModel objectsWhere:[NSString stringWithFormat:@"currency = %d",coinInfo.currency]] lastObject];
         if (getCurrencyModel) {
@@ -137,7 +136,10 @@ CREATE_SHARED_MANAGER(LMWalletManager);
             currenncyMoedl.masterAddress = nil;
             currenncyMoedl.defaultAddress = nil;
             currenncyMoedl.payload = coinInfo.payload;
-            [addedCurrencyArray addObject:currenncyMoedl];
+
+            [[LMRealmManager sharedManager] executeRealmWithRealmBlock:^(RLMRealm *realm) {
+                [realm addOrUpdateObject:currenncyMoedl];
+            }];
         }
     }
     
@@ -154,9 +156,6 @@ CREATE_SHARED_MANAGER(LMWalletManager);
                 [realm deleteObject:getSeedModel];
             }
             [realm addOrUpdateObject:saveSeedModel];
-        }
-        if (addedCurrencyArray.count) {
-            [realm addOrUpdateObjectsFromArray:addedCurrencyArray];
         }
     }];
 }

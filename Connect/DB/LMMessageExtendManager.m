@@ -43,8 +43,6 @@ static LMMessageExtendManager *manager = nil;
     if (array.count <= 0) {
         return;
     }
-    NSMutableArray *temArray = [NSMutableArray array];
-
     for (NSDictionary *dic  in array) {
         LMMessageExt *msgExt = [[LMMessageExt alloc] init];
         msgExt.messageId = [dic safeObjectForKey:@"message_id"];
@@ -53,12 +51,10 @@ static LMMessageExtendManager *manager = nil;
         msgExt.payCount = [[dic safeObjectForKey:@"pay_count"] intValue];
         msgExt.crowdCount = [[dic safeObjectForKey:@"crowd_count"] intValue];
 
-        [temArray addObject:msgExt];
+        [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
+            [realm addOrUpdateObject:msgExt];
+        }];
     }
-
-    [self executeRealmWithRealmBlock:^(RLMRealm *realm) {
-        [realm addOrUpdateObjectsFromArray:temArray];
-    }];
 }
 
 - (void)saveBitchMessageExtendDict:(NSDictionary *)dic {
