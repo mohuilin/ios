@@ -573,6 +573,10 @@ typedef NS_ENUM(NSUInteger, SourceType) {
         user = localUser;
     }
 
+    if ([user.pub_key isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].pub_key]) {
+        return;
+    }
+    
     if (!user.stranger) {
         UserDetailPage *page = [[UserDetailPage alloc] initWithUser:user];
         [self.navigationController pushViewController:page animated:YES];

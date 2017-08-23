@@ -291,10 +291,8 @@
 
 - (void)showUserDetailPageWithUser:(AccountInfo *)user {
     if ([user.address isEqualToString:[[LKUserCenter shareCenter] currentLoginUser].address]) {
-        MyInfoPage *page = [[MyInfoPage alloc] init];
-
-        [self.navigationController pushViewController:page animated:YES];
-
+//        MyInfoPage *page = [[MyInfoPage alloc] init];
+//        [self.navigationController pushViewController:page animated:YES];
         return;
     }
 

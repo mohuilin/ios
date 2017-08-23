@@ -335,7 +335,7 @@
         }
             break;
         case GJGCChatFriendContentTypeMapLocation: {
-            LocationMessage *location = [self makeLocationWithLatitude:messageContent.locationLatitude longitude:messageContent.locationLatitude address:messageContent.originTextMessage];
+            LocationMessage *location = [self makeLocationWithLatitude:messageContent.locationLatitude longitude:messageContent.locationLongitude address:messageContent.originTextMessage];
             msg = location;
         }
             break;
@@ -575,7 +575,7 @@
             CardMessage *card = (CardMessage *)chatMessage.msgContent;
             chatContentModel.contactAvatar = card.avatar;
             chatContentModel.contactPublickey = card.uid;
-            chatContentModel.contactAddress = nil;
+            chatContentModel.contactAddress = [KeyHandle getAddressByPubkey:card.uid];
             NSString *name = card.username;
             if (name != nil) {
                 NSMutableAttributedString *nameText = [[NSMutableAttributedString alloc] initWithString:name];

@@ -64,7 +64,7 @@ CREATE_SHARED_MANAGER(LMChatMsgUploadManager)
     [[GJCFFileUploadManager shareUploadManager] setCompletionBlock:^(GJCFFileUploadTask *task, FileData *fileData) {
         if (completion) {
             GPBMessage *originMsg = [task.userInfo valueForKey:@"originMsg"];
-            BOOL system = [task.userInfo valueForKey:@"system"];
+            BOOL system = [[task.userInfo valueForKey:@"system"] boolValue];
             NSString *chatId = [task.userInfo valueForKey:@"to"];
             NSString *msgId = [task.userInfo valueForKey:@"msgId"];
             NSString *fileUrl = nil;

@@ -8,6 +8,7 @@
 
 #import "GroupDBManager.h"
 #import "RecentChatDBManager.h"
+#import "LMRecentChat.h"
 
 static GroupDBManager *manager = nil;
 
@@ -259,8 +260,12 @@ static GroupDBManager *manager = nil;
     }
 
     LMRamGroupInfo *ramGroupInfo = [[LMRamGroupInfo objectsWhere:[NSString stringWithFormat:@"groupIdentifer = '%@' ",groupId]] lastObject];
+    LMRecentChat *recentChat = [[LMRecentChat objectsWhere:[NSString stringWithFormat:@"identifier = '%@' ",groupId]] lastObject];
     [self executeRealmWithBlock:^{
-       ramGroupInfo.groupName = name;
+        ramGroupInfo.groupName = name;
+        if (recentChat) {
+            recentChat.name = name;
+        }
     }];
     
 }
