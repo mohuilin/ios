@@ -20,6 +20,7 @@
 #import "LMVerifyTableHeadView.h"
 #import "LMRamGroupInfo.h"
 #import "LMIMHelper.h"
+#import "LMConnectIMChater.h"
 
 typedef NS_ENUM(NSUInteger, CellType) {
     CellTypeOther = 0,
@@ -302,30 +303,10 @@ static NSString *cellFrom_ID = @"LMGroupFromTableViewCellID";
     createGroup.secretKey = [[GroupDBManager sharedManager] getGroupEcdhKeyByGroupIdentifier:self.model.groupIdentifier];
 
     GcmData *groupInfoGcmData = [ConnectTool createGcmWithData:createGroup.data publickey:self.model.publickey needEmptySalt:YES];
-
     NSString *backUp = [NSString stringWithFormat:@"%@/%@", [[LKUserCenter shareCenter] currentLoginUser].pub_key, [StringTool hexStringFromData:groupInfoGcmData.data]];
     reviewed.backup = backUp;
-
-
-    NSString *messageID = [ConnectTool generateMessageId];
-    MessageData *messageData = [[MessageData alloc] init];
     
-    ChatMessage *msg = [ChatMessage new];
-    msg.cipherData = groupInfoGcmData;
-    msg.to = self.model.publickey;
-    msg.from = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-    msg.msgId = messageID;
-    
-    messageData.chatMsg = msg;
-    
-    
-    NSString *sign = [ConnectTool signWithData:messageData.data];
-    MessagePost *messagePost = [[MessagePost alloc] init];
-    messagePost.sign = sign;
-    messagePost.pubKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
-    messagePost.msgData = messageData;
-    
-    [[IMService instance] asyncSendGroupInfo:messagePost];
+    [[LMConnectIMChater sharedManager] sendCreateGroupMsg:createGroup to:self.model.publickey];
 
     [MBProgressHUD showLoadingMessageToView:self.view];
 

@@ -25,12 +25,20 @@ CREATE_SHARED_MANAGER(LMConnectIMChater)
 
 - (void)sendCreateGroupMsg:(CreateGroupMessage *)createGroupMessage to:(NSString *)to {
     /// 业务层
-    MessageData *msgData = [LMMessageAdapter packageMessageDataWithTo:to chatType:0 msgType:0 ext:nil groupEcdh:nil cipherData:createGroupMessage];
+    ChatMessage *chatMsg = [LMMessageTool chatMsgWithTo:to chatType:0 msgType:0 ext:nil];
+    GcmData *groupInfoGcmData = [ConnectTool createGcmWithData:createGroupMessage.data publickey:to needEmptySalt:YES];
+    chatMsg.cipherData = groupInfoGcmData;
+    
+    MessageData *msgData = [MessageData new];
+    msgData.chatMsg = chatMsg;
+    
+    
     NSString *sign = [ConnectTool signWithData:msgData.data];
     MessagePost *messagePost = [[MessagePost alloc] init];
-    messagePost.pubKey = [LKUserCenter shareCenter].currentLoginUser.pub_key;
-    messagePost.msgData = msgData;
     messagePost.sign = sign;
+    messagePost.pubKey = [[LKUserCenter shareCenter] currentLoginUser].pub_key;
+    messagePost.msgData = msgData;
+
     [[IMService instance] asyncSendGroupInfo:messagePost];
 }
 

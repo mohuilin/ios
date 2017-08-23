@@ -186,9 +186,7 @@
         if (info != [membsers lastObject]) {
             [welcomeTip appendString:@"、"];
         }
-        ChatMessage *chatMsg = [LMMessageTool chatMsgWithTo:info.pubKey chatType:0 msgType:0 ext:nil];
-        MessagePost *messagePost = (MessagePost *)[LMMessageAdapter packageChatMsg:chatMsg groupEcdh:nil cipherData:groupMessage];
-        [[IMService instance] asyncSendGroupInfo:messagePost];
+        [[LMConnectIMChater sharedManager] sendCreateGroupMsg:groupMessage to:info.pubKey];
     }
     //create local message
     NSString *myChatTip = [NSString stringWithFormat:LMLocalizedString(@"Link invited to the group chat", nil), LMLocalizedString(@"Chat You", nil), welcomeTip];

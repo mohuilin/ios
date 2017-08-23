@@ -416,6 +416,7 @@
     chatMsg.to = to;
     chatMsg.msgType = msgType;
     chatMsg.ext = ext;
+    chatMsg.msgId = [ConnectTool generateMessageId];
     chatMsg.msgTime = [[NSDate date] timeIntervalSince1970] * 1000;
     chatMsg.chatType = chatType;
     
