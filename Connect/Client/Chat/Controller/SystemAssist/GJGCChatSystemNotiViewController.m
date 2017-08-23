@@ -55,14 +55,8 @@
 - (void)chatCellDidTapDetail:(GJGCChatBaseCell *)tapedCell {
     NSIndexPath *tapIndexPath = [self.chatListTable indexPathForCell:tapedCell];
     GJGCChatFriendContentModel *chatContentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
-    if ([chatContentModel.typeString isEqualToString:@"redpackge"]) {
+    if (chatContentModel.hashID.length) {
         [self showRedBagDetailWithHashId:chatContentModel.hashID];
-    }
-    if ([chatContentModel.typeString isEqualToString:@"addressnotify"]) {
-        NSString *url = [NSString stringWithFormat:@"%@%@", txDetailBaseUrl, chatContentModel.hashID];
-        CommonClausePage *page = [[CommonClausePage alloc] initWithUrl:url];
-        page.title = LMLocalizedString(@"Wallet Transaction detail", nil);
-        [self.navigationController pushViewController:page animated:YES];
     }
 }
 

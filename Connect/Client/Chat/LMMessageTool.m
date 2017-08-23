@@ -505,7 +505,6 @@
             chatContentModel.originTextMessage = webSite.URL;
             if ([[GJGCChatContentEmojiParser sharedParser] isWalletUrlString:chatContentModel.originTextMessage]) {
                 chatContentModel.contentType = GJGCChatWalletLink;
-                type = chatContentModel.contentType;
                 if ([webSite.URL containsString:@"transfer?"]) {
                     chatContentModel.walletLinkType = LMWalletlinkTypeOuterTransfer;
                 } else if ([webSite.URL containsString:@"packet?"]) {

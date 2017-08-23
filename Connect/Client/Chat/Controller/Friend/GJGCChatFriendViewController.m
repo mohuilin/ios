@@ -930,7 +930,6 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
 
 - (void)redBagCellDidTap:(GJGCChatBaseCell *)tappedCell {
-
     __weak __typeof(&*self) weakSelf = self;
     NSIndexPath *tapIndexPath = [self.chatListTable indexPathForCell:tappedCell];
     GJGCChatFriendContentModel *chatContentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
@@ -1098,6 +1097,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
 
 - (void)showRedBagDetailWithHashId:(NSString *)hashId {
+    [MBProgressHUD showLoadingMessageToView:self.view];
     __weak __typeof(&*self) weakSelf = self;
     [RedBagNetWorkTool getRedBagDetailWithHashId:hashId complete:^(RedPackageInfo *bagInfo, NSError *error) {
         if (error) {
