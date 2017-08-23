@@ -613,6 +613,9 @@
 		D92233361E83DBC300D67110 /* WallteNetWorkTool.m in Sources */ = {isa = PBXBuildFile; fileRef = D92233321E83DBC300D67110 /* WallteNetWorkTool.m */; };
 		D92241061EF11C290066565C /* LMIMHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = D92241051EF11C290066565C /* LMIMHelper.mm */; };
 		D926FEB41EE13EE00080DA56 /* LMTransactionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D926FEB31EE13EE00080DA56 /* LMTransactionModel.m */; };
+		D93FB3081F4D369E0078B642 /* LMMultiTransferDetailController.m in Sources */ = {isa = PBXBuildFile; fileRef = D93FB3071F4D369E0078B642 /* LMMultiTransferDetailController.m */; };
+		D93FB30B1F4D4E2B0078B642 /* LMMultiTransferCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D93FB30A1F4D4E2B0078B642 /* LMMultiTransferCell.m */; };
+		D93FB30D1F4D4E460078B642 /* LMMultiTransferCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D93FB30C1F4D4E460078B642 /* LMMultiTransferCell.xib */; };
 		D943CD5C1EB083B100BE94EF /* GcmDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D943CD5B1EB083B100BE94EF /* GcmDataModel.m */; };
 		D943CD7A1EB0866C00BE94EF /* GJGCChatSystemNotiCellStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = D943CD681EB0866C00BE94EF /* GJGCChatSystemNotiCellStyle.m */; };
 		D943CD7C1EB0866C00BE94EF /* GJGCChatSystemNotiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D943CD6C1EB0866C00BE94EF /* GJGCChatSystemNotiModel.m */; };
@@ -2146,6 +2149,11 @@
 		D92241051EF11C290066565C /* LMIMHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LMIMHelper.mm; sourceTree = "<group>"; };
 		D926FEB21EE13EE00080DA56 /* LMTransactionModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMTransactionModel.h; sourceTree = "<group>"; };
 		D926FEB31EE13EE00080DA56 /* LMTransactionModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMTransactionModel.m; sourceTree = "<group>"; };
+		D93FB3061F4D369E0078B642 /* LMMultiTransferDetailController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMMultiTransferDetailController.h; sourceTree = "<group>"; };
+		D93FB3071F4D369E0078B642 /* LMMultiTransferDetailController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMMultiTransferDetailController.m; sourceTree = "<group>"; };
+		D93FB3091F4D4E2B0078B642 /* LMMultiTransferCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMMultiTransferCell.h; sourceTree = "<group>"; };
+		D93FB30A1F4D4E2B0078B642 /* LMMultiTransferCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMMultiTransferCell.m; sourceTree = "<group>"; };
+		D93FB30C1F4D4E460078B642 /* LMMultiTransferCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LMMultiTransferCell.xib; sourceTree = "<group>"; };
 		D943CD5A1EB083B100BE94EF /* GcmDataModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GcmDataModel.h; sourceTree = "<group>"; };
 		D943CD5B1EB083B100BE94EF /* GcmDataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GcmDataModel.m; sourceTree = "<group>"; };
 		D943CD671EB0866C00BE94EF /* GJGCChatSystemNotiCellStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJGCChatSystemNotiCellStyle.h; sourceTree = "<group>"; };
@@ -14822,6 +14830,8 @@
 				192350AD1E81213F0022D844 /* OuterTransferHisPage.m */,
 				192350AE1E81213F0022D844 /* OuterTransferViewController.h */,
 				192350AF1E81213F0022D844 /* OuterTransferViewController.m */,
+				D93FB3061F4D369E0078B642 /* LMMultiTransferDetailController.h */,
+				D93FB3071F4D369E0078B642 /* LMMultiTransferDetailController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -14896,6 +14906,9 @@
 				1923511F1E8121CB0022D844 /* WalletItemCell.xib */,
 				D912C01E1F2B1D1E00A97E1A /* LMNoteCreateWalletView.h */,
 				D912C01F1F2B1D1E00A97E1A /* LMNoteCreateWalletView.m */,
+				D93FB3091F4D4E2B0078B642 /* LMMultiTransferCell.h */,
+				D93FB30A1F4D4E2B0078B642 /* LMMultiTransferCell.m */,
+				D93FB30C1F4D4E460078B642 /* LMMultiTransferCell.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -32570,6 +32583,7 @@
 				D9222F721E822A3000D67110 /* natureName.plist in Resources */,
 				D922303F1E822A3100D67110 /* nervous_laugh.gif in Resources */,
 				D95C03671E8108D8006C5C8A /* LMApplyJoinToGroupViewController.xib in Resources */,
+				D93FB30D1F4D4E460078B642 /* LMMultiTransferCell.xib in Resources */,
 				D9222F711E822A3000D67110 /* nature.plist in Resources */,
 				D92230401E822A3100D67110 /* nervous_laugh@3x.png in Resources */,
 				F16FD8161EC3205F002F9395 /* cmath.SUNWCCh in Resources */,
@@ -32830,6 +32844,7 @@
 				192351451E8121CB0022D844 /* TransferInputView.m in Sources */,
 				F116E9601EA06AA500DCAED4 /* LMMessageExtendManager.m in Sources */,
 				D95C036B1E8108D8006C5C8A /* LMGroupChooseNoteMemberlistPage.m in Sources */,
+				D93FB30B1F4D4E2B0078B642 /* LMMultiTransferCell.m in Sources */,
 				D95C03741E8108D8006C5C8A /* LMProgressView.m in Sources */,
 				192350431E811F520022D844 /* NCellImageValue1.m in Sources */,
 				D92232B01E822BF800D67110 /* GJCFAudioRecordSettings.m in Sources */,
@@ -33435,6 +33450,7 @@
 				D91529EA1F2098BA0067C475 /* UIViewController+CurrencyVC.m in Sources */,
 				D92232B41E822BF800D67110 /* CaptureSessionManager.m in Sources */,
 				D92232811E822BF800D67110 /* NSObject+AddProperty.m in Sources */,
+				D93FB3081F4D369E0078B642 /* LMMultiTransferDetailController.m in Sources */,
 				D92232AC1E822BF800D67110 /* GJCFFileDownloadTask+GJCFAudioDownload.m in Sources */,
 				D95C03681E8108D8006C5C8A /* LMchatGroupManageViewController.m in Sources */,
 				D97FDCAE1E86664800B161C8 /* YYTextLine.m in Sources */,

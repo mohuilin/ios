@@ -21,7 +21,7 @@
 
 // user group
 @property(nonatomic, strong) NSMutableArray *members;
-@property (nonatomic ,copy) void (^completeBlock)(NSString *hashId,NSString *tips);
+@property (nonatomic ,copy) void (^completeBlock)(long long amount,NSString *hashId,NSString *tips);
 
 @end
 
@@ -30,7 +30,7 @@ static NSString *friends = @"friends";
 @implementation LMGroupFriendsViewController
 
 
-- (instancetype)initWithMembers:(NSArray *)member complete:(void (^)(NSString *hashId,NSString *tips))complete {
+- (instancetype)initWithMembers:(NSArray *)member complete:(void (^)(long long amount,NSString *hashId,NSString *tips))complete {
     if (self = [super init]) {
         self.members = member.mutableCopy;
         self.completeBlock = complete;

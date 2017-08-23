@@ -596,7 +596,7 @@
             type = chatContentModel.contentType;
             TransferMessage *transfer = (TransferMessage *)chatMessage.msgContent;
             int status = [[LMMessageExtendManager sharedManager] getStatus:transfer.hashId];
-            chatContentModel.transferMessage = [GJGCChatSystemNotiCellStyle formateTransferWithAmount:transfer.amount isSendToMe:!chatContentModel.isFromSelf isOuterTransfer:[SessionManager sharedManager].talkType == GJGCChatFriendTalkTypePostSystem];
+            chatContentModel.transferMessage = [GJGCChatSystemNotiCellStyle formateTransferWithAmount:transfer.amount isSendToMe:!chatContentModel.isFromSelf isOuterTransfer:[SessionManager sharedManager].talkType == GJGCChatFriendTalkTypePostSystem chatType:[SessionManager sharedManager].talkType];
             chatContentModel.transferSubTipMessage = [GJGCChatSystemNotiCellStyle formateCellLeftSubTipsWithType:GJGCChatFriendContentTypeTransfer withNote:transfer.tips isCrowding:NO];
             if ([SessionManager sharedManager].talkType != GJGCChatFriendTalkTypePostSystem) {
                 chatContentModel.transferStatusMessage = [GJGCChatSystemNotiCellStyle formateRecieptSubTipsWithTotal:1 payCount:1 isCrowding:NO transStatus:status == 0 ? 1 : status];
@@ -1002,7 +1002,7 @@
             chatContentModel.hashID = transactionModel.hashId;
             chatContentModel.tipNote = transactionModel.note;
             chatContentModel.amount = transactionModel.amount.longLongValue;
-            chatContentModel.transferMessage = [GJGCChatSystemNotiCellStyle formateTransferWithAmount:chatContentModel.amount isSendToMe:NO isOuterTransfer:talkModel.talkType == GJGCChatFriendTalkTypePostSystem];
+            chatContentModel.transferMessage = [GJGCChatSystemNotiCellStyle formateTransferWithAmount:chatContentModel.amount isSendToMe:NO isOuterTransfer:talkModel.talkType == GJGCChatFriendTalkTypePostSystem chatType:talkModel.talkType];
         }
             break;
         case GJGCChatFriendContentTypeRedEnvelope:{

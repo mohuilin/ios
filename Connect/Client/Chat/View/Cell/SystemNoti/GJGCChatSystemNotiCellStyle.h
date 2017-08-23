@@ -70,7 +70,7 @@
  * @param isOuterTransfer
  * @return
  */
-+ (NSAttributedString *)formateTransferWithAmount:(long long int)amount isSendToMe:(BOOL)isSendToMe isOuterTransfer:(BOOL)isOuterTransfer;
++ (NSAttributedString *)formateTransferWithAmount:(long long int)amount isSendToMe:(BOOL)isSendToMe isOuterTransfer:(BOOL)isOuterTransfer chatType:(ChatType)chatType;
 
 /**
  * fromart receipt message

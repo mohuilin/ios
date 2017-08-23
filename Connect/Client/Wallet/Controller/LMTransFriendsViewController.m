@@ -29,7 +29,7 @@ static NSString *const identifier = @"cellIdentifier";
 @property(nonatomic, strong) NSMutableDictionary *addressDic;
 @property(nonatomic, strong) TransferInputView *inputAmountView;
 
-@property(nonatomic ,copy) void (^completeBlock)(NSString *hashId,NSString *tips);
+@property(nonatomic ,copy) void (^completeBlock)(long long amount,NSString *hashId,NSString *tips);
 @property(nonatomic, strong) NSMutableArray *selectArr;
 @property(copy, nonatomic) changeListBlock changeListBlock;
 
@@ -37,7 +37,7 @@ static NSString *const identifier = @"cellIdentifier";
 
 @implementation LMTransFriendsViewController
 
-- (instancetype)initWithSelectedMembers:(NSArray *)seletedMembers changeListBlock:(changeListBlock)changeListBlock complete:(void (^)(NSString *hashId,NSString *tips))complete{
+- (instancetype)initWithSelectedMembers:(NSArray *)seletedMembers changeListBlock:(changeListBlock)changeListBlock complete:(void (^)(long long amount,NSString *hashId,NSString *tips))complete{
     if (self = [super init]) {
         self.selectArr = (NSMutableArray *)seletedMembers;
         self.changeListBlock = changeListBlock;
@@ -285,7 +285,7 @@ static NSString *const identifier = @"cellIdentifier";
         } else {
             NSString *hashId = (NSString *)data;
             if (self.completeBlock) {
-                self.completeBlock(hashId, note);
+                self.completeBlock([money decimalNumberByMultiplyingBy:[[NSDecimalNumber alloc] initWithInt:userIds.count]].longLongValue,hashId, note);
             }
             [MBProgressHUD showToastwithText:LMLocalizedString(@"Wallet Transfer Successful", nil) withType:ToastTypeSuccess showInView:self.view complete:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];

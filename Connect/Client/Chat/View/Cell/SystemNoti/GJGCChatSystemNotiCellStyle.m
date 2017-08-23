@@ -291,13 +291,17 @@
     return timeStr;
 }
 
-+ (NSAttributedString *)formateTransferWithAmount:(long long int)amount isSendToMe:(BOOL)isSendToMe isOuterTransfer:(BOOL)isOuterTransfer {
++ (NSAttributedString *)formateTransferWithAmount:(long long int)amount isSendToMe:(BOOL)isSendToMe isOuterTransfer:(BOOL)isOuterTransfer chatType:(ChatType)chatType{
     NSString *payMessage = [NSString stringWithFormat:LMLocalizedString(@"Chat Transfer to other BTC", nil), [PayTool getBtcStringWithAmount:amount]];
-    if (isSendToMe) {
-        payMessage = [NSString stringWithFormat:LMLocalizedString(@"Chat Transfer to you BTC", nil), [PayTool getBtcStringWithAmount:amount]];
-    }
-    if (isOuterTransfer) {
-        payMessage = [NSString stringWithFormat:LMLocalizedString(@"Chat You receive a transfer BTC", nil), [PayTool getBtcStringWithAmount:amount]];
+    if (chatType == ChatType_Groupchat) {
+        payMessage = @"转账到群组";
+    } else {
+        if (isSendToMe) {
+            payMessage = [NSString stringWithFormat:LMLocalizedString(@"Chat Transfer to you BTC", nil), [PayTool getBtcStringWithAmount:amount]];
+        }
+        if (isOuterTransfer) {
+            payMessage = [NSString stringWithFormat:LMLocalizedString(@"Chat You receive a transfer BTC", nil), [PayTool getBtcStringWithAmount:amount]];
+        }
     }
     NSMutableAttributedString *descText = [[NSMutableAttributedString alloc] initWithString:payMessage];
     [descText addAttribute:NSFontAttributeName

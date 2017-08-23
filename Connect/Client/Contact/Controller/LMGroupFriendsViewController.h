@@ -10,6 +10,6 @@
 
 @interface LMGroupFriendsViewController : LMBaseViewController
 
-- (instancetype)initWithMembers:(NSArray *)member complete:(void (^)(NSString *hashId,NSString *tips))complete;
+- (instancetype)initWithMembers:(NSArray *)member complete:(void (^)(long long amount,NSString *hashId,NSString *tips))complete;
 
 @end

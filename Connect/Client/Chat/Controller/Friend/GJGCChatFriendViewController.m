@@ -55,6 +55,7 @@
 #import "LMMessageTool.h"
 #import "LMIMHelper.h"
 #import "UIImageView+YYWebImage.h"
+#import "LMMultiTransferDetailController.h"
 
 #define GJGCActionSheetCallPhoneNumberTag 132134
 
@@ -1279,6 +1280,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 }
 
 - (void)transforCellDidTap:(GJGCChatBaseCell *)tapedCell {
+    
     [MBProgressHUD showLoadingMessageToView:self.view];
     NSIndexPath *tapIndexPath = [self.chatListTable indexPathForCell:tapedCell];
     GJGCChatFriendContentModel *chatContentModel = (GJGCChatFriendContentModel *) [self.dataSourceManager contentModelAtIndex:tapIndexPath.row];
@@ -1317,17 +1319,26 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
         }];
     } else {
         [WallteNetWorkTool queryBillInfoWithTransactionhashId:chatContentModel.hashID complete:^(NSError *erro, Bill *bill) {
-            [MBProgressHUD hideHUDForView:weakself.view];
-            LMReciptNotesViewController *noteVc = [[LMReciptNotesViewController alloc] init];
-            noteVc.user = user;
-            noteVc.PayStatus = YES;
-            noteVc.bill = bill;
-            [weakself.navigationController pushViewController:noteVc animated:YES];
-            if (bill.status == 2) {
-                chatContentModel.transferStatusMessage = [GJGCChatSystemNotiCellStyle formateRecieptSubTipsWithTotal:1 payCount:1 isCrowding:NO transStatus:2];
-                [GCDQueue executeInMainQueue:^{
-                    [self.chatListTable reloadData];
-                }];
+            if (!erro) {
+                [MBProgressHUD hideHUDForView:weakself.view];
+                if (self.taklInfo.talkType == ChatType_Groupchat) {
+                    LMMultiTransferDetailController *pagff = [[LMMultiTransferDetailController alloc] initWithBill:bill groupInfo:self.taklInfo.chatGroupInfo];
+                    [self.navigationController pushViewController:pagff animated:YES];
+                } else {
+                    LMReciptNotesViewController *noteVc = [[LMReciptNotesViewController alloc] init];
+                    noteVc.user = user;
+                    noteVc.PayStatus = YES;
+                    noteVc.bill = bill;
+                    [weakself.navigationController pushViewController:noteVc animated:YES];
+                    if (bill.status == 2) {
+                        chatContentModel.transferStatusMessage = [GJGCChatSystemNotiCellStyle formateRecieptSubTipsWithTotal:1 payCount:1 isCrowding:NO transStatus:2];
+                        [GCDQueue executeInMainQueue:^{
+                            [self.chatListTable reloadData];
+                        }];
+                    }
+                }
+            } else {
+                [MBProgressHUD showToastwithText:[LMErrorCodeTool messageWithErrorCode:-1] withType:ToastTypeFail showInView:weakself.view complete:nil];
             }
         }];
     }
@@ -1780,7 +1791,7 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
             } else {
                 NSString *taskIdentifier = nil;
                 if (!imageContentModel.isDownloadThumbImage) {
-                    if (imageContentModel.encodeThumbFileUrl) {
+                    if (imageContentModel.encodeThumbFileUrl.length) {
                         GJCFFileDownloadTask *downloadTask = [GJCFFileDownloadTask taskWithDownloadUrl:imageContentModel.encodeThumbFileUrl withCachePath:imageContentModel.downThumbEncodeImageCachePath withObserver:self getTaskIdentifer:&taskIdentifier];
                         imageContentModel.downloadTaskIdentifier = taskIdentifier;
                         if (self.taklInfo.talkType != GJGCChatFriendTalkTypePrivate && self.taklInfo.talkType != GJGCChatFriendTalkTypeGroup) {
@@ -1805,8 +1816,8 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
                         [self addDownloadTask:downloadTask];
                     }
                 }
-                if (!imageContentModel.isDownloadImage && imageContentModel.isDownloadThumbImage) {
-                    if (imageContentModel.encodeFileUrl) {
+                if (!imageContentModel.isDownloadImage) {
+                    if (imageContentModel.encodeFileUrl.length) {
                         GJCFFileDownloadTask *downloadOriginTask = [GJCFFileDownloadTask taskWithDownloadUrl:imageContentModel.encodeFileUrl withCachePath:imageContentModel.downEncodeImageCachePath withObserver:self getTaskIdentifer:&taskIdentifier];
                         imageContentModel.downloadTaskIdentifier = taskIdentifier;
                         if (self.taklInfo.talkType != GJGCChatFriendTalkTypePrivate && self.taklInfo.talkType != GJGCChatFriendTalkTypeGroup) {
@@ -2396,20 +2407,20 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
 
 #pragma mark - send transfer message
 - (void)transfer {
+    __weak __typeof(&*self) weakSelf = self;
     if (self.taklInfo.talkType == GJGCChatFriendTalkTypeGroup) {
         NSMutableArray *memberInfoArray = [NSMutableArray array];
         for (LMRamMemberInfo *info in self.taklInfo.chatGroupInfo.membersArray) {
             AccountInfo *accountInfo = (AccountInfo *)info.normalInfo;
             [memberInfoArray addObject:accountInfo];
         }
-        LMGroupFriendsViewController *page = [[LMGroupFriendsViewController alloc] initWithMembers:memberInfoArray complete:^(NSString *hashId, NSString *tips) {
-            
+        LMGroupFriendsViewController *page = [[LMGroupFriendsViewController alloc] initWithMembers:memberInfoArray complete:^(long long amount,NSString *hashId, NSString *tips) {
+            [weakSelf sendTransferMessageWithAmount:[PayTool getBtcStringWithAmount:amount] transactionID:hashId note:tips];
         }];
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:page];
         [self presentViewController:nav animated:YES completion:nil];
 
     } else {
-        __weak __typeof(&*self) weakSelf = self;
         LMChatSingleTransferViewController *transferVc = [[LMChatSingleTransferViewController alloc] init];
         transferVc.didGetTransferMoney = ^(NSString *money, NSString *hashId, NSString *notes) {
             [weakSelf sendTransferMessageWithAmount:money transactionID:hashId note:notes];

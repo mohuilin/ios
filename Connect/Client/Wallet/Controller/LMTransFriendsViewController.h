@@ -12,6 +12,6 @@ typedef void (^changeListBlock)();
 
 @interface LMTransFriendsViewController : LMBaseViewController
 
-- (instancetype)initWithSelectedMembers:(NSArray *)seletedMembers changeListBlock:(changeListBlock)changeListBlock complete:(void (^)(NSString *hashId,NSString *tips))complete;
+- (instancetype)initWithSelectedMembers:(NSArray *)seletedMembers changeListBlock:(changeListBlock)changeListBlock complete:(void (^)(long long amount,NSString *hashId,NSString *tips))complete;
 
 @end
