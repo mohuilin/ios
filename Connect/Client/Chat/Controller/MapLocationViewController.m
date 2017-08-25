@@ -106,11 +106,8 @@
 }
 
 - (void)doRight:(id)sender {
-    CGFloat height = DEVICE_SIZE.height / 3;
-    self.annotationImageView.hidden = YES;
-    UIImage *image = [self.view screenShotWithFrame:CGRectMake(0, self.view.center.y - (height / 2), DEVICE_SIZE.width, height)];
     self.annotationImageView.hidden = NO;
-
+    UIImage *image = [self.view screenShotWithFrame:CGRectMake(0, self.view.center.y, DEVICE_SIZE.width, 208 / 434.f * DEVICE_SIZE.width)];
     [MBProgressHUD showMessage:LMLocalizedString(@"Common Loading", nil) toView:self.view];
 
     __weak __typeof(&*self) weakSelf = self;

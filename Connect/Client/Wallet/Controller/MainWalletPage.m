@@ -65,7 +65,9 @@
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    [self checkWalletExist];
+    if (!self.maskView) {
+        [self checkWalletExist];
+    }
 }
 
 #pragma lazy

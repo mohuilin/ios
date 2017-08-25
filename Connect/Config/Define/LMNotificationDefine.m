@@ -9,6 +9,13 @@
 // Download the completed notification
 
 
+// upload file success
+NSString *const ConnnectUploadFileSuccessNotification = @"ConnnectUploadFileSuccessNotification";
+
+// upload file failed
+extern NSString *const ConnnectUploadFileFailedNotification;
+NSString *const ConnnectUploadFileFailedNotification = @"ConnnectUploadFileFailedNotification";
+
 // send message success
 NSString *const ConnnectSendMsgSuccessNotification = @"ConnnectSendMsgSuccessNotification";
 // send message failed

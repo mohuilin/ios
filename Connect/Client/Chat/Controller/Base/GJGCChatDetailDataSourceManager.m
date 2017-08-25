@@ -1159,8 +1159,9 @@
     }
     if (findContent && findIndex != NSNotFound) {
         findContent.sendStatus = status;
-        [self dispatchOptimzeRefresh];
-//        [self.delegate dataSourceManagerRequireUpdateListTable:self reloadForUpdateMsgStateAtIndex:findIndex];
+        if ([self.delegate respondsToSelector:@selector(dataSourceManagerSnapChatUpdateListTable:)]) {
+            [self.delegate dataSourceManagerSnapChatUpdateListTable:self];
+        }
     }
 }
 

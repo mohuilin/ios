@@ -8,6 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
+// upload file success
+extern NSString *const ConnnectUploadFileSuccessNotification;
+// upload file success
+extern NSString *const ConnnectUploadFileFailedNotification;
+
 // send message success
 extern NSString *const ConnnectSendMsgSuccessNotification;
 

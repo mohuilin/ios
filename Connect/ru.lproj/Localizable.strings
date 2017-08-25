@@ -384,7 +384,7 @@
 "Login Encrypted private key"="Шифрование приватного ключа";
 "Login Generated Failure"="Сбой при создании, пожалуйста  убедитесь, что вы настроили звук микрофона";
 "Login Generated Successful"="Успешное создание";
-"Login Generating Bitcoin address"="Создание биткоин адреса как подключиться к услуге ID";
+"Login Generating Bitcoin address"="Создание Btc адреса";
 "Login Generating Private and Public Key"="Создание публичного и частного ключей...";
 "Login Import private key"="Импорт приватного ключа";
 "Login Import your backup"="Импорт резервной копии или другой приватный ключ";

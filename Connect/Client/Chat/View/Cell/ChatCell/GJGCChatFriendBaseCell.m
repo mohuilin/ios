@@ -140,7 +140,7 @@
         [self.headView setHeadImage:nil];
     }
 
-    if (self.isGroupChat && !self.isFromSelf) {
+    if (self.isGroupChat && !self.isFromSelf && chatContentModel.senderName) {
         self.nameLabel.hidden = NO;
         NSAttributedString *name = [[NSAttributedString alloc] initWithString:chatContentModel.senderName];
         self.nameLabel.contentAttributedString = name;

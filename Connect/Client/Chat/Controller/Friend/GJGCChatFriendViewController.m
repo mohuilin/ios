@@ -116,11 +116,34 @@ static NSString *const GJGCActionSheetAssociateKey = @"GJIMSimpleCellActionSheet
     RegisterNotify(ConnnectGroupInfoDidDeleteMember, @selector(removeGroupMember:))
     RegisterNotify(ConnnectGroupInfoDidAddMembers, @selector(addmemberToGroup:))
     RegisterNotify(ConnnectContactDidChangeNotification, @selector(contactChange:))
+    RegisterNotify(ConnnectUploadFileSuccessNotification, @selector(uploadFileSuccess:))
+    RegisterNotify(ConnnectUploadFileFailedNotification, @selector(uploadFileFailed:))
     [self.inputPanel startKeyboardObserve];
 
     //Receive external lackypackge
     if (!GJCFStringIsNull(self.outterRedpackHashid)) {
         [self grabRedBagWithHashId:self.outterRedpackHashid senderName:self.taklInfo.chatUser.username sendAddress:nil];
+    }
+}
+
+- (void)uploadFileSuccess:(NSNotification *)note {
+    NSString *to = [note.object valueForKey:@"to"];
+    NSString *msgId = [note.object valueForKey:@"msgId"];
+    if ([to isEqualToString:self.taklInfo.chatIdendifier]) {
+        GJGCChatFriendContentModel *model = (GJGCChatFriendContentModel *)[self.dataSourceManager contentModelByMsgId:msgId];
+        model.uploadSuccess = YES;
+        [self.chatListTable reloadData];
+    }
+}
+
+- (void)uploadFileFailed:(NSNotification *)note {
+    NSString *to = [note.object valueForKey:@"to"];
+    NSString *msgId = [note.object valueForKey:@"msgId"];
+    if ([to isEqualToString:self.taklInfo.chatIdendifier]) {
+        GJGCChatFriendContentModel *model = (GJGCChatFriendContentModel *)[self.dataSourceManager contentModelByMsgId:msgId];
+        model.sendStatus = GJGCChatFriendSendMessageStatusFaild;
+        model.uploadSuccess = NO;
+        [self.chatListTable reloadData];
     }
 }
 

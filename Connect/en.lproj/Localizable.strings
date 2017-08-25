@@ -384,7 +384,7 @@
 "Login Encrypted private key"="Encrypted private key";
 "Login Generated Failure"="Create failed, please make sure you've made sound/voice around the mic";
 "Login Generated Successful"="Generated Successful";
-"Login Generating Bitcoin address"="Generating Bitcoin address as Connect ID";
+"Login Generating Bitcoin address"="BTC address is being generated";
 "Login Generating Private and Public Key"="Generating Private & Public Key";
 "Login Import private key"="Import private key";
 "Login Import your backup"="Import your backup\nor another bitcoin private key";

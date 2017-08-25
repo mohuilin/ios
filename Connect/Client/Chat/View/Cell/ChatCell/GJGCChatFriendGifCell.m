@@ -167,7 +167,9 @@
     }
 
     CGSize nameSize = CGSizeZero;
-    if (chatContentModel.isGroupChat && !chatContentModel.isFromSelf) {
+    if (chatContentModel.isGroupChat &&
+        !chatContentModel.isFromSelf &&
+        chatContentModel.senderName) {
         NSAttributedString *name = [[NSAttributedString alloc] initWithString:chatContentModel.senderName];
         nameSize = [GJCFCoreTextContentView contentSuggestSizeWithAttributedString:name forBaseContentSize:CGSizeMake(DEVICE_SIZE.width - AUTO_WIDTH(150), 25)];
         nameSize.height += 3;

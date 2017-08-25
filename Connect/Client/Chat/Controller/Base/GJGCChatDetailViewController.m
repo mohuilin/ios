@@ -233,7 +233,6 @@
                 break;
             case 6://crowding pay note
             {
-                ChatMessageInfo *chatMessage = [note.object valueForKey:@"chatMessage"];
                 NSString *operation = @"";
                 NSArray *temA = [operation componentsSeparatedByString:@"/"];
                 Crowdfunding *crowdInfo = [note.object valueForKey:@"crowdfunding"];

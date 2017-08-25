@@ -91,7 +91,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = LMLocalizedString(@"Login creat account", nil);
+    if (self.seedSourceType == SeedSouceTypeWallet) {
+        self.title = @"创建钱包";
+    } else {
+        self.title = LMLocalizedString(@"Login creat account", nil);
+    }
     self.displayLable.text = nil;
     [self setup];
     [self canRecord];

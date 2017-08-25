@@ -198,7 +198,6 @@ static dispatch_queue_t _gjcfFileDownloadManagerOperationQueue ;
 
 - (void)completionWithTask:(GJCFFileDownloadTask *)task
 {
-    NSArray *taskObservers = task.taskObservers;
     task.taskState = GJFileDownloadStateSuccess;
     NSData *downloadDecodeData = nil;
     BOOL cacheState = NO;
@@ -210,7 +209,6 @@ static dispatch_queue_t _gjcfFileDownloadManagerOperationQueue ;
         } else{
             GcmData *gcmData = [GcmData parseFromData:downloadData error:nil];
             downloadDecodeData = [ConnectTool decodeGcmDataWithEcdhKey:task.ecdhkey GcmData:gcmData];
-            //
             cacheState = GJCFFileWrite(downloadDecodeData, task.temOriginFilePath);
             // Delete the downloaded encrypted data
             GJCFFileDeleteFile(task.downEncodeDataCachePath);

@@ -59,6 +59,8 @@ CREATE_SHARED_MANAGER(LMChatMsgUploadManager)
         if (completion) {
             completion(nil,nil,nil,error);
         }
+        /// 发送上传成功的通知
+        SendNotify(ConnnectUploadFileFailedNotification, task.userInfo);
     } forObserver:self];
 
     [[GJCFFileUploadManager shareUploadManager] setCompletionBlock:^(GJCFFileUploadTask *task, FileData *fileData) {
@@ -67,6 +69,7 @@ CREATE_SHARED_MANAGER(LMChatMsgUploadManager)
             BOOL system = [[task.userInfo valueForKey:@"system"] boolValue];
             NSString *chatId = [task.userInfo valueForKey:@"to"];
             NSString *msgId = [task.userInfo valueForKey:@"msgId"];
+
             NSString *fileUrl = nil;
             if (system) {
                 fileUrl = [NSString stringWithFormat:@"%@?token=%@", fileData.URL, fileData.token];
@@ -93,6 +96,8 @@ CREATE_SHARED_MANAGER(LMChatMsgUploadManager)
                 }
                 completion(originMsg,chatId,msgId,nil);
             }
+            /// 发送上传成功的通知
+            SendNotify(ConnnectUploadFileSuccessNotification, task.userInfo);
         }
     } forObserver:self];
     [[GJCFFileUploadManager shareUploadManager] setProgressBlock:^(GJCFFileUploadTask *task, CGFloat progressValue) {

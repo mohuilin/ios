@@ -20,7 +20,7 @@
 @implementation LMMessageAdapter
 
 + (ChatMessageInfo *)decodeMessageWithMassagePost:(MessagePost *)msgPost groupECDH:(NSString *)groupECDH {
-    NSData *data = [ConnectTool decodeGcmDataWithEcdhKey:[StringTool hexStringToData:groupECDH] GcmData:msgPost.msgData.chatMsg.cipherData haveStructData:YES];;
+    NSData *data = [ConnectTool decodeGcmDataWithEcdhKey:[StringTool hexStringToData:groupECDH] GcmData:msgPost.msgData.chatMsg.cipherData haveStructData:NO];
     ChatMessageInfo *chatMessage = [self chatMessageInfoWithChatMsg:msgPost.msgData.chatMsg originMsg:[self parseDataWithData:data msgType:msgPost.msgData.chatMsg.msgType]];
     
     return chatMessage;
@@ -529,7 +529,7 @@
             break;
             
         case GJGCChatFriendTalkTypeGroup:{
-            chatMsg.cipherData = [ConnectTool createGcmWithData:chatMessageInfo.msgContent.data ecdhKey:[StringTool hexStringToData:groupEcdh] needEmptySalt:NO];
+            chatMsg.cipherData = [ConnectTool createGcmDataWithEcdhkey:[StringTool hexStringToData:groupEcdh] data:chatMessageInfo.msgContent.data aad:nil];
         }
             break;
             
